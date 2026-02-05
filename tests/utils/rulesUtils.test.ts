@@ -36,6 +36,7 @@ describe("rules/utils", () => {
       substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: [],
+      scheduleDays: [],
       rulePolicyCitations: {
         "shift-break-limits": "policy-shift-override"
       }
