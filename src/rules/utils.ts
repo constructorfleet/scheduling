@@ -4,7 +4,8 @@ import type {
   FieldTripType,
   SegmentBlock,
   StaffAssignment,
-  Employee
+  Employee,
+  ScheduleDay
 } from "../domain/types";
 import type { RulesContext } from "./types";
 

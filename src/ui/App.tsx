@@ -25,7 +25,7 @@ import {
 import { GuidedStep, RuleViolation as UiRuleViolation, SubstituteAssignmentCard } from "./types";
 import { ScheduleStatus, PolicyCitation } from "../domain/types";
 import { createRulesEngine } from "../rules/engine";
-import type { RuleViolation as EngineRuleViolation } from "../rules/types";
+import type { RuleViolation as EngineRuleViolation, RulesContext } from "../rules/types";
 
 const RULE_TITLES: Record<string, string> = {
   "ratio-segment": "Ratio staffing gap",
@@ -86,10 +86,11 @@ export default function App() {
   const [undoCount, setUndoCount] = useState(2);
   const [redoCount, setRedoCount] = useState(0);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
+  const [scheduleDaysState, _] = useState([]);
 
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
-    const context = {
+    const context: RulesContext = {
       segmentBlocks,
       staffAssignments,
       employees,
@@ -97,7 +98,8 @@ export default function App() {
       fieldTripEvents: fieldTripEventsState,
       fieldTripTypes,
       policyCitations: POLICY_CITATION_LIST,
-      rulePolicyCitations: RULE_POLICY_CITATIONS
+      rulePolicyCitations: RULE_POLICY_CITATIONS,
+      scheduleDays: scheduleDaysState
     };
     return engine.evaluate(context);
   }, [
