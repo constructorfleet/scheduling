@@ -141,7 +141,7 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 ### QA-RULE-024 – Schedule day references a missing field trip event (violation)
 - **Preconditions:** a `ScheduleDay` supplies `fieldTripEventId` but the corresponding event is absent from `context.fieldTripEvents`.
 - **Expectation:** `schedule-day-metadata` emits a violation pointing to the day and lists `fieldTripEventId` inside `metadata` so users see the dangling reference.
-- **Next Step:** add a dedicated unit test to capture this lookup failure once the fixture is available.
+- **Verification:** `tests/rules/rulesEngine.test.ts:778-799` (the `day-missing-event` fixture explicitly asserts the violation and metadata payload).
 
 ## Rule: field-trip-event (Field trip event integrity)
 - **Source:** `DOMAIN_MODEL.md:263-292` (FieldTripEvent lifecycle) and `src/rules/definitions.ts:400-438`.
@@ -159,9 +159,9 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 ### QA-RULE-027 – Event references an unknown type (violation)
 - **Preconditions:** `FieldTripEvent` sets `fieldTripTypeId` to a value that does not exist in `context.fieldTripTypes` while `isNoFieldTrip` is false.
 - **Expectation:** the rule emits a violation tying `target.metadata.fieldTripTypeId` to the missing ID so the user can rebuild their ratio profiles.
-- **Next Step:** add this fixture and expectation to `tests/rules/rulesEngine.test.ts` to prove the lookup guard works.
+- **Verification:** `tests/rules/rulesEngine.test.ts:881-905` (`ft-event-unknown` ensures the rule flags the missing `fieldTripTypeId` metadata).
 
 ### QA-RULE-028 – Event declares “No Field Trip” (clean)
 - **Preconditions:** `FieldTripEvent.isNoFieldTrip` is `true` and `fieldTripTypeId` is empty; the event is linked to a `ScheduleDay`.
 - **Expectation:** the rule short-circuits and emits no violation despite the empty ratio profile.
-- **Note:** the `day-valid` test already exercises this behavior indirectly, but a focused test would keep the rule’s short-circuit explicit.
+- **Verification:** `tests/rules/rulesEngine.test.ts:855-878` (`ft-event-no-trip` proves the rule skips validation when the event marks “No Field Trip”).

@@ -3,6 +3,24 @@
 ## Purpose
 This guide crystallizes how the project keeps every compliance rule, UX flow, and deployment gate testable without a live walkthrough. The goal is to make onboarding QA, product, and ops partners self-sufficient: every artifact references a cataloged policy, every guardrail links to a test, and the execution story signals the current blockers and next steps.
 
+## Key test focus areas
+- **Clock-in/out-driven scheduling.** Every block is entered via HH:MM AM/PM start and end times, and the rule engine must handle multiple non-contiguous blocks per day without reverting to Morning/Midday/Afternoon segments. Jest fixtures and Playwright guided flows validate that gaps, overlaps, and coverage shortages instantly raise the expected violations and that editing the same data clears them once the rules pass again.
+- **Configuration panels (staff/ratios/certifications).** The staff roster page lets users add, edit, and remove employees plus adjust their certifications and ratio requirements. Automated domain tests (`tests/domain/...`) and the Playwright configuration path confirm the UI accepts new staff, enforces required fields, notifies about expired certifications, and re-triggers validation when any roster property changes.
+- **Field trip & schedule-type metadata.** Each calendar day links to a schedule type (Regular / Extended / Enrichment) and either a field-trip type or the explicit “No Field Trip” flag. Tests prove every validation path described in `RULES_TEST_CASES.md` (missing schedule type, missing enrollment, dangling field-trip refs, unknown types, sign-off omissions) and ensure ratio enforcement honors overrides only when approvals exist.
+- **Enrollment headcounts & ratios.** Editable enrollment counts drive ratio math for every block, so both Jest and Playwright suites check that updating the count automatically recalculates required staff, surfaces new violations if coverage shrinks, and clears the violation the moment the threshold is satisfied.
+- **Validation lifecycle.** There is no “mark addressed” option—violations stay active until the underlying cataloged rule is satisfied. The rule-engine tests re-run after every data mutation, confirming the engine only clears violations when the data is compliant and automatically surfaces the updated citation metadata in the UI.
+- **Persistence and audit readiness.** Every edit flows into storage (IndexedDB/JSON journal), emits audit entries, and drives replayable snapshots. QA verifies the journaled output in `test-results/` after running the suites, ensuring that troubleshooting information matches the violated rule metadata.
+
+## Feature coverage matrix
+| Feature | Automation / Manual | Key assertions |
+| --- | --- | --- |
+| Multi-block staff scheduling | Jest (`tests/rules/rulesEngine.test.ts`) + Playwright guided workflow | Multiple non-contiguous blocks per staff can co-exist; ratio violations trigger gap/high-hour alerts; editing start/end times clears the violation only when coverage meets the calculated demands. |
+| Staff roster & certification management | Jest/domain unit tests + manual UI checks | Adding/removing staff, editing certifications/expiration dates, and associating ratio flags immediately triggers validation; missing documentation surfaces in UI and prevents publishing. |
+| Field trip & schedule type metadata | Jest + `RULES_TEST_CASES.md` catalog + Playwright | Days must reference a schedule type and either a valid field-trip type or “No Field Trip”; unknown IDs, missing selections, and sign-off gaps consistently emit QA-RULE-022—028. |
+| Enrollment headcounts | Jest + Playwright | Changing enrollment updates required headcount for ratio math, and violations track once per `ScheduleDay`; the UI reflects the new requirement and unlocks publishing after revalidation. |
+| Validation lifecycle | Jest + React/Playwright UI integration | Violations stay active until the actual data change removes the root cause; no manual “mark addressed” path; re-running the rule engine (and Playwright flows) confirms the lifecycle. |
+| Persistence & audit trail | Regression checks + manual artifact inspection | Running the full suite writes structured journal snapshots/audit entries; `test-results/` gets updated with the same violation IDs seen in the UI so compliance reviews can replay the timeline. |
+
 ## Compliance-first philosophy
 - **Policy-driven automation.** Every test suite maps back to a citation in `RULES_TEST_CASES.md` and the policy-aware definitions in `src/rules/definitions.ts`. When policies change, the catalog entry and the failing fixture tell the story, so auditors can trace a violation from UI > fixture > rule definition > citation without asking a developer.
 - **Early validation.** Validation errors flow from the rule engine and are cleared only when the underlying data passes the check, so pass/fail states are deterministic and never manually toggled.

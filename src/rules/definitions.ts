@@ -495,6 +495,9 @@ export const fieldTripSignoffRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.fieldTripEvents.forEach((event) => {
+      if (event.isNoFieldTrip) {
+        return;
+      }
       const missing: string[] = [];
       if (!event.approverId) {
         missing.push("approverId");

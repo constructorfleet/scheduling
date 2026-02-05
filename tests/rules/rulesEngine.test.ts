@@ -775,6 +775,29 @@ describe("RulesEngine", () => {
     expect(dayViolations).toHaveLength(0);
   });
 
+  test("reports schedule days referencing missing field trip events", () => {
+    const day = createScheduleDay("day-missing-event", {
+      fieldTripEventId: "ft-missing"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const dayViolation = violations.find(
+      (violation) =>
+        violation.ruleId === "schedule-day-metadata" && violation.target.id === day.id
+    );
+    expect(dayViolation).toBeDefined();
+    expect(dayViolation?.target.metadata).toEqual({ fieldTripEventId: "ft-missing" });
+  });
+
   test("flags field trip events that neither declare no-trip nor point to a type", () => {
     const fieldTripEvent = createFieldTripEvent("ft-event-missing-meta", {
       scheduleDayId: "day-ft-missing"
@@ -827,5 +850,57 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const eventViolation = violations.find((violation) => violation.ruleId === "field-trip-event");
     expect(eventViolation).toBeUndefined();
+  });
+
+  test("skips validation when field trip declares no trip", () => {
+    const fieldTripEvent = createFieldTripEvent("ft-event-no-trip", {
+      scheduleDayId: "day-ft-no-trip",
+      isNoFieldTrip: true
+    });
+    const day = createScheduleDay("day-ft-no-trip", {
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const eventViolation = violations.find(
+      (violation) =>
+        violation.ruleId === "field-trip-event" && violation.target.id === fieldTripEvent.id
+    );
+    expect(eventViolation).toBeUndefined();
+  });
+
+  test("flags field trip events referencing unknown types", () => {
+    const fieldTripEvent = createFieldTripEvent("ft-event-unknown", {
+      scheduleDayId: "day-ft-unknown",
+      fieldTripTypeId: "missing-type",
+      approverId: "director",
+      signedOffAt: "2026-02-05T09:00:00Z"
+    });
+    const day = createScheduleDay("day-ft-unknown", {
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const eventViolation = violations.find((violation) => violation.ruleId === "field-trip-event");
+    expect(eventViolation).toBeDefined();
+    expect(eventViolation?.target.metadata).toEqual({ fieldTripTypeId: "missing-type" });
   });
 });
