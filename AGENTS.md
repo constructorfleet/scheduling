@@ -79,7 +79,7 @@ THERE IS NO AGE PROFILES IN THIS PROJECT! DO NOT ADD THEM! REMOVE ANY REFERENCES
 Allow user to enter clock-in and clock-out times.
 Allow staff to have multiple non-contiguous working blocks on any given day.
 
-![alt text](<docs/Example Schedule Spreadsheet.png>)
+![Schedule Wireframe](<docs/Example Schedule Spreadsheet.png>)
 
 ### Configuration
 User can add, remove and maintain employees and their properties via the web ui.
