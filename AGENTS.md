@@ -85,3 +85,5 @@ Staff scheduling should be based on clock-in/clock-out times - which can be ente
 User can add, remove and maintain employees and their properties via the web ui.
 User can add, remove and maintain the ratios and certification requirements viat he web ui.
 User cannot mark validations as addressed - validations are cleared when the data passes validation.
+
+ALWAYS COMMIT YOUR CHANGES WITH CONVENTIONAL COMMIT FORMAT!

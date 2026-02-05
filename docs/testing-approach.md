@@ -94,3 +94,4 @@ Each QA rule defines the compliance edge case that must stay covered:
 1. **Resolve the Playwright host/port block** so `npm run test:e2e` can exercise the guided workflow (field trips, substitutes, publish gating).
 2. **Connect the live data layer** to `src/ui/App.tsx` and the scheduling workspace so compliance tests run against editable/persistent schedules instead of mocks.
 3. **Add Playwright/React specs for QA-RULE-017—021** so the UI automation exposes every guardrail before a week can move past draft status.
+4. **Create the missing schedule-day and field-trip fixtures (`QA-RULE-024`/`QA-RULE-027`) and rerun `npm test -- tests/rules/rulesEngine.test.ts` once `jest-environment-jsdom` is installed** so the rule-engine suite can cover the new metadata validations without manual approval toggles.
