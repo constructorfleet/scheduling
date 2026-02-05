@@ -122,6 +122,7 @@ scheduling/
 
 ### I want to deploy
 → Check **artifacts/phase-9-deployment/** (deployment guide)  
+→ Use **artifacts/phase-9-deployment/deployment-checklist.md** for the repeatable build/deploy verification steps  
 → Run: `npm run build:static`  
 → Run: `npm run deploy:static`  
 

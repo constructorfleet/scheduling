@@ -2,7 +2,7 @@ import type { Config } from "@jest/types";
 
 const config: Config.InitialOptions = {
   preset: "ts-jest",
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   roots: ["<rootDir>/tests", "<rootDir>/src"],
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: false,

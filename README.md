@@ -223,6 +223,7 @@ npm run build:static
 AWS_S3_BUCKET=<bucket> npm run deploy:static
 
 # Deployment details live in artifacts/phase-9-deployment/deployment-guide.md
+# The same folder now includes `deployment-checklist.md`, a hands-on release checklist that walks through build verification, metadata review, cache invalidation, and post-deploy validation so every launch follows the same reproducible steps.
 ```
 
 `npm run build:static` wraps `scripts/build-static.sh`, which starts with `npm run clean`, optionally runs `npm run type-check` (set `SKIP_TYPE_CHECK=1` to skip this step), executes the Vite build into `dist/ui`, stages everything under `dist-static/`, writes `build-metadata.json` (commit/branch/timestamp/environment) for audit tracing, and produces a `dist-static-<timestamp>.tar.gz` archive for release records. Lint (`npm run lint`) and tests (`npm test`) are not part of this script, so run them before you publish a release candidate. Once built, verify `build-metadata.json` locks the bundle to a known commit and follow the deployment guide for cache-invalidation, metadata tracking, and smoke-test recommendations.

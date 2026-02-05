@@ -84,6 +84,10 @@ The Scheduling Application is a standalone HTML5 experience with offline-first b
 - Check `build-metadata.json` via HTTP to ensure the served bundle matches the release under test (use curl or the browser devtools network inspector).  
 - Promote automated sanity checks (e.g., Playwright smoke tests against the deployed URL) as part of the release pipeline.
 
+## Deployment checklist
+- Use `artifacts/phase-9-deployment/deployment-checklist.md` as your step-by-step pre-deployment/verification guide so every release touches the same static bundle, metadata, cache invalidation, and audit log items.
+- Keep the checklist in sync with the `build-static.sh` and `deploy-static.sh` scripts (see `artifacts/phase-9-deployment/build-scripts/README.md`) so you don't miss an extra manual step when the automation changes.
+
 ## Operational notes
 - Cache expiration: set far-future caching on `assets/` (hash-based), but keep `index.html`/`build-metadata.json` short-lived so directors see the latest release.  
 - Audit trail: add a short note to your deployment log referencing the metadata `generatedAt` timestamp and commit so the compliance team can trace every change.  
