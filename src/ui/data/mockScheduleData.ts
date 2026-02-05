@@ -180,8 +180,8 @@ const createSegmentBlocks = (): SegmentBlock[] => {
   const blocks: SegmentBlock[] = [];
 
   for (const day of daySequence) {
-    for (const segmentKey of Object.keys(segmentSlots) as DaySegment[]) {
-      const slot = segmentSlots[segmentKey];
+    for (const segmentKey of Object.keys(segmentSlotDefinitions) as DaySegment[]) {
+      const slot = segmentSlotDefinitions[segmentKey];
       const id = `segment-${day}-${segmentKey}`;
       const isFieldTrip = day === "fri" && segmentKey === "mid";
       const childCount = slot.baseChildCount + (isFieldTrip ? 3 : 0);
