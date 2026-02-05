@@ -78,7 +78,7 @@ THERE IS NO AGE PROFILES IN THIS PROJECT! DO NOT ADD THEM! REMOVE ANY REFERENCES
 ## The schedule
 Allow user to enter clock-in and clock-out times.
 Allow staff to have multiple non-contiguous working blocks on any given day.
-
+Staff scheduling should be based on clock-in/clock-out times - which can be entered as any HH:MM AM/PM of the day within the operating ours.
 ![Schedule Wireframe](<docs/Example Schedule Spreadsheet.png>)
 
 ### Configuration
