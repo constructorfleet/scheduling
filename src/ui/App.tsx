@@ -15,7 +15,6 @@ import {
   fieldTripEvents,
   fieldTripTypes,
   policyCitations,
-  ruleViolations,
   segmentBlocks,
   segmentSlotDefinitions,
   staffAssignments,
@@ -23,8 +22,47 @@ import {
   weekMeta,
   schools
 } from "./data/mockScheduleData";
-import { GuidedStep, RuleViolation, SubstituteAssignmentCard } from "./types";
-import { ScheduleStatus } from "../domain/types";
+import { GuidedStep, RuleViolation as UiRuleViolation, SubstituteAssignmentCard } from "./types";
+import { ScheduleStatus, PolicyCitation } from "../domain/types";
+import { createRulesEngine } from "../rules/engine";
+import type { RuleViolation as EngineRuleViolation } from "../rules/types";
+
+const RULE_TITLES: Record<string, string> = {
+  "ratio-segment": "Ratio staffing gap",
+  "certification-per-segment": "Certification missing",
+  "segment-coverage": "Coverage guardrail",
+  "shift-break-limits": "Shift limit breach",
+  "substitute-parity": "Substitute metadata",
+  "field-trip-ratios": "Field trip ratio",
+  "field-trip-signoff": "Field trip sign-off"
+};
+
+const RECOMMENDED_ACTIONS: Record<string, string> = {
+  "ratio-segment": "Add a certified staff member or adjust child counts so the segment meets the ratio.",
+  "certification-per-segment": "Reassign staff with the required CPR, medical delegation, or leader qualification.",
+  "segment-coverage": "Bring a leader-qualified or medically delegated staff member into the block.",
+  "shift-break-limits": "Split the shift into shorter blocks or assign a break to stay under the cap.",
+  "substitute-parity": "Capture the missing substitute metadata (approver, timestamp, parity) before confirming.",
+  "field-trip-ratios": "Reconcile adult and leader counts with the ratio required for this trip.",
+  "field-trip-signoff": "Add the director approver name and timestamp so the trip can publish."
+};
+
+const RULE_POLICY_CITATIONS = {
+  "ratio-segment": policyCitations.ratio.id,
+  "certification-per-segment": policyCitations.ratio.id,
+  "segment-coverage": policyCitations.leaderCoverage.id,
+  "shift-break-limits": policyCitations.breakPolicy.id,
+  "substitute-parity": policyCitations.leaderCoverage.id,
+  "field-trip-ratios": policyCitations.fieldTrip.id,
+  "field-trip-signoff": policyCitations.fieldTrip.id
+} as const;
+
+const SEVERITY_MAP: Record<EngineRuleViolation["severity"], UiRuleViolation["severity"]> = {
+  error: "critical",
+  warning: "warning"
+};
+
+const POLICY_CITATION_LIST = Object.values(policyCitations);
 
 type WeekDirection = "prev" | "next";
 
@@ -42,19 +80,82 @@ export default function App() {
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
   const [focusedSegmentId, setFocusedSegmentId] = useState<string | null>(null);
   const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>(undefined);
-  const [violations, setViolations] = useState<RuleViolation[]>(ruleViolations);
-  const [fieldTrip, setFieldTrip] = useState(fieldTripEvents[0]);
-  const [substitutes, setSubstitutes] = useState(substituteRequests);
+  const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
+  const [substituteRequestsState, setSubstituteRequestsState] = useState(substituteRequests);
+  const [resolvedViolationIds, setResolvedViolationIds] = useState<Set<string>>(() => new Set());
   const [undoCount, setUndoCount] = useState(2);
   const [redoCount, setRedoCount] = useState(0);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
-  const weekLabel = formatWeekRange(weekStartDate);
-  const unresolvedViolations = violations.filter((violation) => !violation.resolved);
+  const engine = useMemo(() => createRulesEngine(), []);
+  const ruleViolationsFromEngine = useMemo(() => {
+    const context = {
+      segmentBlocks,
+      staffAssignments,
+      employees,
+      substituteRequests: substituteRequestsState,
+      fieldTripEvents: fieldTripEventsState,
+      fieldTripTypes,
+      policyCitations: POLICY_CITATION_LIST,
+      rulePolicyCitations: RULE_POLICY_CITATIONS
+    };
+    return engine.evaluate(context);
+  }, [
+    engine,
+    substituteRequestsState,
+    fieldTripEventsState,
+    segmentBlocks,
+    staffAssignments,
+    employees,
+    fieldTripTypes,
+    POLICY_CITATION_LIST
+  ]);
+
+  const resolveSegmentBlockId = (target: EngineRuleViolation["target"]) => {
+    if (target.entity === "SegmentBlock") {
+      return target.id;
+    }
+    if (target.entity === "StaffAssignment") {
+      const assignment = staffAssignments.find((item) => item.id === target.id);
+      return assignment?.segmentBlockId;
+    }
+    if (target.entity === "FieldTripEvent") {
+      return segmentBlocks.find((block) => block.fieldTripEventId === target.id)?.id;
+    }
+    return undefined;
+  };
+
+  const violationRecords = useMemo(() => {
+    return ruleViolationsFromEngine.map((engineViolation) => {
+      const citation: PolicyCitation =
+        policyCitations[engineViolation.citationId ?? ""] ??
+        ({
+          id: engineViolation.citationId ?? "unknown",
+          name: RULE_TITLES[engineViolation.ruleId] ?? "Policy violation",
+          document: "Rules engine"
+        } as PolicyCitation);
+      const segmentBlockId = resolveSegmentBlockId(engineViolation.target) ?? engineViolation.target.id;
+
+      return {
+        id: engineViolation.id,
+        title: RULE_TITLES[engineViolation.ruleId] ?? engineViolation.ruleId,
+        severity: SEVERITY_MAP[engineViolation.severity] ?? "warning",
+        description: engineViolation.message,
+        segmentBlockId,
+        policyCitation: citation,
+        recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage.",
+        resolved: resolvedViolationIds.has(engineViolation.id)
+      } satisfies UiRuleViolation;
+    });
+  }, [ruleViolationsFromEngine, resolvedViolationIds, policyCitations, segmentBlocks, staffAssignments]);
+
+  const unresolvedViolations = violationRecords.filter((violation) => !violation.resolved);
   const validationComplete = unresolvedViolations.length === 0;
-  const fieldTripSigned = Boolean(fieldTrip?.approverId && fieldTrip?.signedOffAt);
+  const activeFieldTripEvent = fieldTripEventsState[0] ?? null;
+  const fieldTripSigned = Boolean(activeFieldTripEvent?.approverId && activeFieldTripEvent?.signedOffAt);
   const readyToPublish = validationComplete && fieldTripSigned;
   const scheduleStatus: ScheduleStatus = readyToPublish ? "ready_for_review" : weekMeta.status;
+  const weekLabel = formatWeekRange(weekStartDate);
   const complianceHighlights = [
     `${unresolvedViolations.length} violation${unresolvedViolations.length === 1 ? "" : "s"} outstanding`,
     fieldTripSigned ? "Field trip approved" : "Field trip pending sign-off",
@@ -95,29 +196,45 @@ export default function App() {
   };
 
   const handleAutoBalance = () => {
-    const nextViolation = violations.find((violation) => !violation.resolved);
+    const nextViolation = violationRecords.find((violation) => !violation.resolved);
     if (nextViolation) {
       setFocusedSegmentId(nextViolation.segmentBlockId);
     }
   };
 
   const handleResolveViolation = (violationId: string) => {
-    setViolations((prev) =>
-      prev.map((violation) => (violation.id === violationId ? { ...violation, resolved: true } : violation))
-    );
+    setResolvedViolationIds((prev) => {
+      if (prev.has(violationId)) {
+        return prev;
+      }
+      const next = new Set(prev);
+      next.add(violationId);
+      return next;
+    });
   };
 
   const handleFieldTripSignOff = () => {
-    setFieldTrip((prev) => ({
-      ...prev,
-      approverId: "Aisha Patel",
-      signedOffAt: new Date("2026-02-04T16:20:00Z").toISOString()
-    }));
+    if (!activeFieldTripEvent) return;
+    setFieldTripEventsState((prev) =>
+      prev.map((event) =>
+        event.id === activeFieldTripEvent.id
+          ? {
+              ...event,
+              approverId: "Aisha Patel",
+              signedOffAt: new Date("2026-02-04T16:20:00Z").toISOString()
+            }
+          : event
+      )
+    );
   };
 
   const handleStepAction = (stepId: string) => {
     if (stepId === "validation") {
-      setViolations((prev) => prev.map((violation) => ({ ...violation, resolved: true })));
+      setResolvedViolationIds((prev) => {
+        const next = new Set(prev);
+        ruleViolationsFromEngine.forEach((violation) => next.add(violation.id));
+        return next;
+      });
     }
     if (stepId === "field-trip") {
       handleFieldTripSignOff();
@@ -125,7 +242,7 @@ export default function App() {
   };
 
   const handleSubstituteAction = (requestId: string) => {
-    setSubstitutes((prev) =>
+    setSubstituteRequestsState((prev) =>
       prev.map((request) =>
         request.id === requestId
           ? {
@@ -139,7 +256,7 @@ export default function App() {
   };
 
   const substituteCards = useMemo<SubstituteAssignmentCard[]>(() => {
-    return substitutes.map((request) => {
+    return substituteRequestsState.map((request) => {
       const block = segmentBlocks.find((segment) => segment.id === request.segmentBlockId);
       const replacement = employees.find((employee) => employee.id === request.replacementEmployeeId);
       const issues: string[] = [];
@@ -166,9 +283,10 @@ export default function App() {
         state
       };
     });
-  }, [substitutes]);
+  }, [substituteRequestsState, employees, segmentBlocks, segmentSlotDefinitions]);
 
-  const fieldTripType = fieldTripTypes.find((type) => type.id === fieldTrip.fieldTripTypeId) ?? fieldTripTypes[0];
+  const fieldTripType =
+    fieldTripTypes.find((type) => type.id === activeFieldTripEvent?.fieldTripTypeId) ?? fieldTripTypes[0];
 
   const handlePublish = () => {
     if (!readyToPublish) return;
@@ -217,7 +335,7 @@ export default function App() {
             segments={segmentBlocks}
             assignments={staffAssignments}
             employees={employees}
-            violations={violations}
+            violations={violationRecords}
             focusedSegmentId={focusedSegmentId ?? undefined}
             onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
             daySequence={daySequence}
@@ -248,16 +366,18 @@ export default function App() {
             {publishMessage && <p style={{ margin: 0, color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>}
           </div>
           <ViolationNavigator
-            violations={violations}
+            violations={violationRecords}
             onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
             onResolveViolation={handleResolveViolation}
           />
-          <FieldTripApprovalPanel
-            event={fieldTrip}
-            tripType={fieldTripType}
-            citation={policyCitations.fieldTrip}
-            onSignOff={handleFieldTripSignOff}
-          />
+          {activeFieldTripEvent && (
+            <FieldTripApprovalPanel
+              event={activeFieldTripEvent}
+              tripType={fieldTripType}
+              citation={policyCitations.fieldTrip}
+              onSignOff={handleFieldTripSignOff}
+            />
+          )}
           <SubstituteAssignmentPanel requests={substituteCards} onRequestAction={handleSubstituteAction} />
           <AuditTimeline
             events={auditTimeline}
