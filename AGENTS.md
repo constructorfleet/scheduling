@@ -84,3 +84,4 @@ Allow staff to have multiple non-contiguous working blocks on any given day.
 ### Configuration
 User can add, remove and maintain employees and their properties via the web ui.
 User can add, remove and maintain the ratios and certification requirements viat he web ui.
+User cannot mark validations as addressed - validations are cleared when the data passes validation.
