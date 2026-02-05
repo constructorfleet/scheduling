@@ -12,11 +12,11 @@ export default defineConfig({
   use: {
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    baseURL: "http://127.0.0.1:4173"
+    baseURL: "http://127.0.0.1:4174"
   },
   webServer: {
-    command: "npm run dev -- --host 127.0.0.1 --port 4173",
-    url: "http://127.0.0.1:4173",
+    command: "npm run dev -- --host 127.0.0.1 --port 4174",
+    url: "http://127.0.0.1:4174",
     reuseExistingServer: !process.env.CI,
     timeout: 120000
   }

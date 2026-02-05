@@ -75,3 +75,6 @@ THERE IS NO AGE PROFILES IN THIS PROJECT! DO NOT ADD THEM! REMOVE ANY REFERENCES
 2. Solution Architect Agent: propose tech stack and architecture.
 3. Data Model Agent: draft the entity model.
 
+## The schedule
+Allow user to enter clock-in and clock-out times.
+Allow staff to have multiple non-contiguous working blocks on any given day.

@@ -1,4 +1,4 @@
-import { DayOfWeek, Employee, PolicyCitation, SegmentBlock } from "../domain/types";
+import { DayOfWeek, PolicyCitation } from "../domain/types";
 
 export type StepStatus = "complete" | "in_progress" | "blocked";
 
