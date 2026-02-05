@@ -1,0 +1,499 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "SpawnSubagent Tool Specification",
+    "description": "Tool definition for agent-to-agent handoff and coordination",
+    "version": "1.0.0",
+    "type": "object",
+    "definitions": {
+        "Agent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Unique identifier for the agent"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Human-readable agent name"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "What this agent does"
+                },
+                "tools": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Tools available to this agent"
+                },
+                "handoffs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "label": {
+                                "type": "string"
+                            },
+                            "agentId": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ]
+        },
+        "SpawnSubagentRequest": {
+            "type": "object",
+            "properties": {
+                "targetAgent": {
+                    "type": "string",
+                    "description": "ID of the agent to spawn (from Agent Registry)",
+                    "enum": [
+                        "product-domain-agent",
+                        "solution-architect-agent",
+                        "data-model-agent",
+                        "rules-engine-agent",
+                        "scheduling-ux-agent",
+                        "frontend-engineering-agent",
+                        "qa-testing-agent",
+                        "documentation-agent",
+                        "deployment-ops-agent"
+                    ]
+                },
+                "task": {
+                    "type": "string",
+                    "description": "Short title of the task (3-10 words)",
+                    "minLength": 5,
+                    "maxLength": 100
+                },
+                "prompt": {
+                    "type": "string",
+                    "description": "Detailed task description for the agent",
+                    "minLength": 50,
+                    "maxLength": 5000
+                },
+                "context": {
+                    "type": "object",
+                    "description": "Optional context data to pass to the agent",
+                    "additionalProperties": true
+                },
+                "expectedOutputFormat": {
+                    "type": "string",
+                    "description": "Describe the expected structure of the return value",
+                    "minLength": 10,
+                    "maxLength": 1000
+                },
+                "timeoutMinutes": {
+                    "type": "integer",
+                    "description": "Maximum time to wait for task completion",
+                    "minimum": 5,
+                    "maximum": 480,
+                    "default": 30
+                }
+            },
+            "required": [
+                "targetAgent",
+                "task",
+                "prompt"
+            ]
+        },
+        "SubagentResponse": {
+            "type": "object",
+            "properties": {
+                "agentName": {
+                    "type": "string",
+                    "description": "Name of the agent that executed the task"
+                },
+                "taskId": {
+                    "type": "string",
+                    "description": "Unique ID for this task execution"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "completed",
+                        "failed",
+                        "timeout"
+                    ],
+                    "description": "Execution status"
+                },
+                "result": {
+                    "description": "Structured result from the agent (format depends on task)",
+                    "additionalProperties": true
+                },
+                "summary": {
+                    "type": "string",
+                    "description": "1-2 sentence summary of what was accomplished"
+                },
+                "artifacts": {
+                    "type": "object",
+                    "properties": {
+                        "filePath": {
+                            "type": "string",
+                            "description": "Path to file created by agent (if applicable)"
+                        },
+                        "data": {
+                            "description": "Raw data if applicable",
+                            "additionalProperties": true
+                        },
+                        "url": {
+                            "type": "string",
+                            "description": "Link to results if hosted"
+                        }
+                    }
+                },
+                "executedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO8601 timestamp of execution"
+                },
+                "durationSeconds": {
+                    "type": "number",
+                    "description": "How long the task took to execute"
+                },
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Error messages if status is 'failed'"
+                }
+            },
+            "required": [
+                "agentName",
+                "taskId",
+                "status"
+            ]
+        },
+        "AgentRegistry": {
+            "type": "object",
+            "properties": {
+                "agents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Agent"
+                    }
+                }
+            }
+        }
+    },
+    "properties": {
+        "tool": {
+            "type": "string",
+            "enum": [
+                "spawnSubagent"
+            ],
+            "description": "This is the spawnSubagent tool"
+        },
+        "request": {
+            "$ref": "#/definitions/SpawnSubagentRequest"
+        },
+        "response": {
+            "$ref": "#/definitions/SubagentResponse"
+        },
+        "registry": {
+            "$ref": "#/definitions/AgentRegistry"
+        }
+    },
+    "agentRegistry": {
+        "agents": [
+            {
+                "id": "product-domain-agent",
+                "name": "Product & Domain Agent",
+                "description": "Translate daycare policies into precise, testable requirements and compliance rules",
+                "responsibility": "Requirements gathering, rules discovery, user stories, edge case analysis",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "fetch_webpage",
+                    "list_dir",
+                    "file_search",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Architecture Agent",
+                        "agentId": "solution-architect-agent",
+                        "description": "Hand off architecture design work based on requirements discovered"
+                    },
+                    {
+                        "label": "Spawn Data Model Agent",
+                        "agentId": "data-model-agent",
+                        "description": "Hand off data model design based on rules and workflows"
+                    }
+                ]
+            },
+            {
+                "id": "solution-architect-agent",
+                "name": "Solution Architect Agent",
+                "description": "Design the overall architecture, module boundaries, and technology stack",
+                "responsibility": "Architecture decisions, tech stack selection, module design",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "fetch_webpage",
+                    "list_dir",
+                    "file_search",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Data Model Agent",
+                        "agentId": "data-model-agent"
+                    },
+                    {
+                        "label": "Spawn Rules Engine Agent",
+                        "agentId": "rules-engine-agent"
+                    }
+                ]
+            },
+            {
+                "id": "data-model-agent",
+                "name": "Data Model Agent",
+                "description": "Design the core data model, entity relationships, and validation constraints",
+                "responsibility": "Entity design, relationships, validation, schema",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "list_dir",
+                    "file_search",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Rules Engine Agent",
+                        "agentId": "rules-engine-agent"
+                    },
+                    {
+                        "label": "Spawn Frontend Agent",
+                        "agentId": "frontend-engineering-agent"
+                    }
+                ]
+            },
+            {
+                "id": "rules-engine-agent",
+                "name": "Rules Engine Agent",
+                "description": "Implement the compliance rules engine with testable rule definitions",
+                "responsibility": "Rule implementation, compliance logic, evaluation framework",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "replace_string_in_file",
+                    "run_in_terminal",
+                    "list_code_usages",
+                    "get_errors",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn QA Testing Agent",
+                        "agentId": "qa-testing-agent"
+                    }
+                ]
+            },
+            {
+                "id": "scheduling-ux-agent",
+                "name": "Scheduling UX Agent",
+                "description": "Design UI flows and interaction model for non-technical users",
+                "responsibility": "UI flows, wireframes, interaction patterns, component specs",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "list_dir",
+                    "file_search",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Frontend Engineering Agent",
+                        "agentId": "frontend-engineering-agent"
+                    }
+                ]
+            },
+            {
+                "id": "frontend-engineering-agent",
+                "name": "Frontend Engineering Agent",
+                "description": "Build the scheduling UI and client-side application",
+                "responsibility": "UI implementation, state management, component code",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "replace_string_in_file",
+                    "run_in_terminal",
+                    "get_errors",
+                    "list_code_usages",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn QA Testing Agent",
+                        "agentId": "qa-testing-agent"
+                    }
+                ]
+            },
+            {
+                "id": "qa-testing-agent",
+                "name": "QA & Testing Agent",
+                "description": "Build comprehensive test plans and automated checks",
+                "responsibility": "Test planning, test data, coverage strategy, test implementation",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "run_in_terminal",
+                    "get_errors",
+                    "list_code_usages",
+                    "test_failure",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Documentation Agent",
+                        "agentId": "documentation-agent"
+                    }
+                ]
+            },
+            {
+                "id": "documentation-agent",
+                "name": "Documentation Agent",
+                "description": "Produce technical documentation and user guides",
+                "responsibility": "User guides, technical docs, API reference, runbooks",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "fetch_webpage",
+                    "list_dir",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn Deployment Agent",
+                        "agentId": "deployment-ops-agent"
+                    }
+                ]
+            },
+            {
+                "id": "deployment-ops-agent",
+                "name": "Deployment & Ops Agent",
+                "description": "Define packaging, deployment, and operations workflows",
+                "responsibility": "Build pipeline, CI/CD setup, deployment strategy, monitoring",
+                "tools": [
+                    "semantic_search",
+                    "grep_search",
+                    "read_file",
+                    "create_file",
+                    "run_in_terminal",
+                    "list_dir",
+                    "get_errors",
+                    "spawnSubagent"
+                ],
+                "handoffs": [
+                    {
+                        "label": "Spawn QA Testing Agent",
+                        "agentId": "qa-testing-agent"
+                    }
+                ]
+            }
+        ]
+    },
+    "errorCodes": {
+        "AGENT_NOT_FOUND": {
+            "message": "Target agent doesn't exist",
+            "recovery": "Check agent name in registry"
+        },
+        "INVALID_PROMPT": {
+            "message": "Prompt is malformed or too vague",
+            "recovery": "Rewrite with more detail and context"
+        },
+        "TIMEOUT": {
+            "message": "Task took too long",
+            "recovery": "Retry with longer timeout or split task"
+        },
+        "CONTEXT_OVERFLOW": {
+            "message": "Context too large",
+            "recovery": "Pass file paths instead of full content"
+        },
+        "AGENT_BUSY": {
+            "message": "Agent is already processing",
+            "recovery": "Retry after a delay"
+        },
+        "VALIDATION_ERROR": {
+            "message": "Response doesn't match expected format",
+            "recovery": "Review expectedOutputFormat and agent capability"
+        }
+    },
+    "examples": [
+        {
+            "targetAgent": "product-domain-agent",
+            "task": "Discover compliance requirements",
+            "prompt": "Interview daycare directors and extract all compliance rules from their policies. Produce a rules catalog with at least 20 rules, each with title, source, description, and test cases.",
+            "timeoutMinutes": 60
+        },
+        {
+            "targetAgent": "rules-engine-agent",
+            "task": "Implement compliance rules",
+            "prompt": "Implement all ratio and certification rules from the attached rules catalog.",
+            "context": {
+                "rulesFromDiscovery": "rules_catalog.json",
+                "dataModel": "entities_schema.json"
+            },
+            "expectedOutputFormat": "{ rules: Array<{id, name, implementation, tests}>, totalRulesImplemented: number, coverage: number }",
+            "timeoutMinutes": 90
+        },
+        {
+            "description": "Spawn 3 agents in parallel",
+            "code": "const [rules, ui, ops] = await Promise.all([ spawnSubagent({targetAgent: 'rules-engine-agent', ...}), spawnSubagent({targetAgent: 'scheduling-ux-agent', ...}), spawnSubagent({targetAgent: 'deployment-ops-agent', ...}) ])"
+        },
+        {
+            "agentName": "Product & Domain Agent",
+            "taskId": "task-prod-001-2026-02-04",
+            "status": "completed",
+            "result": {
+                "rules": [
+                    {
+                        "id": "RATIO-001",
+                        "title": "Staffing Ratio",
+                        "source": "STATE_REGULATION_2024",
+                        "description": "1 staff per 3 children"
+                    }
+                ],
+                "rulesCount": 25,
+                "storiesCount": 12
+            },
+            "summary": "Discovered 25 compliance rules and 12 core user stories from director interviews and policy documents.",
+            "executedAt": "2026-02-04T15:30:00Z",
+            "durationSeconds": 3600
+        },
+        {
+            "agentName": "Rules Engine Agent",
+            "taskId": "task-rules-001-2026-02-04",
+            "status": "failed",
+            "errors": [
+                "Data model schema not compatible with rule BREAK-001",
+                "Missing field: shift_length_minutes"
+            ],
+            "executedAt": "2026-02-04T16:45:00Z",
+            "durationSeconds": 900
+        }
+    ]
+}

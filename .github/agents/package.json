@@ -1,0 +1,68 @@
+{
+  "name": "daycare-scheduling-spawn-subagent",
+  "version": "1.0.0",
+  "description": "Multi-agent orchestration system for daycare scheduling application",
+  "main": "spawnSubagent.ts",
+  "types": "spawnSubagent.ts",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "examples": "ts-node spawnSubagent.examples.ts",
+    "integration": "ts-node spawnSubagent.integration.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write '**/*.ts'",
+    "dev": "ts-node-dev --respawn spawnSubagent.examples.ts",
+    "start": "node dist/spawnSubagent.js"
+  },
+  "keywords": [
+    "multi-agent",
+    "orchestration",
+    "spawning",
+    "handoff",
+    "coordination",
+    "scheduling"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.40.0",
+    "jest": "^29.5.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.ts",
+      "**/?(*.)+(spec|test).ts"
+    ],
+    "collectCoverageFrom": [
+      "spawnSubagent.ts",
+      "!**/node_modules/**",
+      "!**/*.d.ts"
+    ]
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 100,
+    "tabWidth": 2
+  }
+}
