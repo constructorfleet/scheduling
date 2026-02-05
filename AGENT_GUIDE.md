@@ -262,3 +262,4 @@ For more details, see:
 - `PROJECT.md` - Project charter
 - `AGENTS.md` - Agent specifications
 - `BACKLOG.md` - User stories
+- `docs/Example Schedule Spreadsheet.png` - Schedule editor wireframe
