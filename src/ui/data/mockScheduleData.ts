@@ -94,6 +94,8 @@ export const dayDisplayNames: Record<DayOfWeek, string> = {
 export const weekMeta = {
   id: "week-2026-02-16",
   label: "Feb 16 - Feb 22, 2026",
+  startDate: "2026-02-16",
+  endDate: "2026-02-22",
   status: "draft" as ScheduleStatus
 };
 
