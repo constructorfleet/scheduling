@@ -16,6 +16,8 @@ Each rule includes a violation fixture and a compliant fixture so reviewers imme
 - `shift-break-limits`: validates daily and weekly hour caps plus graceful wrap-around across midnight (`artifacts/phase-4-testing/rules-test-plan.md:25-28`).
 - `substitute-parity`: insists on metadata, approver, and timestamp parity (`artifacts/phase-4-testing/rules-test-plan.md:30-33`).
 - `field-trip ratios` and `field-trip signoff`: make sure either the field trip meeting ratios/recent approvals or the sign-off metadata is present (`artifacts/phase-4-testing/rules-test-plan.md:35-44`).
+- `schedule-day-metadata`: validates that every calendar day has a schedule type, enrollment headcount, and field-trip linkage (missing schedule type, missing enrollment, or a dangling field-trip reference each emit QA-RULE-022—024 and cite the relevant catalog entries in `RULES_TEST_CASES.md:127-144` and `tests/rules/rulesEngine.test.ts`).
+- `field-trip-event`: enforces that every event points to either “No Field Trip” or a defined type, rejects dangling type IDs, and cleanly short-circuits when no field trip is required (QA-RULE-025—028 detail the missing-type/no-trip flag, compliant path, unknown type rejection, and No Field Trip short-circuit).
 
 ## Guardrail catalog (QA-RULE-017—021)
 Each QA rule defines the compliance edge case that must stay covered:
@@ -24,6 +26,13 @@ Each QA rule defines the compliance edge case that must stay covered:
 3. **QA-RULE-019 (Substitute metadata gaps).** Exercises the substitute parity rule, requiring metadata, approver, and timestamp fields before the UI exposes the “ready” state (`tests/rules/rulesEngine.test.ts`, substitute metadata fixture pair).
 4. **QA-RULE-020 (Leader-only shortages).** Ensures leader-level coverage is enforced even when enough non-leader staff exist but no qualifying leader is on shift (`tests/rules/rulesEngine.test.ts`, leader shortage fixture pair).
 5. **QA-RULE-021 (Partial sign-off omissions).** Confirms the field-trip sign-off rule still trips when a partial sign-off exists or was never recorded (`tests/rules/rulesEngine.test.ts`, sign-off fixture pair).
+6. **QA-RULE-022 (Missing schedule-type metadata).** Flags days that never had a schedule type selected, ensuring the scheduler must pick Regular/Extended/Enrichment before publishing (`tests/rules/rulesEngine.test.ts`, schedule-day metadata fixtures).
+7. **QA-RULE-023 (Missing enrollment headcount).** Ensures enrollment is entered before ratios run, and the rule engine keeps the violation active until a child count is provided (`tests/rules/rulesEngine.test.ts`, schedule-day enrollment fixtures).
+8. **QA-RULE-024 (Dangling field-trip metadata).** Catches when a day points at a non-existent `FieldTripEvent` so the UI cannot publish with stale references; the new fixture under `tests/rules/rulesEngine.test.ts` proves the rule rejects the orphaned pointer.
+9. **QA-RULE-025 (Missing field-trip type/no-trip flag).** Covers the failure path when an event neither declares a valid type nor the “No Field Trip” short-circuit before director approval (`tests/rules/rulesEngine.test.ts`, field-trip event fixtures).
+10. **QA-RULE-026 (Clean field-trip path).** Demonstrates the compliant scenario when an event references a valid type, ratios match, and approvals are recorded, guaranteeing the approvals gate stays green (`tests/rules/rulesEngine.test.ts`, field-trip event fixtures).
+11. **QA-RULE-027 (Unknown field-trip type).** Exercises the rule that rejects a `FieldTripEvent` whose `fieldTripTypeId` is not defined; the planned fixture proves the rule cites the dangling type before coverage clears.
+12. **QA-RULE-028 (No Field Trip short-circuit).** Verifies that explicitly choosing “No Field Trip” bypasses the ratio checks while still forcing the scheduler to acknowledge the decision (`tests/rules/rulesEngine.test.ts`, short-circuit fixtures).
 
 ## Automation layers
 ### Rule engine (Jest)
@@ -36,6 +45,11 @@ Each QA rule defines the compliance edge case that must stay covered:
 - Each scenario shows the field-trip block’s prompts, a director sign-off clearing the gate, the substitute parity panel toggling between missing metadata and ready state, and the publish button unlocking only after compliance.
 - New Playwright workflows should keep adding QA-RULE-017—021 paths so UI-level demonstrations mirror the guardrails.
 - **Current blocker:** `npm run test:e2e` is blocked because Vite can’t bind to `127.0.0.1:4174` (listen `EPERM`). Either grant permission or configure `playwright.config.ts` to use an allowed host/port before rerunning.
+
+## Recent test plan updates
+- The written plan now documents QA-RULE-022—024 under `schedule-day-metadata` and QA-RULE-025—028 for `field-trip-event`, describing missing-schedule-type, missing-enrollment, dangling field-trip references, missing type/no-trip flags, the compliant path, unknown-type rejections, and the explicit “No Field Trip” short-circuit. Each rule entry in `RULES_TEST_CASES.md:127-167` refers back to `artifacts/phase-4-testing/rules-test-plan.md` so auditors can trace the policy citation plus the fixture posture.
+- Next steps called out in the plan: (1) add a `ScheduleDay` fixture that points at a non-existent `FieldTripEvent` so QA-RULE-024 has concrete coverage, (2) add a `FieldTripEvent` fixture whose `fieldTripTypeId` is undefined so QA-RULE-027 proves the dangling-type rejection, and (3) rerun `npm test -- tests/rules/rulesEngine.test.ts` (and the full Jest suite) once `jest-environment-jsdom` installs successfully—`npm install --save-dev jest-environment-jsdom` currently fails with `getaddrinfo ENOTFOUND registry.npmjs.org`, so the environment still lacks the required browser API.
+- Keeping this plan updated as new guardrails appear ensures the rule engine, fixtures, and Playwright journeys all point back to a living QA catalog before any schedule can publish.
 
 ## Running the suites
 1. Switch to Node 18+ (`nvm use 18` or equivalent) before installing dependencies.
@@ -60,6 +74,8 @@ Each QA rule defines the compliance edge case that must stay covered:
 ## QA readiness checklist
 - [ ] Document every rule update in `RULES_TEST_CASES.md` with its QA rule identifier and the relevant policy citation.
 - [ ] Update `tests/rules/rulesEngine.test.ts` with violation/clean fixtures and note the QA rule ID (e.g., `QA-RULE-018`) in comments near each describe block.
+- [ ] Add a `ScheduleDay` fixture that points to a missing `FieldTripEvent` so QA-RULE-024 is exercised in the rule-engine suite before any guardrail is considered satisfied.
+- [ ] Add a `FieldTripEvent` fixture whose `fieldTripTypeId` is undefined so QA-RULE-027 documents the rejection of dangling field-trip type references.
 - [ ] Confirm `src/rules/definitions.ts` emits the citations described in the catalog before merging the change.
 - [ ] Run `npm test -- tests/rules/rulesEngine.test.ts` (full `npm test` when larger) to exercise both violation and clean branches.
 - [ ] Capture UI interactions for new guardrails in Playwright (`tests/e2e/`) or in `tests/ui/` React specs.
