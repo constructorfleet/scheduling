@@ -2,6 +2,8 @@
 
 This document describes the core entities, enumerations, and validation points the Data Model Agent owns for the scheduling application. The design keeps scheduling, compliance, and audit needs explicit while remaining storage-agnostic (e.g., IndexedDB snapshots, JSON payloads, etc.).
 
+Staff scheduling should be based on clock-in/clock-out times - which can be entered as any HH:MM AM/PM of the day within the operating ours.
+
 ## Enumerations
 - `JobTitle` – District-provided list such as `Director`, `Assistant Director`, `Leader`, `Support Leader`, `Assistant`. `Leader`-level status (used in coverage rules) is derived when the title is `Leader` or higher in the published hierarchy.
 - `DayScheduleType` – `closed`, `in_house`, `full_day`, `school_day`; determines the operating hours when combined with `DayOfWeek`.
