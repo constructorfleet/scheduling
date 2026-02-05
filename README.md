@@ -216,7 +216,7 @@ npm test
 ### Phase 5: Build & Deploy
 
 ```bash
-# Build the reproducible static bundle (runs lint, type check, tests, build)
+# Build the reproducible static bundle (cleans artifacts, optionally type-checks, bundles the UI, stages `dist-static/`, records metadata, and archives the release)
 npm run build:static
 
 # Publish the bundle to your host (set env vars before running).
@@ -225,9 +225,9 @@ AWS_S3_BUCKET=<bucket> npm run deploy:static
 # Deployment details live in artifacts/phase-9-deployment/deployment-guide.md
 ```
 
-`npm run build:static` wraps `scripts/build-static.sh`, stages the compiled assets under `dist-static/`, writes `build-metadata.json` (commit, timestamp, Node/npm versions), and creates `dist-static-{timestamp}.tar.gz`. Use the ZIP or copy `dist-static/` to your static host, then follow the guide’s cache invalidation and metadata tracking steps before sharing the release with directors. See `artifacts/phase-9-deployment/build-scripts/README.md` for an itemized breakdown of the scripts, knobs such as `SKIP_TYPE_CHECK`, and the outputs they produce.
+`npm run build:static` wraps `scripts/build-static.sh`, which starts with `npm run clean`, optionally runs `npm run type-check` (set `SKIP_TYPE_CHECK=1` to skip this step), executes the Vite build into `dist/ui`, stages everything under `dist-static/`, writes `build-metadata.json` (commit/branch/timestamp/environment) for audit tracing, and produces a `dist-static-<timestamp>.tar.gz` archive for release records. Lint (`npm run lint`) and tests (`npm test`) are not part of this script, so run them before you publish a release candidate. Once built, verify `build-metadata.json` locks the bundle to a known commit and follow the deployment guide for cache-invalidation, metadata tracking, and smoke-test recommendations.
 
-`npm run deploy:static` (`scripts/deploy-static.sh`) copies the staged `dist-static/` bundle to the destination you configure via environment variables (`AWS_S3_BUCKET`/`AWS_S3_PREFIX`, `DEPLOY_HOST`/`DEPLOY_PATH`, or `DEPLOY_LOCAL_PATH`). See `artifacts/phase-9-deployment/deployment-guide.md` for configuration examples, cache-invalidation tips, and verification steps. The same folder also points to `artifacts/phase-9-deployment/build-scripts/README.md` if you need the automation-summary for each script invoked in the workflow.
+`npm run deploy:static` (`scripts/deploy-static.sh`) copies the staged `dist-static/` bundle to the destination you configure via environment variables (`AWS_S3_BUCKET`/`AWS_S3_PREFIX`, `DEPLOY_HOST`/`DEPLOY_PATH`, or `DEPLOY_LOCAL_PATH`). See `artifacts/phase-9-deployment/deployment-guide.md` for configuration examples, cache-invalidation tips, and verification steps. The same folder also points to `artifacts/phase-9-deployment/build-scripts/README.md` if you need the automation summary for each script invoked in the workflow.
 
 ## Configuration
 

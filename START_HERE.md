@@ -107,6 +107,8 @@ npm run dev               # Develop
 npm test                  # Test
 npm run lint              # Lint
 npm run type-check        # Type check
+npm run build:static      # Build release bundle
+npm run deploy:static     # Deploy release bundle
 ```
 
 ---

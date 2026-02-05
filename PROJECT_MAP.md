@@ -122,7 +122,8 @@ scheduling/
 
 ### I want to deploy
 → Check **artifacts/phase-9-deployment/** (deployment guide)  
-→ Run: `npm run build`  
+→ Run: `npm run build:static`  
+→ Run: `npm run deploy:static`  
 
 ### I want to understand the architecture
 → Check **artifacts/phase-2-architecture/** (architecture diagram)  
@@ -182,6 +183,12 @@ npm run lint
 
 # Type check
 npm run type-check
+
+# Build release bundle
+npm run build:static
+
+# Deploy release bundle
+npm run deploy:static
 ```
 
 ## Decision Points

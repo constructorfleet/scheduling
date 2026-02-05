@@ -169,6 +169,8 @@ npm run build:static
 AWS_S3_BUCKET=<bucket> npm run deploy:static
 ```
 
+After building, inspect `dist-static/build-metadata.json` and follow `artifacts/phase-9-deployment/deployment-guide.md` for cache-invalidation, metadata tracking, and verification steps before notifying site directors.
+
 ## Phase Outputs
 
 | Phase | File | Contains |
