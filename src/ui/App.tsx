@@ -54,6 +54,7 @@ export default function App() {
   const validationComplete = unresolvedViolations.length === 0;
   const fieldTripSigned = Boolean(fieldTrip?.approverId && fieldTrip?.signedOffAt);
   const readyToPublish = validationComplete && fieldTripSigned;
+  const scheduleStatus: ScheduleStatus = readyToPublish ? \"ready_for_review\" : weekMeta.status;
   const complianceHighlights = [
     `${unresolvedViolations.length} violation${unresolvedViolations.length === 1 ? "" : "s"} outstanding`,
     fieldTripSigned ? "Field trip approved" : "Field trip pending sign-off",
@@ -199,7 +200,7 @@ export default function App() {
         selectedSchoolId={selectedSchoolId}
         onSchoolChange={setSelectedSchoolId}
         weekLabel={weekLabel}
-        status={weekMeta.status}
+        status={scheduleStatus}
         complianceHighlights={complianceHighlights}
         onShiftWeek={handleWeekShift}
       />
