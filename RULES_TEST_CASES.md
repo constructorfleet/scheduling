@@ -16,6 +16,12 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Expectation:** no `ratio-segment` violations when assignments meet both the ratio and explicit minimum.
 - **Verification:** `tests/rules/rulesEngine.test.ts:105` (ensures `block-ratio-clean` meets both ratio and minimums).
 
+### QA-RULE-017 – Field-trip overrides skip segment ratios
+- **Preconditions:** a `SegmentBlock` linked to a signed-off `FieldTripEvent` with insufficient assignments (e.g., one employee covering 20 children).
+- **Execution:** run `RulesEngine.evaluate()` and collect `ratio-segment` and `field-trip-ratios` violations.
+- **Expectation:** `ratio-segment` should ignore the block while `field-trip-ratios` reports the under-provisioned adults/leaders.
+- **Verification:** `tests/rules/rulesEngine.test.ts` (new `block-trip-ratio-skip` fixture ensures the dedicated field-trip ratio rule fires and the segment ratio rule remains quiet).
+
 ## Rule: certification-per-segment (CPR/medical/leader coverage)
 - **Source:** `artifacts/phase-1-discovery/rules-catalog.md:16`
 
@@ -41,6 +47,12 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Preconditions:** two 4-hour assignments, `maxHoursPerDay = 8`, `maxHoursPerWeek = 16`.
 - **Expectation:** no `shift-break-limits` violations.
 - **Verification:** `tests/rules/rulesEngine.test.ts:265` (`emp-shift-clean` tracks two 4-hour blocks with no breaches).
+
+### QA-RULE-018 – Weekly limits require cross-day enforcement
+- **Preconditions:** an employee works safe hours per day (e.g., two 6-hour shifts on Monday and Tuesday) but the aggregated weekly total exceeds `maxHoursPerWeek`.
+- **Execution:** evaluate the two-day context and inspect `shift-break-limits` violations.
+- **Expectation:** a single weekly violation is emitted while daily limits remain clean.
+- **Verification:** `tests/rules/rulesEngine.test.ts` (`block-weekly-...` fixture validates the weekly violation message and absence of daily flags).
 
 ## Rule: segment-coverage (Leader + medically delegated coverage)
 - **Source:** `artifacts/phase-1-discovery/rules-catalog.md:28`
@@ -68,6 +80,12 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Expectation:** no violations.
 - **Verification:** `tests/rules/rulesEngine.test.ts:311` (`assign-sub-clean` uses an approved request with full metadata).
 
+### QA-RULE-019 – Substitute parity flags incomplete approvals
+- **Preconditions:** a substitute assignment references a request that exists but is still `pending` or missing approver/timestamp metadata.
+- **Execution:** feed the context into `RulesEngine.evaluate()` and capture the `missing` array from the `substitute-parity` violation.
+- **Expectation:** the violation lists every missing property (`state`, `approverId`, `approvedAt`, etc.) without allowing the assignment to persist.
+- **Verification:** `tests/rules/rulesEngine.test.ts` (`block-sub-incomplete` fixture asserts the `missing` metadata and single violation).
+
 ## Rule: field-trip-ratios (Field trip adult/leader ratios)
 - **Source:** `artifacts/phase-1-discovery/rules-catalog.md:40`
 
@@ -81,6 +99,12 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Expectation:** rule emits no violations.
 - **Verification:** `tests/rules/rulesEngine.test.ts:384` (`block-trip-clean` adds four employees, two leaders, and clears the ratio rule).
 
+### QA-RULE-020 – Leader shortages surface even when adult coverage is adequate
+- **Preconditions:** a field-trip block has enough unique adults to satisfy the adult ratio but lacks the minimum number of leader-qualified attendees (e.g., four adults, only one leader).
+- **Execution:** evaluate and isolate `field-trip-ratios` violations.
+- **Expectation:** only the leader shortage violation appears, confirming the rule evaluates leaders separately from adults.
+- **Verification:** `tests/rules/rulesEngine.test.ts` (`block-trip-leader-shortage` fixture asserts a single violation mentioning `leaders`).
+
 ## Rule: field-trip-signoff (Director approvals)
 - **Source:** `artifacts/phase-1-discovery/edge-cases.md:16` (director sign-off requirement)
 
@@ -93,3 +117,9 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Preconditions:** event already has `approverId` and `signedOffAt` set.
 - **Expectation:** no sign-off violations reported.
 - **Verification:** `tests/rules/rulesEngine.test.ts:452` (`ft-event-4` includes both fields and clears the rule).
+
+### QA-RULE-021 – Sign-off violations can list only the missing approver
+- **Preconditions:** `FieldTripEvent` has `signedOffAt` but lacks an `approverId`.
+- **Execution:** evaluate the event and inspect the `missing` payload on the `field-trip-signoff` violation.
+- **Expectation:** the rule emits a violation containing only `["approverId"]` so users know exactly what field is absent.
+- **Verification:** `tests/rules/rulesEngine.test.ts` (`ft-event-6` fixture confirms the selective metadata and violation).

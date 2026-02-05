@@ -129,6 +129,46 @@ describe("RulesEngine", () => {
     expect(ratioViolations).toHaveLength(0);
   });
 
+  test("skips segment ratio checks for field-trip overrides", () => {
+    const fieldTripType: FieldTripType = {
+      id: "trip-type-skip",
+      name: "Museum Express",
+      minAdultStudentRatio: 0.2,
+      minLeaderStudentRatio: 0.1,
+      policyCitationId: "policy-field-trip",
+      notes: undefined
+    };
+    const fieldTripEvent: FieldTripEvent = {
+      id: "ft-event-skip",
+      scheduleWeekId: "week-1",
+      dayOfWeek: "mon" as DayOfWeek,
+      segment: "open" as DaySegment,
+      fieldTripTypeId: fieldTripType.id,
+      approverId: "director",
+      signedOffAt: "2026-02-04T08:00:00Z"
+    };
+    const block = createSegmentBlock("block-trip-ratio-skip", {
+      childCount: 20,
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const assignment = createAssignment("assign-trip-skip", block.id, "emp-trip-skip");
+    const context: RulesContext = {
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [createEmployee("emp-trip-skip")],
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: [fieldTripType]
+    };
+
+    const violations = engine.evaluate(context);
+    const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
+    expect(ratioViolations).toHaveLength(0);
+    const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
+    expect(tripViolations.length).toBeGreaterThan(0);
+    expect(tripViolations.every((v) => v.target.id === block.id)).toBe(true);
+  });
+
   test("detects missing certifications when multiple flags are required", () => {
     const block = createSegmentBlock("block-cert", {
       requirementTemplate: createRequirementTemplate({
@@ -287,6 +327,33 @@ describe("RulesEngine", () => {
     expect(shiftViolations).toHaveLength(0);
   });
 
+  test("flags weekly limit violations even when daily totals stay under the cap", () => {
+    const blockMon = createSegmentBlock("block-weekly-mon", { dayOfWeek: "mon" });
+    const blockTue = createSegmentBlock("block-weekly-tue", { dayOfWeek: "tue" });
+    const employee = createEmployee("emp-weekly", { maxHoursPerDay: 8, maxHoursPerWeek: 10 });
+    const firstAssignment = createAssignment("assign-weekly-mon", blockMon.id, employee.id, {
+      startTime: "08:00",
+      endTime: "14:00"
+    });
+    const secondAssignment = createAssignment("assign-weekly-tue", blockTue.id, employee.id, {
+      startTime: "08:00",
+      endTime: "14:00"
+    });
+    const context: RulesContext = {
+      segmentBlocks: [blockMon, blockTue],
+      staffAssignments: [firstAssignment, secondAssignment],
+      employees: [employee],
+      substituteRequests: [],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    };
+
+    const violations = engine.evaluate(context);
+    const shiftViolations = violations.filter((violation) => violation.ruleId === "shift-break-limits");
+    expect(shiftViolations).toHaveLength(1);
+    expect(shiftViolations[0].message).toContain("weekly limit");
+  });
+
   test("flags substitute assignments missing requests", () => {
     const block = createSegmentBlock("block-sub");
     const assignment = createAssignment("assign-sub", block.id, "emp-sub", {
@@ -339,6 +406,40 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const substituteViolations = violations.filter((violation) => violation.ruleId === "substitute-parity");
     expect(substituteViolations).toHaveLength(0);
+  });
+
+  test("reports substitute parity violations when approval metadata is incomplete", () => {
+    const block = createSegmentBlock("block-sub-incomplete");
+    const substituteRequest: SubstituteRequest = {
+      id: "req-pending",
+      originalAssignmentId: "assign-sub-incomplete",
+      segmentBlockId: block.id,
+      replacementEmployeeId: "emp-sub-incomplete",
+      requestedBy: "director",
+      requestedAt: "2026-02-01T09:00:00Z",
+      state: "pending",
+      reason: "fill coverage gap",
+      policyCitationId: "policy-substitute"
+    };
+    const assignment = createAssignment("assign-sub-incomplete", block.id, substituteRequest.replacementEmployeeId, {
+      isSubstitute: true,
+      substituteRequestId: substituteRequest.id
+    });
+    const context: RulesContext = {
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [createEmployee(substituteRequest.replacementEmployeeId)],
+      substituteRequests: [substituteRequest],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    };
+
+    const violations = engine.evaluate(context);
+    const substituteViolations = violations.filter((violation) => violation.ruleId === "substitute-parity");
+    expect(substituteViolations).toHaveLength(1);
+    expect(substituteViolations[0].target.metadata).toEqual({
+      missing: ["state", "approverId", "approvedAt"]
+    });
   });
 
   test("enforces field trip ratio minima", () => {
@@ -426,6 +527,52 @@ describe("RulesEngine", () => {
     expect(tripViolations).toHaveLength(0);
   });
 
+  test("reports leader shortages when adult counts satisfy field-trip minima", () => {
+    const fieldTripType: FieldTripType = {
+      id: "trip-type-3",
+      name: "Botanical Garden",
+      minAdultStudentRatio: 0.2,
+      minLeaderStudentRatio: 0.1,
+      policyCitationId: "policy-field-trip",
+      notes: undefined
+    };
+    const fieldTripEvent: FieldTripEvent = {
+      id: "ft-event-5",
+      scheduleWeekId: "week-1",
+      dayOfWeek: "thu" as DayOfWeek,
+      segment: "open" as DaySegment,
+      fieldTripTypeId: fieldTripType.id,
+      approverId: "director",
+      signedOffAt: "2026-02-04T11:00:00Z"
+    };
+    const block = createSegmentBlock("block-trip-leader-shortage", {
+      childCount: 20,
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const employees = [
+      createEmployee("emp-trip-leader-1", { leaderQualified: true }),
+      createEmployee("emp-trip-leader-2"),
+      createEmployee("emp-trip-leader-3"),
+      createEmployee("emp-trip-leader-4")
+    ];
+    const assignments = employees.map((employee, index) =>
+      createAssignment(`assign-trip-leader-${index + 1}`, block.id, employee.id, { isSubstitute: false })
+    );
+    const context: RulesContext = {
+      segmentBlocks: [block],
+      staffAssignments: assignments,
+      employees,
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: [fieldTripType]
+    };
+
+    const violations = engine.evaluate(context);
+    const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
+    expect(tripViolations).toHaveLength(1);
+    expect(tripViolations[0].message).toContain("leaders");
+  });
+
   test("flags field trips missing sign-off metadata", () => {
     const fieldTripEvent: FieldTripEvent = {
       id: "ft-event-2",
@@ -471,5 +618,29 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const signOff = violations.find((violation) => violation.ruleId === "field-trip-signoff");
     expect(signOff).toBeUndefined();
+  });
+
+  test("reports sign-off violations when approver metadata alone is missing", () => {
+    const fieldTripEvent: FieldTripEvent = {
+      id: "ft-event-6",
+      scheduleWeekId: "week-1",
+      dayOfWeek: "fri" as DayOfWeek,
+      segment: "open" as DaySegment,
+      fieldTripTypeId: "trip-type-1",
+      signedOffAt: "2026-02-04T12:00:00Z"
+    };
+    const context: RulesContext = {
+      segmentBlocks: [],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: []
+    };
+
+    const violations = engine.evaluate(context);
+    const signOff = violations.find((violation) => violation.ruleId === "field-trip-signoff");
+    expect(signOff).toBeDefined();
+    expect(signOff?.target.metadata).toEqual({ missing: ["approverId"] });
   });
 });
