@@ -18,6 +18,28 @@ Describe how to package, deploy, and update the scheduling workspace so each bui
 
 All targets read from `dist-static/` produced by the build script, so ensure `npm run build:static` ran immediately before deployment. If the directory is missing, the deploy script exits with a clear error prompting a rebuild.
 
+## Configuration Reference
+| Variable | Applies to | Purpose |
+| --- | --- | --- |
+| `SKIP_TYPE_CHECK` | Build | Skip `npm run type-check` when you just need the UI bundle; defaults to `0` and is reflected in `build-metadata.json`. |
+| `AWS_S3_BUCKET` | Deploy | Required bucket for CDN rollouts; syncs `dist-static/` into this target. |
+| `AWS_S3_PREFIX` | Deploy | Optional bucket prefix (e.g., `prod/2026.02.05`) so you can keep releases separated. |
+| `AWS_PROFILE` | Deploy | Forwarded to the AWS CLI so multi-profile teams can target the correct credentials. |
+| `DEPLOY_HOST` | Deploy | Remote host that receives the `rsync` sync; must be paired with `DEPLOY_PATH`. |
+| `DEPLOY_USER` | Deploy | SSH user for remote hosts; defaults to the current `$USER`. |
+| `DEPLOY_PATH` | Deploy | Destination path on the remote host that mirrors `dist-static/`. |
+| `DEPLOY_LOCAL_PATH` | Deploy | Local filesystem target for pilots, packaging, or QA copies of the bundle. |
+
+## Build metadata & traceability
+`npm run build:static` (which drives `./scripts/build-static.sh`) records every release through `dist-static/build-metadata.json` and the timestamped tarball next to the repo root. The metadata captures:
+
+- `commands`: the exact commands run (`npm run clean`, `npm run type-check`, `npm run build:ui`).
+- `versions`: Node/npm tool versions so the environment can be reproduced.
+- `vcs`: git `commit`, `branch`, and `dirty` state so auditors know what code produced the bundle.
+- `environment`: the resolved `NODE_ENV` and `SKIP_TYPE_CHECK` flag so variations are explicit.
+
+Keep the metadata file and tarball together with the staged `dist-static/` directory. Before deployment, verify the metadata matches the release you intend to push and note the `generatedAt` timestamp in your release log. When deploying, copy the entire directory (including `build-metadata.json`) to the target so the live environment can be traced back to the archived build. Retain previous tarballs plus their metadata in case a rollback is needed.
+
 ## Release Workflow & Governance
 1. **Prepare release branch/tag**: Merge the latest compliant work, run `npm run test` (Jest) and `npm run lint` before building so rule coverage is fresh.
 2. **Generate release bundle**: `npm run build:static` produces the metadata and tarball. Record the git commit (also in metadata) and append the tarball name to release notes.
