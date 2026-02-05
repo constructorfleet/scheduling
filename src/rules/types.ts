@@ -5,10 +5,12 @@ import {
   StaffAssignment,
   Employee,
   SubstituteRequest,
-  PolicyCitation
+  PolicyCitation,
+  ScheduleDay
 } from "../domain/types";
 
 export interface RulesContext {
+  scheduleDays: ScheduleDay[];
   segmentBlocks: SegmentBlock[];
   staffAssignments: StaffAssignment[];
   employees: Employee[];

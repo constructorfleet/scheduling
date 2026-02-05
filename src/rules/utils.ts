@@ -42,6 +42,11 @@ export const getFieldTripTypeById = (
 ): FieldTripType | undefined =>
   context.fieldTripTypes.find((type) => type.id === typeId);
 
+export const getScheduleDayById = (
+  context: RulesContext,
+  dayId?: string
+): ScheduleDay | undefined => context.scheduleDays.find((day) => day.id === dayId);
+
 export const getDayOfWeekForAssignment = (
   context: RulesContext,
   assignment: StaffAssignment

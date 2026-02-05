@@ -17,7 +17,9 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
   "segment-coverage": "policy-coverage",
   "substitute-parity": "policy-substitute",
   "field-trip-ratios": "policy-field-trip",
-  "field-trip-signoff": "policy-field-trip-signoff"
+  "field-trip-signoff": "policy-field-trip-signoff",
+  "schedule-day-metadata": "policy-schedule-day",
+  "field-trip-event": "policy-field-trip-event"
 };
 
 const assignedEmployeesForBlock = (context: RulesContext, blockId: string) => {
@@ -80,6 +82,77 @@ export const ratioSegmentRule: RuleDefinition = {
         const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${block.requirementTemplate.minStaff}, ratio ${childrenPerStaff}) but only ${assigned} assigned`;
         violations.push(
           buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId)
+        );
+      }
+    });
+    return violations;
+  }
+};
+
+export const scheduleDayMetadataRule: RuleDefinition = {
+  id: "schedule-day-metadata",
+  description:
+    "Each schedule day must capture a schedule type, enrollment headcount, and an explicit field trip decision before the week can advance",
+  evaluate: (context: RulesContext) => {
+    const violations: RuleViolation[] = [];
+    const citationId = getCitationId(
+      context,
+      "schedule-day-metadata",
+      DEFAULT_POLICY_CITATIONS["schedule-day-metadata"]
+    );
+    (context.scheduleDays ?? []).forEach((day) => {
+      if (!day.scheduleType) {
+        violations.push(
+          buildViolation(
+            "schedule-day-metadata",
+            `Schedule day ${day.date} lacks a selected schedule type`,
+            "ScheduleDay",
+            day.id,
+            citationId,
+            "error",
+            { missing: ["scheduleType"] }
+          )
+        );
+      }
+      if (day.enrollmentCount === undefined || day.enrollmentCount === null) {
+        violations.push(
+          buildViolation(
+            "schedule-day-metadata",
+            `Schedule day ${day.date} needs an enrollment headcount`,
+            "ScheduleDay",
+            day.id,
+            citationId,
+            "error",
+            { missing: ["enrollmentCount"] }
+          )
+        );
+      }
+      if (!day.fieldTripEventId) {
+        violations.push(
+          buildViolation(
+            "schedule-day-metadata",
+            `Schedule day ${day.date} must link to a field trip decision (or mark "No Field Trip")`,
+            "ScheduleDay",
+            day.id,
+            citationId,
+            "error",
+            { missing: ["fieldTripEventId"] }
+          )
+        );
+        return;
+      }
+      const hasEvent = context.fieldTripEvents.some((event) => event.id === day.fieldTripEventId);
+      if (!hasEvent) {
+        violations.push(
+          buildViolation(
+            "schedule-day-metadata",
+            `Schedule day ${day.date} references a missing field trip decision (${day.fieldTripEventId})`,
+            "ScheduleDay",
+            day.id,
+            citationId,
+            "error",
+            { fieldTripEventId: day.fieldTripEventId }
+          )
         );
       }
     });
@@ -313,6 +386,54 @@ export const substituteParityRule: RuleDefinition = {
   }
 };
 
+export const fieldTripEventIntegrityRule: RuleDefinition = {
+  id: "field-trip-event",
+  description:
+    "Field trip events must either declare “No Field Trip” or point to an existing FieldTripType before they can be applied",
+  evaluate: (context: RulesContext) => {
+    const violations: RuleViolation[] = [];
+    const citationId = getCitationId(
+      context,
+      "field-trip-event",
+      DEFAULT_POLICY_CITATIONS["field-trip-event"]
+    );
+    context.fieldTripEvents.forEach((event) => {
+      if (event.isNoFieldTrip) {
+        return;
+      }
+      if (!event.fieldTripTypeId) {
+        violations.push(
+          buildViolation(
+            "field-trip-event",
+            `Field trip event ${event.id} must reference a FieldTripType or declare "No Field Trip"`,
+            "FieldTripEvent",
+            event.id,
+            citationId,
+            "error",
+            { missing: ["fieldTripTypeId", "isNoFieldTrip"] }
+          )
+        );
+        return;
+      }
+      const typeExists = context.fieldTripTypes.some((type) => type.id === event.fieldTripTypeId);
+      if (!typeExists) {
+        violations.push(
+          buildViolation(
+            "field-trip-event",
+            `Field trip event ${event.id} points to an unknown FieldTripType (${event.fieldTripTypeId})`,
+            "FieldTripEvent",
+            event.id,
+            citationId,
+            "error",
+            { fieldTripTypeId: event.fieldTripTypeId }
+          )
+        );
+      }
+    });
+    return violations;
+  }
+};
+
 export const fieldTripRatiosRule: RuleDefinition = {
   id: "field-trip-ratios",
   description: "Applies field trip ratios for adults and leaders in overridden segments",
@@ -405,11 +526,13 @@ export const fieldTripSignoffRule: RuleDefinition = {
 };
 
 export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
+  scheduleDayMetadataRule,
   ratioSegmentRule,
   certificationPerSegmentRule,
   segmentCoverageRule,
   shiftBreakLimitsRule,
   substituteParityRule,
+  fieldTripEventIntegrityRule,
   fieldTripRatiosRule,
   fieldTripSignoffRule
 ];

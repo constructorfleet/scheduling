@@ -3,6 +3,8 @@ export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 export type ScheduleStatus = "draft" | "ready_for_review" | "submitted" | "approved" | "archived";
 export type AssignmentSource = "template" | "manual_adjustment" | "field_trip_override" | "substitute" | "import";
 export type ApprovalState = "pending" | "approved" | "rejected";
+export type ScheduleType = "regular" | "extended" | "enrichment";
+export type EnrollmentSource = "roster" | "manual_adjustment" | "override";
 
 export interface PolicyCitation {
   id: string;
@@ -44,6 +46,7 @@ export interface SegmentRequirementTemplate {
 export interface SegmentBlock {
   id: string;
   scheduleWeekId: string;
+  scheduleDayId?: string;
   dayOfWeek: DayOfWeek;
   segment: DaySegment;
   startTime: string;
@@ -61,9 +64,12 @@ export interface FieldTripEvent {
   scheduleWeekId: string;
   dayOfWeek: DayOfWeek;
   segment: DaySegment;
-  fieldTripTypeId: string;
+  scheduleDayId?: string;
+  fieldTripTypeId?: string;
+  isNoFieldTrip?: boolean;
   approverId?: string;
   signedOffAt?: string;
+  policyCitationId?: string;
   notes?: string;
 }
 
@@ -105,6 +111,19 @@ export interface StaffAssignment {
   isSubstitute: boolean;
   substituteRequestId?: string;
   status: "scheduled" | "active" | "on_break" | "completed";
+  notes?: string;
+}
+
+export interface ScheduleDay {
+  id: string;
+  scheduleWeekId: string;
+  date: string;
+  dayOfWeek: DayOfWeek;
+  scheduleType?: ScheduleType;
+  enrollmentCount?: number;
+  enrollmentSource?: EnrollmentSource;
+  fieldTripEventId?: string;
+  operatingCapacityOverride?: number;
   notes?: string;
 }
 
