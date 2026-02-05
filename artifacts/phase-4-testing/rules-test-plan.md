@@ -11,6 +11,7 @@ Each rule below lists the critical compliance-side scenario (what will produce a
 - **Critical scenario (violation):** A segment block with fewer staff assignments than `max(minStaff, ceil(childCount / ratio.childrenPerStaff))`, e.g., 18 children with only one assignee and no enforced minimum.
 - **Happy-path (clean):** Assignment count meets both the ratio and any explicit minimum (e.g., three employees cover 24 children with `minStaff = 3`).
 - **Automated reference:** `tests/rules/rulesEngine.test.ts` ratio tests that flag `ratio-segment` violations and verify a zero-violation outcome; see `RULES_TEST_CASES.md` entries QA-RULE-001/QA-RULE-002.
+- **Field-trip overrides:** Blocks tied to signed-off field trips skip this rule so their adult/leader coverage is governed by `field-trip-ratios`; QA-RULE-017 proves that the segment ratio rule remains silent while the field-trip variant raises violations.
 
 ### certification-per-segment
 - **Critical scenario:** A block requiring CPR, medical delegation, and leader flags with an assignment that lacks all three certifications (results in three separate violations).
@@ -26,21 +27,25 @@ Each rule below lists the critical compliance-side scenario (what will produce a
 - **Critical scenario:** Back-to-back assignments push an employee past `maxHoursPerDay` and `maxHoursPerWeek`, resulting in distinct daily and weekly violations.
 - **Happy-path:** Assignments remain below both caps (e.g., two four-hour blocks vs. eight-hour daily and sixteen-hour weekly limits).
 - **Automated reference:** Shift limit tests documented under QA-RULE-007/QA-RULE-008.
+- **Weekly-total enforcement:** A weekly violation surfaces even when each day's hours are compliant, keeping cumulative totals and QA-RULE-018 in sync.
 
 ### substitute-parity
 - **Critical scenario:** A substitute assignment references a missing or non-approved request, generating a violation that enumerates the absent metadata (`substituteRequest`, `state`, `approverId`, etc.).
 - **Happy-path:** The substitute request is approved with approver/timestamp/reason metadata, satisfying parity.
 - **Automated reference:** Substitute parity tests and QA-RULE-011/QA-RULE-012.
+- **Approval metadata completeness:** Even a pending request with missing approver/timestamp fields triggers QA-RULE-019, which proves the violation lists each missing property before persistence.
 
 ### field-trip-ratios
 - **Critical scenario:** A trip block with child/adult counts below the `FieldTripType`'s `minAdultStudentRatio` or `minLeaderStudentRatio`, yielding adult and/or leader violations.
 - **Happy-path:** Enough unique adult assignments and leader-qualified employees meet both ratio minima.
 - **Automated reference:** Field-trip ratio tests and QA-RULE-013/QA-RULE-014.
+- **Leader-specific shortages:** QA-RULE-020 isolates the leader ratio so that adequate adult coverage alone does not suppress a leader shortage violation.
 
 ### field-trip-signoff
 - **Critical scenario:** A `FieldTripEvent` without `approverId` and/or `signedOffAt` throws a sign-off violation that lists every missing field.
 - **Happy-path:** Both fields are populated so the event clears the rule.
 - **Automated reference:** Sign-off tests and QA-RULE-015/QA-RULE-016.
+- **Partial metadata enforcement:** QA-RULE-021 demonstrates that missing only `approverId` still produces a `field-trip-signoff` violation, keeping approvals explicit.
 
 ## Validation Strategy
 

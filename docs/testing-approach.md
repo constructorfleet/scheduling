@@ -15,6 +15,13 @@ The plan enumerates each rule, the critical scenario that must trigger a violati
 - **field-trip-ratios:** Adult and leader counts are validated against `FieldTripType` minima so both shortage and compliant combinations are recorded (`artifacts/phase-4-testing/rules-test-plan.md:35-38`).
 - **field-trip-signoff:** The plan enforces that missing `approverId` or `signedOffAt` fields produce violations while full sign-offs clear (“happy path”) (`artifacts/phase-4-testing/rules-test-plan.md:40-44`).
 
+### Additional guardrails
+- **Field-trip overrides own ratios:** `ratio-segment` stops evaluating blocks that are tied to signed-off field trips, ensuring `field-trip-ratios` is the single source of truth for those overrides (`QA-RULE-017` / `tests/rules/rulesEngine.test.ts`).
+- **Weekly cap detection spans days:** Weekly violations trigger even when each individual day stays within its cap so cumulative coverage is enforced (`QA-RULE-018` / `tests/rules/rulesEngine.test.ts`).
+- **Substitute parity enumerates missing approval metadata:** Partial approvals surface a violation whose `missing` array lists every absent field, making it easy to resolve incomplete substitute requests (`QA-RULE-019` / `tests/rules/rulesEngine.test.ts`).
+- **Field trips distinguish adults from leaders:** Even when adult staffing meets the ratio, leader shortages still yield violations so leadership coverage can't be bypassed (`QA-RULE-020` / `tests/rules/rulesEngine.test.ts`).
+- **Sign-off metadata is granular:** Missing only `approverId` still produces an actionable `field-trip-signoff` violation, keeping the approval status explicit (`QA-RULE-021` / `tests/rules/rulesEngine.test.ts`).
+
 ## Rule engine suites (Jest)
 The `RulesEngine` (`src/rules/engine.ts:4`) evaluates `DEFAULT_RULE_DEFINITIONS` (`src/rules/definitions.ts:407`) so every execution path shares the same curated catalog. Each definition—ratios, certifications, coverage, shift limits, substitutes, and field-trip requirements—uses helpers for violation metadata and policy citations before emitting `RuleViolation` objects. The Jest harness, configured via `jest.config.ts:3-10`, runs under the `ts-jest` preset and uses `tests/setupTests.ts:1` as a future hook for shared matchers or spies.
 
