@@ -23,6 +23,21 @@ The Scheduling Application is a standalone HTML5 experience with offline-first b
    - Verify the archive’s `build-metadata.json` before deployment to trace rule compliance to a commit.  
    - `npm run lint` and `npm test` are not part of the build script, so run them explicitly before committing a release candidate.
 
+## Configuration reference
+
+| Variable | Applies to | Purpose |
+| --- | --- | --- |
+| `SKIP_TYPE_CHECK=1` | Build | Skip the `npm run type-check` stage when you only need a fresh UI bundle; defaults to `0`. |
+| `AWS_S3_BUCKET` | Deploy | Required for S3/CDN deployments; `aws s3 sync` mirrors `dist-static/` into this bucket. |
+| `AWS_S3_PREFIX` | Deploy | Optional key prefix inside the bucket (e.g., `prod/2026.02.05`). |
+| `AWS_PROFILE` | Deploy | For multi-profile setups; forwarded directly to the AWS CLI. |
+| `DEPLOY_HOST` | Deploy | Remote server hostname that receives the `rsync` sync. |
+| `DEPLOY_USER` | Deploy | SSH user for `rsync`; defaults to the current `$USER`. |
+| `DEPLOY_PATH` | Deploy | Destination directory on `DEPLOY_HOST`; required when `DEPLOY_HOST` is set. |
+| `DEPLOY_LOCAL_PATH` | Deploy | Local filesystem target for straight disk copies (useful for pilots or wrapped installers). |
+
+`scripts/deploy-static.sh` refuses to run without one of the deployment targets (`AWS_S3_BUCKET`, `DEPLOY_HOST` + `DEPLOY_PATH`, or `DEPLOY_LOCAL_PATH`), so always stage the bundle via `npm run build:static` before invoking the deploy step.
+
 ## Packaging considerations
 - Clean slate: `scripts/build-static.sh` runs `npm run clean` before building, ensuring deterministic outputs.  
 - Source map inclusion (`vite.config.ts` enables sourcemaps) aids debugging but can be stripped in future releases when not needed; update the build script accordingly.  
@@ -52,6 +67,12 @@ The Scheduling Application is a standalone HTML5 experience with offline-first b
 - **Release tagging**: embed the `dist-static-<timestamp>.tar.gz` identifier in release notes.  
 - **Version tracking**: copy `build-metadata.json` into your release tracker (e.g., SharePoint, Notion) so directors can trace what commit produced a release.  
 - **Automated pipeline**: run `scripts/build-static.sh` inside CI (e.g., GitHub Actions) and upload both the tarball and `dist-static/` to a release artifact store before invoking `scripts/deploy-static.sh`.
+- **CI/CD snippet**: a reproducible pipeline only needs
+  1. `npm ci` (or `npm install`) plus any tooling setup you require.  
+  2. `npm run build:static` (set `SKIP_TYPE_CHECK=1` if your linting/tests already run elsewhere).  
+  3. Publish `dist-static-*.tar.gz` and `dist-static/` as artifacts for auditors or downstream deployments.  
+  4. Optionally run `AWS_S3_BUCKET=... npm run deploy:static` or `DEPLOY_HOST=... DEPLOY_PATH=... ./scripts/deploy-static.sh` from a trusted runner that has network access to the target.  
+  Retain the generated `build-metadata.json` alongside each artifact so consumers can tie a deployment URL back to the originating commit and environment.
 
 ## Rollback & rollback detection
 - Keep the previous tarball (and optionally a copy of `dist-static/`) in your artifact storage.  

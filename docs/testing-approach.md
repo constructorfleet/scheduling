@@ -35,13 +35,17 @@ The canonical tests in `tests/rules/rulesEngine.test.ts:83-474` always pair viol
 - Field-trip sign-off missing data vs. signed-off events (`tests/rules/rulesEngine.test.ts:429-452`).
 
 ## 4. Integration and UI automation (Playwright)
-Playwright is already wired for future scenario-based flows via `npm run test:e2e` (`package.json:14`). When the scheduling workspace and conflict navigator reach implementation, `tests/e2e/` and `tests/ui/` will house Page objects, fixtures, and walkthroughs that reproduce key rules before persistence, ensuring the guided experience stays compliant without manual tricks.
+Playwright is already wired for future scenario-based flows via `npm run test:e2e` (`package.json:14`). The latest guided-workflow spec (`tests/e2e/guided-workflows.spec.ts:25-65`) explicitly exercises the field-trip and substitute gating the UI must honor before allowing any publish action, verifying that:
+- the field-trip card begins blocked with “Field trip needs a director signature,” transitions to “Complete” after “Add director sign-off,” and then enables the publish CTA, and
+- the substitute parity panel starts blocked, surfaces the missing metadata, resolves via “Resolve parity,” and finishes ready with the approver/timestamp shown and the resolve button removed.
+
+Future Playwright worktrees in `tests/e2e/` and `tests/ui/` should continue encoding the `QA-RULE-017` through `QA-RULE-021` scenarios so the guided experience reproduces every compliance gate before persistence.
 
 ## 5. Running the suites
 - `npm test` (`package.json:16`) executes Jest with roots from `jest.config.ts:6`, so rule-engine suites run with every developer iteration.
 - `npm test -- tests/rules/rulesEngine.test.ts` focuses on the compliance block during rule updates.
 - `npm run test:watch` (`package.json:17`) keeps Jest in watch mode for rapid iteration.
-- `npm run test:e2e` (`package.json:14`) binds Playwright scripts into CI once the fixtures exist.
+- `npm run test:e2e` (`package.json:14`) chains the Playwright walkthroughs, but it currently fails before the first scenario because the configured Vite web server cannot bind to `127.0.0.1:4174` (“listen EPERM: operation not permitted”), so the guided-workflow suite never starts. Grant Vite permission for that port or adjust `playwright.config.ts` to use an allowed port before rerunning this command to exercise the Field Trip/Substitute gating expectations.
 - Node 18+ is required to satisfy the Jest/Playwright stack (`package.json:54-56`).
 
 ## 6. Traceability and onboarding
@@ -59,4 +63,5 @@ New policy rules begin in the Rule Catalog (`RULES_TEST_CASES.md:1-95`). Before 
 
 ## 9. Next steps
 1. Publish these guardrail notes to the QA dashboard or tracker that surfaces `RULES_TEST_CASES.md` so auditors can map the documented cases to the guarded scenarios.
-2. When the scheduling workspace/UI is ready, add integration/end-to-end flows (Playwright or similar) that recreate `QA-RULE-017` through `QA-RULE-021` before allowing a week to progress beyond draft.
+2. Coordinate with Ops or local security to allow Playwright’s Vite server to bind to `127.0.0.1:4174` (or adjust `playwright.config.ts` to a permitted port) and rerun `npm run test:e2e` so the guided-workflow assertions for field trips and substitute parity complete.
+3. When the scheduling workspace/UI is ready, add integration/end-to-end flows (Playwright or similar) that recreate `QA-RULE-017` through `QA-RULE-021` before allowing a week to progress beyond draft.
