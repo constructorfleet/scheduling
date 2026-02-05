@@ -19,7 +19,8 @@ const highlightList = [
 const quickInfo = [
   {
     label: "Build command",
-    detail: "`npm run build:static` (runs `tsc`, bundles the UI, stages `dist-static/`, and records metadata)."
+    detail:
+      "`npm run build:static` (cleans, optionally type-checks, runs the Vite build, stages `dist-static/`, records metadata, and archives the release)."
   },
   {
     label: "Deploy command",
