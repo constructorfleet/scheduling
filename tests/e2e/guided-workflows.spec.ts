@@ -23,6 +23,8 @@ test.describe("Scheduling workspace guided flows", () => {
       await markResolvedButton.first().click();
     }
     await expect(page.getByText("0 violations outstanding")).toBeVisible();
+    const fieldTripStep = page.locator("article", { hasText: "Field trip sign-off" });
+    await expect(fieldTripStep.getByText("Field trip needs a director signature")).toBeVisible();
     const validationStep = page.locator("article", { hasText: "Validation" });
     await expect(validationStep.getByText("Complete")).toBeVisible();
 
@@ -31,6 +33,7 @@ test.describe("Scheduling workspace guided flows", () => {
     await expect(page.getByText("Field trip approved")).toBeVisible();
     const signedOffButton = page.getByRole("button", { name: "Signed off" });
     await expect(signedOffButton).toBeDisabled();
+    await expect(fieldTripStep.getByText("Complete")).toBeVisible();
 
     const publishButton = page.getByRole("button", { name: "Publish schedule" });
     await expect(publishButton).toBeEnabled();
@@ -39,11 +42,14 @@ test.describe("Scheduling workspace guided flows", () => {
   });
 
   test("substitute parity resolution and audit controls stay in sync", async ({ page }) => {
-    const resolveParity = page.getByRole("button", { name: "Resolve parity" });
-    await resolveParity.click();
     const substitutePanel = page.locator("section", {
       has: page.getByRole("heading", { name: "Substitute coverage" })
     });
+    await expect(substitutePanel.getByText("blocked")).toBeVisible();
+    await expect(substitutePanel.getByText("Approver metadata missing")).toBeVisible();
+    await expect(substitutePanel.getByText("Approval timestamp missing")).toBeVisible();
+    const resolveParity = substitutePanel.getByRole("button", { name: "Resolve parity" });
+    await resolveParity.click();
     await expect(substitutePanel.getByText("ready")).toBeVisible();
     await expect(substitutePanel.getByText("Approver: Aisha Patel")).toBeVisible();
     await expect(substitutePanel.getByText("Signed")).toBeVisible();
