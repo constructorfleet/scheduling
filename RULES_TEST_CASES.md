@@ -123,3 +123,45 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Execution:** evaluate the event and inspect the `missing` payload on the `field-trip-signoff` violation.
 - **Expectation:** the rule emits a violation containing only `["approverId"]` so users know exactly what field is absent.
 - **Verification:** `tests/rules/rulesEngine.test.ts` (`ft-event-6` fixture confirms the selective metadata and violation).
+
+## Rule: schedule-day-metadata (Day-level metadata completeness)
+- **Source:** `DOMAIN_MODEL.md:306-313` (Schedule day captures schedule type, enrollment, and field trip metadata) plus `src/rules/definitions.ts:67-125`.
+
+### QA-RULE-022 – Schedule day missing required metadata (violation)
+- **Preconditions:** a `ScheduleDay` without `scheduleType`, `enrollmentCount`, or `fieldTripEventId`.
+- **Execution:** evaluate the empty-day context so the rule can inspect metadata fields.
+- **Expectation:** three `schedule-day-metadata` violations naming each missing property and exposing the `missing` metadata arrays.
+- **Verification:** `tests/rules/rulesEngine.test.ts:727-750` (the `day-missing` fixture explicitly asserts all three violations).
+
+### QA-RULE-023 – Schedule day with full metadata (clean)
+- **Preconditions:** a `ScheduleDay` linked to an `isNoFieldTrip` event, with `scheduleType` and `enrollmentCount` populated.
+- **Expectation:** the rule finds every field populated and emits zero violations.
+- **Verification:** `tests/rules/rulesEngine.test.ts:753-775` (the `day-valid` fixture keeps the rule quiet once the day is valid).
+
+### QA-RULE-024 – Schedule day references a missing field trip event (violation)
+- **Preconditions:** a `ScheduleDay` supplies `fieldTripEventId` but the corresponding event is absent from `context.fieldTripEvents`.
+- **Expectation:** `schedule-day-metadata` emits a violation pointing to the day and lists `fieldTripEventId` inside `metadata` so users see the dangling reference.
+- **Next Step:** add a dedicated unit test to capture this lookup failure once the fixture is available.
+
+## Rule: field-trip-event (Field trip event integrity)
+- **Source:** `DOMAIN_MODEL.md:263-292` (FieldTripEvent lifecycle) and `src/rules/definitions.ts:400-438`.
+
+### QA-RULE-025 – Event missing both type and “No Field Trip” flag (violation)
+- **Preconditions:** `FieldTripEvent` lacks `isNoFieldTrip` and `fieldTripTypeId`, yet is linked to a `ScheduleDay`.
+- **Expectation:** `field-trip-event` returns a violation with `metadata.missing` listing both `fieldTripTypeId` and `isNoFieldTrip`.
+- **Verification:** `tests/rules/rulesEngine.test.ts:778-798` (`ft-event-missing-meta` covers the detection and metadata reporting).
+
+### QA-RULE-026 – Event references a configured field trip type (clean)
+- **Preconditions:** `FieldTripEvent.fieldTripTypeId` points to an existing `FieldTripType` and `isNoFieldTrip` remains unset.
+- **Expectation:** the rule stays quiet because the referenced type is resolvable.
+- **Verification:** `tests/rules/rulesEngine.test.ts:801-830` (`ft-event-sourced` and `trip-type-guard` provide the clean path).
+
+### QA-RULE-027 – Event references an unknown type (violation)
+- **Preconditions:** `FieldTripEvent` sets `fieldTripTypeId` to a value that does not exist in `context.fieldTripTypes` while `isNoFieldTrip` is false.
+- **Expectation:** the rule emits a violation tying `target.metadata.fieldTripTypeId` to the missing ID so the user can rebuild their ratio profiles.
+- **Next Step:** add this fixture and expectation to `tests/rules/rulesEngine.test.ts` to prove the lookup guard works.
+
+### QA-RULE-028 – Event declares “No Field Trip” (clean)
+- **Preconditions:** `FieldTripEvent.isNoFieldTrip` is `true` and `fieldTripTypeId` is empty; the event is linked to a `ScheduleDay`.
+- **Expectation:** the rule short-circuits and emits no violation despite the empty ratio profile.
+- **Note:** the `day-valid` test already exercises this behavior indirectly, but a focused test would keep the rule’s short-circuit explicit.
