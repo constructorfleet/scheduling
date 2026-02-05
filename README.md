@@ -225,9 +225,9 @@ AWS_S3_BUCKET=<bucket> npm run deploy:static
 # Deployment details live in artifacts/phase-9-deployment/deployment-guide.md
 ```
 
-`npm run build:static` wraps `scripts/build-static.sh`, stages the compiled assets under `dist-static/`, writes `build-metadata.json` (commit, timestamp, Node/npm versions), and creates `dist-static-{timestamp}.tar.gz`. Use the ZIP or copy `dist-static/` to your static host, then follow the guide’s cache invalidation and metadata tracking steps before sharing the release with directors.
+`npm run build:static` wraps `scripts/build-static.sh`, stages the compiled assets under `dist-static/`, writes `build-metadata.json` (commit, timestamp, Node/npm versions), and creates `dist-static-{timestamp}.tar.gz`. Use the ZIP or copy `dist-static/` to your static host, then follow the guide’s cache invalidation and metadata tracking steps before sharing the release with directors. See `artifacts/phase-9-deployment/build-scripts/README.md` for an itemized breakdown of the scripts, knobs such as `SKIP_TYPE_CHECK`, and the outputs they produce.
 
-`npm run deploy:static` (`scripts/deploy-static.sh`) copies the staged `dist-static/` bundle to the destination you configure via environment variables (`AWS_S3_BUCKET`/`AWS_S3_PREFIX`, `DEPLOY_HOST`/`DEPLOY_PATH`, or `DEPLOY_LOCAL_PATH`). See `artifacts/phase-9-deployment/deployment-guide.md` for configuration examples, cache-invalidation tips, and verification steps.
+`npm run deploy:static` (`scripts/deploy-static.sh`) copies the staged `dist-static/` bundle to the destination you configure via environment variables (`AWS_S3_BUCKET`/`AWS_S3_PREFIX`, `DEPLOY_HOST`/`DEPLOY_PATH`, or `DEPLOY_LOCAL_PATH`). See `artifacts/phase-9-deployment/deployment-guide.md` for configuration examples, cache-invalidation tips, and verification steps. The same folder also points to `artifacts/phase-9-deployment/build-scripts/README.md` if you need the automation-summary for each script invoked in the workflow.
 
 ## Configuration
 

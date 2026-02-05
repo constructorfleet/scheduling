@@ -48,7 +48,7 @@ This document describes the core entities, enumerations, and validation points t
 
 
 ### RatioProfile
-- `id`, `age_group_profile_id`
+- `id`
 - `segment` (`DaySegment`)
 - `children_per_staff` (number > 0)
 - `leader_required` (bool)

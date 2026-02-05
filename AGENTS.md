@@ -2,6 +2,8 @@
 
 This project will be executed by a set of focused agents that collaborate with a project manager (you). Each agent owns a clear set of outputs and has defined handoffs.
 
+THERE IS NO AGE PROFILES IN THIS PROJECT! DO NOT ADD THEM! REMOVE ANY REFERENCES TO AGES, AGE_GROUP and AGE_GROUP_PROFILE.
+
 ## How to Use These Agents
 - Assign tasks by referencing the agent name and expected artifact.
 - Each agent should produce concrete outputs (documents, code, tests, or UI artifacts).
