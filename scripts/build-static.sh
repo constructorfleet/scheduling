@@ -9,6 +9,13 @@ DIST_UI_DIR="$ROOT_DIR/dist/ui"
 STAGING_DIR="$ROOT_DIR/dist-static"
 ARCHIVE_TS="$(date -u +"%Y%m%dT%H%M%SZ")"
 BUILD_TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+SKIP_TYPE_CHECK_RAW="${SKIP_TYPE_CHECK:-0}"
+case "$SKIP_TYPE_CHECK_RAW" in
+  1|[Tt][Rr][Uu][Ee]) TYPE_CHECK_SKIPPED="true" ;;
+  *) TYPE_CHECK_SKIPPED="false" ;;
+esac
+
+COMMANDS=()
 
 info() {
   printf '\033[1;34m[build-static]\033[0m %s\n' "$*"
@@ -22,18 +29,28 @@ die() {
 info "Ensuring prerequisites are available"
 command -v npm >/dev/null 2>&1 || die "npm must be installed"
 command -v node >/dev/null 2>&1 || die "node must be installed"
+if command -v python3 >/dev/null 2>&1; then
+  PYTHON_CMD="$(command -v python3)"
+elif command -v python >/dev/null 2>&1; then
+  PYTHON_CMD="$(command -v python)"
+else
+  die "python3 or python must be installed"
+fi
 
 info "Cleaning previous artifacts"
+COMMANDS+=("$CLEAN_CMD")
 eval "$CLEAN_CMD"
 
-if [[ "${SKIP_TYPE_CHECK:-0}" != "1" ]]; then
+if [[ "$TYPE_CHECK_SKIPPED" == "false" ]]; then
   info "Running type check"
+  COMMANDS+=("$TYPE_CHECK_CMD")
   NODE_ENV=production $TYPE_CHECK_CMD
 else
-  info "Skipping type check (SKIP_TYPE_CHECK=1)"
+  info "Skipping type check (SKIP_TYPE_CHECK=${SKIP_TYPE_CHECK_RAW})"
 fi
 
 info "Bundling UI (Vite)"
+COMMANDS+=("$UI_BUILD_CMD")
 NODE_ENV=production $UI_BUILD_CMD
 
 if [[ ! -d "$DIST_UI_DIR" ]]; then
@@ -62,30 +79,38 @@ NPM_VERSION="$(npm --version)"
 META_FILE="$STAGING_DIR/build-metadata.json"
 
 info "Recording build metadata"
-cat <<EOF > "$META_FILE"
-{
-  "generatedAt": "$BUILD_TS",
-  "archiveTimestamp": "$ARCHIVE_TS",
-  "commands": [
-    "$CLEAN_CMD",
-    "$TYPE_CHECK_CMD",
-    "$UI_BUILD_CMD"
-  ],
+COMMANDS_JSON_ARRAY=$($PYTHON_CMD - <<'PY' "${COMMANDS[@]}"
+import json, sys
+print(json.dumps(sys.argv[1:]))
+PY
+)
+(
+  export COMMANDS_JSON_ARRAY BUILD_TS ARCHIVE_TS NODE_VERSION NPM_VERSION GIT_COMMIT GIT_BRANCH GIT_DIRTY TYPE_CHECK_SKIPPED
+  "$PYTHON_CMD" - <<'PY'
+import json, os
+
+meta = {
+  "generatedAt": os.environ["BUILD_TS"],
+  "archiveTimestamp": os.environ["ARCHIVE_TS"],
+  "commands": json.loads(os.environ["COMMANDS_JSON_ARRAY"]),
   "versions": {
-    "node": "$NODE_VERSION",
-    "npm": "$NPM_VERSION"
+    "node": os.environ["NODE_VERSION"],
+    "npm": os.environ["NPM_VERSION"]
   },
   "vcs": {
-    "commit": "$GIT_COMMIT",
-    "branch": "$GIT_BRANCH",
-    "dirty": $GIT_DIRTY
+    "commit": os.environ["GIT_COMMIT"],
+    "branch": os.environ["GIT_BRANCH"],
+    "dirty": os.environ["GIT_DIRTY"].lower() == "true"
   },
   "environment": {
     "nodeEnv": "production",
-    "skipTypeCheck": "${SKIP_TYPE_CHECK:-0}"
+    "skipTypeCheck": os.environ["TYPE_CHECK_SKIPPED"] == "true"
   }
 }
-EOF
+
+print(json.dumps(meta, indent=2))
+PY
+) > "$META_FILE"
 
 ARCHIVE_NAME="dist-static-${ARCHIVE_TS}.tar.gz"
 ARCHIVE_PATH="$ROOT_DIR/$ARCHIVE_NAME"

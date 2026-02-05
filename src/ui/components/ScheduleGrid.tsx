@@ -61,7 +61,7 @@ export default function ScheduleGrid({
     const ratio = block.requirementTemplate.ratioProfile.childrenPerStaff;
     const requiredStaff = Math.max(block.requirementTemplate.minStaff, Math.ceil(block.childCount / ratio));
     const hasLeader = assignedStaff.some((employee) => employee.leaderQualified);
-    const hasViolation = (violationsBySegment[block.id] ?? []).some((violation) => !violation.resolved);
+    const hasViolation = (violationsBySegment[block.id]?.length ?? 0) > 0;
     const compliant = assignedCount >= requiredStaff && hasLeader;
     const slot = segmentDefinitions[block.segment];
     if (!slot) {

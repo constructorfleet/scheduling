@@ -19,7 +19,6 @@ export interface RuleViolation {
   segmentBlockId: string;
   policyCitation: PolicyCitation;
   recommendedAction: string;
-  resolved: boolean;
 }
 
 export interface AuditEvent {

@@ -30,6 +30,6 @@ AWS_S3_BUCKET=... npm run deploy:static
 ```
 
 ## Build metadata & verification
-- After `npm run build:static` completes, inspect `dist-static/build-metadata.json` to confirm it captured `commands` (clean/type-check/build), tool versions, git `commit`/`branch`, the `dirty` flag, and whether `SKIP_TYPE_CHECK` was used. This file is the single source of truth for each release.
+- After `npm run build:static` completes, inspect `dist-static/build-metadata.json` to confirm the `commands` array lists the steps that actually ran (type-check only shows up when you let it run), tool versions, git `commit`/`branch`, the `dirty` flag, and that `skipTypeCheck` matches whether `SKIP_TYPE_CHECK=1` was set. This file is the single source of truth for each release.
 - Keep the staging directory (`dist-static/`) and the tarball (`dist-static-<timestamp>.tar.gz`) together when you publish so QA teams can replay the bundle and auditors can trace every deployment.
 - Follow `artifacts/phase-9-deployment/deployment-checklist.md` to run through the same build/verification/deploy steps every time—and treat the checklist as an operational artifact that accompanies any release notes or compliance logs.

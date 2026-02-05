@@ -4,9 +4,10 @@
 Describe how to package, deploy, and update the scheduling workspace so each build ends up as a standalone HTML5 bundle that can be audited, rolled back, and redeployed without depending on a backend runtime.
 
 ## Build & Packaging
-1. **Prerequisites**: Node 18+, npm, and Vite tooling. The source tree already ships with `npm run clean`, `npm run type-check`, and `npm run build:ui`, so the `scripts/build-static.sh` orchestrates these steps and copies `dist/ui` into `dist-static` while capturing metadata in `build-metadata.json`.
-2. **Command**: Run `npm run build:static` (which invokes `scripts/build-static.sh`). It enforces a fresh clean, optional type check (skip via `SKIP_TYPE_CHECK=1`), Bundles the UI with `NODE_ENV=production`, and stages the output directory before archiving it as `dist-static-<timestamp>.tar.gz`.
-3. **Reproducible metadata**: The script records timestamps, the exact commands executed, Node/npm versions, git commit/branch/dirty state, and the `SKIP_TYPE_CHECK` flag, so every artifact can be traced back to a single source. Preserve `build-metadata.json` alongside each release bundle to detect drift.
+1. **Prerequisites**: Node 18+, npm, Vite tooling, and Python 3 (or `python`) so the metadata helper can serialize the `build-metadata.json` audit log. The source tree already ships with `npm run clean`, `npm run type-check`, and `npm run build:ui`, so the `scripts/build-static.sh` orchestrates these steps and copies `dist/ui` into `dist-static` while capturing metadata in `build-metadata.json`.
+2. **Command**: Run `npm run build:static` (which invokes `scripts/build-static.sh`). It enforces a fresh clean, runs `npm run type-check` (currently successful), bundles the UI with `NODE_ENV=production`, stages the output directory, and archives it as `dist-static-<timestamp>.tar.gz`. Set `SKIP_TYPE_CHECK=1` only when you need a faster UI-only iteration; the resulting metadata always records the flag so you can tell whether the type-check phase ran.
+3. **Reproducible metadata**: The script records timestamps, the ordered commands you actually ran (clean, optional type-check when `SKIP_TYPE_CHECK` is unset, and the Vite build), Node/npm versions, git commit/branch/dirty state, and the `SKIP_TYPE_CHECK` flag so every artifact can be traced back to a single source. Preserve `build-metadata.json` alongside each release bundle to detect drift.
+   Ensure Python 3 (or `python`) remains on your PATH so the helper that emits the JSON metadata can run successfully every time.
 4. **Archives**: The final tarball lives next to the repo root, ready for transfer. Keep the archive name timestamped (`dist-static-<UTC>.tar.gz`) to prevent accidental reuse and to provide a human-friendly reference in release notes.
 
 ## Deployment Targets
@@ -33,10 +34,10 @@ All targets read from `dist-static/` produced by the build script, so ensure `np
 ## Build metadata & traceability
 `npm run build:static` (which drives `./scripts/build-static.sh`) records every release through `dist-static/build-metadata.json` and the timestamped tarball next to the repo root. The metadata captures:
 
-- `commands`: the exact commands run (`npm run clean`, `npm run type-check`, `npm run build:ui`).
+- `commands`: the ordered commands that executed (`npm run clean`, optionally `npm run type-check` when it didn’t run with `SKIP_TYPE_CHECK=1`, and `npm run build:ui`).
 - `versions`: Node/npm tool versions so the environment can be reproduced.
 - `vcs`: git `commit`, `branch`, and `dirty` state so auditors know what code produced the bundle.
-- `environment`: the resolved `NODE_ENV` and `SKIP_TYPE_CHECK` flag so variations are explicit.
+- `environment`: the resolved `NODE_ENV` and the `skipTypeCheck` flag (true when `SKIP_TYPE_CHECK=1`) so variations in whether the type-check phase ran are explicit.
 
 Keep the metadata file and tarball together with the staged `dist-static/` directory. Before deployment, verify the metadata matches the release you intend to push and note the `generatedAt` timestamp in your release log. When deploying, copy the entire directory (including `build-metadata.json`) to the target so the live environment can be traced back to the archived build. Retain previous tarballs plus their metadata in case a rollback is needed.
 

@@ -5,7 +5,7 @@ Use this checklist every time you cut a release so the static bundle, metadata, 
 ## 1. Build & stage the static bundle
 - [ ] Run `npm run build:static` from the repository root (set `SKIP_TYPE_CHECK=1` if you only need the UI bundle during iteration).
 - [ ] Confirm `dist-static/` exists and contains the hashed `assets/` directory plus `index.html`, `build-metadata.json`, and other static files.
-- [ ] Open `dist-static/build-metadata.json` and verify it records the `commands` array, `versions` (node + npm), and `vcs` details (`commit`, `branch`, `dirty`) that tie the build back to a single git state.
+- [ ] Open `dist-static/build-metadata.json` and verify it records the `commands` array, `versions` (node + npm), `vcs` details (`commit`, `branch`, `dirty`), and the `skipTypeCheck` flag so the build can be tied to a single git state and you can tell whether the type-check phase ran.
 - [ ] Retain the `dist-static-<timestamp>.tar.gz` archive that `build-static.sh` produces next to the repo root for release notes, QA handoffs, or artifact storage.
 
 ## 2. Validate & log the release
@@ -21,7 +21,7 @@ Use this checklist every time you cut a release so the static bundle, metadata, 
 
 ## 4. Verify the deployment
 - [ ] `curl` the deployed `index.html` (or open it in a browser) and ensure it returns HTTP 200 and renders the UI.
-- [ ] `curl <target>/build-metadata.json` and confirm that the metadata matches the release you just staged (commit hash, branch, timestamp, commands, and `dirty` flag).
+- [ ] `curl <target>/build-metadata.json` and confirm that the metadata matches the release you just staged (commit hash, branch, timestamp, `commands`, `dirty`, and `skipTypeCheck`) so the deployed bundle mirrors the staging run.
 - [ ] Run a quick smoke test (Playwright, manual checklist, or the UI flows in `tests/ui`) against the deployed URL to make sure the scheduler loads and can open a week view.
 - [ ] Verify CDN cache settings leave hashed assets cached long-term while keeping `index.html` and `build-metadata.json` short-lived.
 

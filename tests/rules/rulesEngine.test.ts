@@ -903,4 +903,68 @@ describe("RulesEngine", () => {
     expect(eventViolation).toBeDefined();
     expect(eventViolation?.target.metadata).toEqual({ fieldTripTypeId: "missing-type" });
   });
+
+  test("flags segment blocks with invalid time windows", () => {
+    const invalidBlock = createSegmentBlock("block-invalid-window", {
+      startTime: "12:00",
+      endTime: "10:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [invalidBlock],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const timelineViolations = violations.filter((violation) => violation.ruleId === "segment-block-timeline");
+    expect(timelineViolations).toHaveLength(1);
+    expect(timelineViolations[0].target.id).toBe(invalidBlock.id);
+    expect(timelineViolations[0].target.metadata).toEqual({
+      startTime: invalidBlock.startTime,
+      endTime: invalidBlock.endTime
+    });
+    expect(timelineViolations[0].message).toContain("invalid window");
+  });
+
+  test("flags overlapping segment blocks on the same day", () => {
+    const dayId = "day-timeline-overlap";
+    const fieldTripEvent = createFieldTripEvent("ft-day-timeline", {
+      scheduleDayId: dayId,
+      isNoFieldTrip: true
+    });
+    const scheduleDay = createScheduleDay(dayId, {
+      scheduleType: "regular",
+      enrollmentCount: 15,
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const firstBlock = createSegmentBlock("block-timeline-first", {
+      scheduleDayId: dayId,
+      startTime: "08:00",
+      endTime: "10:00"
+    });
+    const overlappingBlock = createSegmentBlock("block-timeline-overlap", {
+      scheduleDayId: dayId,
+      startTime: "09:30",
+      endTime: "11:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [scheduleDay],
+      segmentBlocks: [firstBlock, overlappingBlock],
+      staffAssignments: [],
+      employees: [],
+      substituteRequests: [],
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const timelineViolations = violations.filter((violation) => violation.ruleId === "segment-block-timeline");
+    expect(timelineViolations).toHaveLength(1);
+    expect(timelineViolations[0].target.id).toBe(overlappingBlock.id);
+    expect(timelineViolations[0].target.metadata).toEqual({ overlapsWith: firstBlock.id });
+    expect(timelineViolations[0].message).toContain("overlaps with");
+  });
 });

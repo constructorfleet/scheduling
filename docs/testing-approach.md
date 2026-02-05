@@ -1,115 +1,101 @@
-# Testing Approach for the Scheduling Application
+# Testing approach for the scheduling application
 
 ## Purpose
-This guide crystallizes how the project keeps every compliance rule, UX flow, and deployment gate testable without a live walkthrough. The goal is to make onboarding QA, product, and ops partners self-sufficient: every artifact references a cataloged policy, every guardrail links to a test, and the execution story signals the current blockers and next steps.
+This guide describes how the scheduling app’s automation layers (rule-engine Jest suites, RTL component specs, Playwright journeys, and audit-ready artifacts) keep every policy violation traceable and teachable without a live walkthrough. It also captures the blockers, tools, and next steps the Documentation & QA agents highlight so onboarding leans on the documentation itself.
 
-## Key test focus areas
-- **Clock-in/out-driven scheduling.** Every block is entered via HH:MM AM/PM start and end times, and the rule engine must handle multiple non-contiguous blocks per day without reverting to Morning/Midday/Afternoon segments. Jest fixtures and Playwright guided flows validate that gaps, overlaps, and coverage shortages instantly raise the expected violations and that editing the same data clears them once the rules pass again.
-- **Configuration panels (staff/ratios/certifications).** The staff roster page lets users add, edit, and remove employees plus adjust their certifications and ratio requirements. Automated domain tests (`tests/domain/...`) and the Playwright configuration path confirm the UI accepts new staff, enforces required fields, notifies about expired certifications, and re-triggers validation when any roster property changes.
-- **Field trip & schedule-type metadata.** Each calendar day links to a schedule type (Regular / Extended / Enrichment) and either a field-trip type or the explicit “No Field Trip” flag. Tests prove every validation path described in `RULES_TEST_CASES.md` (missing schedule type, missing enrollment, dangling field-trip refs, unknown types, sign-off omissions) and ensure ratio enforcement honors overrides only when approvals exist.
-- **Enrollment headcounts & ratios.** Editable enrollment counts drive ratio math for every block, so both Jest and Playwright suites check that updating the count automatically recalculates required staff, surfaces new violations if coverage shrinks, and clears the violation the moment the threshold is satisfied.
-- **Validation lifecycle.** There is no “mark addressed” option—violations stay active until the underlying cataloged rule is satisfied. The rule-engine tests re-run after every data mutation, confirming the engine only clears violations when the data is compliant and automatically surfaces the updated citation metadata in the UI.
-- **Persistence and audit readiness.** Every edit flows into storage (IndexedDB/JSON journal), emits audit entries, and drives replayable snapshots. QA verifies the journaled output in `test-results/` after running the suites, ensuring that troubleshooting information matches the violated rule metadata.
+## Testing philosophy
+- **Compliance-first traceability.** Each QA rule listed in `RULES_TEST_CASES.md` links a policy citation to a violation/clean fixture pair in `tests/rules/rulesEngine.test.ts`, so the UI’s violation navigator can point back to the exact rule definition in `src/rules/definitions.ts` and the underlying operating policy.
+- **Data-driven revalidation.** There is no “mark addressed” button—`GuidedStatusTracker` guides directors to the unresolved field trip, ratio, or clock block, and the rules engine clears every violation automatically once the submitted metadata is compliant.
+- **Auditable automation.** Every Jest or Playwright run creates validation data (`test-results/`) that can be attached to release notes, QA dashboards, or compliance reports, ensuring the same scripts executed in each school deployment produce identical outputs.
+- **Offline parity.** The available automation runs locally (Vite dev server + Playwright, Jest with `ts-jest` and `jsdom`), so even air-gapped deployments can execute the same commands and capture JSON/journal snapshots for auditors.
 
-## Feature coverage matrix
-| Feature | Automation / Manual | Key assertions |
+## Guardrail catalog (QA-RULE-017—030)
+| QA rule | Coverage | Automated reference |
 | --- | --- | --- |
-| Multi-block staff scheduling | Jest (`tests/rules/rulesEngine.test.ts`) + Playwright guided workflow | Multiple non-contiguous blocks per staff can co-exist; ratio violations trigger gap/high-hour alerts; editing start/end times clears the violation only when coverage meets the calculated demands. |
-| Staff roster & certification management | Jest/domain unit tests + manual UI checks | Adding/removing staff, editing certifications/expiration dates, and associating ratio flags immediately triggers validation; missing documentation surfaces in UI and prevents publishing. |
-| Field trip & schedule type metadata | Jest + `RULES_TEST_CASES.md` catalog + Playwright | Days must reference a schedule type and either a valid field-trip type or “No Field Trip”; unknown IDs, missing selections, and sign-off gaps consistently emit QA-RULE-022—028. |
-| Enrollment headcounts | Jest + Playwright | Changing enrollment updates required headcount for ratio math, and violations track once per `ScheduleDay`; the UI reflects the new requirement and unlocks publishing after revalidation. |
-| Validation lifecycle | Jest + React/Playwright UI integration | Violations stay active until the actual data change removes the root cause; no manual “mark addressed” path; re-running the rule engine (and Playwright flows) confirms the lifecycle. |
-| Persistence & audit trail | Regression checks + manual artifact inspection | Running the full suite writes structured journal snapshots/audit entries; `test-results/` gets updated with the same violation IDs seen in the UI so compliance reviews can replay the timeline. |
+| QA-RULE-017 Field-trip overrides skip base ratios | Ensures field trips enforce their own staffing formulas rather than the standard segment ratios. | `tests/rules/rulesEngine.test.ts` + future Playwright scenario that edits a field-trip sign-off. |
+| QA-RULE-018 Weekly totals enforce cross-day ceilings | Warns when daily compliance hides a weekly cap violation. | `tests/rules/rulesEngine.test.ts` (weekly totals fixtures) and planned Playwright coverage for publishing gating. |
+| QA-RULE-019 Substitute approvals need metadata | Catches missing approver IDs or timestamps before toggling compliance. | `tests/rules/rulesEngine.test.ts` + `tests/ui/SubstituteAssignmentPanel.test.tsx`. |
+| QA-RULE-020 Leader-focused shortages | Keeps leader ratios separate so adult compliance cannot mask leader gaps. | `tests/rules/rulesEngine.test.ts` and `tests/ui/ViolationNavigator.test.tsx` verifying violation cards highlight leader shortages. |
+| QA-RULE-021 Partial sign-offs still block publishing | Lists any missing approver detail instead of allowing silent clearance. | `tests/rules/rulesEngine.test.ts` (field-trip sign-off fixtures) and `tests/e2e/violation-workflows.spec.ts` that exercises the guided tracker/violation navigator for incomplete approvals. |
+| QA-RULE-029 Segment block windows must be positive | Prevents zero-length or negative-duration segment blocks that hide compliance gaps. | `tests/rules/rulesEngine.test.ts` (`segment-block-timeline` fixtures) + `tests/ui/ClockBlockTimeline.test.tsx` ensuring violation badges appear for invalid windows and the focused block toggles `aria-pressed`. |
+| QA-RULE-030 Segment block overlaps are disallowed | Flags overlapping assignments within the same day so auto-balance can reflow staff. | `tests/rules/rulesEngine.test.ts` (overlap fixtures) + `tests/e2e/workspace-interactions.spec.ts` verifying the violation navigator steers directors back to the conflicting blocks. |
 
-## Compliance-first philosophy
-- **Policy-driven automation.** Every test suite maps back to a citation in `RULES_TEST_CASES.md` and the policy-aware definitions in `src/rules/definitions.ts`. When policies change, the catalog entry and the failing fixture tell the story, so auditors can trace a violation from UI > fixture > rule definition > citation without asking a developer.
-- **Early validation.** Validation errors flow from the rule engine and are cleared only when the underlying data passes the check, so pass/fail states are deterministic and never manually toggled.
-- **On-device readiness.** Node 18+ is required for the Jest/Playwright stack (see `package.json`), ensuring every tester and QA workstation runs the same runtime as CI.
-
-## Rule coverage tiers
-Each rule includes a violation fixture and a compliant fixture so reviewers immediately see the gap that must be fixed. Key tiers:
-- `ratio-segment`: enforces `max(minStaff, ceil(childCount / ratio.childrenPerStaff))` per block (`artifacts/phase-4-testing/rules-test-plan.md:10-14` and `tests/rules/rulesEngine.test.ts:83-120`).
-- `certification-per-segment`: guards CPR/medical/leader flags and documentation for every block (`artifacts/phase-4-testing/rules-test-plan.md:15-19`, relevant fixtures).
-- `segment-coverage`: monitors ratio, leader, and medical coverage simultaneously (`artifacts/phase-4-testing/rules-test-plan.md:20-24`).
-- `shift-break-limits`: validates daily and weekly hour caps plus graceful wrap-around across midnight (`artifacts/phase-4-testing/rules-test-plan.md:25-28`).
-- `substitute-parity`: insists on metadata, approver, and timestamp parity (`artifacts/phase-4-testing/rules-test-plan.md:30-33`).
-- `field-trip ratios` and `field-trip signoff`: make sure either the field trip meeting ratios/recent approvals or the sign-off metadata is present (`artifacts/phase-4-testing/rules-test-plan.md:35-44`).
-- `schedule-day-metadata`: validates that every calendar day has a schedule type, enrollment headcount, and field-trip linkage (missing schedule type, missing enrollment, or a dangling field-trip reference each emit QA-RULE-022—024 and cite the relevant catalog entries in `RULES_TEST_CASES.md:127-144` and `tests/rules/rulesEngine.test.ts`).
-- `field-trip-event`: enforces that every event points to either “No Field Trip” or a defined type, rejects dangling type IDs, and cleanly short-circuits when no field trip is required (QA-RULE-025—028 detail the missing-type/no-trip flag, compliant path, unknown type rejection, and No Field Trip short-circuit).
-
-## Guardrail catalog (QA-RULE-017—021)
-Each QA rule defines the compliance edge case that must stay covered:
-1. **QA-RULE-017 (Field trip overrides).** Confirms field-trip overrides can temporarily waive base ratios but still emit the override citation and require documentation before publishing (`tests/rules/rulesEngine.test.ts`, field-trip fixture pair).
-2. **QA-RULE-018 (Weekly total spans).** Validates rules honor weekly totals across contiguous days, not just per-day aggregates, so the rule engine flags a block that would break week-level maximums (`tests/rules/rulesEngine.test.ts`, weekly fixture pair).
-3. **QA-RULE-019 (Substitute metadata gaps).** Exercises the substitute parity rule, requiring metadata, approver, and timestamp fields before the UI exposes the “ready” state (`tests/rules/rulesEngine.test.ts`, substitute metadata fixture pair).
-4. **QA-RULE-020 (Leader-only shortages).** Ensures leader-level coverage is enforced even when enough non-leader staff exist but no qualifying leader is on shift (`tests/rules/rulesEngine.test.ts`, leader shortage fixture pair).
-5. **QA-RULE-021 (Partial sign-off omissions).** Confirms the field-trip sign-off rule still trips when a partial sign-off exists or was never recorded (`tests/rules/rulesEngine.test.ts`, sign-off fixture pair).
-6. **QA-RULE-022 (Missing schedule-type metadata).** Flags days that never had a schedule type selected, ensuring the scheduler must pick Regular/Extended/Enrichment before publishing (`tests/rules/rulesEngine.test.ts`, schedule-day metadata fixtures).
-7. **QA-RULE-023 (Missing enrollment headcount).** Ensures enrollment is entered before ratios run, and the rule engine keeps the violation active until a child count is provided (`tests/rules/rulesEngine.test.ts`, schedule-day enrollment fixtures).
-8. **QA-RULE-024 (Dangling field-trip metadata).** Catches when a day points at a non-existent `FieldTripEvent` so the UI cannot publish with stale references; the new fixture under `tests/rules/rulesEngine.test.ts` proves the rule rejects the orphaned pointer.
-9. **QA-RULE-025 (Missing field-trip type/no-trip flag).** Covers the failure path when an event neither declares a valid type nor the “No Field Trip” short-circuit before director approval (`tests/rules/rulesEngine.test.ts`, field-trip event fixtures).
-10. **QA-RULE-026 (Clean field-trip path).** Demonstrates the compliant scenario when an event references a valid type, ratios match, and approvals are recorded, guaranteeing the approvals gate stays green (`tests/rules/rulesEngine.test.ts`, field-trip event fixtures).
-11. **QA-RULE-027 (Unknown field-trip type).** Exercises the rule that rejects a `FieldTripEvent` whose `fieldTripTypeId` is not defined; the planned fixture proves the rule cites the dangling type before coverage clears.
-12. **QA-RULE-028 (No Field Trip short-circuit).** Verifies that explicitly choosing “No Field Trip” bypasses the ratio checks while still forcing the scheduler to acknowledge the decision (`tests/rules/rulesEngine.test.ts`, short-circuit fixtures).
+### Timeline integrity (QA-RULE-029—030)
+- The `segment-block-timeline` rule (see `src/rules/definitions.ts:240-309`) validates every `SegmentBlock` for a positive clock window and no overlaps within its day, producing actionable violations that carry the block metadata for downstream reporting. `RULES_TEST_CASES.md:169-182` keeps the QA-ID/citation pair aligned with the fixtures used in `tests/rules/rulesEngine.test.ts:907-968` so auditors can replay a violation straight from the documentation. 
+- Component tests (`tests/ui/DayMetadataStrip.test.tsx`, `tests/ui/ClockBlockTimeline.test.tsx`) and the workspace-focused Playwright journeys ensure the guided metadata flows, auto-balance hints, and `aria-pressed` focus semantics reflect the same rule payloads; new QA-RULE references now appear in the feature/coverage matrix and QA catalog so onboarding scripts can point learners to the exact fixtures and commands. 
+- Every rerun of `npm test -- tests/rules/rulesEngine.test.ts` or the narrower `tests/ui/ClockBlockTimeline.test.tsx` suite should capture `test-results/segment-block-timeline.json` (or similar) with the QA rule ID so release notes and compliance decks cite both the policy and automation path before publishing. 
 
 ## Automation layers
-### Rule engine (Jest)
-- Tests run via `npm test` (or `npm test -- tests/rules/rulesEngine.test.ts` for the focused suite). `jest.config.ts` points at `ts-jest`; helpers and shared matchers live in `tests/setupTests.ts`.
-- Each describe block wires `RulesEngine` (`src/rules/engine.ts`) to curated definitions, covering violation/clean pairs for every eligibility, ratio, certification, coverage, shift-break, substitute, field-trip ratio, and sign-off rule.
-- Deterministic fixtures pull from `src/ui/data/mockScheduleData.ts` and `src/ui/types.ts`, ensuring the same types feed both UI automation and rule validation when the live data layer arrives.
+### Rule engine & helpers (Jest)
+- `tests/rules/rulesEngine.test.ts` walks through every QA rule ID, firing compliant and violating fixtures so auditors can replay a violation from the UI back to the policy citation exported alongside `src/rules/definitions.ts`.
+- Utility suites such as `tests/utils/rulesUtils.test.ts` protect the shared math helpers (`parseTimeToMinutes`, ratio calculations, clock block duration checks) that keep coverage consistent when block windows span midnight or combine non-contiguous assignments.
+- Jest uses `ts-jest`, the `jsdom` environment configured in `jest.config.ts`, and DOM helpers from `tests/setupTests.ts` so the React components and rule engine agree on the same helpers and mocking story.
 
-### Integration & UI automation (Playwright)
-- The guided workflow spec (`tests/e2e/guided-workflows.spec.ts`) recreates the district director, substitute parity, and field-trip approval journeys before enabling the publish CTA.
-- Each scenario shows the field-trip block’s prompts, a director sign-off clearing the gate, the substitute parity panel toggling between missing metadata and ready state, and the publish button unlocking only after compliance.
-- New Playwright workflows should keep adding QA-RULE-017—021 paths so UI-level demonstrations mirror the guardrails.
-- **Current blocker:** `npm run test:e2e` is blocked because Vite can’t bind to `127.0.0.1:4174` (listen `EPERM`). Either grant permission or configure `playwright.config.ts` to use an allowed host/port before rerunning.
+### Component & guided workspace integration (React Testing Library)
+- `tests/ui/GuidedStatusTracker.test.tsx` proves the tracker renders statuses, focuses the relevant card, and never mutates data—it only scrolls directors toward the outstanding violation, and the rules engine clears the violation once their edits are committed.
+- `tests/ui/ViolationNavigator.test.tsx` ensures each card highlights all impacted clock blocks, links to the policy metadata, surfaces the leader/adult delta, and never provides a “resolve manually” control.
+- Supporting tests (`FieldTripApprovalPanel`, `SubstituteAssignmentPanel`, `StaffPalette`) keep guided panels and selection affordances aligned with the mocked domain state from `src/ui/data/mockScheduleData.ts` and the `ScheduleDay`/`FieldTripEvent` metadata model.
+- `tests/ui/DayMetadataStrip.test.tsx` validates each metadata card flags missing enrollment/schedule/field-trip details, surfaces the chosen ratio hint, and dispatches the correct payload per control change.
+- `tests/ui/ClockBlockTimeline.test.tsx` exercises the timeline blocks so assigned staff, required-staff/ratio data, and violation badges render, the focused block toggles `aria-pressed`, and the auto-balance/focus callbacks fire when the user interacts.
+- These specs run alongside the rule-engine tests via `npm test` or focused commands (e.g., `npm test -- tests/ui`), guaranteeing UI props reflect the same rules as the backend fixtures.
 
-## Recent test plan updates
-- The written plan now documents QA-RULE-022—024 under `schedule-day-metadata` and QA-RULE-025—028 for `field-trip-event`, describing missing-schedule-type, missing-enrollment, dangling field-trip references, missing type/no-trip flags, the compliant path, unknown-type rejections, and the explicit “No Field Trip” short-circuit. Each rule entry in `RULES_TEST_CASES.md:127-167` refers back to `artifacts/phase-4-testing/rules-test-plan.md` so auditors can trace the policy citation plus the fixture posture.
-- Next steps called out in the plan: (1) add a `ScheduleDay` fixture that points at a non-existent `FieldTripEvent` so QA-RULE-024 has concrete coverage, (2) add a `FieldTripEvent` fixture whose `fieldTripTypeId` is undefined so QA-RULE-027 proves the dangling-type rejection, and (3) rerun `npm test -- tests/rules/rulesEngine.test.ts` (and the full Jest suite) once `jest-environment-jsdom` installs successfully—`npm install --save-dev jest-environment-jsdom` currently fails with `getaddrinfo ENOTFOUND registry.npmjs.org`, so the environment still lacks the required browser API.
-- Keeping this plan updated as new guardrails appear ensures the rule engine, fixtures, and Playwright journeys all point back to a living QA catalog before any schedule can publish.
+### Guided end-to-end flows (Playwright)
+- `tests/e2e/day-metadata-workflows.spec.ts` covers the DayMetadataStrip interactions: showing ratio hints for each schedule type, reflecting field-trip approvals, and re-blocking publish until the director signs off again.
+- `tests/e2e/guided-workflows.spec.ts` walks through a full guided week: navigating the workspace, resolving violations, signing off field trips, approving substitutes, and unlocking the publish CTA only when all metadata and approvals are complete.
+- `tests/e2e/workspace-interactions.spec.ts` verifies the workspace toolbar hints (“Field trip needs signature”, “Publish blocked”), the violation navigator’s auto-focus, and the auto-select behavior inside the staff palette once a violation has been chosen.
+- `tests/e2e/violation-workflows.spec.ts` focuses on the violation navigator and guided tracker so UX reviewers can see the compliance highlight drop to zero only after the rules engine reruns with edited clock blocks or approvals—it confirms there is never a manual dismiss path.
+- Playwright reuses `playwright.config.ts`, which currently expects `http://127.0.0.1:4174`; retained traces/screenshots unlock root-cause debugging when runs fail offline.
 
 ## Running the suites
-1. Switch to Node 18+ (`nvm use 18` or equivalent) before installing dependencies.
-2. `npm install` to restore packages; offline work means this remains a one-time manual step if network is obstructed.
-3. Rule engine (Jest): `npm test -- tests/rules/rulesEngine.test.ts` (runs only the rule coverage). Full suite: `npm test`.
-4. Watch mode: `npm run test:watch` (Jest stays live while you adjust fixtures or definitions).
-5. Playwright (integration): `npm run test:e2e` once the Vite host/port issue is resolved.
-6. UI build verification: `npm run build:ui` and inspect `dist` artifacts; run this before every release to ensure the UI compiles.
-
-## Traceability & onboarding
-1. Start with `RULES_TEST_CASES.md` and `artifacts/phase-4-testing/rules-test-plan.md`: each entry lists the QA rule ID, the compliant/violation posture, and the policy citation.
-2. Follow the cross-reference into `tests/rules/rulesEngine.test.ts` and `src/rules/definitions.ts`; the coder should see where the violation triggers and which citation surfaces in the UI.
-3. When policies change, update the catalog, add the fixture pair with the QA rule ID in the comments, ensure `DEFAULT_RULE_DEFINITIONS` still emits the same metadata, and refresh this doc so auditors know how to verify the new behavior.
+1. Use Node 18+ to match the `engines` declaration in `package.json`; `nvm use 18` or a similar tool should be part of any onboarding script.
+2. Install dependencies (`npm install`) whenever `package-lock.json` or the repo changes.
+3. Rule-engine and helper Jest suites:
+   - `npm test` for the full Jest surface area.
+   - `npm test -- tests/rules/rulesEngine.test.ts tests/utils/rulesUtils.test.ts` to focus on policy and helper math coverage.
+   - `npm test -- tests/ui` for guided-workspace component specs; watch for the `jsdom` dependency listed under blockers.
+   - `npm run test:watch` for rapid iteration while editing rules or component props.
+4. End-to-end:
+   - `npm run test:e2e` (once the Vite dev server can bind to `127.0.0.1:4174` or the host/port is adjusted); specify individual specs (e.g., `tests/e2e/day-metadata-workflows.spec.ts`, `tests/e2e/violation-workflows.spec.ts`) to target focused journeys.
+5. `npm run build:ui` before each release to ensure Vite’s `dist/` artifacts (and `dist-static/` later) reflect the latest metadata-driven workspace.
+6. Archive the generated logs/artifacts under `test-results/` (create the folder if missing) so compliance reviewers can match violation IDs to actual runs.
 
 ## Maintaining and expanding coverage
-- Keep each new rule in sync with a dedicated fixture pair and QA identifier so the compliance story stays explicit.
-- Add guardrail entries (QA-RULE-017—021) to `artifacts/phase-4-testing/rules-test-plan.md` and the QA dashboard (or `RULES_TEST_CASES.md`) so automation traces the edge case plus the visual workflow.
-- Include new interactions in Playwright or React UI specs (`tests/ui/`) so the guided workspace exposes the same validation gates as the rule engine.
-- Revisit the `artifacts/phase-3-data-model` documents whenever the data shape changes so the tests keep restoring the same structures the UI expects.
-- Periodically rerun `npm test -- tests/rules/rulesEngine.test.ts` and `npm run build:ui` (or CI) before every release, and capture the results in `test-results/` for auditors.
+- When adding or revising a QA rule, update `RULES_TEST_CASES.md` (policy citation + QA ID), extend `tests/rules/rulesEngine.test.ts` with violation/clean fixtures, and reflect the same QA ID in any relevant component or Playwright spec.
+- Guardrail updates (e.g., new field-trip overrides, leader-only shortages, substitute metadata requirements) should live in this doc’s catalog plus any new table rows in `artifacts/phase-4-testing/rules-test-plan.md` so every agent sees where enforcement sits.
+- Capture failing runs in `test-results/` with the QA rule references used during that execution so release notes can mention the exact policy IDs.
+- Flag automation gaps immediately: missing helper coverage, new UI flows that are not yet automated, or Playwright specs that cannot run because the Vite host is blocked.
+
+## Traceability & documentation
+- QA rules, policy citations, and fixture pairings live in `RULES_TEST_CASES.md`; linking a new rule there ensures the story propagates to `tests/rules/rulesEngine.test.ts` and the `ViolationNavigator` metadata found in `src/ui/components/ViolationNavigator.tsx`.
+- Reference artifacts such as `artifacts/phase-4-testing/rules-test-plan.md` and `docs/technical-overview.md` for policy intent, rule mappings, and command sequences that reproduce every layer.
+- Mention the QA rule IDs inside Playwright reports (custom trace names, screenshot filenames) so operations can batch discover failing policies without parsing logs.
+
+## Blockers & immediate actions
+| Blocking area | Impact | Next action |
+| --- | --- | --- |
+| `jest-environment-jsdom` missing | `npm test -- tests/ui` fails because the DOM environment does not exist | Install `jest-environment-jsdom` once the registry is reachable: `npm install --save-dev jest-environment-jsdom`; rerun the focused suites. |
+| Playwright host binding (`listen EPERM 127.0.0.1:4174`) | `npm run test:e2e` cannot launch the Vite dev server, so guided workflows and violation navigator journeys never execute | Allow binding to `127.0.0.1:4174` or update `playwright.config.ts`/`npm run dev` to use an allowed host/port (e.g., `0.0.0.0` or a non-privileged port) and rerun each spec. |
+| Manual validation resolution | The UI must never provide a manual “mark resolved” button, so testers must expect violations to clear only after data edits | Keep `GuidedStatusTracker` focused on directing directors to the violation and adjust Playwright assertions to await the rules engine revalidation instead of the tracker action. |
 
 ## QA readiness checklist
-- [ ] Document every rule update in `RULES_TEST_CASES.md` with its QA rule identifier and the relevant policy citation.
-- [ ] Update `tests/rules/rulesEngine.test.ts` with violation/clean fixtures and note the QA rule ID (e.g., `QA-RULE-018`) in comments near each describe block.
-- [ ] Add a `ScheduleDay` fixture that points to a missing `FieldTripEvent` so QA-RULE-024 is exercised in the rule-engine suite before any guardrail is considered satisfied.
-- [ ] Add a `FieldTripEvent` fixture whose `fieldTripTypeId` is undefined so QA-RULE-027 documents the rejection of dangling field-trip type references.
-- [ ] Confirm `src/rules/definitions.ts` emits the citations described in the catalog before merging the change.
-- [ ] Run `npm test -- tests/rules/rulesEngine.test.ts` (full `npm test` when larger) to exercise both violation and clean branches.
-- [ ] Capture UI interactions for new guardrails in Playwright (`tests/e2e/`) or in `tests/ui/` React specs.
-- [ ] Update `docs/testing-approach.md` to highlight any new guardrail, automation command, or environment requirement so onboarding stays current.
+1. Document each new QA rule + citation in `RULES_TEST_CASES.md` so the story feeds both the rules engine and the frontend metadata.
+2. Pair new rules with violation/clean fixtures in `tests/rules/rulesEngine.test.ts`; keep the QA ID next to each describe block.
+3. Cover the updated flows in `tests/ui/*` (guided tracker, violation navigator, field-trip approvals, substitute panels) so the components reflect the same metadata.
+4. Expand Playwright coverage (`tests/e2e/*.spec.ts`) for the new journeys described in this doc (day metadata, violation navigator, guided workspace gating, workbook interactions).
+5. Capture any failing runs in `test-results/` and note the QA rule IDs in release notes or QA dashboards before releasing a schedule week.
 
 ## Execution status snapshot
 | Suite | Command | Scope | Status | Notes |
 | --- | --- | --- | --- | --- |
-| Rule engine (Jest) | `npm test` / `npm test -- tests/rules/rulesEngine.test.ts` | Every policy definition | Passed (per latest implementation summary) | Essential regression check; run locally and in CI before release. |
-| Integration (Playwright) | `npm run test:e2e` | Guided workflow (field trips, substitutes, publish gate) | Blocked | Vite dev server cannot bind to `127.0.0.1:4174`; update `playwright.config.ts` or grant permission before rerunning. |
-| UI build | `npm run build:ui` | Static UI bundle | Passed (last reported run) | Required before packaging/releases. |
+| Rule engine + helpers (Jest) | `npm test -- tests/rules/rulesEngine.test.ts tests/utils/rulesUtils.test.ts` | Ratio/coverage/field-trip metadata guards; helper math | Blocked | Awaiting `jest-environment-jsdom` so DOM-based helpers and component imports resolve. |
+| Component integrations (RTL) | `npm test -- tests/ui` | Guided tracker, violation navigator, field trip approval, staff palette | Blocked | Same DOM dependency; rerun after environment is installed. |
+| End-to-end (Playwright) | `npm run test:e2e` | Guided flows (day metadata, violation navigator, staff palette, publish gate) | Blocked | Vite dev server cannot bind to `127.0.0.1:4174`; adjust host/port or permissions. |
+| Static UI build | `npm run build:ui` | Bundles React app for offline deployment | Not run | Run before every release. |
 
-> **Reminder:** Validations are only cleared when the underlying data passes the rule engine; there is no manual “mark as answered” action.
+> Validations clear only when the actual data passes the rules engine; there is no manual “mark resolved” override.
 
-## Blockers & next steps
-1. **Resolve the Playwright host/port block** so `npm run test:e2e` can exercise the guided workflow (field trips, substitutes, publish gating).
-2. **Connect the live data layer** to `src/ui/App.tsx` and the scheduling workspace so compliance tests run against editable/persistent schedules instead of mocks.
-3. **Add Playwright/React specs for QA-RULE-017—021** so the UI automation exposes every guardrail before a week can move past draft status.
-4. **Create the missing schedule-day and field-trip fixtures (`QA-RULE-024`/`QA-RULE-027`) and rerun `npm test -- tests/rules/rulesEngine.test.ts` once `jest-environment-jsdom` is installed** so the rule-engine suite can cover the new metadata validations without manual approval toggles.
+## Next steps
+1. Install `jest-environment-jsdom` once registry access is restored and rerun `npm test -- tests/rules/rulesEngine.test.ts tests/ui` so the DOM-based suites pass.
+2. Allow Playwright’s Vite server to bind to `127.0.0.1:4174` (or switch to an approved host/port) and rerun `npm run test:e2e` so the guided-workflow and violation-spec assertions execute in a browser.
+3. Once the workspace supports editable/persistent schedule blocks and approvals, expand Playwright coverage to include every QA-RULE-017—021 journey before allowing a week to publish.
+4. Keep `docs/testing-approach.md` aligned with `RULES_TEST_CASES.md` and `artifacts/phase-4-testing/rules-test-plan.md` so new guardrails stay documented for onboarding.

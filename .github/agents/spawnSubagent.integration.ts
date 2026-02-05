@@ -972,7 +972,7 @@ export async function orchestrateFullProject() {
     // Phase 1: Product Agent
     console.log('Phase 1: Product & Domain Agent');
     const productAgent = new ProductDomainAgentImpl();
-    const requirements = await productAgent.execute('Gather requirements');
+    const requirements = await productAgent.execute('New requirements: 1. The schedule should be made up of clock-in/clock-out times for staff members, not Morning/Midday/Afternoon (see docs/Example Schedule Spreadsheet.png). 2. There MUST be a settings page/panel where the user can add/edit/remove staff and maintain their certifications. 3. A user CANNOT mark a violation as addressed - violations must be cleared by the data being validated. 4. Each day of the week must be marked with either a field trip type or "no field trip". 5. The user must be able to add/edit/remove field trip types and their ratios. 6. The user must be able to update the enrolled children on any given day 7. Each day must have a drop down for the schedule type.');
 
     // Phase 2: Solution Architect
     console.log('Phase 2: Solution Architect Agent');

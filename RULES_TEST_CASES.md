@@ -165,3 +165,18 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Preconditions:** `FieldTripEvent.isNoFieldTrip` is `true` and `fieldTripTypeId` is empty; the event is linked to a `ScheduleDay`.
 - **Expectation:** the rule short-circuits and emits no violation despite the empty ratio profile.
 - **Verification:** `tests/rules/rulesEngine.test.ts:855-878` (`ft-event-no-trip` proves the rule skips validation when the event marks “No Field Trip”).
+
+## Rule: segment-block-timeline (Segment clock window validation)
+- **Source:** `src/rules/definitions.ts:240-309`
+
+### QA-RULE-029 – Segment block with invalid window (violation)
+- **Preconditions:** a `SegmentBlock` whose `startTime` is the same as or after `endTime` (e.g., `startTime = "12:00"`, `endTime = "10:00"`).
+- **Execution:** evaluate the context so the rule inspects the block timeline.
+- **Expectation:** a `segment-block-timeline` violation citing the block id, messaging the invalid window, and populating `target.metadata` with both timestamps.
+- **Verification:** `tests/rules/rulesEngine.test.ts:907-930` (the `block-invalid-window` fixture asserts the invalid window violation and metadata payload).
+
+### QA-RULE-030 – Overlapping segment blocks (violation)
+- **Preconditions:** two `SegmentBlock`s tied to the same day with `startTime`/`endTime` values that overlap (e.g., one spans `08:00-10:00`, the other `09:30-11:00`).
+- **Execution:** run the rules engine to capture timeline violations.
+- **Expectation:** the later block emits a `segment-block-timeline` violation referencing the earlier block in `metadata.overlapsWith` and the message mentions the overlapping block id/range.
+- **Verification:** `tests/rules/rulesEngine.test.ts:932-968` (the `block-timeline-overlap` fixture confirms only the latter block produces the violation and metadata).

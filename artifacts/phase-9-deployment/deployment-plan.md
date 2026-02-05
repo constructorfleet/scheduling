@@ -11,7 +11,7 @@
 3. **Artifact capture** – keep the staged folder, `build-metadata.json`, and the generated `dist-static-<timestamp>.tar.gz` together with every release bundle so QA or ops can replay an exact byte-equivalent deployment.
 
 ## Verification gates
-- Open `dist-static/build-metadata.json` immediately after the build to confirm the `commands`, `versions` (node + npm), and `vcs` (`commit`, `branch`, `dirty`) section tie the bundle to a known Git state.
+- Open `dist-static/build-metadata.json` immediately after the build to confirm the `commands` array (and `skipTypeCheck` flag) plus the `versions` (node + npm) and `vcs` (`commit`, `branch`, `dirty`) sections tie the bundle to a known Git state and the expected phases executed.
 - If metadata flags `dirty: true`, raise the exception in your release log and confirm the change is intentional before proceeding.
 - Optionally run `npm run lint` / `npm test` outside the build script and capture their outputs in your release notes (useful for compliance), but do not rely on the build for these checks.
 

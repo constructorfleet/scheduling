@@ -9,18 +9,19 @@ The Scheduling Application is a standalone HTML5 experience with offline-first b
 ## Reproducible build workflow
 1. **Prerequisites**  
    - Node.js 18+ (per `package.json` engines) and npm installed.  
-   - Git checkout clean or intentionally dirty commits recorded in metadata.
+   - Git checkout clean or intentionally dirty commits recorded in metadata.  
+   - Python 3 (or `python` if that points to Python 3) on the PATH—the build script uses a tiny Python helper to serialize `build-metadata.json` with the `commands` array and `skipTypeCheck` flag.
 2. **Run the orchestrated build**  
    ```bash
    ./scripts/build-static.sh
    ```  
-   Optional flags: `SKIP_TYPE_CHECK=1` skips the type-check phase if you only need the latest UI bundle.
+   The script runs the type-check stage (`npm run type-check`) by default and currently completes successfully, so keep `SKIP_TYPE_CHECK=0` unless you are iterating on the UI bundle. The metadata file records the flag you pass so you can tell later whether the type-check phase executed.
 3. **Key outputs**  
    - `dist-static/` — complete static site ready to publish (assets, `index.html`, manifest).  
-   - `dist-static/build-metadata.json` — commit, branch, timestamp, and command trace for audit/compliance.  
+   - `dist-static/build-metadata.json` — commit, branch, timestamp, and the ordered `commands` array with the `skipTypeCheck` flag so you can verify exactly which steps ran for audit/compliance.  
    - `dist-static-<timestamp>.tar.gz` — tarball suitable for release archives, QA handoff, or storage in versioned buckets.
 4. **Validation**  
-   - Verify the archive’s `build-metadata.json` before deployment to trace rule compliance to a commit.  
+   - Verify the archive’s `build-metadata.json` before deployment to trace rule compliance to a commit and confirm the `commands` array plus `skipTypeCheck` flag match the run you expect.  
    - `npm run lint` and `npm test` are not part of the build script, so run them explicitly before committing a release candidate.
 
 ## Configuration reference

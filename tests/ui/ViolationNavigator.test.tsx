@@ -17,8 +17,7 @@ const violations: RuleViolation[] = [
     description: "Missing leader for Monday open segment.",
     segmentBlockId: "segment-mon-open",
     policyCitation,
-    recommendedAction: "Add a leader-qualified staff member.",
-    resolved: false
+    recommendedAction: "Add a leader-qualified staff member."
   },
   {
     id: "viol-2",
@@ -27,38 +26,27 @@ const violations: RuleViolation[] = [
     description: "Jordan needs a break on Wednesday mid.",
     segmentBlockId: "segment-wed-mid",
     policyCitation,
-    recommendedAction: "Log the break or add support coverage.",
-    resolved: true
+    recommendedAction: "Log the break or add support coverage."
   }
 ] as const;
 
 describe("ViolationNavigator", () => {
   it("renders violation cards with severity badges and action buttons", () => {
-    render(
-      <ViolationNavigator
-        violations={violations}
-        onFocusSegment={jest.fn()}
-        onResolveViolation={jest.fn()}
-      />
-    );
+    render(<ViolationNavigator violations={violations} onFocusSegment={jest.fn()} />);
 
     expect(screen.getByText("Critical")).toBeVisible();
-    expect(screen.getByText("Resolved")).toBeVisible();
+    expect(
+      screen.getAllByText("Live violation — edit the timeline to clear it.")[0]
+    ).toBeVisible();
     expect(screen.getAllByRole("button", { name: "Jump to block" })).toHaveLength(2);
   });
 
   it("calls handlers when action buttons are used", () => {
     const focus = jest.fn();
-    const resolve = jest.fn();
 
-    render(
-      <ViolationNavigator violations={violations} onFocusSegment={focus} onResolveViolation={resolve} />
-    );
+    render(<ViolationNavigator violations={violations} onFocusSegment={focus} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "Jump to block" })[0]);
     expect(focus).toHaveBeenCalledWith("segment-mon-open");
-
-    fireEvent.click(screen.getByRole("button", { name: "Mark resolved" }));
-    expect(resolve).toHaveBeenCalledWith("viol-1");
   });
 });

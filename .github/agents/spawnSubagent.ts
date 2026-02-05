@@ -8,7 +8,7 @@
  * @version 1.0.0
  * @date February 4, 2026
  */
-import { spawnSync } from 'child_process';
+import { spawn } from 'child_process';
 
 import Ajv, { JSONSchemaType } from 'ajv';
 
@@ -681,10 +681,27 @@ export class OpenAIProvider implements AIProvider {
         process.cwd() + "/src",
         'exec',
         '--skip-git-repo-check',
-        fullPrompt
+        fullPrompt,
       ];
       process.env['OPENAI_API_KEY'] = this.apiKey;
-      const result = spawnSync('codex', args, { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 });
+      let result: string = "";
+      await new Promise<string>((resolve, reject) => {
+        const child = spawn('codex', args); // { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 });
+        child.stdout.on('data', (data) => {
+          process.stdout.write(data);
+          result += data.toString();
+        });
+        child.stderr.on('data', (data) => {
+          process.stderr.write(data);
+        });
+        child.on('close', (code) => {
+          if (code !== 0) {
+            reject(new Error(`Codex process exited with code ${code}`));
+          } else {
+            resolve(result);
+          }
+        });
+      });
       delete process.env['OPENAI_API_KEY'];
     //   const response = await fetch('https://api.openai.com/v1/completions', {
     //     method: 'POST',
@@ -700,11 +717,11 @@ export class OpenAIProvider implements AIProvider {
     //     }),
     //   });
 
-      if (!result.stdout) {
-        throw new Error(`Codex error: ${result.stderr || 'No output from Codex'}`);
-      }
+      // if (result.error || result.status !== 0) {
+      //   throw new Error(`Codex error: ${result.stderr || 'No output from Codex'}`);
+      // }
 
-      return result.stdout.trim();
+      return result.trim();
     } catch (error) {
       throw new Error(`Failed to call Codex: ${error}`);
     }
@@ -735,22 +752,23 @@ export class CopilotProvider implements AIProvider {
 
       console.dir({copilotArgs: args});
 
-      const result = spawnSync('copilot', args, { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 });
+      throw new Error("Disabled Copilot calls for now");
+      // const result = spawnSync('copilot', args, { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 });
 
-      if (result.error) {
-        throw result.error;
-      }
+      // if (result.error) {
+      //   throw result.error;
+      // }
 
-      const stdout = result.stdout ? String(result.stdout) : '';
-      const stderr = result.stderr ? String(result.stderr) : '';
+      // const stdout = result.stdout ? String(result.stdout) : '';
+      // const stderr = result.stderr ? String(result.stderr) : '';
 
-      if (!stdout) {
-        console.dir(result);
-        console.dir({ agent, prompt: fullPrompt, context });
-        throw new Error(`Copilot API error: ${stderr || 'No output from Copilot'}`);
-      }
+      // if (!stdout) {
+      //   console.dir(result);
+      //   console.dir({ agent, prompt: fullPrompt, context });
+      //   throw new Error(`Copilot API error: ${stderr || 'No output from Copilot'}`);
+      // }
 
-      return stdout.trim();
+      // return stdout.trim();
     } catch (error) {
       throw new Error(`Failed to call Copilot: ${error}`);
     }

@@ -10,7 +10,9 @@ import {
   StaffAssignment,
   SubstituteRequest,
   Employee,
-  ScheduleStatus
+  ScheduleDay,
+  ScheduleStatus,
+  ScheduleType
 } from "../../domain/types";
 import { RuleViolation, AuditEvent } from "../types";
 
@@ -51,6 +53,32 @@ export const policyCitations: Record<string, PolicyCitation> = {
     notes: "Every publish action must emit an audit-ready event."
   }
 };
+
+export const scheduleTypeOptions: {
+  value: ScheduleType;
+  label: string;
+  ratioHint: string;
+  description: string;
+}[] = [
+  {
+    value: "regular",
+    label: "Regular day",
+    ratioHint: "Standard ratio (1 staff per 6 children)",
+    description: "Default preschool coverage with full staffing resources."
+  },
+  {
+    value: "extended",
+    label: "Extended care",
+    ratioHint: "Tighter ratio (1 staff per 5 children)",
+    description: "Covers early arrival or late pickup windows."
+  },
+  {
+    value: "enrichment",
+    label: "Enrichment focus",
+    ratioHint: "Leader-led pods (1 leader per 4 children)",
+    description: "Smaller cohorts for project-based learning."
+  }
+];
 
 const ratioProfile: RatioProfile = {
   id: "ratio-preschool",
@@ -98,6 +126,28 @@ export const weekMeta = {
   endDate: "2026-02-22",
   status: "draft" as ScheduleStatus
 };
+
+const createScheduleDays = (): ScheduleDay[] => {
+  const baseDate = new Date(weekMeta.startDate);
+  return daySequence.map((day, index) => {
+    const date = new Date(baseDate);
+    date.setDate(baseDate.getDate() + index);
+    const scheduleType: ScheduleType =
+      day === "wed" ? "enrichment" : day === "thu" ? "extended" : "regular";
+    const enrollmentCount = 24 - index;
+    return {
+      id: `schedule-day-${day}`,
+      scheduleWeekId: weekMeta.id,
+      date: date.toISOString().split("T")[0],
+      dayOfWeek: day,
+      scheduleType,
+      enrollmentCount,
+      fieldTripEventId: `field-trip-${day}`
+    };
+  });
+};
+
+export const scheduleDays = createScheduleDays();
 
 export const schools = [
   { id: "school-evergreen", name: "Evergreen Elementary Daycare" },
@@ -277,18 +327,37 @@ export const fieldTripTypes: FieldTripType[] = [
     minLeaderStudentRatio: 12,
     policyCitationId: policyCitations.fieldTrip.id,
     notes: "Requires two leaders for any outdoor trips"
+  },
+  {
+    id: "ft-forest",
+    name: "Forest STEAM outing",
+    minAdultStudentRatio: 10,
+    minLeaderStudentRatio: 14,
+    policyCitationId: policyCitations.fieldTrip.id,
+    notes: "Leader-led nature explorations with small pods"
   }
 ];
 
-export const fieldTripEvents: FieldTripEvent[] = [
-  {
-    id: "field-trip-1",
-    scheduleWeekId: weekMeta.id,
-    dayOfWeek: "fri",
-    segment: "mid",
-    fieldTripTypeId: "ft-zoo"
-  }
-];
+const buildFieldTripEvents = (): FieldTripEvent[] => {
+  return scheduleDays.map((scheduleDay) => {
+    const isFieldTripDay = scheduleDay.dayOfWeek === "fri";
+    return {
+      id: `field-trip-${scheduleDay.dayOfWeek}`,
+      scheduleWeekId: weekMeta.id,
+      dayOfWeek: scheduleDay.dayOfWeek,
+      segment: "mid",
+      scheduleDayId: scheduleDay.id,
+      fieldTripTypeId: isFieldTripDay ? "ft-zoo" : undefined,
+      isNoFieldTrip: !isFieldTripDay,
+      approverId: isFieldTripDay ? undefined : "Aisha Patel",
+      signedOffAt: isFieldTripDay ? undefined : "2026-02-01T09:45:00Z",
+      policyCitationId: policyCitations.fieldTrip.id,
+      notes: isFieldTripDay ? "Pending director signature" : "Recorded as stay-on-campus"
+    };
+  });
+};
+
+export const fieldTripEvents = buildFieldTripEvents();
 
 export const substituteRequests: SubstituteRequest[] = [
   {
@@ -312,8 +381,7 @@ export const ruleViolations: RuleViolation[] = [
     description: "Monday morning has two assistants and no leader-qualified staff.",
     segmentBlockId: "segment-mon-open",
     policyCitation: policyCitations.leaderCoverage,
-    recommendedAction: "Add a leader-qualified staff member (e.g., Aisha or Kai)",
-    resolved: false
+    recommendedAction: "Add a leader-qualified staff member (e.g., Aisha or Kai)"
   },
   {
     id: "viol-2",
@@ -322,8 +390,7 @@ export const ruleViolations: RuleViolation[] = [
     description: "Jordan is assigned to Wednesday midday without a recorded break; coverage could dip below the minimum threshold.",
     segmentBlockId: "segment-wed-mid",
     policyCitation: policyCitations.breakPolicy,
-    recommendedAction: "Log the scheduled break or add another staff member for the 12:30–1:00 slot",
-    resolved: false
+    recommendedAction: "Log the scheduled break or add another staff member for the 12:30–1:00 slot"
   },
   {
     id: "viol-3",
@@ -332,8 +399,7 @@ export const ruleViolations: RuleViolation[] = [
     description: "Friday midday field trip lacks director signature and timestamp, so adjustments cannot reach Ready for Sign-off.",
     segmentBlockId: "segment-fri-mid",
     policyCitation: policyCitations.fieldTrip,
-    recommendedAction: "Capture the director name and approval time in the Field Trip panel",
-    resolved: false
+    recommendedAction: "Capture the director name and approval time in the Field Trip panel"
   }
 ];
 

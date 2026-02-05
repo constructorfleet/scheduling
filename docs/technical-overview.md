@@ -53,14 +53,14 @@ Enumerations such as `DayScheduleType`, `DaySegment`, `JobTitle`, `Certification
 | `npm run dev` | Starts Vite dev server for the UI | Use for local development; 127.0.0.1 binding only until Playwright blocker resolved. |
 | `npm run build` | TypeScript + Vite production build | Used before running `npm run build:ui`. |
 | `npm run build:ui` | Produces optimized UI bundle (`dist/`) | Relies on Jest/Vite compile of `src/ui`. |
-| `npm run build:static` | Stages static assets for deployment (`dist-static/`) | Currently requires `SKIP_TYPE_CHECK=1` due to TypeScript issues in the E2E tests; see `tests/e2e/workspace-interactions.spec.ts:29` for the invalid locator blocker. |
+| `npm run build:static` | Stages static assets for deployment (`dist-static/`) | Runs the clean → optional type-check → Vite build pipeline, stages `dist-static/`, captures `build-metadata.json` (including the ordered `commands` array and `skipTypeCheck` flag), and emits `dist-static-<timestamp>.tar.gz`. `SKIP_TYPE_CHECK=1` is only needed for quick UI iterations and the chosen flag is recorded in the metadata for traceability. |
 | `npm test` | Runs Jest suites | Requires `jest-environment-jsdom`; install once registry access is available. |
 | `npm run test:e2e` | Launches Playwright guided-workflow tests | Blocked until Vite can bind to `127.0.0.1:4174`. |
 
 ## Deployment & Ops Notes
 - **Static deployment**: Operates as standalone HTML5 assets; `artifacts/phase-9-deployment/deployment-guide.md` and `deployment-checklist.md` contain the release/rollback workflow, verification matrix, and cache-invalidation steps.
 - **Build metadata**: `npm run build:static` writes `build-metadata.json` alongside the tarball so operators can trace the CSS/JS versions deployed to each school.
-- **Troubleshooting**: If `tsc` flags `hasText` in the Playwright spec or unresolved imports from `tests/ui`, fix the tests first (`hasText` is not a valid locator option) before expecting `npm run build:static` to produce `dist-static/`.
+- **Troubleshooting**: If `tsc` raises Playwright or UI test errors (unsupported locator options, missing imports, or failing mocks), resolve those failures before expecting `npm run build:static` to produce `dist-static/`. The metadata's `commands` array and `skipTypeCheck` flag show which phases executed so you can correlate a failing staging run with the test suite (or the skipped type-check) that originally triggered it.
 
 ## Next Steps for New Contributors
 1. Review `docs/onboarding-guide.md` to understand the user touchpoints before modifying UI components.

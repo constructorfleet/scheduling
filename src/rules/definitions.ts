@@ -6,9 +6,11 @@ import {
   getDayOfWeekForAssignment,
   getEmployeeById,
   getFieldTripEventById,
-  getFieldTripTypeById
+  getFieldTripTypeById,
+  parseTimeToMinutes
 } from "./utils";
 import type { RulesContext, RuleViolation } from "./types";
+import type { SegmentBlock } from "../domain/types";
 
 const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
   "ratio-segment": "policy-ratio",
@@ -19,7 +21,8 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
   "field-trip-ratios": "policy-field-trip",
   "field-trip-signoff": "policy-field-trip-signoff",
   "schedule-day-metadata": "policy-schedule-day",
-  "field-trip-event": "policy-field-trip-event"
+  "field-trip-event": "policy-field-trip-event",
+  "segment-block-timeline": "policy-coverage"
 };
 
 const assignedEmployeesForBlock = (context: RulesContext, blockId: string) => {
@@ -257,6 +260,76 @@ export const segmentCoverageRule: RuleDefinition = {
         );
       }
     });
+    return violations;
+  }
+};
+
+export const segmentBlockTimelineRule: RuleDefinition = {
+  id: "segment-block-timeline",
+  description: "Detects invalid or overlapping clock windows for segment blocks attached to the same day",
+  evaluate: (context: RulesContext) => {
+    const violations: RuleViolation[] = [];
+    const citationId = getCitationId(
+      context,
+      "segment-block-timeline",
+      DEFAULT_POLICY_CITATIONS["segment-block-timeline"]
+    );
+    const groupedBlocks: Record<string, SegmentBlock[]> = {};
+    context.segmentBlocks.forEach((block) => {
+      const dayKey = block.scheduleDayId ?? `${block.scheduleWeekId}:${block.dayOfWeek}`;
+      if (!groupedBlocks[dayKey]) {
+        groupedBlocks[dayKey] = [];
+      }
+      groupedBlocks[dayKey].push(block);
+    });
+
+    Object.values(groupedBlocks).forEach((blocks) => {
+      const sortedBlocks = [...blocks].sort(
+        (a, b) => parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime)
+      );
+      let activeBlock: SegmentBlock | null = null;
+      let activeEnd = 0;
+
+      sortedBlocks.forEach((block) => {
+        const start = parseTimeToMinutes(block.startTime);
+        const end = parseTimeToMinutes(block.endTime);
+
+        if (start >= end) {
+          violations.push(
+            buildViolation(
+              "segment-block-timeline",
+              `Segment block ${block.id} has an invalid window (${block.startTime} ≥ ${block.endTime})`,
+              "SegmentBlock",
+              block.id,
+              citationId,
+              "error",
+              { startTime: block.startTime, endTime: block.endTime }
+            )
+          );
+          return;
+        }
+
+        if (activeBlock && start < activeEnd) {
+          violations.push(
+            buildViolation(
+              "segment-block-timeline",
+              `Segment block ${block.id} overlaps with ${activeBlock.id} (${activeBlock.startTime}-${activeBlock.endTime})`,
+              "SegmentBlock",
+              block.id,
+              citationId,
+              "error",
+              { overlapsWith: activeBlock.id }
+            )
+          );
+        }
+
+        if (!activeBlock || end >= activeEnd) {
+          activeBlock = block;
+          activeEnd = end;
+        }
+      });
+    });
+
     return violations;
   }
 };
@@ -533,6 +606,7 @@ export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
   ratioSegmentRule,
   certificationPerSegmentRule,
   segmentCoverageRule,
+  segmentBlockTimelineRule,
   shiftBreakLimitsRule,
   substituteParityRule,
   fieldTripEventIntegrityRule,

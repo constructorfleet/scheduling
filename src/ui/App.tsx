@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import WeekNavigationBanner from "./components/WeekNavigationBanner";
 import StaffPalette from "./components/StaffPalette";
-import ScheduleGrid from "./components/ScheduleGrid";
+import DayMetadataStrip, { FieldTripSelection } from "./components/DayMetadataStrip";
+import ClockBlockTimeline from "./components/ClockBlockTimeline";
 import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
 import FieldTripApprovalPanel from "./components/FieldTripApprovalPanel";
@@ -14,6 +15,8 @@ import {
   employees,
   fieldTripEvents,
   fieldTripTypes,
+  scheduleDays,
+  scheduleTypeOptions,
   policyCitations,
   segmentBlocks,
   segmentSlotDefinitions,
@@ -23,7 +26,7 @@ import {
   schools
 } from "./data/mockScheduleData";
 import { GuidedStep, RuleViolation as UiRuleViolation, SubstituteAssignmentCard } from "./types";
-import { ScheduleStatus, PolicyCitation } from "../domain/types";
+import { DayOfWeek, FieldTripEvent, PolicyCitation, ScheduleStatus, ScheduleType } from "../domain/types";
 import { createRulesEngine } from "../rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "../rules/types";
 
@@ -82,11 +85,17 @@ export default function App() {
   const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>(undefined);
   const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
   const [substituteRequestsState, setSubstituteRequestsState] = useState(substituteRequests);
-  const [resolvedViolationIds, setResolvedViolationIds] = useState<Set<string>>(() => new Set());
   const [undoCount, setUndoCount] = useState(2);
   const [redoCount, setRedoCount] = useState(0);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
-  const [scheduleDaysState, _] = useState([]);
+  const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
+
+  const fieldTripEventsByDay = useMemo<Record<DayOfWeek, FieldTripEvent | undefined>>(() => {
+    return fieldTripEventsState.reduce((map, event) => {
+      map[event.dayOfWeek] = event;
+      return map;
+    }, {} as Record<DayOfWeek, FieldTripEvent | undefined>);
+  }, [fieldTripEventsState]);
 
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
@@ -110,7 +119,8 @@ export default function App() {
     staffAssignments,
     employees,
     fieldTripTypes,
-    POLICY_CITATION_LIST
+    POLICY_CITATION_LIST,
+    scheduleDaysState
   ]);
 
   const resolveSegmentBlockId = (target: EngineRuleViolation["target"]) => {
@@ -145,21 +155,22 @@ export default function App() {
         description: engineViolation.message,
         segmentBlockId,
         policyCitation: citation,
-        recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage.",
-        resolved: resolvedViolationIds.has(engineViolation.id)
+        recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage."
       } satisfies UiRuleViolation;
     });
-  }, [ruleViolationsFromEngine, resolvedViolationIds, policyCitations, segmentBlocks, staffAssignments]);
+  }, [ruleViolationsFromEngine, policyCitations, segmentBlocks, staffAssignments]);
 
-  const unresolvedViolations = violationRecords.filter((violation) => !violation.resolved);
-  const validationComplete = unresolvedViolations.length === 0;
-  const activeFieldTripEvent = fieldTripEventsState[0] ?? null;
+  const validationComplete = violationRecords.length === 0;
+  const activeFieldTripEvent =
+    fieldTripEventsState.find((event) => !event.approverId || !event.signedOffAt) ??
+    fieldTripEventsState[0] ??
+    null;
   const fieldTripSigned = Boolean(activeFieldTripEvent?.approverId && activeFieldTripEvent?.signedOffAt);
   const readyToPublish = validationComplete && fieldTripSigned;
   const scheduleStatus: ScheduleStatus = readyToPublish ? "ready_for_review" : weekMeta.status;
   const weekLabel = formatWeekRange(weekStartDate);
   const complianceHighlights = [
-    `${unresolvedViolations.length} violation${unresolvedViolations.length === 1 ? "" : "s"} outstanding`,
+    `${violationRecords.length} violation${violationRecords.length === 1 ? "" : "s"} outstanding`,
     fieldTripSigned ? "Field trip approved" : "Field trip pending sign-off",
     readyToPublish ? "Ready for publish" : "Resolve blockers before publishing"
   ];
@@ -169,9 +180,9 @@ export default function App() {
     {
       id: "validation",
       label: "Validation",
-      detail: "Violations link directly to the grid; clear them so the tracker turns green.",
+      detail: "Violations link directly to the timeline; fixes re-run the engine automatically.",
       status: validationComplete ? "complete" : "in_progress",
-      actionLabel: validationComplete ? undefined : "Mark validations addressed"
+      actionLabel: validationComplete ? undefined : "Review violations"
     },
     {
       id: "field-trip",
@@ -198,21 +209,48 @@ export default function App() {
   };
 
   const handleAutoBalance = () => {
-    const nextViolation = violationRecords.find((violation) => !violation.resolved);
+    const nextViolation = violationRecords[0];
     if (nextViolation) {
       setFocusedSegmentId(nextViolation.segmentBlockId);
     }
   };
 
-  const handleResolveViolation = (violationId: string) => {
-    setResolvedViolationIds((prev) => {
-      if (prev.has(violationId)) {
-        return prev;
-      }
-      const next = new Set(prev);
-      next.add(violationId);
-      return next;
-    });
+  const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
+    setScheduleDaysState((prev) =>
+      prev.map((day) => (day.id === dayId ? { ...day, enrollmentCount: enrollment } : day))
+    );
+  };
+
+  const handleScheduleTypeUpdate = (dayId: string, scheduleType: ScheduleType | undefined) => {
+    setScheduleDaysState((prev) => prev.map((day) => (day.id === dayId ? { ...day, scheduleType } : day)));
+  };
+
+  const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
+    setFieldTripEventsState((prev) =>
+      prev.map((event) => {
+        if (event.scheduleDayId !== dayId) {
+          return event;
+        }
+        if (selection.type === "none") {
+          return {
+            ...event,
+            fieldTripTypeId: undefined,
+            isNoFieldTrip: true,
+            approverId: undefined,
+            signedOffAt: undefined,
+            notes: "No field trip selected"
+          };
+        }
+        return {
+          ...event,
+          fieldTripTypeId: selection.fieldTripTypeId,
+          isNoFieldTrip: false,
+          approverId: undefined,
+          signedOffAt: undefined,
+          notes: "Field trip metadata needs review"
+        };
+      })
+    );
   };
 
   const handleFieldTripSignOff = () => {
@@ -232,11 +270,7 @@ export default function App() {
 
   const handleStepAction = (stepId: string) => {
     if (stepId === "validation") {
-      setResolvedViolationIds((prev) => {
-        const next = new Set(prev);
-        ruleViolationsFromEngine.forEach((violation) => next.add(violation.id));
-        return next;
-      });
+      handleAutoBalance();
     }
     if (stepId === "field-trip") {
       handleFieldTripSignOff();
@@ -333,7 +367,18 @@ export default function App() {
             selectedId={selectedStaffId}
             onSelect={setSelectedStaffId}
           />
-          <ScheduleGrid
+          <DayMetadataStrip
+            days={scheduleDaysState}
+            daySequence={daySequence}
+            dayDisplayNames={dayDisplayNames}
+            scheduleTypeOptions={scheduleTypeOptions}
+            fieldTripTypes={fieldTripTypes}
+            fieldTripEventsByDay={fieldTripEventsByDay}
+            onEnrollmentChange={handleEnrollmentUpdate}
+            onScheduleTypeChange={handleScheduleTypeUpdate}
+            onFieldTripSelection={handleFieldTripSelection}
+          />
+          <ClockBlockTimeline
             segments={segmentBlocks}
             assignments={staffAssignments}
             employees={employees}
@@ -342,7 +387,6 @@ export default function App() {
             onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
             daySequence={daySequence}
             dayDisplayNames={dayDisplayNames}
-            segmentDefinitions={segmentSlotDefinitions}
             onAutoBalance={handleAutoBalance}
           />
         </div>
@@ -370,7 +414,6 @@ export default function App() {
           <ViolationNavigator
             violations={violationRecords}
             onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
-            onResolveViolation={handleResolveViolation}
           />
           {activeFieldTripEvent && (
             <FieldTripApprovalPanel

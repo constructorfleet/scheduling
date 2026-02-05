@@ -3,7 +3,6 @@ import { RuleViolation } from "../types";
 interface ViolationNavigatorProps {
   violations: RuleViolation[];
   onFocusSegment: (segmentId: string) => void;
-  onResolveViolation: (violationId: string) => void;
 }
 
 const severityStyles: Record<RuleViolation["severity"], { label: string; color: string }> = {
@@ -12,7 +11,7 @@ const severityStyles: Record<RuleViolation["severity"], { label: string; color: 
   info: { label: "Info", color: "#0ea5e9" }
 };
 
-export default function ViolationNavigator({ violations, onFocusSegment, onResolveViolation }: ViolationNavigatorProps) {
+export default function ViolationNavigator({ violations, onFocusSegment }: ViolationNavigatorProps) {
   return (
     <section
       style={{
@@ -32,15 +31,15 @@ export default function ViolationNavigator({ violations, onFocusSegment, onResol
           return (
             <article
               key={violation.id}
-              style={{
-                borderRadius: 12,
-                border: "1px solid #e5e7eb",
-                padding: "0.75rem",
-                background: violation.resolved ? "#ecfdf5" : "#fff",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.35rem"
-              }}
+            style={{
+              borderRadius: 12,
+              border: "1px solid #e5e7eb",
+              padding: "0.75rem",
+              background: "#fff",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.35rem"
+            }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h4 style={{ margin: 0, fontSize: "1rem" }}>{violation.title}</h4>
@@ -75,32 +74,14 @@ export default function ViolationNavigator({ violations, onFocusSegment, onResol
                 >
                   Jump to block
                 </button>
-                {!violation.resolved ? (
-                  <button
-                    onClick={() => onResolveViolation(violation.id)}
-                    style={{
-                      borderRadius: 999,
-                      border: "none",
-                      background: "#10b981",
-                      color: "#fff",
-                      padding: "0.35rem 0.85rem"
-                    }}
-                  >
-                    Mark resolved
-                  </button>
-                ) : (
-                  <span
-                    style={{
-                      fontSize: "0.8rem",
-                      padding: "0.2rem 0.6rem",
-                      borderRadius: 999,
-                      background: "#d1fae5",
-                      color: "#047857"
-                    }}
-                  >
-                    Resolved
-                  </span>
-                )}
+                <span
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "#6b7280"
+                  }}
+                >
+                  Live violation — edit the timeline to clear it.
+                </span>
               </div>
             </article>
           );
