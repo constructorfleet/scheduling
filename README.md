@@ -81,13 +81,18 @@ scheduling/
 │   │   ├── RulesEngine.ts
 │   │   ├── rules/
 │   │   └── ...
-│   ├── ui/               # React components (TBD)
-│   │   ├── ScheduleGrid.tsx
-│   │   ├── RuleViolations.tsx
-│   │   └── ...
 │   ├── storage/          # Data persistence (IndexedDB)
 │   │   └── ...
 │   └── index.ts
+├── apps/
+│   ├── ui/               # React workspace (Vite entry: apps/ui/main.tsx)
+│   │   ├── components/
+│   │   ├── data/
+│   │   └── ...
+│   └── api/              # Fastify + Prisma API
+│       ├── src/
+│       └── generated/
+├── prisma/               # Prisma schemas (sqlite/postgres/mysql)
 ├── tests/                # Test suites
 │   ├── domain.test.ts
 │   ├── rules.test.ts
