@@ -24,9 +24,16 @@
     "orchestrate": "ts-node orchestrate.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint src tests",
+    "lint": "eslint src apps tests",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist coverage"
+    ,
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --max-warnings=0"
+    ]
   },
   "keywords": [
     "scheduling",
