@@ -104,6 +104,8 @@ npm install                # Setup
 npm run orchestrate        # Generate specs
 npm run build             # Build
 npm run dev               # Develop
+npm run api:dev           # Run API (Fastify)
+npm run api:openapi:client # Regenerate OpenAPI client
 npm test                  # Test
 npm run lint              # Lint
 npm run type-check        # Type check

@@ -10,6 +10,8 @@ npm run type-check         # Check types
 
 # Development
 npm run dev                # Run in dev mode
+npm run api:dev            # Run API server
+npm run api:openapi:client # Regenerate OpenAPI client
 npm run orchestrate        # Run full agent orchestration
 npm test                   # Run tests
 npm run lint               # Lint code
