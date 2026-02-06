@@ -2,6 +2,7 @@
 
 ## Purpose
 Capture every scheduling, compliance, and audit artifact so downstream agents have typed, referenceable inputs. Each entity explicitly links back to policy citations, derives the coverage math that feeds ratio enforcement, and retains timestamps for audit/event replay.
+This overview aligns with the Domain & Model Layer described in `artifacts/phase-2-architecture/architecture.md` and anchors every rule back to the Product & Domain agent catalog (`artifacts/phase-1-requirements/product-domain-agent-deliverables.md`).
 
 ## Enumerations we rely on
 - `JobTitle`, `DayScheduleType`, `ScheduleType`, `DaySegment`, `DayOfWeek`, `TripDay`, `AssignmentSource`, `ApprovalState`, `CPRCertification`, `MedDelegated`, `AuditAction`, `ScheduleStatus`, `ShiftStatus`, `BreakType`, `CertificationType`, `EmploymentStatus`, `JournalEntryStatus`, `EnrollmentSource`, `ValidationSeverity`, `ValidationStatus`.
@@ -25,6 +26,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
 - `id`, `segment` (`DaySegment`), `children_per_staff`, `leader_required`, `policy_citation_id`, `notes`.
 - Derived: `min_staff_from_ratio = ceil(child_count / children_per_staff)`.
 - Applies to `SegmentRequirementTemplate`s and `SegmentBlock`s unless a `FieldTripEvent` overrides it.
+> Maps directly to PD-R1 (Segment ratio enforcement) so every ratio profile references a policy.
 
 ### FieldTripType
 - `id`, `name`, `min_adult_student_ratio`, `min_leader_student_ratio`, `policy_citation_id`, `notes`.
@@ -47,6 +49,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
 - `id`, `schedule_week_id`, `date`, `day_of_week`, `schedule_type` (`ScheduleType`), `enrollment_count`, `enrollment_source` (`EnrollmentSource`), `field_trip_event_id`, `operating_capacity_override`, `notes`.
 - Every day exposes a schedule-type dropdown (regular, extended, enrichment) plus an editable enrollment headcount and the field-trip selection (`FieldTripEvent` or explicit “No Field Trip”). Missing metadata triggers validation violations before a week can be saved.
 - The schedule-type selection deterministically drives which `RatioProfile`s and certification guards the rules engine applies per time segment.
+> Enforces PD-R8 (Schedule day metadata completeness) and PD-R5 (Field trip overrides) because the day must declare its schedule type, enrollment, and field trip status/sign-off before downstream validation runs.
 
 ### SegmentBlock
 - `id`, `schedule_week_id`, `schedule_day_id`, `day_of_week`, `segment`, `start_time`, `end_time`, `child_count`, `requirement_template_id`, `status`, `field_trip_event_id`, `operating_capacity_override`, `closed_reason`, `last_updated_by`, `last_updated_at`.
@@ -55,6 +58,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
   - `required_staff = max(requirement.min_staff, ceil(child_count / ratio.children_per_staff))` (ratio overrides when a field trip applies)
   - `coverage_gap = required_staff - staff_assignments.length`
   - `shortage` flag and `leader_guardrails` when `requirement` or `FieldTripEvent` signals a leader is needed.
+> Aligns with PD-R3 (Time-window validity & multi-block coverage) by validating start/end times stay within `OperatingHours`, forbidding overlaps, and re-deriving coverage for each discrete block.
 
 ### EnrollmentGroup
 - `id`, `segment_block_id`, `child_count`, `source` (`roster`, `manual_adjustment`, `override`), `updated_at`, `notes`.
@@ -64,6 +68,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
 - `id`, `segment_block_id`, `employee_id`, `assignment_source`, `is_substitute`, `substitute_request_id`, `start_time`, `end_time`, `status`, `role`, `created_by`, `created_at`, `notes`.
 - Opposite view used to compute shift lengths, guard against daily/weekly max hours, and qualify coverage.
 - When `is_substitute` = true, references an approved `SubstituteRequest`; the replacement `Employee` must satisfy the same ratio/certification requirements tied to the original block.
+> Answers PD-R2 (Certification coverage), PD-R6 (Substitute parity), and PD-R7 (Shift length/break limits) by requiring certifications, approved substitute metadata, and respect for configured caps.
 
 ### ShiftBreak
 - `id`, `assignment_id`, `start_time`, `end_time`, `break_type`, `approved_by`, `approved_at`, `policy_citation_id`, `notes`.
@@ -77,6 +82,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
 - `id`, `schedule_week_id`, `schedule_day_id`, `day_of_week`, `field_trip_type_id`, `is_no_field_trip`, `approver_id`, `signed_off_at`, `policy_citation_id`, `notes`.
 - Every `ScheduleDay` links to a single field-trip decision. The `is_no_field_trip` flag lets teams explicitly opt out while keeping validations tied to that declared state.
 - Supplies alternate ratios (`FieldTripType`) and leader/adult requirements; the event blocks `SegmentBlock`s from progressing until director sign-off metadata exists.
+> Implements PD-R5 (Field trip overrides and sign-off) so no week can leave `ready_for_review` until every day has approved sign-off and a ratio source.
 
 ### Employee
 - `id`, `name`, `contact_info`, `job_title`, `home_school_id`, `max_hours_per_day`, `max_hours_per_week`, `employment_status`, `notes`.
@@ -85,6 +91,7 @@ Capture every scheduling, compliance, and audit artifact so downstream agents ha
 ### Certification
 - `id`, `employee_id`, `type`, `issued_at`, `expires_at`, `document_reference`, `policy_citation_id`, `notes`.
 - Derived: `is_current = expires_at > now`; scheduling surfaces warnings when assignments depend on soon-to-expire credentials.
+> Supports PD-R2 and PD-R10 (Certification expirations) by tying expiration-based flags to violation logic.
 
 ### AvailabilityWindow
 - `id`, `employee_id`, `day_of_week`, `segment`, `start_time`, `end_time`, `notes`.

@@ -38,6 +38,12 @@ Minimum steps: 3 actions (open navigator → implement fix → confirmed auto-va
 3. Undo/redo controls remain available in case an accidental change slipped through before publishing.
 Minimum steps: 3 actions (confirm tracker → click publish → review audit confirmation).
 
+### 6. Enter clock segments with operating-hours guardrails
+1. The workspace paints each day with the linked `OperatingHours` window (open/close times and `OperatingHoursId`), so users always see the allowable range before adding a block.
+2. Tap “Add Clock Block” or drag a staff tile onto the timeline, then use the time picker to choose any HH:MM AM/PM pair inside that window; the timeline allows adding multiple non-contiguous `SegmentBlock`s for the same staff or day, and each block flags if the rules engine detects an operating-hours violation.
+3. The guided tracker and Conflict Navigator immediately surface ratio violations, certification gaps, or coverage shortfalls tied to those blocks; there is no “mark addressed” control—violations clear only when a new block or metadata change satisfies the rules engine, so the workspace stays truthful to the live data.
+Minimum steps: 3 actions (view operating hours → create block(s) → confirm tracker/Conflict Navigator shows no blockers).
+
 ## UI Flow Map
 | Task | Entry Point | Key Screens / Actions | Outcome | Minimal Steps | Notes |
 | --- | --- | --- | --- | --- | --- |

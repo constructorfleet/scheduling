@@ -51,7 +51,7 @@ By default, the MockAIProvider is used (no API keys needed for testing):
 
 **To use real AI:**
 
-Edit `orchestrate.ts` and add before calling `orchestrateFullProject()`:
+Edit `orchestrate.ts` and add before calling `orchestrateSelfProject()`:
 
 ```typescript
 import { setAIProvider, OpenAIProvider } from './.github/agents/spawnSubagent';
