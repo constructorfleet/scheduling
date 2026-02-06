@@ -27,6 +27,11 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "apps/ui/**/*.ts", "apps/ui/**/*.tsx", "apps/api/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "apps/ui/**/*.ts", "apps/ui/**/*.tsx", "apps/api/**/*.ts", "apps/api/**/*.d.ts", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "apps/ui/data/generated/**",
+    "apps/api/generated/**"
+  ]
 }

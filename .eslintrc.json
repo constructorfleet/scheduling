@@ -18,7 +18,9 @@
   "ignorePatterns": [
     "dist/",
     "dist-static/",
-    "node_modules/"
+    "node_modules/",
+    "apps/ui/data/generated/",
+    "apps/api/generated/"
   ],
   "rules": {
     "no-console": "warn",
