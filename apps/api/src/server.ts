@@ -1,13 +1,31 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import fastifyStatic from "@fastify/static";
 import { getPrisma } from "./db";
 import { applyDbEnv, isDebugEnabled } from "./config";
+import { openapiPath } from "./openapi";
+import path from "node:path";
+import { readFileSync } from "node:fs";
 
 const buildServer = async () => {
   const fastify = Fastify({ logger: isDebugEnabled() });
   await fastify.register(cors, { origin: true });
 
+  const swaggerEditorRoot = path.resolve(__dirname, "../../../node_modules/swagger-editor-dist");
+  await fastify.register(fastifyStatic, {
+    root: swaggerEditorRoot,
+    prefix: "/api/docs/"
+  });
+
   fastify.get("/api/health", async () => ({ status: "ok" }));
+
+  fastify.get("/api/openapi.yaml", async (_, reply) => {
+    const spec = readFileSync(openapiPath, "utf-8");
+    reply.type("application/yaml").send(spec);
+  });
+
+  fastify.get("/api/docs", async (_, reply) => {
+    const html = `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>OpenAPI Editor</title>\n  <link rel=\"stylesheet\" href=\"/api/docs/swagger-editor.css\" />\n  <style>html, body { margin: 0; padding: 0; height: 100%; } #swagger-editor { height: 100vh; }</style>\n</head>\n<body>\n  <div id=\"swagger-editor\"></div>\n  <script src=\"/api/docs/swagger-editor-bundle.js\"></script>\n  <script src=\"/api/docs/swagger-editor-standalone-preset.js\"></script>\n  <script>\n    window.onload = function () {\n      SwaggerEditorBundle({\n        url: '/api/openapi.yaml',\n        dom_id: '#swagger-editor',\n        layout: 'StandaloneLayout',\n        presets: [SwaggerEditorStandalonePreset]\n      });\n    };\n  </script>\n</body>\n</html>`;\n    reply.type("text/html").send(html);\n  });
 
   fastify.get("/api/settings/:schoolId", async (request) => {
     const { schoolId } = request.params as { schoolId: string };

@@ -11,6 +11,9 @@ export default defineConfig({
     sourcemap: true
   },
   server: {
-    port: 4173
+    port: 4173,
+    proxy: {
+      "/api": "http://localhost:4000"
+    }
   }
 });

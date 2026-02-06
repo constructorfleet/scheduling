@@ -32,9 +32,9 @@ import {
   ScheduleStatus,
   ScheduleType,
   SegmentBlock
-} from "../domain/types";
-import { createRulesEngine } from "../rules/engine";
-import type { RuleViolation as EngineRuleViolation, RulesContext } from "../rules/types";
+} from "../../src/domain/types";
+import { createRulesEngine } from "../../src/rules/engine";
+import type { RuleViolation as EngineRuleViolation, RulesContext } from "../../src/rules/types";
 import { fetchSchedule, fetchSettings, saveSchedule, saveSettings } from "./data/apiClient";
 
 const RULE_TITLES: Record<string, string> = {

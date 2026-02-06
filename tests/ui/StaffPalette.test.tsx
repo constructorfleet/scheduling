@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import StaffPalette from "../../src/ui/components/StaffPalette";
+import StaffPalette from "../../apps/ui/components/StaffPalette";
 import type { Employee, StaffAssignment } from "../../src/domain/types";
 
 describe("StaffPalette", () => {

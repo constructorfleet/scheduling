@@ -1,4 +1,4 @@
-import { PolicyCitation } from "../domain/types";
+import { PolicyCitation } from "../../src/domain/types";
 
 export type StepStatus = "complete" | "in_progress" | "blocked";
 

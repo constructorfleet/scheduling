@@ -34,7 +34,7 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 ### Component & guided workspace integration (React Testing Library)
 - `tests/ui/GuidedStatusTracker.test.tsx` proves the tracker renders statuses, focuses the relevant card, and never mutates data—it only scrolls directors toward the outstanding violation, and the rules engine clears the violation once their edits are committed.
 - `tests/ui/ViolationNavigator.test.tsx` ensures each card highlights all impacted clock blocks, links to the policy metadata, surfaces the leader/adult delta, and never provides a “resolve manually” control.
-- Supporting tests (`FieldTripApprovalPanel`, `SubstituteAssignmentPanel`, `StaffPalette`) keep guided panels and selection affordances aligned with the mocked domain state from `src/ui/data/mockScheduleData.ts` and the `ScheduleDay`/`FieldTripEvent` metadata model.
+- Supporting tests (`FieldTripApprovalPanel`, `SubstituteAssignmentPanel`, `StaffPalette`) keep guided panels and selection affordances aligned with the mocked domain state from `apps/ui/data/mockScheduleData.ts` and the `ScheduleDay`/`FieldTripEvent` metadata model.
 - `tests/ui/DayMetadataStrip.test.tsx` validates each metadata card flags missing enrollment/schedule/field-trip details, surfaces the chosen ratio hint, and dispatches the correct payload per control change.
 - `tests/ui/ClockBlockTimeline.test.tsx` exercises the timeline blocks so assigned staff, required-staff/ratio data, and violation badges render, the focused block toggles `aria-pressed`, and the auto-balance/focus callbacks fire when the user interacts.
 - These specs run alongside the rule-engine tests via `npm test` or focused commands (e.g., `npm test -- tests/ui`), guaranteeing UI props reflect the same rules as the backend fixtures.
@@ -66,7 +66,7 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 - Flag automation gaps immediately: missing helper coverage, new UI flows that are not yet automated, or Playwright specs that cannot run because the Vite host is blocked.
 
 ## Traceability & documentation
-- QA rules, policy citations, and fixture pairings live in `RULES_TEST_CASES.md`; linking a new rule there ensures the story propagates to `tests/rules/rulesEngine.test.ts` and the `ViolationNavigator` metadata found in `src/ui/components/ViolationNavigator.tsx`.
+- QA rules, policy citations, and fixture pairings live in `RULES_TEST_CASES.md`; linking a new rule there ensures the story propagates to `tests/rules/rulesEngine.test.ts` and the `ViolationNavigator` metadata found in `apps/ui/components/ViolationNavigator.tsx`.
 - Reference artifacts such as `artifacts/phase-4-testing/rules-test-plan.md` and `docs/technical-overview.md` for policy intent, rule mappings, and command sequences that reproduce every layer.
 - Mention the QA rule IDs inside Playwright reports (custom trace names, screenshot filenames) so operations can batch discover failing policies without parsing logs.
 

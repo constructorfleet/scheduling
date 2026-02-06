@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { DayOfWeek, FieldTripType, Employee, ScheduleType } from "../../domain/types";
+import { DayOfWeek, FieldTripType, Employee, ScheduleType } from "../../../src/domain/types";
 import type { ScheduleTypeOption } from "./DayMetadataStrip";
 
 interface SettingsPanelProps {

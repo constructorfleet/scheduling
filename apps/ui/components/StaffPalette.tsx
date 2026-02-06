@@ -1,4 +1,4 @@
-import { Employee, StaffAssignment } from "../../domain/types";
+import { Employee, StaffAssignment } from "../../../src/domain/types";
 
 interface StaffPaletteProps {
   staff: Employee[];

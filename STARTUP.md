@@ -7,7 +7,7 @@
 
 - ✅ Agent orchestration system implemented (9 specialized agents)
 - ✅ Project specifications in markdown (PROJECT.md, AGENTS.md, BACKLOG.md, DOMAIN_MODEL.md)
-- ✅ Project structure created (src/domain, src/rules, src/ui, src/storage, tests/)
+- ✅ Project structure created (src/domain, src/rules, apps/ui, src/storage, tests/)
 - ✅ Documentation created (README, KICKOFF, AGENT_GUIDE, PROJECT_MAP)
 - ✅ Orchestration script created (orchestrate.ts)
 - ✅ Artifacts directory with README (for storing agent outputs)
@@ -190,7 +190,7 @@ Once orchestration is complete and approved:
 
 ```bash
 # Implement UI components based on phase-5/6 output
-# src/ui/
+# apps/ui/
 ```
 
 - [ ] Create React components

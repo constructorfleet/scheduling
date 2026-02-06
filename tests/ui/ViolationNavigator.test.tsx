@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import ViolationNavigator from "../../src/ui/components/ViolationNavigator";
-import type { RuleViolation } from "../../src/ui/types";
+import ViolationNavigator from "../../apps/ui/components/ViolationNavigator";
+import type { RuleViolation } from "../../apps/ui/types";
 
 const policyCitation = {
   id: "policy-leader",

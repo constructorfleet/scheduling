@@ -4,7 +4,7 @@
 This reference explains how the Scheduling workspace hangs together so any engineer, ops lead, or documentation agent can update, verify, or deploy the system without relying on tribal knowledge. It complements the onboarding narrative by spelling out the architecture, data lifecycle, rules execution, and agent coordination that keep the UI compliant.
 
 ## Architecture at a Glance
-- **Static HTML5 frontend.** `src/ui` contains the guided React workspace built for offline-first delivery; the entry point wires into `index.html` and relies on `vite.config.ts` for build-time asset bundling.
+- **Static HTML5 frontend.** `apps/ui` contains the guided React workspace built for offline-first delivery; the entry point wires into `index.html` and relies on `vite.config.ts` for build-time asset bundling.
 - **Domain layer.** `src/domain` encapsulates entities such as `School`, `Staff`, `Schedule`, `PolicyCitation`, `RatioProfile`, and `Certification`. Business rules—validation hooks, derived booleans, state transitions—reside close to these models.
 - **Rules engine.** `src/rules/RulesEngine.ts` orchestrates the compliance checks described in the charter: ratio coverage, certification expiration, break enforcement, field-trip overrides, coverage gaps, substitute parity, and approval gating. The engine exposes `violationRecords` that the UI consumes to render `ViolationNavigator`, the guided tracker, and the publish CTA state.
 - **Storage & persistence.** Local storage (IndexedDB snapshots or JSON-based journals) lives under `src/storage`. Every scheduling action produces a journal entry so offline edits can replay, audit trails stay complete, and data can later sync or export.
@@ -31,7 +31,7 @@ Enumerations such as `DayScheduleType`, `DaySegment`, `JobTitle`, `Certification
 - **Validations clear automatically.** There is no “mark addressed” button. Once the underlying configuration or assignment satisfies the rule, the violation disappears and the workspace advances.
 
 ## UI Modules & Guided Workflow
-- **ScheduleGrid** (`src/ui/components/ScheduleGrid.tsx`) displays weekly blocks, supports clock-in/clock-out data entry, and allows staff to hold multiple non-contiguous time slices per day. Users drag staff cards from the palette onto segments or rely on the “Auto-select” helper to honor leader/ratio needs.
+- **ScheduleGrid** (`apps/ui/components/ScheduleGrid.tsx`) displays weekly blocks, supports clock-in/clock-out data entry, and allows staff to hold multiple non-contiguous time slices per day. Users drag staff cards from the palette onto segments or rely on the “Auto-select” helper to honor leader/ratio needs.
 - **StaffPalette** shows the roster, certifications, availability, and auto-select predictions. Clicking a card pushes that staff member into the focus trail; keyboard shortcuts for the guided steps are documented in `docs/onboarding-guide.md`.
 - **ViolationNavigator** lists every outstanding rule with links to the offending segment or certificate. Opening the navigator also highlights the card inside the grid and the status tracker, giving users contextual guidance about what to adjust before publish.
 - **Guided Status Tracker** enforces the sequence: prepare staff → assign shifts/field trips → review violations → publish. Each step surfaces blockers derived from the rules engine, the substitution queue, and the field-trip signoff checklist.
@@ -52,7 +52,7 @@ Enumerations such as `DayScheduleType`, `DaySegment`, `JobTitle`, `Certification
 | --- | --- | --- |
 | `npm run dev` | Starts Vite dev server for the UI | Use for local development; 127.0.0.1 binding only until Playwright blocker resolved. |
 | `npm run build` | TypeScript + Vite production build | Used before running `npm run build:ui`. |
-| `npm run build:ui` | Produces optimized UI bundle (`dist/`) | Relies on Jest/Vite compile of `src/ui`. |
+| `npm run build:ui` | Produces optimized UI bundle (`dist/`) | Relies on Jest/Vite compile of `apps/ui`. |
 | `npm run build:static` | Stages static assets for deployment (`dist-static/`) | Runs the clean → optional type-check → Vite build pipeline, stages `dist-static/`, captures `build-metadata.json` (including the ordered `commands` array and `skipTypeCheck` flag), and emits `dist-static-<timestamp>.tar.gz`. `SKIP_TYPE_CHECK=1` is only needed for quick UI iterations and the chosen flag is recorded in the metadata for traceability. |
 | `npm test` | Runs Jest suites | Requires `jest-environment-jsdom`; install once registry access is available. |
 | `npm run test:e2e` | Launches Playwright guided-workflow tests | Blocked until Vite can bind to `127.0.0.1:4174`. |

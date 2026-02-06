@@ -1,4 +1,4 @@
-import { DayOfWeek, DaySegment, Employee, SegmentBlock, StaffAssignment } from "../../domain/types";
+import { DayOfWeek, DaySegment, Employee, SegmentBlock, StaffAssignment } from "../../../src/domain/types";
 import { RuleViolation } from "../types";
 
 interface ScheduleGridProps {

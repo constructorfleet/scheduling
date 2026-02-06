@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import DayMetadataStrip, { ScheduleTypeOption } from "../../src/ui/components/DayMetadataStrip";
+import DayMetadataStrip, { ScheduleTypeOption } from "../../apps/ui/components/DayMetadataStrip";
 import type {
   DayOfWeek,
   FieldTripEvent,

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import GuidedStatusTracker from "../../src/ui/components/GuidedStatusTracker";
-import type { GuidedStep } from "../../src/ui/types";
+import GuidedStatusTracker from "../../apps/ui/components/GuidedStatusTracker";
+import type { GuidedStep } from "../../apps/ui/types";
 
 describe("GuidedStatusTracker", () => {
   const baseSteps: GuidedStep[] = [

@@ -27,6 +27,6 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "apps/ui/**/*.ts", "apps/ui/**/*.tsx", "apps/api/**/*.ts", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
   "exclude": ["node_modules", "dist"]
 }

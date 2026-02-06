@@ -1,4 +1,4 @@
-import { FieldTripEvent, FieldTripType, PolicyCitation } from "../../domain/types";
+import { FieldTripEvent, FieldTripType, PolicyCitation } from "../../../src/domain/types";
 
 interface FieldTripApprovalPanelProps {
   event: FieldTripEvent;

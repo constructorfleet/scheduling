@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import ClockBlockTimeline from "../../src/ui/components/ClockBlockTimeline";
-import { segmentSlotDefinitions } from "../../src/ui/data/mockScheduleData";
+import ClockBlockTimeline from "../../apps/ui/components/ClockBlockTimeline";
+import { segmentSlotDefinitions } from "../../apps/ui/data/mockScheduleData";
 import type {
   DayOfWeek,
   Employee,
@@ -9,7 +9,7 @@ import type {
   StaffAssignment,
   OperatingHours
 } from "../../src/domain/types";
-import type { RuleViolation } from "../../src/ui/types";
+import type { RuleViolation } from "../../apps/ui/types";
 
 const dayDisplayNames: Record<DayOfWeek, string> = {
   mon: "Monday",

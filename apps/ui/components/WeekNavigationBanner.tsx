@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ScheduleStatus } from "../../domain/types";
+import { ScheduleStatus } from "../../../src/domain/types";
 
 const statusBadges: Record<ScheduleStatus, { label: string; color: string }> = {
   draft: { label: "Draft", color: "#f59e0b" },

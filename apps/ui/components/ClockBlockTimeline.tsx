@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DayOfWeek, DaySegment, Employee, OperatingHours, SegmentBlock, StaffAssignment } from "../../domain/types";
+import { DayOfWeek, DaySegment, Employee, OperatingHours, SegmentBlock, StaffAssignment } from "../../../src/domain/types";
 import { RuleViolation } from "../types";
 
 export interface AddClockBlockRequest {

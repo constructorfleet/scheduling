@@ -10,9 +10,9 @@ import {
   ScheduleType,
   SegmentBlock,
   StaffAssignment
-} from "../../domain/types";
+} from "../../../src/domain/types";
 import { ScheduleTypeOption, FieldTripSelection } from "./DayMetadataStrip";
-import { parseTimeToMinutes } from "../../rules/utils";
+import { parseTimeToMinutes } from "../../../src/rules/utils";
 
 interface ScheduleMatrixProps {
   staff: Employee[];
