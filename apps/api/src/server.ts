@@ -7,6 +7,90 @@ import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
 
+type DbCreateArgs<T> = { data: T };
+type DbDeleteArgs<T> = { where: T };
+type DbUpsertArgs<TCreate, TUpdate, TWhere> = {
+  where: TWhere;
+  create: TCreate;
+  update: TUpdate;
+};
+
+type DbModelClient<TCreate = unknown, TUpdate = unknown, TWhere = unknown, TFind = unknown> = {
+  createMany: (args: DbCreateArgs<TCreate[]>) => Promise<unknown>;
+  deleteMany: (args: DbDeleteArgs<TWhere>) => Promise<unknown>;
+  upsert: (args: DbUpsertArgs<TCreate, TUpdate, TWhere>) => Promise<unknown>;
+  findUnique: (args: { where: TWhere; include?: Record<string, boolean> }) => Promise<TFind | null>;
+};
+
+type DbTransaction = {
+  school: DbModelClient<unknown, unknown, { id: string }, Record<string, unknown>>;
+  scheduleType: DbModelClient<unknown, unknown, { schoolId: string }>;
+  jobTitle: DbModelClient<unknown, unknown, { schoolId: string }>;
+  employee: DbModelClient<unknown, unknown, { schoolId: string }>;
+  operatingHours: DbModelClient<unknown, unknown, { schoolId: string }>;
+  fieldTripType: DbModelClient<unknown, unknown, { schoolId: string }>;
+  scheduleWeek: DbModelClient<unknown, unknown, { id: string }, Record<string, unknown>>;
+  scheduleDay: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
+  fieldTripEvent: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
+  segmentBlock: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
+  staffAssignment: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
+};
+
+type ScheduleWeekPayload = {
+  schoolId: string;
+  label?: string;
+  status: string;
+  startDate?: string;
+};
+
+type ScheduleDayPayload = {
+  id: string;
+  date?: string;
+  dayOfWeek: string;
+  scheduleType?: string;
+  enrollmentCount?: number;
+  enrollmentSource?: string;
+  fieldTripEventId?: string;
+  operatingCapacityOverride?: number;
+  notes?: string;
+  dayScheduleType?: string;
+};
+
+type FieldTripEventPayload = {
+  id: string;
+  dayOfWeek: string;
+  segment: string;
+  scheduleDayId?: string;
+  fieldTripTypeId?: string;
+  isNoFieldTrip?: boolean;
+  approverId?: string;
+  signedOffAt?: string;
+  notes?: string;
+};
+
+type SegmentBlockPayload = {
+  id: string;
+  scheduleDayId?: string;
+  dayOfWeek: string;
+  segment: string;
+  startTime: string;
+  endTime: string;
+  childCount: number;
+  requirementTemplate: unknown;
+  status: string;
+};
+
+type StaffAssignmentPayload = {
+  id: string;
+  segmentBlockId: string;
+  employeeId: string;
+  assignmentSource: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  notes?: string;
+};
+
 const buildServer = async () => {
   const fastify = Fastify({ logger: isDebugEnabled() });
   await fastify.register(cors, { origin: true });
@@ -25,7 +109,9 @@ const buildServer = async () => {
   });
 
   fastify.get("/api/docs", async (_, reply) => {
-    const html = `<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  <title>OpenAPI Editor</title>\n  <link rel=\"stylesheet\" href=\"/api/docs/swagger-editor.css\" />\n  <style>html, body { margin: 0; padding: 0; height: 100%; } #swagger-editor { height: 100vh; }</style>\n</head>\n<body>\n  <div id=\"swagger-editor\"></div>\n  <script src=\"/api/docs/swagger-editor-bundle.js\"></script>\n  <script src=\"/api/docs/swagger-editor-standalone-preset.js\"></script>\n  <script>\n    window.onload = function () {\n      SwaggerEditorBundle({\n        url: '/api/openapi.yaml',\n        dom_id: '#swagger-editor',\n        layout: 'StandaloneLayout',\n        presets: [SwaggerEditorStandalonePreset]\n      });\n    };\n  </script>\n</body>\n</html>`;\n    reply.type("text/html").send(html);\n  });
+    const html = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>OpenAPI Editor</title>\n  <link rel="stylesheet" href="/api/docs/swagger-editor.css" />\n  <style>html, body { margin: 0; padding: 0; height: 100%; } #swagger-editor { height: 100vh; }</style>\n</head>\n<body>\n  <div id="swagger-editor"></div>\n  <script src="/api/docs/swagger-editor-bundle.js"></script>\n  <script src="/api/docs/swagger-editor-standalone-preset.js"></script>\n  <script>\n    window.onload = function () {\n      SwaggerEditorBundle({\n        url: '/api/openapi.yaml',\n        dom_id: '#swagger-editor',\n        layout: 'StandaloneLayout',\n        presets: [SwaggerEditorStandalonePreset]\n      });\n    };\n  </script>\n</body>\n</html>`;
+    reply.type("text/html").send(html);
+  });
 
   fastify.get("/api/settings/:schoolId", async (request) => {
     const { schoolId } = request.params as { schoolId: string };
@@ -102,7 +188,7 @@ const buildServer = async () => {
 
     const prisma = await getPrisma();
 
-    const school = await prisma.$transaction(async (tx: any) => {
+    const school = await prisma.$transaction(async (tx: DbTransaction) => {
       const upsertedSchool = await tx.school.upsert({
         where: { id: schoolId },
         create: {
@@ -222,21 +308,16 @@ const buildServer = async () => {
   fastify.put("/api/schedule/:weekId", async (request) => {
     const { weekId } = request.params as { weekId: string };
     const payload = request.body as {
-      scheduleWeek: {
-        schoolId: string;
-        label?: string;
-        status: string;
-        startDate?: string;
-      };
-      scheduleDays: Array<Record<string, any>>;
-      segmentBlocks: Array<Record<string, any>>;
-      staffAssignments: Array<Record<string, any>>;
-      fieldTripEvents: Array<Record<string, any>>;
+      scheduleWeek: ScheduleWeekPayload;
+      scheduleDays: ScheduleDayPayload[];
+      segmentBlocks: SegmentBlockPayload[];
+      staffAssignments: StaffAssignmentPayload[];
+      fieldTripEvents: FieldTripEventPayload[];
     };
 
     const prisma = await getPrisma();
 
-    await prisma.$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx: DbTransaction) => {
       await tx.scheduleWeek.upsert({
         where: { id: weekId },
         create: {
