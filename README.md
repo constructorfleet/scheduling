@@ -136,6 +136,19 @@ scheduling/
 - **[AGENT_GUIDE.md](AGENT_GUIDE.md)** - How to run and customize the agent system
 - **[artifacts/README.md](artifacts/README.md)** - How to work with agent outputs
 
+## Local Development
+
+```bash
+# UI
+npm run dev
+
+# API (Fastify + Prisma)
+npm run api:dev
+
+# Regenerate OpenAPI client
+npm run api:openapi:client
+```
+
 ## Core Concepts
 
 ### Domain Model

@@ -30,11 +30,6 @@
     ,
     "prepare": "husky"
   },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --max-warnings=0 --ignore-pattern apps/ui/data/generated/** --ignore-pattern apps/api/generated/**"
-    ]
-  },
   "keywords": [
     "scheduling",
     "daycare",
