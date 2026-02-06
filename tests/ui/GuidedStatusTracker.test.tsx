@@ -15,7 +15,7 @@ describe("GuidedStatusTracker", () => {
       label: "Validation",
       detail: "Violations link directly to the grid; clear them so the tracker turns green.",
       status: "in_progress",
-      actionLabel: "Mark validations addressed"
+      actionLabel: "Review violations"
     },
     {
       id: "field-trip",
@@ -38,7 +38,7 @@ describe("GuidedStatusTracker", () => {
     const onStepAction = jest.fn();
     render(<GuidedStatusTracker steps={baseSteps} onStepAction={onStepAction} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark validations addressed" }));
+    fireEvent.click(screen.getByRole("button", { name: "Review violations" }));
     expect(onStepAction).toHaveBeenCalledWith("validation");
   });
 });

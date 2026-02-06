@@ -44,20 +44,7 @@ test.describe("Scheduling workspace guided flows", () => {
     await expect(page.getByText("Field trip approved")).toBeVisible();
   });
 
-  test("substitute parity resolution and audit controls stay in sync", async ({ page }) => {
-    const substitutePanel = page.locator("section", {
-      has: page.getByRole("heading", { name: "Substitute coverage" })
-    });
-    await expect(substitutePanel.getByText("blocked")).toBeVisible();
-    await expect(substitutePanel.getByText("Approver metadata missing")).toBeVisible();
-    await expect(substitutePanel.getByText("Approval timestamp missing")).toBeVisible();
-    const resolveParity = substitutePanel.getByRole("button", { name: "Resolve parity" });
-    await resolveParity.click();
-    await expect(substitutePanel.getByText("ready")).toBeVisible();
-    await expect(substitutePanel.getByText("Approver: Aisha Patel")).toBeVisible();
-    await expect(substitutePanel.getByText("Signed")).toBeVisible();
-    await expect(substitutePanel.getByRole("button", { name: "Resolve parity" })).toHaveCount(0);
-
+  test("audit controls stay in sync", async ({ page }) => {
     const undoButton = page.getByRole("button", { name: "Undo" });
     const redoButton = page.getByRole("button", { name: "Redo" });
     await expect(undoButton).toBeEnabled();

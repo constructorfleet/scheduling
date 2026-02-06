@@ -11,7 +11,7 @@ import type {
   SegmentBlock,
   SegmentRequirementTemplate,
   StaffAssignment,
-  SubstituteRequest
+  OperatingHours
 } from "../../src/domain/types";
 import type { RulesContext } from "../../src/rules/types";
 
@@ -61,7 +61,6 @@ const createAssignment = (
   assignmentSource: "manual_adjustment" as AssignmentSource,
   startTime: "08:00",
   endTime: "12:00",
-  isSubstitute: false,
   status: "scheduled",
   ...overrides
 });
@@ -105,6 +104,7 @@ const createScheduleDay = (id: string, overrides: Partial<ScheduleDay> = {}): Sc
   enrollmentCount: 20,
   enrollmentSource: "manual_adjustment",
   fieldTripEventId: overrides.fieldTripEventId,
+  dayScheduleType: overrides.dayScheduleType ?? "full_day",
   ...overrides
 });
 
@@ -116,19 +116,36 @@ const defaultScheduleDay = createScheduleDay("day-default", {
   fieldTripEventId: defaultFieldTripEvent.id
 });
 
+const WEEK_DAYS: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const createOperatingHours = (
+  overrides: Partial<OperatingHours> & { dayOfWeek?: DayOfWeek } = {}
+): OperatingHours => ({
+  id: overrides.id ?? `operating-${overrides.dayOfWeek ?? "mon"}`,
+  schoolId: overrides.schoolId ?? "school-default",
+  dayOfWeek: overrides.dayOfWeek ?? "mon",
+  dayScheduleType: overrides.dayScheduleType ?? "full_day",
+  open: overrides.open ?? "06:00",
+  close: overrides.close ?? "18:00",
+  notes: overrides.notes
+});
+const defaultOperatingHours = WEEK_DAYS.map((day) =>
+  createOperatingHours({ dayOfWeek: day, dayScheduleType: "full_day" })
+);
+
 const withDefaultScheduleInfo = (context: Partial<RulesContext>): RulesContext => {
   const mergedFieldTripEvents = [
     defaultFieldTripEvent,
     ...(context.fieldTripEvents ?? []).filter((event) => event.id !== defaultFieldTripEvent.id)
   ];
+  const operatingHours = context.operatingHours ?? defaultOperatingHours;
   return {
     segmentBlocks: context.segmentBlocks ?? [],
     staffAssignments: context.staffAssignments ?? [],
     employees: context.employees ?? [],
-    substituteRequests: context.substituteRequests ?? [],
     fieldTripEvents: mergedFieldTripEvents,
     fieldTripTypes: context.fieldTripTypes ?? [],
     scheduleDays: context.scheduleDays ?? [defaultScheduleDay],
+    operatingHours,
     policyCitations: context.policyCitations,
     rulePolicyCitations: context.rulePolicyCitations
   };
@@ -147,7 +164,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [assignment],
       employees: [createEmployee("emp-ratio")],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -175,7 +191,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: assignments,
       employees,
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -212,7 +227,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [assignment],
       employees: [createEmployee("emp-trip-skip")],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -238,7 +252,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [assignment],
       employees: [createEmployee("emp-cert", { cprCurrent: false })],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -270,7 +283,6 @@ describe("RulesEngine", () => {
           leaderQualified: true
         })
       ],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -292,7 +304,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [assignment],
       employees: [createEmployee("emp-coverage")],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -321,7 +332,6 @@ describe("RulesEngine", () => {
           medicallyDelegated: true
         })
       ],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -346,7 +356,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [firstAssignment, secondAssignment],
       employees: [employee],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -373,7 +382,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [block],
       staffAssignments: [firstAssignment, secondAssignment],
       employees: [employee],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -399,7 +407,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [blockMon, blockTue],
       staffAssignments: [firstAssignment, secondAssignment],
       employees: [employee],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -408,94 +415,6 @@ describe("RulesEngine", () => {
     const shiftViolations = violations.filter((violation) => violation.ruleId === "shift-break-limits");
     expect(shiftViolations).toHaveLength(1);
     expect(shiftViolations[0].message).toContain("weekly limit");
-  });
-
-  test("flags substitute assignments missing requests", () => {
-    const block = createSegmentBlock("block-sub");
-    const assignment = createAssignment("assign-sub", block.id, "emp-sub", {
-      isSubstitute: true,
-      substituteRequestId: "req-missing"
-    });
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [createEmployee("emp-sub")],
-      substituteRequests: [],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const substituteViolations = violations.filter((violation) => violation.ruleId === "substitute-parity");
-    expect(substituteViolations).toHaveLength(1);
-    expect(substituteViolations[0].target.metadata).toEqual({ missing: ["substituteRequest"] });
-  });
-
-  test("passes substitute parity when approved metadata is present", () => {
-    const block = createSegmentBlock("block-sub-clean");
-    const substituteRequest: SubstituteRequest = {
-      id: "req-approved",
-      originalAssignmentId: "assign-sub-clean",
-      segmentBlockId: block.id,
-      replacementEmployeeId: "emp-sub-clean",
-      requestedBy: "director",
-      requestedAt: "2026-02-01T09:00:00Z",
-      state: "approved",
-      reason: "fill coverage gap",
-      approverId: "approver-1",
-      approvedAt: "2026-02-01T10:00:00Z",
-      policyCitationId: "policy-substitute"
-    };
-    const assignment = createAssignment("assign-sub-clean", block.id, substituteRequest.replacementEmployeeId, {
-      isSubstitute: true,
-      substituteRequestId: substituteRequest.id
-    });
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [createEmployee(substituteRequest.replacementEmployeeId)],
-      substituteRequests: [substituteRequest],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const substituteViolations = violations.filter((violation) => violation.ruleId === "substitute-parity");
-    expect(substituteViolations).toHaveLength(0);
-  });
-
-  test("reports substitute parity violations when approval metadata is incomplete", () => {
-    const block = createSegmentBlock("block-sub-incomplete");
-    const substituteRequest: SubstituteRequest = {
-      id: "req-pending",
-      originalAssignmentId: "assign-sub-incomplete",
-      segmentBlockId: block.id,
-      replacementEmployeeId: "emp-sub-incomplete",
-      requestedBy: "director",
-      requestedAt: "2026-02-01T09:00:00Z",
-      state: "pending",
-      reason: "fill coverage gap",
-      policyCitationId: "policy-substitute"
-    };
-    const assignment = createAssignment("assign-sub-incomplete", block.id, substituteRequest.replacementEmployeeId, {
-      isSubstitute: true,
-      substituteRequestId: substituteRequest.id
-    });
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [createEmployee(substituteRequest.replacementEmployeeId)],
-      substituteRequests: [substituteRequest],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const substituteViolations = violations.filter((violation) => violation.ruleId === "substitute-parity");
-    expect(substituteViolations).toHaveLength(1);
-    expect(substituteViolations[0].target.metadata).toEqual({
-      missing: ["state", "approverId", "approvedAt"]
-    });
   });
 
   test("enforces field trip ratio minima", () => {
@@ -521,13 +440,11 @@ describe("RulesEngine", () => {
       fieldTripEventId: fieldTripEvent.id
     });
     const assignment = createAssignment("assign-trip", block.id, "emp-trip", {
-      isSubstitute: false
     });
     const context: RulesContext = withDefaultScheduleInfo({
       segmentBlocks: [block],
       staffAssignments: [assignment],
       employees: [createEmployee("emp-trip", { leaderQualified: true })],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -567,13 +484,12 @@ describe("RulesEngine", () => {
       createEmployee("emp-trip-clean-4")
     ];
     const assignments = employees.map((employee, index) =>
-      createAssignment(`assign-trip-clean-${index + 1}`, block.id, employee.id, { isSubstitute: false })
+      createAssignment(`assign-trip-clean-${index + 1}`, block.id, employee.id)
     );
     const context: RulesContext = withDefaultScheduleInfo({
       segmentBlocks: [block],
       staffAssignments: assignments,
       employees,
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -612,13 +528,12 @@ describe("RulesEngine", () => {
       createEmployee("emp-trip-leader-4")
     ];
     const assignments = employees.map((employee, index) =>
-      createAssignment(`assign-trip-leader-${index + 1}`, block.id, employee.id, { isSubstitute: false })
+      createAssignment(`assign-trip-leader-${index + 1}`, block.id, employee.id)
     );
     const context: RulesContext = withDefaultScheduleInfo({
       segmentBlocks: [block],
       staffAssignments: assignments,
       employees,
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -649,7 +564,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -682,7 +596,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -713,7 +626,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -735,7 +647,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -765,7 +676,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -784,7 +694,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -810,7 +719,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -842,7 +750,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: [fieldTripType]
     });
@@ -865,7 +772,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -893,7 +799,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -913,7 +818,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [invalidBlock],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: []
     });
@@ -955,7 +859,6 @@ describe("RulesEngine", () => {
       segmentBlocks: [firstBlock, overlappingBlock],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -966,5 +869,71 @@ describe("RulesEngine", () => {
     expect(timelineViolations[0].target.id).toBe(overlappingBlock.id);
     expect(timelineViolations[0].target.metadata).toEqual({ overlapsWith: firstBlock.id });
     expect(timelineViolations[0].message).toContain("overlaps with");
+  });
+
+  test("flags segment blocks that start before operating hours", () => {
+    const customHours = createOperatingHours({
+      dayOfWeek: "mon",
+      dayScheduleType: "full_day",
+      open: "07:00",
+      close: "17:00",
+      id: "operating-custom-start"
+    });
+    const earlyBlock = createSegmentBlock("block-before-open", {
+      scheduleDayId: defaultScheduleDay.id,
+      startTime: "06:30",
+      endTime: "09:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [earlyBlock],
+      staffAssignments: [],
+      employees: [],
+      fieldTripEvents: [],
+      fieldTripTypes: [],
+      operatingHours: [customHours]
+    });
+
+    const violations = engine.evaluate(context);
+    const timelineViolations = violations.filter((violation) => violation.ruleId === "segment-block-timeline");
+    expect(timelineViolations).toHaveLength(1);
+    expect(timelineViolations[0].message).toContain("starts before operating hours");
+    expect(timelineViolations[0].target.metadata).toEqual({
+      operatingHoursId: customHours.id,
+      startTime: earlyBlock.startTime,
+      boundary: customHours.open
+    });
+  });
+
+  test("flags segment blocks that end after operating hours", () => {
+    const customHours = createOperatingHours({
+      dayOfWeek: "mon",
+      dayScheduleType: "full_day",
+      open: "06:00",
+      close: "12:00",
+      id: "operating-custom-end"
+    });
+    const lateBlock = createSegmentBlock("block-after-close", {
+      scheduleDayId: defaultScheduleDay.id,
+      startTime: "10:00",
+      endTime: "13:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [lateBlock],
+      staffAssignments: [],
+      employees: [],
+      fieldTripEvents: [],
+      fieldTripTypes: [],
+      operatingHours: [customHours]
+    });
+
+    const violations = engine.evaluate(context);
+    const timelineViolations = violations.filter((violation) => violation.ruleId === "segment-block-timeline");
+    expect(timelineViolations).toHaveLength(1);
+    expect(timelineViolations[0].message).toContain("ends after operating hours");
+    expect(timelineViolations[0].target.metadata).toEqual({
+      operatingHoursId: customHours.id,
+      endTime: lateBlock.endTime,
+      boundary: customHours.close
+    });
   });
 });

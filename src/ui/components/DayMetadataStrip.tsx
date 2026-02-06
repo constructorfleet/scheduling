@@ -3,7 +3,7 @@ import { DayOfWeek, FieldTripEvent, FieldTripType, ScheduleDay, ScheduleType } f
 export interface ScheduleTypeOption {
   value: ScheduleType;
   label: string;
-  ratioHint: string;
+  ratio: { adults: number; students: number };
   description: string;
 }
 
@@ -159,7 +159,9 @@ export default function DayMetadataStrip({
                 ))}
               </select>
               {selectedType && (
-                <p style={{ margin: 0, fontSize: "0.75rem", color: "#2563eb" }}>{selectedType.ratioHint}</p>
+                <p style={{ margin: 0, fontSize: "0.75rem", color: "#2563eb" }}>
+                  Adult:Student {selectedType.ratio.adults}:{selectedType.ratio.students}
+                </p>
               )}
 
               <label style={{ fontSize: "0.75rem", color: "#374151" }}>Field trip selection</label>

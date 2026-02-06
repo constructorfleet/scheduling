@@ -1,4 +1,4 @@
-import { DayOfWeek, PolicyCitation } from "../domain/types";
+import { PolicyCitation } from "../domain/types";
 
 export type StepStatus = "complete" | "in_progress" | "blocked";
 
@@ -9,6 +9,7 @@ export interface GuidedStep {
   detail: string;
   actionLabel?: string;
   blockingReason?: string;
+  actionDisabled?: boolean;
 }
 
 export interface RuleViolation {
@@ -19,6 +20,7 @@ export interface RuleViolation {
   segmentBlockId: string;
   policyCitation: PolicyCitation;
   recommendedAction: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AuditEvent {
@@ -28,16 +30,4 @@ export interface AuditEvent {
   action: string;
   policyCitation: PolicyCitation;
   notes?: string;
-}
-
-export interface SubstituteAssignmentCard {
-  requestId: string;
-  replacementName: string;
-  originalDay: DayOfWeek;
-  segmentLabel: string;
-  approver?: string;
-  approvedAt?: string;
-  parityCheck: boolean;
-  issues: string[];
-  state: "ready" | "pending" | "blocked";
 }

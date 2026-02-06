@@ -1,10 +1,11 @@
 export type DaySegment = "open" | "mid" | "close";
 export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 export type ScheduleStatus = "draft" | "ready_for_review" | "submitted" | "approved" | "archived";
-export type AssignmentSource = "template" | "manual_adjustment" | "field_trip_override" | "substitute" | "import";
+export type AssignmentSource = "template" | "manual_adjustment" | "field_trip_override" | "import";
 export type ApprovalState = "pending" | "approved" | "rejected";
-export type ScheduleType = "regular" | "extended" | "enrichment";
+export type ScheduleType = string;
 export type EnrollmentSource = "roster" | "manual_adjustment" | "override";
+export type DayScheduleType = "closed" | "in_house" | "full_day" | "school_day";
 
 export interface PolicyCitation {
   id: string;
@@ -29,6 +30,16 @@ export interface FieldTripType {
   minAdultStudentRatio: number;
   minLeaderStudentRatio: number;
   policyCitationId: string;
+  notes?: string;
+}
+
+export interface OperatingHours {
+  id: string;
+  schoolId: string;
+  dayOfWeek: DayOfWeek;
+  dayScheduleType: DayScheduleType;
+  open: string;
+  close: string;
   notes?: string;
 }
 
@@ -86,21 +97,6 @@ export interface Employee {
   notes?: string;
 }
 
-export interface SubstituteRequest {
-  id: string;
-  originalAssignmentId: string;
-  segmentBlockId: string;
-  replacementEmployeeId: string;
-  requestedBy: string;
-  requestedAt: string;
-  state: ApprovalState;
-  reason?: string;
-  approverId?: string;
-  approvedAt?: string;
-  policyCitationId?: string;
-  notes?: string;
-}
-
 export interface StaffAssignment {
   id: string;
   segmentBlockId: string;
@@ -108,8 +104,6 @@ export interface StaffAssignment {
   assignmentSource: AssignmentSource;
   startTime: string;
   endTime: string;
-  isSubstitute: boolean;
-  substituteRequestId?: string;
   status: "scheduled" | "active" | "on_break" | "completed";
   notes?: string;
 }
@@ -125,6 +119,7 @@ export interface ScheduleDay {
   fieldTripEventId?: string;
   operatingCapacityOverride?: number;
   notes?: string;
+  dayScheduleType?: DayScheduleType;
 }
 
 export interface ShiftBreak {

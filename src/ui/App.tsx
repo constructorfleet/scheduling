@@ -1,32 +1,38 @@
 import { useMemo, useState } from "react";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import WeekNavigationBanner from "./components/WeekNavigationBanner";
-import StaffPalette from "./components/StaffPalette";
-import DayMetadataStrip, { FieldTripSelection } from "./components/DayMetadataStrip";
-import ClockBlockTimeline from "./components/ClockBlockTimeline";
+import { FieldTripSelection } from "./components/DayMetadataStrip";
+import ScheduleMatrix from "./components/ScheduleMatrix";
 import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
-import FieldTripApprovalPanel from "./components/FieldTripApprovalPanel";
-import SubstituteAssignmentPanel from "./components/SubstituteAssignmentPanel";
 import AuditTimeline from "./components/AuditTimeline";
+import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
 import {
   auditTimeline,
   dayDisplayNames,
   daySequence,
-  employees,
   fieldTripEvents,
-  fieldTripTypes,
+  operatingHours,
   scheduleDays,
-  scheduleTypeOptions,
   policyCitations,
   segmentBlocks,
-  segmentSlotDefinitions,
   staffAssignments,
-  substituteRequests,
   weekMeta,
-  schools
+  schools,
+  scheduleTypeOptions,
+  fieldTripTypes,
+  employees
 } from "./data/mockScheduleData";
-import { GuidedStep, RuleViolation as UiRuleViolation, SubstituteAssignmentCard } from "./types";
-import { DayOfWeek, FieldTripEvent, PolicyCitation, ScheduleStatus, ScheduleType } from "../domain/types";
+import { GuidedStep, RuleViolation as UiRuleViolation } from "./types";
+import {
+  DayOfWeek,
+  FieldTripEvent,
+  OperatingHours,
+  PolicyCitation,
+  ScheduleStatus,
+  ScheduleType,
+  SegmentBlock
+} from "../domain/types";
 import { createRulesEngine } from "../rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "../rules/types";
 
@@ -35,9 +41,10 @@ const RULE_TITLES: Record<string, string> = {
   "certification-per-segment": "Certification missing",
   "segment-coverage": "Coverage guardrail",
   "shift-break-limits": "Shift limit breach",
-  "substitute-parity": "Substitute metadata",
   "field-trip-ratios": "Field trip ratio",
-  "field-trip-signoff": "Field trip sign-off"
+  "open-close-coverage": "Open/close coverage",
+  "medical-delegated-coverage": "Medical delegation",
+  "cpr-current-required": "CPR current required"
 };
 
 const RECOMMENDED_ACTIONS: Record<string, string> = {
@@ -45,9 +52,10 @@ const RECOMMENDED_ACTIONS: Record<string, string> = {
   "certification-per-segment": "Reassign staff with the required CPR, medical delegation, or leader qualification.",
   "segment-coverage": "Bring a leader-qualified or medically delegated staff member into the block.",
   "shift-break-limits": "Split the shift into shorter blocks or assign a break to stay under the cap.",
-  "substitute-parity": "Capture the missing substitute metadata (approver, timestamp, parity) before confirming.",
   "field-trip-ratios": "Reconcile adult and leader counts with the ratio required for this trip.",
-  "field-trip-signoff": "Add the director approver name and timestamp so the trip can publish."
+  "open-close-coverage": "Add the required opener/closer coverage and ensure a leader-qualified staff member is present.",
+  "medical-delegated-coverage": "Assign medically delegated staff to meet the minimum requirement.",
+  "cpr-current-required": "Replace the staff member with a current CPR certification."
 };
 
 const RULE_POLICY_CITATIONS = {
@@ -55,9 +63,10 @@ const RULE_POLICY_CITATIONS = {
   "certification-per-segment": policyCitations.ratio.id,
   "segment-coverage": policyCitations.leaderCoverage.id,
   "shift-break-limits": policyCitations.breakPolicy.id,
-  "substitute-parity": policyCitations.leaderCoverage.id,
   "field-trip-ratios": policyCitations.fieldTrip.id,
-  "field-trip-signoff": policyCitations.fieldTrip.id
+  "open-close-coverage": policyCitations.leaderCoverage.id,
+  "medical-delegated-coverage": policyCitations.breakPolicy.id,
+  "cpr-current-required": policyCitations.breakPolicy.id
 } as const;
 
 const SEVERITY_MAP: Record<EngineRuleViolation["severity"], UiRuleViolation["severity"]> = {
@@ -81,14 +90,89 @@ const formatWeekRange = (startDate: Date) => {
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
-  const [focusedSegmentId, setFocusedSegmentId] = useState<string | null>(null);
-  const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>(undefined);
+  const [schoolName, setSchoolName] = useState(schools[0].name);
+  const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(scheduleTypeOptions);
+  const [fieldTripTypesState, setFieldTripTypesState] = useState(fieldTripTypes);
+  const [employeesState, setEmployeesState] = useState(employees);
   const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
-  const [substituteRequestsState, setSubstituteRequestsState] = useState(substituteRequests);
   const [undoCount, setUndoCount] = useState(2);
   const [redoCount, setRedoCount] = useState(0);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
   const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
+  const [segmentBlocksState, setSegmentBlocksState] = useState(segmentBlocks);
+  const [staffAssignmentsState, setStaffAssignmentsState] = useState(staffAssignments);
+  const [showViolationNavigator, setShowViolationNavigator] = useState(false);
+  const [showAuditTimeline, setShowAuditTimeline] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsDirty, setSettingsDirty] = useState(false);
+  const [settingsCloseAttempt, setSettingsCloseAttempt] = useState(0);
+  const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>(["sat", "sun"]);
+  const [schoolRulesState, setSchoolRulesState] = useState<SchoolRules>({
+    openerCount: 2,
+    closerCount: 2,
+    minimumMedicalDelegated: 1,
+    requireCurrentCpr: true
+  });
+
+  const [jobTitlesState, setJobTitlesState] = useState<JobTitleSetting[]>(() => {
+    const map = new Map<string, JobTitleSetting>();
+    employees.forEach((employee) => {
+      if (!map.has(employee.jobTitle)) {
+        map.set(employee.jobTitle, {
+          id: `job-${employee.jobTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+          title: employee.jobTitle,
+          leaderQualified: employee.leaderQualified,
+          requiresLeaderForOpenClose: !employee.leaderQualified
+        });
+      }
+    });
+    return Array.from(map.values());
+  });
+
+  const [operatingHoursConfigState, setOperatingHoursConfigState] = useState<OperatingHoursConfig[]>(() => {
+    const configMap = new Map<string, OperatingHoursConfig>();
+    scheduleDays.forEach((day) => {
+      const hours = operatingHours.find((entry) => entry.dayOfWeek === day.dayOfWeek);
+      if (!hours || !day.scheduleType) {
+        return;
+      }
+      const key = `${day.scheduleType}-${hours.open}-${hours.close}`;
+      const existing = configMap.get(key);
+      if (existing) {
+        if (!existing.daysOfWeek.includes(day.dayOfWeek)) {
+          existing.daysOfWeek.push(day.dayOfWeek);
+        }
+        return;
+      }
+      configMap.set(key, {
+        id: `hours-${day.scheduleType}-${hours.open}-${hours.close}`,
+        scheduleType: day.scheduleType,
+        daysOfWeek: [day.dayOfWeek],
+        open: hours.open,
+        close: hours.close
+      });
+    });
+    return Array.from(configMap.values());
+  });
+
+  const jobTitleLeaderMap = useMemo(() => {
+    return new Map(jobTitlesState.map((title) => [title.title, title.leaderQualified]));
+  }, [jobTitlesState]);
+
+  const jobTitleRules = useMemo(() => {
+    return jobTitlesState.reduce<Record<string, { requiresLeaderForOpenClose: boolean }>>((acc, title) => {
+      acc[title.title] = { requiresLeaderForOpenClose: title.requiresLeaderForOpenClose };
+      return acc;
+    }, {});
+  }, [jobTitlesState]);
+
+  const employeesDerived = useMemo(() => {
+    return employeesState.map((employee) => ({
+      ...employee,
+      leaderQualified: jobTitleLeaderMap.get(employee.jobTitle) ?? employee.leaderQualified,
+      cprCurrent: schoolRulesState.requireCurrentCpr ? employee.cprCurrent : true
+    }));
+  }, [employeesState, jobTitleLeaderMap, schoolRulesState.requireCurrentCpr]);
 
   const fieldTripEventsByDay = useMemo<Record<DayOfWeek, FieldTripEvent | undefined>>(() => {
     return fieldTripEventsState.reduce((map, event) => {
@@ -97,30 +181,118 @@ export default function App() {
     }, {} as Record<DayOfWeek, FieldTripEvent | undefined>);
   }, [fieldTripEventsState]);
 
+  const operatingHoursByDay = useMemo<Record<DayOfWeek, OperatingHours | undefined>>(() => {
+    return daySequence.reduce((map, day) => {
+      if (closedDaysState.includes(day)) {
+        map[day] = undefined;
+        return map;
+      }
+      const scheduleDay = scheduleDaysState.find((item) => item.dayOfWeek === day);
+      const scheduleType = scheduleDay?.scheduleType;
+      const configMatch = operatingHoursConfigState.find(
+        (entry) => entry.scheduleType === scheduleType && entry.daysOfWeek.includes(day)
+      );
+      if (configMatch) {
+        map[day] = {
+          id: `hours-${day}-${configMatch.scheduleType}`,
+          schoolId: selectedSchoolId,
+          dayOfWeek: day,
+          dayScheduleType: "full_day",
+          open: configMatch.open,
+          close: configMatch.close,
+          notes: `${configMatch.scheduleType} operating hours`
+        };
+        return map;
+      }
+      map[day] = undefined;
+      return map;
+    }, {} as Record<DayOfWeek, OperatingHours | undefined>);
+  }, [scheduleDaysState, operatingHoursConfigState, daySequence, selectedSchoolId, closedDaysState]);
+
+  const openDaySequence = useMemo(() => {
+    return daySequence.filter((day) => !closedDaysState.includes(day));
+  }, [daySequence, closedDaysState]);
+
+  const ratioByScheduleType = useMemo(() => {
+    return scheduleTypeOptionsState.reduce<Record<string, number>>((acc, option) => {
+      const adults = option.ratio?.adults ?? 0;
+      const students = option.ratio?.students ?? 0;
+      if (adults > 0 && students > 0) {
+        acc[option.value] = students / adults;
+      }
+      return acc;
+    }, {});
+  }, [scheduleTypeOptionsState]);
+
+  const derivedOperatingHours = useMemo<OperatingHours[]>(() => {
+    const entries: OperatingHours[] = [];
+    operatingHoursConfigState.forEach((entry) => {
+      entry.daysOfWeek.forEach((day) => {
+        if (closedDaysState.includes(day)) {
+          return;
+        }
+        entries.push({
+          id: `hours-${entry.scheduleType}-${day}`,
+          schoolId: selectedSchoolId,
+          dayOfWeek: day,
+          dayScheduleType: "full_day",
+          open: entry.open,
+          close: entry.close,
+          notes: `${entry.scheduleType} operating hours`
+        });
+      });
+    });
+    return entries;
+  }, [operatingHoursConfigState, selectedSchoolId, closedDaysState]);
+
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
     const context: RulesContext = {
-      segmentBlocks,
-      staffAssignments,
-      employees,
-      substituteRequests: substituteRequestsState,
+      segmentBlocks: segmentBlocksState.map((block) => {
+        const scheduleDay = scheduleDaysState.find((day) => day.id === block.scheduleDayId);
+        if (!scheduleDay?.scheduleType) {
+          return block;
+        }
+        const ratio = ratioByScheduleType[scheduleDay.scheduleType];
+        if (!ratio) {
+          return block;
+        }
+        return {
+          ...block,
+          requirementTemplate: {
+            ...block.requirementTemplate,
+            ratioProfile: {
+              ...block.requirementTemplate.ratioProfile,
+              childrenPerStaff: ratio
+            }
+          }
+        };
+      }),
+      staffAssignments: staffAssignmentsState,
+      employees: employeesDerived,
       fieldTripEvents: fieldTripEventsState,
-      fieldTripTypes,
+      fieldTripTypes: fieldTripTypesState,
       policyCitations: POLICY_CITATION_LIST,
       rulePolicyCitations: RULE_POLICY_CITATIONS,
-      scheduleDays: scheduleDaysState
+      scheduleDays: scheduleDaysState,
+      operatingHours: derivedOperatingHours,
+      schoolRules: schoolRulesState,
+      jobTitleRules
     };
     return engine.evaluate(context);
   }, [
     engine,
-    substituteRequestsState,
     fieldTripEventsState,
-    segmentBlocks,
-    staffAssignments,
-    employees,
-    fieldTripTypes,
+    segmentBlocksState,
+    staffAssignmentsState,
+    employeesDerived,
+    fieldTripTypesState,
     POLICY_CITATION_LIST,
-    scheduleDaysState
+    scheduleDaysState,
+    derivedOperatingHours,
+    schoolRulesState,
+    jobTitleRules,
+    ratioByScheduleType
   ]);
 
   const resolveSegmentBlockId = (target: EngineRuleViolation["target"]) => {
@@ -128,11 +300,11 @@ export default function App() {
       return target.id;
     }
     if (target.entity === "StaffAssignment") {
-      const assignment = staffAssignments.find((item) => item.id === target.id);
+      const assignment = staffAssignmentsState.find((item) => item.id === target.id);
       return assignment?.segmentBlockId;
     }
     if (target.entity === "FieldTripEvent") {
-      return segmentBlocks.find((block) => block.fieldTripEventId === target.id)?.id;
+      return segmentBlocksState.find((block) => block.fieldTripEventId === target.id)?.id;
     }
     return undefined;
   };
@@ -155,23 +327,18 @@ export default function App() {
         description: engineViolation.message,
         segmentBlockId,
         policyCitation: citation,
-        recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage."
+        recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage.",
+        metadata: engineViolation.target.metadata
       } satisfies UiRuleViolation;
     });
-  }, [ruleViolationsFromEngine, policyCitations, segmentBlocks, staffAssignments]);
+  }, [ruleViolationsFromEngine, policyCitations, segmentBlocksState, staffAssignmentsState]);
 
   const validationComplete = violationRecords.length === 0;
-  const activeFieldTripEvent =
-    fieldTripEventsState.find((event) => !event.approverId || !event.signedOffAt) ??
-    fieldTripEventsState[0] ??
-    null;
-  const fieldTripSigned = Boolean(activeFieldTripEvent?.approverId && activeFieldTripEvent?.signedOffAt);
-  const readyToPublish = validationComplete && fieldTripSigned;
+  const readyToPublish = validationComplete;
   const scheduleStatus: ScheduleStatus = readyToPublish ? "ready_for_review" : weekMeta.status;
   const weekLabel = formatWeekRange(weekStartDate);
   const complianceHighlights = [
     `${violationRecords.length} violation${violationRecords.length === 1 ? "" : "s"} outstanding`,
-    fieldTripSigned ? "Field trip approved" : "Field trip pending sign-off",
     readyToPublish ? "Ready for publish" : "Resolve blockers before publishing"
   ];
 
@@ -185,18 +352,12 @@ export default function App() {
       actionLabel: validationComplete ? undefined : "Review violations"
     },
     {
-      id: "field-trip",
-      label: "Field trip sign-off",
-      detail: "Director approval metadata gates any trip overrides.",
-      status: fieldTripSigned ? "complete" : "blocked",
-      actionLabel: fieldTripSigned ? undefined : "Add director sign-off",
-      blockingReason: fieldTripSigned ? undefined : "Field trip needs a director signature"
-    },
-    {
       id: "publish",
       label: "Ready to publish",
       detail: "Publish only when every validation step is clear.",
-      status: readyToPublish ? "in_progress" : "blocked"
+      status: readyToPublish ? "in_progress" : "blocked",
+      actionLabel: "Publish schedule",
+      actionDisabled: !readyToPublish
     }
   ];
 
@@ -206,13 +367,6 @@ export default function App() {
       updated.setDate(updated.getDate() + (direction === "next" ? 7 : -7));
       return updated;
     });
-  };
-
-  const handleAutoBalance = () => {
-    const nextViolation = violationRecords[0];
-    if (nextViolation) {
-      setFocusedSegmentId(nextViolation.segmentBlockId);
-    }
   };
 
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
@@ -253,76 +407,18 @@ export default function App() {
     );
   };
 
-  const handleFieldTripSignOff = () => {
-    if (!activeFieldTripEvent) return;
-    setFieldTripEventsState((prev) =>
-      prev.map((event) =>
-        event.id === activeFieldTripEvent.id
-          ? {
-              ...event,
-              approverId: "Aisha Patel",
-              signedOffAt: new Date("2026-02-04T16:20:00Z").toISOString()
-            }
-          : event
-      )
-    );
-  };
-
   const handleStepAction = (stepId: string) => {
+    if (stepId === "publish") {
+      handlePublish();
+    }
     if (stepId === "validation") {
-      handleAutoBalance();
-    }
-    if (stepId === "field-trip") {
-      handleFieldTripSignOff();
+      setShowViolationNavigator(true);
     }
   };
 
-  const handleSubstituteAction = (requestId: string) => {
-    setSubstituteRequestsState((prev) =>
-      prev.map((request) =>
-        request.id === requestId
-          ? {
-              ...request,
-              approverId: "Aisha Patel",
-              approvedAt: new Date("2026-02-04T15:10:00Z").toISOString()
-            }
-          : request
-      )
-    );
+  const handleFocusSegment = (_segmentId: string) => {
+    // Timeline view removed in favor of the matrix; keep for navigator actions.
   };
-
-  const substituteCards = useMemo<SubstituteAssignmentCard[]>(() => {
-    return substituteRequestsState.map((request) => {
-      const block = segmentBlocks.find((segment) => segment.id === request.segmentBlockId);
-      const replacement = employees.find((employee) => employee.id === request.replacementEmployeeId);
-      const issues: string[] = [];
-      if (!request.approverId) {
-        issues.push("Approver metadata missing");
-      }
-      if (!request.approvedAt) {
-        issues.push("Approval timestamp missing");
-      }
-      if (!replacement?.leaderQualified) {
-        issues.push("Leader parity needs review");
-      }
-      const slotLabel = block ? segmentSlotDefinitions[block.segment]?.label ?? "Segment" : "Segment";
-      const state: SubstituteAssignmentCard["state"] = issues.length ? "blocked" : "ready";
-      return {
-        requestId: request.id,
-        replacementName: replacement?.name ?? "Unknown",
-        originalDay: block?.dayOfWeek ?? "mon",
-        segmentLabel: slotLabel,
-        approver: request.approverId,
-        approvedAt: request.approvedAt,
-        parityCheck: Boolean(replacement?.leaderQualified),
-        issues,
-        state
-      };
-    });
-  }, [substituteRequestsState, employees, segmentBlocks, segmentSlotDefinitions]);
-
-  const fieldTripType =
-    fieldTripTypes.find((type) => type.id === activeFieldTripEvent?.fieldTripTypeId) ?? fieldTripTypes[0];
 
   const handlePublish = () => {
     if (!readyToPublish) return;
@@ -339,16 +435,37 @@ export default function App() {
     setUndoCount((value) => value + 1);
   };
 
+  const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
+    setStaffAssignmentsState((prev) =>
+      prev.map((assignment) =>
+        assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
+      )
+    );
+  };
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
-        padding: "2rem",
-        fontFamily: "Inter, system-ui, sans-serif",
-        color: "#111827"
-      }}
-    >
+    <MotionConfig transition={{ type: "tween", ease: "linear", duration: 0.2 }}>
+      <motion.div
+        layout="position"
+        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
+          padding: "2rem",
+          fontFamily: "Inter, system-ui, sans-serif",
+          color: "#111827"
+        }}
+      >
+      <style>{`
+        * {
+          transition: background-color 0.2s linear, border-color 0.2s linear, color 0.2s linear,
+            box-shadow 0.2s linear, opacity 0.2s linear;
+        }
+        button, input, select, textarea {
+          transition: background-color 0.2s linear, border-color 0.2s linear, color 0.2s linear,
+            box-shadow 0.2s linear, opacity 0.2s linear;
+        }
+      `}</style>
       <WeekNavigationBanner
         schoolOptions={schools}
         selectedSchoolId={selectedSchoolId}
@@ -357,82 +474,133 @@ export default function App() {
         status={scheduleStatus}
         complianceHighlights={complianceHighlights}
         onShiftWeek={handleWeekShift}
+        onOpenViolations={() => setShowViolationNavigator((prev) => !prev)}
+        onOpenAuditTimeline={() => setShowAuditTimeline((prev) => !prev)}
+        hasViolations={violationRecords.length > 0}
+        isViolationsOpen={showViolationNavigator}
+        isAuditOpen={showAuditTimeline}
+        onOpenSettings={() => {
+          if (showSettings && settingsDirty) {
+            setSettingsCloseAttempt((prev) => prev + 1);
+            return;
+          }
+          setShowSettings((prev) => !prev);
+        }}
+        isSettingsOpen={showSettings}
       />
+      <motion.div
+        layout="position"
+        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
+        style={{ marginTop: "1rem", marginBottom: "1.5rem" }}
+      >
+        <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
+        {publishMessage && (
+          <p style={{ margin: "0.5rem 0 0", color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>
+        )}
+      </motion.div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 360px", gap: "1.5rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <StaffPalette
-            staff={employees}
-            assignments={staffAssignments}
-            selectedId={selectedStaffId}
-            onSelect={setSelectedStaffId}
-          />
-          <DayMetadataStrip
-            days={scheduleDaysState}
-            daySequence={daySequence}
-            dayDisplayNames={dayDisplayNames}
-            scheduleTypeOptions={scheduleTypeOptions}
-            fieldTripTypes={fieldTripTypes}
-            fieldTripEventsByDay={fieldTripEventsByDay}
-            onEnrollmentChange={handleEnrollmentUpdate}
-            onScheduleTypeChange={handleScheduleTypeUpdate}
-            onFieldTripSelection={handleFieldTripSelection}
-          />
-          <ClockBlockTimeline
-            segments={segmentBlocks}
-            assignments={staffAssignments}
-            employees={employees}
-            violations={violationRecords}
-            focusedSegmentId={focusedSegmentId ?? undefined}
-            onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
-            daySequence={daySequence}
-            dayDisplayNames={dayDisplayNames}
-            onAutoBalance={handleAutoBalance}
-          />
-        </div>
+      <motion.div
+        layout="position"
+        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
+        style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+      >
+        <ScheduleMatrix
+          staff={employeesDerived}
+          assignments={staffAssignmentsState}
+          segmentBlocks={segmentBlocksState}
+          days={scheduleDaysState}
+          daySequence={openDaySequence}
+          dayDisplayNames={dayDisplayNames}
+          scheduleTypeOptions={scheduleTypeOptionsState}
+          fieldTripTypes={fieldTripTypesState}
+          fieldTripEventsByDay={fieldTripEventsByDay}
+          operatingHoursByDay={operatingHoursByDay}
+          onEnrollmentChange={handleEnrollmentUpdate}
+          onScheduleTypeChange={handleScheduleTypeUpdate}
+          onFieldTripSelection={handleFieldTripSelection}
+          onUpdateAssignmentTime={handleUpdateAssignmentTime}
+          onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
+            const scheduleDay = scheduleDaysState.find((day) => day.dayOfWeek === dayOfWeek);
+            const segmentId = `segment-${dayOfWeek}-custom-${Date.now()}`;
+            const newBlock: SegmentBlock = {
+              id: segmentId,
+              scheduleWeekId: weekMeta.id,
+              dayOfWeek,
+              segment: "open",
+              startTime,
+              endTime,
+              childCount: scheduleDay?.enrollmentCount ?? 0,
+              requirementTemplate: segmentBlocksState[0]?.requirementTemplate ?? segmentBlocks[0].requirementTemplate,
+              status: "draft",
+              scheduleDayId: scheduleDay?.id
+            };
+            setStaffAssignmentsState((prev) => [
+              ...prev,
+              {
+                id: `assign-${segmentId}-${employeeId}`,
+                segmentBlockId: segmentId,
+                employeeId,
+                assignmentSource: "manual_adjustment",
+                startTime,
+                endTime,
+                status: "scheduled"
+              }
+            ]);
+            setSegmentBlocksState((prev) => [...prev, newBlock]);
+          }}
+        />
+      </motion.div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
-            <button
-              disabled={!readyToPublish}
-              onClick={handlePublish}
-              style={{
-                borderRadius: 999,
-                border: "none",
-                background: readyToPublish ? "#0ea5e9" : "#cbd5f5",
-                color: "#fff",
-                padding: "0.65rem 1rem",
-                fontWeight: 600,
-                cursor: readyToPublish ? "pointer" : "not-allowed"
-              }}
-            >
-              {readyToPublish ? "Publish schedule" : "Publish blocked"}
-            </button>
-            {publishMessage && <p style={{ margin: 0, color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>}
-          </div>
+      <AnimatePresence>
+        {showViolationNavigator && (
           <ViolationNavigator
             violations={violationRecords}
-            onFocusSegment={(segmentId) => setFocusedSegmentId(segmentId)}
+            onFocusSegment={handleFocusSegment}
+            isOpen={showViolationNavigator}
+            onClose={() => setShowViolationNavigator(false)}
           />
-          {activeFieldTripEvent && (
-            <FieldTripApprovalPanel
-              event={activeFieldTripEvent}
-              tripType={fieldTripType}
-              citation={policyCitations.fieldTrip}
-              onSignOff={handleFieldTripSignOff}
-            />
-          )}
-          <SubstituteAssignmentPanel requests={substituteCards} onRequestAction={handleSubstituteAction} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAuditTimeline && (
           <AuditTimeline
             events={auditTimeline}
             onUndo={handleUndo}
             onRedo={handleRedo}
             canUndo={undoCount > 0}
             canRedo={redoCount > 0}
+            isOpen={showAuditTimeline}
+            onClose={() => setShowAuditTimeline(false)}
           />
-        </div>
-      </div>
-    </div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showSettings && (
+      <SettingsPanel
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        schoolName={schoolName}
+        schoolRules={schoolRulesState}
+        scheduleTypes={scheduleTypeOptionsState}
+        jobTitles={jobTitlesState}
+        operatingHoursConfig={operatingHoursConfigState}
+        closedDays={closedDaysState}
+        fieldTripTypes={fieldTripTypesState}
+        employees={employeesState}
+        onUpdateScheduleTypes={setScheduleTypeOptionsState}
+        onUpdateJobTitles={setJobTitlesState}
+        onUpdateOperatingHoursConfig={setOperatingHoursConfigState}
+        onUpdateClosedDays={setClosedDaysState}
+        onUpdateSchoolName={setSchoolName}
+        onUpdateSchoolRules={setSchoolRulesState}
+        onUpdateFieldTrips={setFieldTripTypesState}
+        onUpdateEmployees={setEmployeesState}
+        onDirtyChange={setSettingsDirty}
+        closeAttempt={settingsCloseAttempt}
+      />
+        )}
+      </AnimatePresence>
+      </motion.div>
+    </MotionConfig>
   );
 }

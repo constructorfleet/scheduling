@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { ScheduleStatus } from "../../domain/types";
 
 const statusBadges: Record<ScheduleStatus, { label: string; color: string }> = {
@@ -16,6 +17,13 @@ interface WeekNavigationBannerProps {
   status: ScheduleStatus;
   complianceHighlights: string[];
   onShiftWeek: (direction: "prev" | "next") => void;
+  onOpenViolations: () => void;
+  onOpenAuditTimeline: () => void;
+  hasViolations: boolean;
+  isViolationsOpen: boolean;
+  isAuditOpen: boolean;
+  onOpenSettings: () => void;
+  isSettingsOpen: boolean;
 }
 
 export default function WeekNavigationBanner({
@@ -25,13 +33,24 @@ export default function WeekNavigationBanner({
   weekLabel,
   status,
   complianceHighlights,
-  onShiftWeek
+  onShiftWeek,
+  onOpenViolations,
+  onOpenAuditTimeline,
+  hasViolations,
+  isViolationsOpen,
+  isAuditOpen,
+  onOpenSettings,
+  isSettingsOpen
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
   const selectedSchool = schoolOptions.find((school) => school.id === selectedSchoolId) ?? schoolOptions[0];
 
   return (
-    <section
+    <motion.section
+      layout
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "linear", layout: { type: "tween", duration: 0.2, ease: "linear" } }}
       style={{
         borderRadius: 18,
         background: "#1f2937",
@@ -78,6 +97,116 @@ export default function WeekNavigationBanner({
           >
             {badge.label}
           </span>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={onOpenViolations}
+              disabled={!hasViolations}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.35)",
+                background: isViolationsOpen ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.12)",
+                color: hasViolations ? "#f9fafb" : "#9ca3af",
+                padding: "0.35rem 0.8rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                cursor: hasViolations ? "pointer" : "not-allowed"
+              }}
+            >
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {isViolationsOpen ? (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+                    <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                )}
+              </span>
+              {isViolationsOpen ? "Close Violations" : "Open Violations"}
+            </button>
+            <button
+              type="button"
+              onClick={onOpenAuditTimeline}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.35)",
+                background: isAuditOpen ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.12)",
+                color: "#f9fafb",
+                padding: "0.35rem 0.8rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem"
+              }}
+            >
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {isAuditOpen ? (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+                    <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                )}
+              </span>
+              {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
+            </button>
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.35)",
+                background: isSettingsOpen ? "rgba(99,102,241,0.25)" : "rgba(255,255,255,0.12)",
+                color: "#f9fafb",
+                padding: "0.35rem 0.8rem",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem"
+              }}
+            >
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                {isSettingsOpen ? (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+                    <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                    <path d="M12 2h-4l-.5 2.2-2 .8-1.8-1.2-2.8 2.8 1.2 1.8-.8 2L2 12v4l2.2.5.8 2-1.2 1.8 2.8 2.8 1.8-1.2 2 .8.5 2.2h4l.5-2.2 2-.8 1.8 1.2 2.8-2.8-1.2-1.8.8-2L22 16v-4l-2.2-.5-.8-2 1.2-1.8-2.8-2.8-1.8 1.2-2-.8L12 2z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="1.4" />
+                  </svg>
+                )}
+              </span>
+              {isSettingsOpen ? "Close Settings" : "Open Settings"}
+            </button>
+          </div>
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               onClick={() => onShiftWeek("prev")}
@@ -128,6 +257,6 @@ export default function WeekNavigationBanner({
           </span>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -36,7 +36,6 @@ describe("StaffPalette", () => {
       assignmentSource: "manual_adjustment",
       startTime: "07:00",
       endTime: "11:00",
-      isSubstitute: false,
       status: "active"
     },
     {
@@ -46,7 +45,6 @@ describe("StaffPalette", () => {
       assignmentSource: "manual_adjustment",
       startTime: "12:00",
       endTime: "16:00",
-      isSubstitute: false,
       status: "active"
     },
     {
@@ -56,7 +54,6 @@ describe("StaffPalette", () => {
       assignmentSource: "manual_adjustment",
       startTime: "09:00",
       endTime: "13:00",
-      isSubstitute: false,
       status: "active"
     }
   ];

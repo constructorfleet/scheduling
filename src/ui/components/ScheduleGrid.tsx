@@ -146,19 +146,6 @@ export default function ScheduleGrid({
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <p style={{ margin: 0, fontSize: "0.75rem" }}>{toHours(assignment.startTime, assignment.endTime).toFixed(1)} hrs</p>
-                    {assignment.isSubstitute && (
-                      <span
-                        style={{
-                          fontSize: "0.65rem",
-                          padding: "0.15rem 0.4rem",
-                          borderRadius: 999,
-                          background: "#fee2e2",
-                          color: "#991b1b"
-                        }}
-                      >
-                        Substitute
-                      </span>
-                    )}
                   </div>
                 </div>
               );

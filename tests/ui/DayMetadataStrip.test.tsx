@@ -25,13 +25,13 @@ const scheduleTypeOptions: ScheduleTypeOption[] = [
   {
     value: "regular",
     label: "Regular day",
-    ratioHint: "Default ratio 1:8",
+    ratio: { adults: 1, students: 8 },
     description: "Standard hours with the baseline ratio rules."
   },
   {
     value: "extended",
     label: "Extended day",
-    ratioHint: "Extended ratio 1:10",
+    ratio: { adults: 1, students: 10 },
     description: "Long-day coverage with an alternate ratio."
   }
 ];
@@ -119,7 +119,7 @@ describe("DayMetadataStrip", () => {
 
     const tuesdayCard = screen.getByText("Tuesday").closest("article");
     expect(tuesdayCard).not.toBeNull();
-    expect(within(tuesdayCard as HTMLElement).getByText("Default ratio 1:8")).toBeVisible();
+    expect(within(tuesdayCard as HTMLElement).getByText("Adult:Student 1:8")).toBeVisible();
     expect(within(tuesdayCard as HTMLElement).getByText("Zoo visit")).toBeVisible();
   });
 

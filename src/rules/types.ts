@@ -4,9 +4,9 @@ import {
   FieldTripType,
   StaffAssignment,
   Employee,
-  SubstituteRequest,
   PolicyCitation,
-  ScheduleDay
+  ScheduleDay,
+  OperatingHours
 } from "../domain/types";
 
 export interface RulesContext {
@@ -14,11 +14,26 @@ export interface RulesContext {
   segmentBlocks: SegmentBlock[];
   staffAssignments: StaffAssignment[];
   employees: Employee[];
-  substituteRequests: SubstituteRequest[];
   fieldTripEvents: FieldTripEvent[];
   fieldTripTypes: FieldTripType[];
+  operatingHours: OperatingHours[];
+  schoolRules?: SchoolRules;
+  jobTitleRules?: Record<string, JobTitleRule>;
   policyCitations?: PolicyCitation[];
   rulePolicyCitations?: Record<string, string>;
+}
+
+export interface SchoolRules {
+  openerCount: number;
+  closerCount: number;
+  minimumMedicalDelegated: number;
+  requireCurrentCpr: boolean;
+  openerWindowMinutes?: number;
+  closerWindowMinutes?: number;
+}
+
+export interface JobTitleRule {
+  requiresLeaderForOpenClose: boolean;
 }
 
 export interface RuleTarget {

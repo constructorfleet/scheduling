@@ -33,13 +33,13 @@ describe("rules/utils", () => {
       segmentBlocks: [],
       staffAssignments: [],
       employees: [],
-      substituteRequests: [],
       fieldTripEvents: [],
       fieldTripTypes: [],
       scheduleDays: [],
       rulePolicyCitations: {
         "shift-break-limits": "policy-shift-override"
-      }
+      },
+      operatingHours: []
     };
 
     it("returns the override citation when available", () => {

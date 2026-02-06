@@ -1,14 +1,15 @@
 import {
   DayOfWeek,
   DaySegment,
+  DayScheduleType,
   FieldTripEvent,
   FieldTripType,
+  OperatingHours,
   PolicyCitation,
   RatioProfile,
   SegmentBlock,
   SegmentRequirementTemplate,
   StaffAssignment,
-  SubstituteRequest,
   Employee,
   ScheduleDay,
   ScheduleStatus,
@@ -57,25 +58,25 @@ export const policyCitations: Record<string, PolicyCitation> = {
 export const scheduleTypeOptions: {
   value: ScheduleType;
   label: string;
-  ratioHint: string;
+  ratio: { adults: number; students: number; };
   description: string;
 }[] = [
   {
     value: "regular",
     label: "Regular day",
-    ratioHint: "Standard ratio (1 staff per 6 children)",
+    ratio: { adults: 1, students: 15 },
     description: "Default preschool coverage with full staffing resources."
   },
   {
     value: "extended",
     label: "Extended care",
-    ratioHint: "Tighter ratio (1 staff per 5 children)",
+    ratio: { adults: 1, students: 20 },
     description: "Covers early arrival or late pickup windows."
   },
   {
     value: "enrichment",
     label: "Enrichment focus",
-    ratioHint: "Leader-led pods (1 leader per 4 children)",
+    ratio: { adults: 1, students: 4 },
     description: "Smaller cohorts for project-based learning."
   }
 ];
@@ -88,7 +89,7 @@ const ratioProfile: RatioProfile = {
   notes: "1 staff per 6 children and one leader per segment"
 };
 
-const requirementTemplate: SegmentRequirementTemplate = {
+export const requirementTemplate: SegmentRequirementTemplate = {
   id: "template-all-day",
   ratioProfile,
   minStaff: 3,
@@ -106,6 +107,22 @@ export const segmentSlotDefinitions: Record<
   open: { label: "Morning", start: "07:00", end: "11:00", baseChildCount: 18 },
   mid: { label: "Midday", start: "11:15", end: "15:00", baseChildCount: 15 },
   close: { label: "Afternoon", start: "15:30", end: "18:00", baseChildCount: 10 }
+};
+
+const scheduleTypeForDay = (day: DayOfWeek): ScheduleType =>
+  day === "wed" ? "enrichment" : day === "thu" ? "extended" : "regular";
+
+const scheduleTypeToDayScheduleType: Record<ScheduleType, DayScheduleType> = {
+  regular: "full_day",
+  extended: "school_day",
+  enrichment: "in_house"
+};
+
+const operatingHoursByDayScheduleType: Record<DayScheduleType, { open: string; close: string }> = {
+  full_day: { open: "06:30", close: "18:30" },
+  school_day: { open: "07:30", close: "17:00" },
+  in_house: { open: "08:00", close: "16:00" },
+  closed: { open: "00:00", close: "00:00" }
 };
 
 export const daySequence: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
@@ -132,8 +149,8 @@ const createScheduleDays = (): ScheduleDay[] => {
   return daySequence.map((day, index) => {
     const date = new Date(baseDate);
     date.setDate(baseDate.getDate() + index);
-    const scheduleType: ScheduleType =
-      day === "wed" ? "enrichment" : day === "thu" ? "extended" : "regular";
+    const scheduleType: ScheduleType = scheduleTypeForDay(day);
+    const dayScheduleType: DayScheduleType = scheduleTypeToDayScheduleType[scheduleType];
     const enrollmentCount = 24 - index;
     return {
       id: `schedule-day-${day}`,
@@ -141,6 +158,7 @@ const createScheduleDays = (): ScheduleDay[] => {
       date: date.toISOString().split("T")[0],
       dayOfWeek: day,
       scheduleType,
+      dayScheduleType,
       enrollmentCount,
       fieldTripEventId: `field-trip-${day}`
     };
@@ -153,6 +171,21 @@ export const schools = [
   { id: "school-evergreen", name: "Evergreen Elementary Daycare" },
   { id: "school-maple", name: "Maple Creek Childcare" }
 ];
+
+export const operatingHours: OperatingHours[] = daySequence.map((day) => {
+  const scheduleType = scheduleTypeForDay(day);
+  const dayScheduleType = scheduleTypeToDayScheduleType[scheduleType];
+  const times = operatingHoursByDayScheduleType[dayScheduleType];
+  return {
+    id: `operating-hours-${day}-${dayScheduleType}`,
+    schoolId: schools[0].id,
+    dayOfWeek: day,
+    dayScheduleType,
+    open: times.open,
+    close: times.close,
+    notes: `${dayScheduleType} operating hours`
+  };
+});
 
 export const employees: Employee[] = [
   {
@@ -215,14 +248,14 @@ export const employees: Employee[] = [
   {
     id: "emp-zoe",
     name: "Zoe Martinez",
-    jobTitle: "Substitute",
+    jobTitle: "Float Support",
     maxHoursPerDay: 8,
     maxHoursPerWeek: 20,
     employmentStatus: "active",
     leaderQualified: true,
     medicallyDelegated: true,
     cprCurrent: true,
-    notes: "Substitute on approved request"
+    notes: "Flexible support coverage"
   }
 ];
 
@@ -264,7 +297,6 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "manual_adjustment",
     startTime: "07:00",
     endTime: "11:00",
-    isSubstitute: false,
     status: "active"
   },
   {
@@ -274,7 +306,6 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "template",
     startTime: "07:00",
     endTime: "11:00",
-    isSubstitute: false,
     status: "active"
   },
   {
@@ -284,7 +315,6 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "manual_adjustment",
     startTime: "11:15",
     endTime: "15:00",
-    isSubstitute: false,
     status: "active"
   },
   {
@@ -294,7 +324,6 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "template",
     startTime: "07:00",
     endTime: "11:00",
-    isSubstitute: false,
     status: "active"
   },
   {
@@ -304,7 +333,6 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "manual_adjustment",
     startTime: "11:15",
     endTime: "15:00",
-    isSubstitute: false,
     status: "active"
   },
   {
@@ -314,7 +342,15 @@ export const staffAssignments: StaffAssignment[] = [
     assignmentSource: "field_trip_override",
     startTime: "11:15",
     endTime: "15:00",
-    isSubstitute: false,
+    status: "active"
+  },
+  {
+    id: "assign-mon-close-aisha",
+    segmentBlockId: "segment-mon-close",
+    employeeId: "emp-aisha",
+    assignmentSource: "manual_adjustment",
+    startTime: "15:30",
+    endTime: "18:00",
     status: "active"
   }
 ];
@@ -359,20 +395,6 @@ const buildFieldTripEvents = (): FieldTripEvent[] => {
 
 export const fieldTripEvents = buildFieldTripEvents();
 
-export const substituteRequests: SubstituteRequest[] = [
-  {
-    id: "sub-1",
-    originalAssignmentId: "assign-wed-mid-jordan",
-    segmentBlockId: "segment-wed-mid",
-    replacementEmployeeId: "emp-zoe",
-    requestedBy: "Rae Morales",
-    requestedAt: "2026-02-02T08:05:00Z",
-    state: "pending",
-    reason: "Need leader-qualified coverage for midday",
-    policyCitationId: policyCitations.leaderCoverage.id
-  }
-];
-
 export const ruleViolations: RuleViolation[] = [
   {
     id: "viol-1",
@@ -416,7 +438,7 @@ export const auditTimeline: AuditEvent[] = [
     id: "audit-2",
     timestamp: "2026-02-02T09:05:00Z",
     user: "Rae Morales",
-    action: "Marked Wednesday midpoint for substitute review",
+    action: "Flagged Wednesday midpoint for coverage review",
     policyCitation: policyCitations.leaderCoverage
   },
   {

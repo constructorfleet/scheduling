@@ -5,7 +5,9 @@ import type {
   SegmentBlock,
   StaffAssignment,
   Employee,
-  ScheduleDay
+  ScheduleDay,
+  OperatingHours,
+  DayScheduleType
 } from "../domain/types";
 import type { RulesContext } from "./types";
 
@@ -47,6 +49,24 @@ export const getScheduleDayById = (
   context: RulesContext,
   dayId?: string
 ): ScheduleDay | undefined => context.scheduleDays.find((day) => day.id === dayId);
+
+export const getOperatingHoursForDay = (
+  context: RulesContext,
+  dayOfWeek: DayOfWeek,
+  dayScheduleType?: DayScheduleType
+): OperatingHours | undefined => {
+  const candidates = context.operatingHours.filter((hours) => hours.dayOfWeek === dayOfWeek);
+  if (!candidates.length) {
+    return undefined;
+  }
+  if (dayScheduleType) {
+    const exactMatch = candidates.find((hours) => hours.dayScheduleType === dayScheduleType);
+    if (exactMatch) {
+      return exactMatch;
+    }
+  }
+  return candidates[0];
+};
 
 export const getDayOfWeekForAssignment = (
   context: RulesContext,
