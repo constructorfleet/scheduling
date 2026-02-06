@@ -1,0 +1,305 @@
+openapi: 3.0.3
+info:
+  title: Daycare Scheduler API
+  version: 0.1.0
+servers:
+  - url: /
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/settings/{schoolId}:
+    get:
+      summary: Get settings for a school
+      parameters:
+        - in: path
+          name: schoolId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settings payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+    put:
+      summary: Save settings for a school
+      parameters:
+        - in: path
+          name: schoolId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsPayload'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsSaveResponse'
+  /api/schedule/{weekId}:
+    get:
+      summary: Get schedule week
+      parameters:
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Schedule week
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleWeekResponse'
+    put:
+      summary: Save schedule week
+      parameters:
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleSavePayload'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+    SchoolSettings:
+      type: object
+      properties:
+        name:
+          type: string
+        closedDays:
+          type: array
+          items:
+            type: string
+        openerCount:
+          type: integer
+        closerCount:
+          type: integer
+        minimumMedicalDelegated:
+          type: integer
+        requireCurrentCpr:
+          type: boolean
+      required:
+        - name
+        - closedDays
+        - openerCount
+        - closerCount
+        - minimumMedicalDelegated
+        - requireCurrentCpr
+    ScheduleType:
+      type: object
+      properties:
+        value:
+          type: string
+        label:
+          type: string
+        ratio:
+          type: object
+          properties:
+            adults:
+              type: integer
+            students:
+              type: integer
+          required: [adults, students]
+        description:
+          type: string
+      required: [value, label, ratio]
+    JobTitle:
+      type: object
+      properties:
+        title:
+          type: string
+        leaderQualified:
+          type: boolean
+        requiresLeaderForOpenClose:
+          type: boolean
+      required: [title, leaderQualified, requiresLeaderForOpenClose]
+    Employee:
+      type: object
+      properties:
+        name:
+          type: string
+        jobTitle:
+          type: string
+        maxHoursPerDay:
+          type: integer
+        maxHoursPerWeek:
+          type: integer
+        employmentStatus:
+          type: string
+        medicallyDelegated:
+          type: boolean
+        cprCurrent:
+          type: boolean
+        notes:
+          type: string
+      required:
+        - name
+        - jobTitle
+        - maxHoursPerDay
+        - maxHoursPerWeek
+        - employmentStatus
+        - medicallyDelegated
+        - cprCurrent
+    OperatingHours:
+      type: object
+      properties:
+        scheduleType:
+          type: string
+        daysOfWeek:
+          type: array
+          items:
+            type: string
+        open:
+          type: string
+        close:
+          type: string
+      required: [scheduleType, daysOfWeek, open, close]
+    FieldTripType:
+      type: object
+      properties:
+        name:
+          type: string
+        minAdultStudentRatio:
+          type: number
+        minLeaderStudentRatio:
+          type: number
+        policyCitationId:
+          type: string
+        notes:
+          type: string
+      required: [name, minAdultStudentRatio, minLeaderStudentRatio]
+    SettingsPayload:
+      type: object
+      properties:
+        school:
+          $ref: '#/components/schemas/SchoolSettings'
+        scheduleTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleType'
+        jobTitles:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobTitle'
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+        operatingHours:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatingHours'
+        fieldTripTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldTripType'
+      required:
+        - school
+        - scheduleTypes
+        - jobTitles
+        - employees
+        - operatingHours
+        - fieldTripTypes
+    SettingsResponse:
+      type: object
+      properties:
+        school:
+          type: object
+        scheduleTypes:
+          type: array
+          items: {}
+        jobTitles:
+          type: array
+          items: {}
+        employees:
+          type: array
+          items: {}
+        operatingHours:
+          type: array
+          items: {}
+        fieldTripTypes:
+          type: array
+          items: {}
+      required: [school]
+    SettingsSaveResponse:
+      type: object
+      properties:
+        school:
+          type: object
+      required: [school]
+    ScheduleSavePayload:
+      type: object
+      properties:
+        scheduleWeek:
+          type: object
+          properties:
+            schoolId:
+              type: string
+            label:
+              type: string
+            status:
+              type: string
+            startDate:
+              type: string
+          required: [schoolId, status]
+        scheduleDays:
+          type: array
+          items: {}
+        segmentBlocks:
+          type: array
+          items: {}
+        staffAssignments:
+          type: array
+          items: {}
+        fieldTripEvents:
+          type: array
+          items: {}
+      required: [scheduleWeek, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents]
+    ScheduleWeekResponse:
+      type: object
+      properties:
+        id:
+          type: string
+      additionalProperties: true
+    GenericOk:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required: [ok]
