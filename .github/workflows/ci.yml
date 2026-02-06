@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+      - name: Install
+        run: npm ci
+      - name: Generate OpenAPI client
+        run: npm run api:openapi:client
+      - name: Check generated client committed
+        run: git diff --exit-code
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run type-check
+      - name: Tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Build API
+        run: npm run api:build
