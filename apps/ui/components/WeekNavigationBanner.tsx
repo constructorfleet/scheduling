@@ -24,6 +24,10 @@ interface WeekNavigationBannerProps {
   isAuditOpen: boolean;
   onOpenSettings: () => void;
   isSettingsOpen: boolean;
+  apiStatus: {
+    state: "loading" | "saving" | "saved" | "error" | "idle";
+    message: string;
+  };
 }
 
 export default function WeekNavigationBanner({
@@ -40,7 +44,8 @@ export default function WeekNavigationBanner({
   isViolationsOpen,
   isAuditOpen,
   onOpenSettings,
-  isSettingsOpen
+  isSettingsOpen,
+  apiStatus
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
   const selectedSchool = schoolOptions.find((school) => school.id === selectedSchoolId) ?? schoolOptions[0];
@@ -96,6 +101,31 @@ export default function WeekNavigationBanner({
             }}
           >
             {badge.label}
+          </span>
+          <span
+            style={{
+              padding: "0.25rem 0.75rem",
+              borderRadius: 999,
+              fontWeight: 600,
+              fontSize: "0.8rem",
+              border: "1px solid rgba(255,255,255,0.35)",
+              background:
+                apiStatus.state === "error"
+                  ? "rgba(239,68,68,0.2)"
+                  : apiStatus.state === "saved"
+                    ? "rgba(16,185,129,0.2)"
+                    : apiStatus.state === "loading" || apiStatus.state === "saving"
+                      ? "rgba(56,189,248,0.2)"
+                      : "rgba(255,255,255,0.08)",
+              color:
+                apiStatus.state === "error"
+                  ? "#fecaca"
+                  : apiStatus.state === "saved"
+                    ? "#bbf7d0"
+                    : "#e2e8f0"
+            }}
+          >
+            {apiStatus.message}
           </span>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
             <button

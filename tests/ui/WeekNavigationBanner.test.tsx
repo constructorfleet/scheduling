@@ -20,7 +20,11 @@ describe("WeekNavigationBanner", () => {
     isViolationsOpen: false,
     isAuditOpen: false,
     onOpenSettings: jest.fn(),
-    isSettingsOpen: false
+    isSettingsOpen: false,
+    apiStatus: {
+      state: "idle" as const,
+      message: "Idle"
+    }
   };
 
   it("disables the violations button when there are no violations", () => {

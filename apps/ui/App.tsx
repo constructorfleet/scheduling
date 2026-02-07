@@ -150,9 +150,42 @@ export default function App() {
   const [scheduleStatusOverride, setScheduleStatusOverride] = useState<ScheduleStatus | null>(null);
   const [hasLoadedRemote, setHasLoadedRemote] = useState(false);
   const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
+  const [apiStatus, setApiStatus] = useState<{
+    state: "loading" | "saving" | "saved" | "error" | "idle";
+    message: string;
+  }>({
+    state: "idle",
+    message: "Idle"
+  });
   const scheduleSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const schedulePayloadRef = useRef<ScheduleSavePayload | null>(null);
   const scheduleDirtyRef = useRef(false);
+  const activeApiRequestsRef = useRef(0);
+  const apiStatusResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const beginApiAction = (kind: "loading" | "saving", message: string) => {
+    activeApiRequestsRef.current += 1;
+    if (apiStatusResetTimer.current) {
+      clearTimeout(apiStatusResetTimer.current);
+    }
+    setApiStatus({ state: kind, message });
+  };
+
+  const completeApiAction = (message: string) => {
+    activeApiRequestsRef.current = Math.max(0, activeApiRequestsRef.current - 1);
+    if (activeApiRequestsRef.current > 0) {
+      return;
+    }
+    setApiStatus({ state: "saved", message });
+    apiStatusResetTimer.current = setTimeout(() => {
+      setApiStatus({ state: "idle", message: "Idle" });
+    }, 2000);
+  };
+
+  const failApiAction = (message: string) => {
+    activeApiRequestsRef.current = Math.max(0, activeApiRequestsRef.current - 1);
+    setApiStatus({ state: "error", message });
+  };
 
   const [jobTitlesState, setJobTitlesState] = useState<JobTitleSetting[]>(() => {
     const map = new Map<string, JobTitleSetting>();
@@ -363,9 +396,12 @@ export default function App() {
 
   const persistSettings = async (overrides: Parameters<typeof buildSettingsPayload>[0] = {}) => {
     if (!hasLoadedRemote) return;
+    beginApiAction("saving", "Saving settings...");
     try {
       await saveSettings(selectedSchoolId, buildSettingsPayload(overrides));
+      completeApiAction("Settings saved");
     } catch (error) {
+      failApiAction("Settings save failed");
       // eslint-disable-next-line no-console
       console.error("Failed to save settings", error);
     }
@@ -375,7 +411,9 @@ export default function App() {
     let isActive = true;
     const hydrate = async () => {
       try {
+        beginApiAction("loading", "Loading settings...");
         const settings = await fetchSettings(selectedSchoolId);
+        completeApiAction("Settings loaded");
         if (!isActive) return;
         if (settings?.school) {
           setSchoolName(settings.school.name ?? schoolName);
@@ -451,12 +489,15 @@ export default function App() {
           }
         }
       } catch (error) {
+        failApiAction("Settings load failed");
         // eslint-disable-next-line no-console
         console.error("Failed to load settings", error);
       }
 
       try {
+        beginApiAction("loading", "Loading schedule...");
         const schedule = await fetchSchedule(weekMeta.id);
+        completeApiAction("Schedule loaded");
         if (!isActive) return;
         if (schedule) {
           if (schedule.status) {
@@ -486,6 +527,7 @@ export default function App() {
           }
         }
       } catch (error) {
+        failApiAction("Schedule load failed");
         // eslint-disable-next-line no-console
         console.error("Failed to load schedule", error);
       }
@@ -527,13 +569,16 @@ export default function App() {
       if (!latestPayload) {
         return;
       }
+      beginApiAction("saving", "Saving schedule...");
       saveSchedule(weekMeta.id, latestPayload)
         .then(() => {
           scheduleDirtyRef.current = false;
           setScheduleSaveError(null);
+          completeApiAction("Schedule saved");
         })
         .catch((error) => {
           setScheduleSaveError("Autosave failed. Changes will retry automatically.");
+          failApiAction("Schedule save failed");
           // eslint-disable-next-line no-console
           console.error("Failed to save schedule", error);
         });
@@ -575,6 +620,14 @@ export default function App() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [hasLoadedRemote]);
+
+  useEffect(() => {
+    return () => {
+      if (apiStatusResetTimer.current) {
+        clearTimeout(apiStatusResetTimer.current);
+      }
+    };
+  }, []);
 
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
@@ -863,6 +916,7 @@ export default function App() {
         hasViolations={violationRecords.length > 0}
         isViolationsOpen={showViolationNavigator}
         isAuditOpen={showAuditTimeline}
+        apiStatus={apiStatus}
         onOpenSettings={() => {
           if (showSettings && settingsDirty) {
             setSettingsCloseAttempt((prev) => prev + 1);
