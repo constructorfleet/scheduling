@@ -5469,6 +5469,8 @@ export namespace Prisma {
     medicallyDelegated: number
     cprCurrent: number
     notes: number
+    availability: number
+    requestedDaysOff: number
     _all: number
   }
 
@@ -5520,6 +5522,8 @@ export namespace Prisma {
     medicallyDelegated?: true
     cprCurrent?: true
     notes?: true
+    availability?: true
+    requestedDaysOff?: true
     _all?: true
   }
 
@@ -5620,6 +5624,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes: string | null
+    availability: JsonValue | null
+    requestedDaysOff: JsonValue | null
     _count: EmployeeCountAggregateOutputType | null
     _avg: EmployeeAvgAggregateOutputType | null
     _sum: EmployeeSumAggregateOutputType | null
@@ -5652,6 +5658,8 @@ export namespace Prisma {
     medicallyDelegated?: boolean
     cprCurrent?: boolean
     notes?: boolean
+    availability?: boolean
+    requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
@@ -5666,6 +5674,8 @@ export namespace Prisma {
     medicallyDelegated?: boolean
     cprCurrent?: boolean
     notes?: boolean
+    availability?: boolean
+    requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
@@ -5680,6 +5690,8 @@ export namespace Prisma {
     medicallyDelegated?: boolean
     cprCurrent?: boolean
     notes?: boolean
+    availability?: boolean
+    requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
@@ -5694,9 +5706,11 @@ export namespace Prisma {
     medicallyDelegated?: boolean
     cprCurrent?: boolean
     notes?: boolean
+    availability?: boolean
+    requestedDaysOff?: boolean
   }
 
-  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes", ExtArgs["result"]["employee"]>
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
   export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }
@@ -5723,6 +5737,8 @@ export namespace Prisma {
       medicallyDelegated: boolean
       cprCurrent: boolean
       notes: string | null
+      availability: Prisma.JsonValue | null
+      requestedDaysOff: Prisma.JsonValue | null
     }, ExtArgs["result"]["employee"]>
     composites: {}
   }
@@ -6157,6 +6173,8 @@ export namespace Prisma {
     readonly medicallyDelegated: FieldRef<"Employee", 'Boolean'>
     readonly cprCurrent: FieldRef<"Employee", 'Boolean'>
     readonly notes: FieldRef<"Employee", 'String'>
+    readonly availability: FieldRef<"Employee", 'Json'>
+    readonly requestedDaysOff: FieldRef<"Employee", 'Json'>
   }
     
 
@@ -14591,7 +14609,9 @@ export namespace Prisma {
     employmentStatus: 'employmentStatus',
     medicallyDelegated: 'medicallyDelegated',
     cprCurrent: 'cprCurrent',
-    notes: 'notes'
+    notes: 'notes',
+    availability: 'availability',
+    requestedDaysOff: 'requestedDaysOff'
   };
 
   export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -14711,6 +14731,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const JsonNullValueFilter: {
@@ -15024,6 +15052,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFilter<"Employee"> | boolean
     cprCurrent?: BoolFilter<"Employee"> | boolean
     notes?: StringNullableFilter<"Employee"> | string | null
+    availability?: JsonNullableFilter<"Employee">
+    requestedDaysOff?: JsonNullableFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
   }
 
@@ -15038,6 +15068,8 @@ export namespace Prisma {
     medicallyDelegated?: SortOrder
     cprCurrent?: SortOrder
     notes?: SortOrderInput | SortOrder
+    availability?: SortOrderInput | SortOrder
+    requestedDaysOff?: SortOrderInput | SortOrder
     school?: SchoolOrderByWithRelationInput
   }
 
@@ -15055,6 +15087,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFilter<"Employee"> | boolean
     cprCurrent?: BoolFilter<"Employee"> | boolean
     notes?: StringNullableFilter<"Employee"> | string | null
+    availability?: JsonNullableFilter<"Employee">
+    requestedDaysOff?: JsonNullableFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
   }, "id">
 
@@ -15069,6 +15103,8 @@ export namespace Prisma {
     medicallyDelegated?: SortOrder
     cprCurrent?: SortOrder
     notes?: SortOrderInput | SortOrder
+    availability?: SortOrderInput | SortOrder
+    requestedDaysOff?: SortOrderInput | SortOrder
     _count?: EmployeeCountOrderByAggregateInput
     _avg?: EmployeeAvgOrderByAggregateInput
     _max?: EmployeeMaxOrderByAggregateInput
@@ -15090,6 +15126,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolWithAggregatesFilter<"Employee"> | boolean
     cprCurrent?: BoolWithAggregatesFilter<"Employee"> | boolean
     notes?: StringNullableWithAggregatesFilter<"Employee"> | string | null
+    availability?: JsonNullableWithAggregatesFilter<"Employee">
+    requestedDaysOff?: JsonNullableWithAggregatesFilter<"Employee">
   }
 
   export type OperatingHoursWhereInput = {
@@ -15863,6 +15901,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
     school: SchoolCreateNestedOneWithoutEmployeesInput
   }
 
@@ -15877,6 +15917,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUpdateInput = {
@@ -15889,6 +15931,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
     school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
   }
 
@@ -15903,6 +15947,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeCreateManyInput = {
@@ -15916,6 +15962,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUpdateManyMutationInput = {
@@ -15928,6 +15976,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUncheckedUpdateManyInput = {
@@ -15941,6 +15991,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type OperatingHoursCreateInput = {
@@ -16865,6 +16917,24 @@ export namespace Prisma {
     leaderQualified?: SortOrder
     requiresLeaderForOpenClose?: SortOrder
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type EmployeeCountOrderByAggregateInput = {
     id?: SortOrder
@@ -16877,6 +16947,8 @@ export namespace Prisma {
     medicallyDelegated?: SortOrder
     cprCurrent?: SortOrder
     notes?: SortOrder
+    availability?: SortOrder
+    requestedDaysOff?: SortOrder
   }
 
   export type EmployeeAvgOrderByAggregateInput = {
@@ -16913,6 +16985,27 @@ export namespace Prisma {
   export type EmployeeSumOrderByAggregateInput = {
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type OperatingHoursCountOrderByAggregateInput = {
@@ -18136,6 +18229,24 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
@@ -18265,6 +18376,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUncheckedCreateWithoutSchoolInput = {
@@ -18277,6 +18390,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeCreateOrConnectWithoutSchoolInput = {
@@ -18461,6 +18576,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFilter<"Employee"> | boolean
     cprCurrent?: BoolFilter<"Employee"> | boolean
     notes?: StringNullableFilter<"Employee"> | string | null
+    availability?: JsonNullableFilter<"Employee">
+    requestedDaysOff?: JsonNullableFilter<"Employee">
   }
 
   export type OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput = {
@@ -19721,6 +19838,8 @@ export namespace Prisma {
     medicallyDelegated: boolean
     cprCurrent: boolean
     notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type OperatingHoursCreateManySchoolInput = {
@@ -19807,6 +19926,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUncheckedUpdateWithoutSchoolInput = {
@@ -19819,6 +19940,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type EmployeeUncheckedUpdateManyWithoutSchoolInput = {
@@ -19831,6 +19954,8 @@ export namespace Prisma {
     medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
     cprCurrent?: BoolFieldUpdateOperationsInput | boolean
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type OperatingHoursUpdateWithoutSchoolInput = {

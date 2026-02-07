@@ -248,6 +248,14 @@ components:
           type: boolean
         notes:
           type: string
+        availability:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeAvailabilityDay'
+        requestedDaysOff:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeTimeOffRequest'
       required:
         - name
         - jobTitle
@@ -279,6 +287,14 @@ components:
           type: boolean
         notes:
           type: string
+        availability:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeAvailabilityDay'
+        requestedDaysOff:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeTimeOffRequest'
       required:
         - id
         - schoolId
@@ -289,6 +305,34 @@ components:
         - employmentStatus
         - medicallyDelegated
         - cprCurrent
+    EmployeeAvailabilityBlock:
+      type: object
+      properties:
+        startTime:
+          type: string
+        endTime:
+          type: string
+      required: [startTime, endTime]
+    EmployeeAvailabilityDay:
+      type: object
+      properties:
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        blocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeAvailabilityBlock'
+      required: [dayOfWeek, blocks]
+    EmployeeTimeOffRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+        note:
+          type: string
+      required: [id, date]
     OperatingHoursPayload:
       type: object
       properties:

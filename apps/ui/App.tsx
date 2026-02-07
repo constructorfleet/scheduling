@@ -364,7 +364,9 @@ export default function App() {
         leaderQualified: false,
         medicallyDelegated: false,
         cprCurrent: true,
-        notes: "This assignment references a missing employee record. Re-link in Settings."
+        notes: "This assignment references a missing employee record. Re-link in Settings.",
+        availability: [],
+        requestedDaysOff: []
       });
     });
     return Array.from(byId.values());
@@ -500,7 +502,9 @@ export default function App() {
         employmentStatus: employee.employmentStatus,
         medicallyDelegated: employee.medicallyDelegated,
         cprCurrent: employee.cprCurrent,
-        notes: employee.notes
+        notes: employee.notes,
+        availability: employee.availability ?? [],
+        requestedDaysOff: employee.requestedDaysOff ?? []
       })) as EmployeePayload[],
       operatingHours: overrides.operatingHours ?? operatingHoursConfigState,
       fieldTripTypes: (overrides.fieldTripTypes ?? fieldTripTypesState).map((trip) => ({
@@ -582,7 +586,9 @@ export default function App() {
               settings.employees.map((employee) => ({
                 ...employee,
                 leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
-                employmentStatus: coerceEmploymentStatus(employee.employmentStatus)
+                employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
+                availability: employee.availability ?? [],
+                requestedDaysOff: employee.requestedDaysOff ?? []
               }))
             );
           }

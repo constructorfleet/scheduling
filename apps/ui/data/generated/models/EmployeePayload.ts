@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { EmployeeAvailabilityDay } from './EmployeeAvailabilityDay';
+import type { EmployeeTimeOffRequest } from './EmployeeTimeOffRequest';
 import type { EmploymentStatus } from './EmploymentStatus';
 export type EmployeePayload = {
     name: string;
@@ -12,5 +14,7 @@ export type EmployeePayload = {
     medicallyDelegated: boolean;
     cprCurrent: boolean;
     notes?: string;
+    availability?: Array<EmployeeAvailabilityDay>;
+    requestedDaysOff?: Array<EmployeeTimeOffRequest>;
 };
 

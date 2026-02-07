@@ -84,7 +84,9 @@ const emptyEmployee = (): Employee => ({
   leaderQualified: false,
   medicallyDelegated: false,
   cprCurrent: false,
-  notes: ""
+  notes: "",
+  availability: [],
+  requestedDaysOff: []
 });
 
 const emptyJobTitle = (): JobTitleSetting => ({

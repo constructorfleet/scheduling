@@ -75,6 +75,24 @@ export interface Employee {
   medicallyDelegated: boolean;
   cprCurrent: boolean;
   notes?: string;
+  availability?: EmployeeAvailabilityDay[];
+  requestedDaysOff?: EmployeeTimeOffRequest[];
+}
+
+export interface EmployeeAvailabilityBlock {
+  startTime: string;
+  endTime: string;
+}
+
+export interface EmployeeAvailabilityDay {
+  dayOfWeek: DayOfWeek;
+  blocks: EmployeeAvailabilityBlock[];
+}
+
+export interface EmployeeTimeOffRequest {
+  id: string;
+  date: string;
+  note?: string;
 }
 
 export interface StaffAssignment {

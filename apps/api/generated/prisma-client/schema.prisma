@@ -61,6 +61,8 @@ model Employee {
   medicallyDelegated Boolean
   cprCurrent         Boolean
   notes              String?
+  availability       Json?
+  requestedDaysOff   Json?
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }

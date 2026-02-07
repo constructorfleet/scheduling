@@ -157,7 +157,9 @@ exports.Prisma.EmployeeScalarFieldEnum = {
   employmentStatus: 'employmentStatus',
   medicallyDelegated: 'medicallyDelegated',
   cprCurrent: 'cprCurrent',
-  notes: 'notes'
+  notes: 'notes',
+  availability: 'availability',
+  requestedDaysOff: 'requestedDaysOff'
 };
 
 exports.Prisma.OperatingHoursScalarFieldEnum = {
@@ -246,6 +248,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 

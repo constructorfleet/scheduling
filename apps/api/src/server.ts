@@ -7,8 +7,62 @@ import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
 import type { Prisma as CorePrisma } from "../generated/prisma-client";
+import type {
+  DayOfWeek,
+  EmployeeAvailabilityBlock,
+  EmployeeAvailabilityDay,
+  EmployeeTimeOffRequest
+} from "@core/domain/types";
 
 type DbTransaction = CorePrisma.TransactionClient;
+const toJsonValue = (value: unknown): CorePrisma.InputJsonValue => value as CorePrisma.InputJsonValue;
+const DAY_VALUES: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const isDayOfWeek = (value: unknown): value is DayOfWeek =>
+  typeof value === "string" && DAY_VALUES.includes(value as DayOfWeek);
+const asObject = (value: unknown): Record<string, unknown> | null =>
+  typeof value === "object" && value !== null ? (value as Record<string, unknown>) : null;
+
+const normalizeAvailability = (value: unknown): EmployeeAvailabilityDay[] => {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((entry) => {
+      const rawDay = asObject(entry);
+      if (!rawDay || !isDayOfWeek(rawDay.dayOfWeek)) {
+        return null;
+      }
+      const blocksRaw = Array.isArray(rawDay.blocks) ? rawDay.blocks : [];
+      const blocks = blocksRaw
+        .map((block): EmployeeAvailabilityBlock | null => {
+          const rawBlock = asObject(block);
+          if (!rawBlock) return null;
+          const startTime = typeof rawBlock.startTime === "string" ? rawBlock.startTime : "";
+          const endTime = typeof rawBlock.endTime === "string" ? rawBlock.endTime : "";
+          return startTime && endTime ? { startTime, endTime } : null;
+        })
+        .filter((block): block is EmployeeAvailabilityBlock => Boolean(block))
+        .slice(0, 3);
+      return {
+        dayOfWeek: rawDay.dayOfWeek,
+        blocks
+      };
+    })
+    .filter((entry): entry is EmployeeAvailabilityDay => Boolean(entry));
+};
+
+const normalizeRequestedDaysOff = (value: unknown): EmployeeTimeOffRequest[] => {
+  if (!Array.isArray(value)) return [];
+  const normalized: EmployeeTimeOffRequest[] = [];
+  value.forEach((entry) => {
+    const raw = asObject(entry);
+    if (!raw) return;
+    const id = typeof raw.id === "string" && raw.id ? raw.id : `timeoff-${Date.now()}`;
+    const date = typeof raw.date === "string" ? raw.date : "";
+    if (!date) return;
+    const note = typeof raw.note === "string" ? raw.note : undefined;
+    normalized.push(note ? { id, date, note } : { id, date });
+  });
+  return normalized;
+};
 
 type ScheduleWeekPayload = {
   schoolId: string;
@@ -106,7 +160,11 @@ const buildServer = async () => {
       school,
       scheduleTypes: school.scheduleTypes,
       jobTitles: school.jobTitles,
-      employees: school.employees,
+      employees: school.employees.map((employee) => ({
+        ...employee,
+        availability: normalizeAvailability(employee.availability),
+        requestedDaysOff: normalizeRequestedDaysOff(employee.requestedDaysOff)
+      })),
       operatingHours: school.operatingHours,
       fieldTripTypes: school.fieldTripTypes
     };
@@ -144,6 +202,8 @@ const buildServer = async () => {
         medicallyDelegated: boolean;
         cprCurrent: boolean;
         notes?: string;
+        availability?: EmployeeAvailabilityDay[];
+        requestedDaysOff?: EmployeeTimeOffRequest[];
       }>;
       operatingHours: Array<{
         scheduleType: string;
@@ -246,7 +306,9 @@ const buildServer = async () => {
                 employmentStatus: employee.employmentStatus,
                 medicallyDelegated: employee.medicallyDelegated,
                 cprCurrent: employee.cprCurrent,
-                notes: employee.notes ?? null
+                notes: employee.notes ?? null,
+                availability: toJsonValue(normalizeAvailability(employee.availability)),
+                requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
               }
             });
             continue;
@@ -263,7 +325,9 @@ const buildServer = async () => {
               employmentStatus: employee.employmentStatus,
               medicallyDelegated: employee.medicallyDelegated,
               cprCurrent: employee.cprCurrent,
-              notes: employee.notes ?? null
+              notes: employee.notes ?? null,
+              availability: toJsonValue(normalizeAvailability(employee.availability)),
+              requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
             }
           });
           keptEmployeeIds.add(created.id);
