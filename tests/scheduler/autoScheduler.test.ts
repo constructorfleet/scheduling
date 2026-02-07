@@ -496,6 +496,76 @@ describe("autoSchedule", () => {
       expect(closers.length).toBeGreaterThanOrEqual(2);
     });
 
+    it("should prefer open-only constrained staff after satisfying med delegated opener minimum", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 8
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-med-open", "Medical Opener", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8
+          }),
+          createEmployee("emp-open-only", "Open Only Non-Med", {
+            leaderQualified: true,
+            medicallyDelegated: false,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "06:30", endTime: "12:00" }] }
+            ]
+          }),
+          createEmployee("emp-flex", "Flexible Non-Med", {
+            leaderQualified: true,
+            medicallyDelegated: false,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "06:30", endTime: "18:00" }] }
+            ]
+          }),
+          createEmployee("emp-close-med", "Medical Closer", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "10:00", endTime: "18:00" }] }
+            ]
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 20 },
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const mondayOpeners = result.staffAssignments.filter(a => a.startTime === "06:30");
+
+      const hasMedicalOpener = mondayOpeners.some(a => a.employeeId === "emp-med-open");
+      const hasOpenOnlyOpener = mondayOpeners.some(a => a.employeeId === "emp-open-only");
+      const hasFlexOpener = mondayOpeners.some(a => a.employeeId === "emp-flex");
+
+      expect(hasMedicalOpener).toBe(true);
+      expect(hasOpenOnlyOpener).toBe(true);
+      expect(hasFlexOpener).toBe(false);
+    });
+
     it("should prioritize leader-qualified employees", () => {
       // Realistic scenario: Mix of leaders and assistants
       const context: AutoSchedulerContext = {

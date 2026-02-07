@@ -205,9 +205,25 @@ function generateInitialAssignments(
             Math.max(0, context.schoolRules?.closerCount ?? 0),
             ratioRequired
         );
+        const minimumMedicalDelegated = Math.max(0, context.schoolRules?.minimumMedicalDelegated ?? 0);
+        const requiredMedicalOpeners = Math.min(openerCount, minimumMedicalDelegated);
 
         for (let i = 0; i < openerCount; i++) {
-            const bestOpener = findBestOpeningSeedCandidate(seedingContext, seededAssignments, day, openBlock);
+            const currentMedicalOpeners = seededAssignments
+                .filter(assignment => assignment.segmentBlockId === openBlock.id)
+                .reduce((count, assignment) => {
+                    const employee = context.employees.find(emp => emp.id === assignment.employeeId);
+                    return count + (employee?.medicallyDelegated ? 1 : 0);
+                }, 0);
+            const requireMedDelegated = currentMedicalOpeners < requiredMedicalOpeners;
+            const bestOpener = findBestOpeningSeedCandidate(
+                seedingContext,
+                seededAssignments,
+                day,
+                openBlock,
+                closeBlock,
+                requireMedDelegated
+            );
             if (!bestOpener) break;
             seededAssignments.push({
                 id: `auto-seed-open-${ day.dayOfWeek }-${ i }-${ bestOpener.employee.id }`,
@@ -489,7 +505,9 @@ function findBestOpeningSeedCandidate(
     context: AutoSchedulerContext,
     assignments: StaffAssignment[],
     day: ScheduleDay,
-    openBlock: SegmentBlock
+    openBlock: SegmentBlock,
+    closeBlock: SegmentBlock,
+    requireMedDelegated: boolean
 ): { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } | null {
     const candidates = context.employees
         .filter(emp => emp.employmentStatus === "active")
@@ -497,14 +515,39 @@ function findBestOpeningSeedCandidate(
         .map(employee => {
             const window = getPreferredAssignmentWindow(context, assignments, employee, openBlock);
             if (!window) return null;
+            const canCoverClose = isEmployeeAvailable(
+                employee,
+                day.dayOfWeek,
+                closeBlock.startTime,
+                closeBlock.endTime,
+                day.date
+            );
             return {
                 employee,
                 window,
-                duration: timeToMinutes(window.endTime) - timeToMinutes(window.startTime)
+                duration: timeToMinutes(window.endTime) - timeToMinutes(window.startTime),
+                openOnlyConstrained: !canCoverClose
             };
         })
-        .filter((candidate): candidate is { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } => Boolean(candidate))
+        .filter((candidate): candidate is {
+            employee: Employee;
+            window: { startTime: string; endTime: string; };
+            duration: number;
+            openOnlyConstrained: boolean;
+        } => Boolean(candidate))
         .sort((a, b) => {
+            if (requireMedDelegated) {
+                const aMed = a.employee.medicallyDelegated ? 1 : 0;
+                const bMed = b.employee.medicallyDelegated ? 1 : 0;
+                if (bMed !== aMed) {
+                    return bMed - aMed;
+                }
+            }
+            const aConstrained = a.openOnlyConstrained ? 1 : 0;
+            const bConstrained = b.openOnlyConstrained ? 1 : 0;
+            if (bConstrained !== aConstrained) {
+                return bConstrained - aConstrained;
+            }
             if (b.duration !== a.duration) {
                 return b.duration - a.duration;
             }
