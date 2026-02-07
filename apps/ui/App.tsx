@@ -68,7 +68,7 @@ const RULE_TITLES: Record<string, string> = {
   "medical-delegated-coverage": "Medical delegation",
   "cpr-current-required": "CPR current required",
   "schedule-day-metadata": "Missing day details",
-  "segment-block-timeline": "Clock block timeline issue",
+  "segment-block-timeline": "Schedule block timeline issue",
   "employee-availability": "Employee availability",
   "field-trip-event": "Field trip data issue",
   "certification-per-segment": "Certification coverage gap",
@@ -1270,11 +1270,11 @@ export default function App() {
 
   const getSegmentDisplayLabel = (segmentId?: string) => {
     if (!segmentId) {
-      return "Clock block";
+      return "Schedule block";
     }
     const block = segmentBlocksState.find((item) => item.id === segmentId);
     if (!block) {
-      return "Clock block";
+      return "Schedule block";
     }
     const dayLabel = dayDisplayNames[block.dayOfWeek]?.toUpperCase() ?? block.dayOfWeek.toUpperCase();
     return `${dayLabel} ${block.startTime}-${block.endTime}`;
