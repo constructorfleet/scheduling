@@ -702,17 +702,8 @@ const buildServer = async () => {
       }
 
       if (staffAssignmentsPayload.length) {
-        const segmentBlockIds = new Set(segmentBlocksPayload.map((block) => block.id));
-        const existingSegmentBlocks = await tx.segmentBlock.findMany({
-          where: { scheduleWeekId: weekId },
-          select: { id: true }
-        });
-        existingSegmentBlocks.forEach((block) => segmentBlockIds.add(block.id));
         const uniqueAssignments = new Map<string, StaffAssignmentPayload>();
         staffAssignmentsPayload.forEach((assignment) => {
-          if (!segmentBlockIds.has(assignment.segmentBlockId)) {
-            return;
-          }
           uniqueAssignments.set(assignment.id, assignment);
         });
         for (const assignment of Array.from(uniqueAssignments.values())) {
