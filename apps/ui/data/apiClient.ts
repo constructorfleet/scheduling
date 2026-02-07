@@ -1,15 +1,26 @@
-import { DefaultService, OpenAPI, type SettingsPayload, type ScheduleSavePayload } from "./generated";
+import {
+  DefaultService,
+  OpenAPI,
+  type AuthSessionResponse,
+  type LoginPayload,
+  type MeResponse,
+  type SettingsPayload,
+  type ScheduleSavePayload
+} from "./generated";
+import { ApiError } from "./generated";
 
 OpenAPI.BASE = "";
+OpenAPI.WITH_CREDENTIALS = true;
 
 export type { SettingsPayload, ScheduleSavePayload };
 
+export type { AuthSessionResponse, LoginPayload, MeResponse };
+
+export const isApiErrorStatus = (error: unknown, status: number) =>
+  error instanceof ApiError && error.status === status;
+
 export const fetchSettings = async (schoolId: string) => {
-  try {
-    return await DefaultService.getApiSettings(schoolId);
-  } catch {
-    return null;
-  }
+  return DefaultService.getApiSettings(schoolId);
 };
 
 export const saveSettings = async (schoolId: string, payload: SettingsPayload) => {
@@ -19,8 +30,11 @@ export const saveSettings = async (schoolId: string, payload: SettingsPayload) =
 export const fetchSchedule = async (weekId: string) => {
   try {
     return await DefaultService.getApiSchedule(weekId);
-  } catch {
-    return null;
+  } catch (error) {
+    if (isApiErrorStatus(error, 404)) {
+      return null;
+    }
+    throw error;
   }
 };
 
@@ -29,11 +43,11 @@ export const saveSchedule = async (weekId: string, payload: ScheduleSavePayload)
 };
 
 export const deleteScheduleAssignments = async (weekId: string) => {
-  const response = await fetch(`/api/schedule/${weekId}/staff-assignments`, {
-    method: "DELETE"
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to clear staff assignments for ${weekId}`);
-  }
-  return response.json() as Promise<{ ok: boolean; deleted: number }>;
+  return DefaultService.deleteApiScheduleStaffAssignments(weekId);
 };
+
+export const fetchAuthMe = async () => DefaultService.getApiAuthMe();
+
+export const login = async (payload: LoginPayload) => DefaultService.postApiAuthLogin(payload);
+
+export const logout = async () => DefaultService.postApiAuthLogout();
