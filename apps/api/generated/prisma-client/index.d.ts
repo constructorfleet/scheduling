@@ -16219,8 +16219,18 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
+  }
+
+  export type UserAvgAggregateOutputType = {
+    failedLoginAttempts: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    failedLoginAttempts: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -16229,6 +16239,8 @@ export namespace Prisma {
     passwordHash: string | null
     displayName: string | null
     status: $Enums.UserStatus | null
+    failedLoginAttempts: number | null
+    lockoutUntil: Date | null
     lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -16240,6 +16252,8 @@ export namespace Prisma {
     passwordHash: string | null
     displayName: string | null
     status: $Enums.UserStatus | null
+    failedLoginAttempts: number | null
+    lockoutUntil: Date | null
     lastLoginAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -16251,6 +16265,8 @@ export namespace Prisma {
     passwordHash: number
     displayName: number
     status: number
+    failedLoginAttempts: number
+    lockoutUntil: number
     lastLoginAt: number
     createdAt: number
     updatedAt: number
@@ -16258,12 +16274,22 @@ export namespace Prisma {
   }
 
 
+  export type UserAvgAggregateInputType = {
+    failedLoginAttempts?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    failedLoginAttempts?: true
+  }
+
   export type UserMinAggregateInputType = {
     id?: true
     email?: true
     passwordHash?: true
     displayName?: true
     status?: true
+    failedLoginAttempts?: true
+    lockoutUntil?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -16275,6 +16301,8 @@ export namespace Prisma {
     passwordHash?: true
     displayName?: true
     status?: true
+    failedLoginAttempts?: true
+    lockoutUntil?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -16286,6 +16314,8 @@ export namespace Prisma {
     passwordHash?: true
     displayName?: true
     status?: true
+    failedLoginAttempts?: true
+    lockoutUntil?: true
     lastLoginAt?: true
     createdAt?: true
     updatedAt?: true
@@ -16330,6 +16360,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -16360,6 +16402,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
@@ -16370,10 +16414,14 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status: $Enums.UserStatus
+    failedLoginAttempts: number
+    lockoutUntil: Date | null
     lastLoginAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -16398,6 +16446,8 @@ export namespace Prisma {
     passwordHash?: boolean
     displayName?: boolean
     status?: boolean
+    failedLoginAttempts?: boolean
+    lockoutUntil?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -16412,6 +16462,8 @@ export namespace Prisma {
     passwordHash?: boolean
     displayName?: boolean
     status?: boolean
+    failedLoginAttempts?: boolean
+    lockoutUntil?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -16423,6 +16475,8 @@ export namespace Prisma {
     passwordHash?: boolean
     displayName?: boolean
     status?: boolean
+    failedLoginAttempts?: boolean
+    lockoutUntil?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -16434,12 +16488,14 @@ export namespace Prisma {
     passwordHash?: boolean
     displayName?: boolean
     status?: boolean
+    failedLoginAttempts?: boolean
+    lockoutUntil?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "status" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "status" | "failedLoginAttempts" | "lockoutUntil" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     memberships?: boolean | User$membershipsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -16460,6 +16516,8 @@ export namespace Prisma {
       passwordHash: string
       displayName: string
       status: $Enums.UserStatus
+      failedLoginAttempts: number
+      lockoutUntil: Date | null
       lastLoginAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -16893,6 +16951,8 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly displayName: FieldRef<"User", 'String'>
     readonly status: FieldRef<"User", 'UserStatus'>
+    readonly failedLoginAttempts: FieldRef<"User", 'Int'>
+    readonly lockoutUntil: FieldRef<"User", 'DateTime'>
     readonly lastLoginAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -19726,6 +19786,8 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     displayName: 'displayName',
     status: 'status',
+    failedLoginAttempts: 'failedLoginAttempts',
+    lockoutUntil: 'lockoutUntil',
     lastLoginAt: 'lastLoginAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -20821,6 +20883,8 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     displayName?: StringFilter<"User"> | string
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
+    failedLoginAttempts?: IntFilter<"User"> | number
+    lockoutUntil?: DateTimeNullableFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -20834,6 +20898,8 @@ export namespace Prisma {
     passwordHash?: SortOrder
     displayName?: SortOrder
     status?: SortOrder
+    failedLoginAttempts?: SortOrder
+    lockoutUntil?: SortOrderInput | SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -20850,6 +20916,8 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     displayName?: StringFilter<"User"> | string
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
+    failedLoginAttempts?: IntFilter<"User"> | number
+    lockoutUntil?: DateTimeNullableFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -20863,12 +20931,16 @@ export namespace Prisma {
     passwordHash?: SortOrder
     displayName?: SortOrder
     status?: SortOrder
+    failedLoginAttempts?: SortOrder
+    lockoutUntil?: SortOrderInput | SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -20880,6 +20952,8 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     displayName?: StringWithAggregatesFilter<"User"> | string
     status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
+    failedLoginAttempts?: IntWithAggregatesFilter<"User"> | number
+    lockoutUntil?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -22050,6 +22124,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22063,6 +22139,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22076,6 +22154,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22089,6 +22169,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22102,6 +22184,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -22113,6 +22197,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22124,6 +22210,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23174,9 +23262,15 @@ export namespace Prisma {
     passwordHash?: SortOrder
     displayName?: SortOrder
     status?: SortOrder
+    failedLoginAttempts?: SortOrder
+    lockoutUntil?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type UserAvgOrderByAggregateInput = {
+    failedLoginAttempts?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -23185,6 +23279,8 @@ export namespace Prisma {
     passwordHash?: SortOrder
     displayName?: SortOrder
     status?: SortOrder
+    failedLoginAttempts?: SortOrder
+    lockoutUntil?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -23196,9 +23292,15 @@ export namespace Prisma {
     passwordHash?: SortOrder
     displayName?: SortOrder
     status?: SortOrder
+    failedLoginAttempts?: SortOrder
+    lockoutUntil?: SortOrder
     lastLoginAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    failedLoginAttempts?: SortOrder
   }
 
   export type EnumUserStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -26299,6 +26401,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26311,6 +26415,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26380,6 +26486,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26392,6 +26500,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26451,6 +26561,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26463,6 +26575,8 @@ export namespace Prisma {
     passwordHash: string
     displayName: string
     status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -26491,6 +26605,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26503,6 +26619,8 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

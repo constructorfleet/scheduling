@@ -263,6 +263,8 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   displayName: 'displayName',
   status: 'status',
+  failedLoginAttempts: 'failedLoginAttempts',
+  lockoutUntil: 'lockoutUntil',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

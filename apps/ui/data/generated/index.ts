@@ -11,6 +11,7 @@ export type { AssignmentSource } from './models/AssignmentSource';
 export type { AuditEvent } from './models/AuditEvent';
 export type { AuthSessionResponse } from './models/AuthSessionResponse';
 export type { AuthUser } from './models/AuthUser';
+export type { CsrfHeader } from './models/CsrfHeader';
 export type { DayOfWeek } from './models/DayOfWeek';
 export type { DayScheduleType } from './models/DayScheduleType';
 export type { DaySegment } from './models/DaySegment';

@@ -10,5 +10,6 @@ export type AuthSessionResponse = {
     currentSchoolId: string;
     memberships: Array<SchoolMembership>;
     session: SessionInfo;
+    csrfToken: string;
 };
 

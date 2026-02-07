@@ -19,12 +19,27 @@ export type { AuthSessionResponse, LoginPayload, MeResponse };
 export const isApiErrorStatus = (error: unknown, status: number) =>
   error instanceof ApiError && error.status === status;
 
+const getCookieValue = (name: string) => {
+  if (typeof document === "undefined") {
+    return "";
+  }
+  const prefix = `${name}=`;
+  const parts = document.cookie.split(";").map((part) => part.trim());
+  const entry = parts.find((part) => part.startsWith(prefix));
+  if (!entry) {
+    return "";
+  }
+  return decodeURIComponent(entry.slice(prefix.length));
+};
+
+const getCsrfToken = () => getCookieValue("sched_csrf");
+
 export const fetchSettings = async (schoolId: string) => {
   return DefaultService.getApiSettings(schoolId);
 };
 
 export const saveSettings = async (schoolId: string, payload: SettingsPayload) => {
-  return DefaultService.putApiSettings(schoolId, payload);
+  return DefaultService.putApiSettings(getCsrfToken(), schoolId, payload);
 };
 
 export const fetchSchedule = async (weekId: string) => {
@@ -39,15 +54,15 @@ export const fetchSchedule = async (weekId: string) => {
 };
 
 export const saveSchedule = async (weekId: string, payload: ScheduleSavePayload) => {
-  return DefaultService.putApiSchedule(weekId, payload);
+  return DefaultService.putApiSchedule(getCsrfToken(), weekId, payload);
 };
 
 export const deleteScheduleAssignments = async (weekId: string) => {
-  return DefaultService.deleteApiScheduleStaffAssignments(weekId);
+  return DefaultService.deleteApiScheduleStaffAssignments(getCsrfToken(), weekId);
 };
 
 export const fetchAuthMe = async () => DefaultService.getApiAuthMe();
 
 export const login = async (payload: LoginPayload) => DefaultService.postApiAuthLogin(payload);
 
-export const logout = async () => DefaultService.postApiAuthLogout();
+export const logout = async () => DefaultService.postApiAuthLogout(getCsrfToken());

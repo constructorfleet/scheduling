@@ -41,17 +41,28 @@ export class DefaultService {
             url: '/api/auth/login',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Invalid credentials`,
+                423: `Account locked`,
+                429: `Too many login attempts`,
+            },
         });
     }
     /**
      * Revoke current session and clear cookie
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @returns GenericOk Logout complete
      * @throws ApiError
      */
-    public static postApiAuthLogout(): CancelablePromise<GenericOk> {
+    public static postApiAuthLogout(
+        xCsrfToken: string,
+    ): CancelablePromise<GenericOk> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/auth/logout',
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
         });
     }
     /**
@@ -91,12 +102,14 @@ export class DefaultService {
     }
     /**
      * Save settings for a school
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @param schoolId
      * @param requestBody
      * @returns SettingsSaveResponse OK
      * @throws ApiError
      */
     public static putApiSettings(
+        xCsrfToken: string,
         schoolId: string,
         requestBody: SettingsPayload,
     ): CancelablePromise<SettingsSaveResponse> {
@@ -105,6 +118,9 @@ export class DefaultService {
             url: '/api/settings/{schoolId}',
             path: {
                 'schoolId': schoolId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -137,12 +153,14 @@ export class DefaultService {
     }
     /**
      * Save schedule week
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @param weekId
      * @param requestBody
      * @returns GenericOk OK
      * @throws ApiError
      */
     public static putApiSchedule(
+        xCsrfToken: string,
         weekId: string,
         requestBody: ScheduleSavePayload,
     ): CancelablePromise<GenericOk> {
@@ -151,6 +169,9 @@ export class DefaultService {
             url: '/api/schedule/{weekId}',
             path: {
                 'weekId': weekId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -162,11 +183,13 @@ export class DefaultService {
     }
     /**
      * Clear staff assignments for a schedule week
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @param weekId
      * @returns any Delete result
      * @throws ApiError
      */
     public static deleteApiScheduleStaffAssignments(
+        xCsrfToken: string,
         weekId: string,
     ): CancelablePromise<{
         ok: boolean;
@@ -177,6 +200,9 @@ export class DefaultService {
             url: '/api/schedule/{weekId}/staff-assignments',
             path: {
                 'weekId': weekId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
             },
             errors: {
                 401: `Authentication required`,

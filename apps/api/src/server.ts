@@ -9,8 +9,10 @@ import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
 import {
+  createCsrfToken,
   createSessionExpiry,
   createSessionToken,
+  CSRF_COOKIE_NAME,
   hashSessionToken,
   normalizeEmail,
   SESSION_COOKIE_NAME,
@@ -165,6 +167,19 @@ const SESSION_COOKIE_OPTIONS = {
   sameSite: "lax" as const,
   secure: process.env.NODE_ENV === "production"
 };
+const CSRF_COOKIE_OPTIONS = {
+  httpOnly: false,
+  path: "/",
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production"
+};
+
+const LOGIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 20;
+const USER_LOGIN_MAX_FAILURES = 5;
+const USER_LOCKOUT_MS = 15 * 60 * 1000;
+
+const ipLoginAttempts = new Map<string, number[]>();
 
 const buildServer = async () => {
   const fastify = Fastify({ logger: isDebugEnabled() });
@@ -237,6 +252,35 @@ const buildServer = async () => {
     return auth;
   };
 
+  const isIpRateLimited = (ipAddress: string) => {
+    const now = Date.now();
+    const cutoff = now - LOGIN_RATE_LIMIT_WINDOW_MS;
+    const attempts = ipLoginAttempts.get(ipAddress) ?? [];
+    const recent = attempts.filter((timestamp) => timestamp >= cutoff);
+    if (recent.length >= LOGIN_RATE_LIMIT_MAX_ATTEMPTS) {
+      ipLoginAttempts.set(ipAddress, recent);
+      return true;
+    }
+    recent.push(now);
+    ipLoginAttempts.set(ipAddress, recent);
+    return false;
+  };
+
+  const clearIpRateLimit = (ipAddress: string) => {
+    ipLoginAttempts.delete(ipAddress);
+  };
+
+  const requireCsrf = (request: FastifyRequest, reply: FastifyReply) => {
+    const csrfCookie = request.cookies[CSRF_COOKIE_NAME];
+    const csrfHeader = request.headers["x-csrf-token"];
+    const headerValue = Array.isArray(csrfHeader) ? csrfHeader[0] : csrfHeader;
+    if (!csrfCookie || !headerValue || headerValue !== csrfCookie) {
+      reply.code(403).send({ message: "Invalid CSRF token." });
+      return false;
+    }
+    return true;
+  };
+
   fastify.get("/api/health", async () => ({ status: "ok" }));
 
   fastify.get("/api/openapi.yaml", async (_, reply) => {
@@ -250,6 +294,11 @@ const buildServer = async () => {
   });
 
   fastify.post("/api/auth/login", async (request, reply) => {
+    const ipAddress = request.ip;
+    if (isIpRateLimited(ipAddress)) {
+      return reply.code(429).send({ message: "Too many login attempts. Try again shortly." });
+    }
+
     const body = (request.body ?? {}) as {
       email?: string;
       password?: string;
@@ -269,7 +318,22 @@ const buildServer = async () => {
       include: { memberships: true }
     });
 
-    if (!user || user.status !== "active" || !verifyPassword(password, user.passwordHash)) {
+    if (!user || user.status !== "active") {
+      return reply.code(401).send({ message: "Invalid credentials." });
+    }
+    if (user.lockoutUntil && user.lockoutUntil.getTime() > Date.now()) {
+      return reply.code(423).send({ message: "Account temporarily locked. Please try again later." });
+    }
+    if (!verifyPassword(password, user.passwordHash)) {
+      const nextFailures = user.failedLoginAttempts + 1;
+      const shouldLock = nextFailures >= USER_LOGIN_MAX_FAILURES;
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: shouldLock ? 0 : nextFailures,
+          lockoutUntil: shouldLock ? new Date(Date.now() + USER_LOCKOUT_MS) : null
+        }
+      });
       return reply.code(401).send({ message: "Invalid credentials." });
     }
 
@@ -282,10 +346,20 @@ const buildServer = async () => {
     }
 
     const token = createSessionToken();
+    const csrfToken = createCsrfToken();
     const tokenHash = hashSessionToken(token);
     const expiresAt = createSessionExpiry();
-    const ipAddress = request.ip;
     const userAgent = request.headers["user-agent"] ?? null;
+
+    await prisma.session.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null
+      },
+      data: {
+        revokedAt: new Date()
+      }
+    });
 
     const session = await prisma.session.create({
       data: {
@@ -300,7 +374,9 @@ const buildServer = async () => {
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        lastLoginAt: new Date()
+        lastLoginAt: new Date(),
+        failedLoginAttempts: 0,
+        lockoutUntil: null
       }
     });
 
@@ -308,6 +384,11 @@ const buildServer = async () => {
       ...SESSION_COOKIE_OPTIONS,
       expires: expiresAt
     });
+    reply.setCookie(CSRF_COOKIE_NAME, csrfToken, {
+      ...CSRF_COOKIE_OPTIONS,
+      expires: expiresAt
+    });
+    clearIpRateLimit(ipAddress);
 
     return reply.send({
       user: {
@@ -323,11 +404,15 @@ const buildServer = async () => {
       session: {
         id: session.id,
         expiresAt: expiresAt.toISOString()
-      }
+      },
+      csrfToken
     });
   });
 
   fastify.post("/api/auth/logout", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const auth = await resolveAuth(request);
     if (auth) {
       const prisma = getPrisma();
@@ -338,6 +423,7 @@ const buildServer = async () => {
     }
 
     reply.clearCookie(SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS);
+    reply.clearCookie(CSRF_COOKIE_NAME, CSRF_COOKIE_OPTIONS);
     return reply.send({ ok: true });
   });
 
@@ -406,6 +492,9 @@ const buildServer = async () => {
   });
 
   fastify.put("/api/settings/:schoolId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { schoolId } = request.params as { schoolId: string };
     if (!(await requireRoleForSchool(request, reply, schoolId, "director"))) {
       return;
@@ -732,6 +821,9 @@ const buildServer = async () => {
   });
 
   fastify.delete("/api/schedule/:weekId/staff-assignments", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { weekId } = request.params as { weekId: string };
     const prisma = getPrisma();
     const scheduleWeek = await prisma.scheduleWeek.findUnique({
@@ -756,6 +848,9 @@ const buildServer = async () => {
   });
 
   fastify.put("/api/schedule/:weekId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { weekId } = request.params as { weekId: string };
     const payload = request.body as Partial<{
       scheduleWeek: ScheduleWeekPayload;

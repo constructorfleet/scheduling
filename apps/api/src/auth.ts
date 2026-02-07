@@ -7,6 +7,7 @@ const SCRYPT_P = 1;
 const KEY_LENGTH = 64;
 
 export const SESSION_COOKIE_NAME = "sched_session";
+export const CSRF_COOKIE_NAME = "sched_csrf";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 
 const toBase64Url = (buffer: Buffer) =>
@@ -28,6 +29,7 @@ export const hashSessionToken = (token: string) =>
   crypto.createHash("sha256").update(token).digest("hex");
 
 export const createSessionToken = () => toBase64Url(crypto.randomBytes(32));
+export const createCsrfToken = () => toBase64Url(crypto.randomBytes(24));
 
 export const createSessionExpiry = () => new Date(Date.now() + SESSION_TTL_MS);
 

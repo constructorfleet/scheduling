@@ -154,6 +154,15 @@ const formatShortDate = (value?: string) => {
   return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 };
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const getCookieValue = (name: string) => {
+  if (typeof document === "undefined") return "";
+  const prefix = `${name}=`;
+  const entry = document.cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(prefix));
+  return entry ? decodeURIComponent(entry.slice(prefix.length)) : "";
+};
 
 type ScheduleSnapshot = {
   scheduleDays: ScheduleDay[];
@@ -1175,7 +1184,10 @@ export default function App() {
       }
       void fetch(`/api/schedule/${currentWeekId}`, {
         method: "PUT",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "x-csrf-token": getCookieValue("sched_csrf")
+        },
         body: JSON.stringify(pendingPayload),
         keepalive: true
       });

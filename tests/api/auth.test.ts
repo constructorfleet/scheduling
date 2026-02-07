@@ -1,6 +1,7 @@
 /** @jest-environment node */
 
 import {
+  createCsrfToken,
   createSessionExpiry,
   createSessionToken,
   hashPassword,
@@ -30,6 +31,13 @@ describe("auth helpers", () => {
     expect(tokenA).not.toBe(tokenB);
     expect(hashSessionToken(tokenA)).toHaveLength(64);
     expect(hashSessionToken(tokenA)).not.toBe(hashSessionToken(tokenB));
+  });
+
+  test("creates csrf tokens", () => {
+    const tokenA = createCsrfToken();
+    const tokenB = createCsrfToken();
+    expect(tokenA).not.toBe(tokenB);
+    expect(tokenA.length).toBeGreaterThan(20);
   });
 
   test("creates session expiry in the future", () => {
