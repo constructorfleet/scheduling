@@ -8,3 +8,5 @@ dist-static/
 dist-static-*.tar.gz
 dist-api/
 scheduling.db
+.DS_Store
+**/.DS_Store
