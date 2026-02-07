@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DayOfWeek, DaySegment, Employee, OperatingHours, SegmentBlock, StaffAssignment } from "@core/domain/types";
 import { RuleViolation } from "../types";
+import type { SchoolRules } from "./SettingsPanel";
 
 export interface AddClockBlockRequest {
   dayOfWeek: DayOfWeek;
@@ -17,6 +18,9 @@ interface ClockBlockTimelineProps {
   employees: Employee[];
   violations: RuleViolation[];
   focusedSegmentId?: string;
+  schoolRules?: Pick<SchoolRules, "openerCount" | "closerCount">;
+  scheduleDays: Array<{ id: string; dayOfWeek: DayOfWeek; scheduleType?: string }>;
+  scheduleTypeRatios: Record<string, number>;
   onFocusSegment: (segmentId: string) => void;
   daySequence: DayOfWeek[];
   dayDisplayNames: Record<DayOfWeek, string>;
@@ -53,6 +57,9 @@ export default function ClockBlockTimeline({
   employees,
   violations,
   focusedSegmentId,
+  schoolRules,
+  scheduleDays,
+  scheduleTypeRatios,
   onFocusSegment,
   daySequence,
   dayDisplayNames,
@@ -102,11 +109,19 @@ export default function ClockBlockTimeline({
   const startMinute = Math.max(earliestStart - 30, 6 * 60);
   const endMinute = Math.min(latestEnd + 30, 21 * 60);
   const totalSpan = Math.max(endMinute - startMinute, 1);
-  const axisMarkers = [];
+  const axisMarkers: number[] = [];
   for (let marker = startMinute; marker <= endMinute; marker += 60) {
     axisMarkers.push(marker);
   }
   const timelineHeight = 360;
+
+  useEffect(() => {
+    if (!focusedSegmentId) return;
+    const target = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${focusedSegmentId}"]`);
+    if (target && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+    }
+  }, [focusedSegmentId]);
 
   const segmentsByDay = daySequence.reduce<Record<DayOfWeek, SegmentBlock[]>>((map, day) => {
     map[day] = segments
@@ -114,6 +129,8 @@ export default function ClockBlockTimeline({
       .sort((a, b) => parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime));
     return map;
   }, {} as Record<DayOfWeek, SegmentBlock[]>);
+  const scheduleDaysById = Object.fromEntries(scheduleDays.map((day) => [day.id, day]));
+  const scheduleDaysByDow = Object.fromEntries(scheduleDays.map((day) => [day.dayOfWeek, day]));
 
   const guardrailForDraftDay = operatingHoursByDay[draftBlock.day];
   const handleChildCountChange = (value: string) => {
@@ -425,9 +442,19 @@ export default function ClockBlockTimeline({
                     const assignedStaff = assigned
                       .map((assignment) => employeesById[assignment.employeeId])
                       .filter((employee): employee is Employee => Boolean(employee));
-                    const ratioChildren = segment.requirementTemplate.ratioProfile.childrenPerStaff || 0;
+                    const scheduleDay =
+                      (segment.scheduleDayId ? scheduleDaysById[segment.scheduleDayId] : undefined) ??
+                      scheduleDaysByDow[segment.dayOfWeek];
+                    const ratioChildren =
+                      (scheduleDay?.scheduleType ? scheduleTypeRatios[scheduleDay.scheduleType] : undefined) ?? 0;
+                    let minStaff = segment.requirementTemplate.minStaff ?? 0;
+                    if (segment.segment === "open" && (schoolRules?.openerCount ?? 0) > 0) {
+                      minStaff = schoolRules?.openerCount ?? minStaff;
+                    } else if (segment.segment === "close" && (schoolRules?.closerCount ?? 0) > 0) {
+                      minStaff = schoolRules?.closerCount ?? minStaff;
+                    }
                     const requiredStaff = Math.max(
-                      segment.requirementTemplate.minStaff,
+                      minStaff,
                       Math.ceil(segment.childCount / Math.max(ratioChildren, 1))
                     );
                     const hasLeader = assignedStaff.some((employee) => employee.leaderQualified);
@@ -444,6 +471,7 @@ export default function ClockBlockTimeline({
                         aria-pressed={blockFocused}
                         aria-label={`${dayDisplayNames[day]} ${segment.startTime} – ${segment.endTime} ${segment.segment}`}
                         onClick={() => onFocusSegment(segment.id)}
+                        data-timeline-segment-id={segment.id}
                         style={{
                           position: "absolute",
                           top,

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AuditEvent } from "../types";
 
@@ -24,6 +24,18 @@ export default function AuditTimeline({
   const [position, setPosition] = useState({ x: 420, y: 140 });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  const clampPosition = (x: number, y: number) => {
+    const overlay = containerRef.current;
+    const width = overlay?.offsetWidth ?? 380;
+    const height = overlay?.offsetHeight ?? 420;
+    const margin = 12;
+    return {
+      x: Math.max(margin, Math.min(x, window.innerWidth - width - margin)),
+      y: Math.max(margin, Math.min(y, window.innerHeight - height - margin))
+    };
+  };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(true);
@@ -31,20 +43,28 @@ export default function AuditTimeline({
       x: event.clientX - position.x,
       y: event.clientY - position.y
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
   };
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  useEffect(() => {
     if (!isDragging) return;
-    setPosition({
-      x: Math.max(12, event.clientX - dragOffset.current.x),
-      y: Math.max(12, event.clientY - dragOffset.current.y)
-    });
-  };
+    const handlePointerMove = (event: PointerEvent) => {
+      const next = clampPosition(event.clientX - dragOffset.current.x, event.clientY - dragOffset.current.y);
+      setPosition(next);
+    };
+    const handlePointerUp = () => {
+      setIsDragging(false);
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isDragging]);
 
-  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handlePointerUp = () => {
     setIsDragging(false);
-    event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
   if (!isOpen) {
@@ -53,6 +73,7 @@ export default function AuditTimeline({
 
   return (
     <motion.section
+      ref={containerRef}
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
@@ -76,7 +97,6 @@ export default function AuditTimeline({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
         <div
           onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           style={{
             display: "flex",

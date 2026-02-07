@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { RuleViolation } from "../types";
 
@@ -24,6 +24,18 @@ export default function ViolationNavigator({
   const [position, setPosition] = useState({ x: 24, y: 140 });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  const clampPosition = (x: number, y: number) => {
+    const overlay = containerRef.current;
+    const width = overlay?.offsetWidth ?? 360;
+    const height = overlay?.offsetHeight ?? 420;
+    const margin = 12;
+    return {
+      x: Math.max(margin, Math.min(x, window.innerWidth - width - margin)),
+      y: Math.max(margin, Math.min(y, window.innerHeight - height - margin))
+    };
+  };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(true);
@@ -31,20 +43,77 @@ export default function ViolationNavigator({
       x: event.clientX - position.x,
       y: event.clientY - position.y
     };
-    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
   };
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  useEffect(() => {
     if (!isDragging) return;
-    setPosition({
-      x: Math.max(12, event.clientX - dragOffset.current.x),
-      y: Math.max(12, event.clientY - dragOffset.current.y)
-    });
+    const handlePointerMove = (event: PointerEvent) => {
+      const next = clampPosition(event.clientX - dragOffset.current.x, event.clientY - dragOffset.current.y);
+      setPosition(next);
+    };
+    const handlePointerUp = () => {
+      setIsDragging(false);
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [isDragging]);
+
+  const handlePointerUp = () => {
+    setIsDragging(false);
   };
 
-  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    setIsDragging(false);
-    event.currentTarget.releasePointerCapture(event.pointerId);
+  const getTargetForSegment = (segmentId: string) => {
+    const candidates = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        `[data-timeline-segment-id="${segmentId}"], [data-segment-id="${segmentId}"]`
+      )
+    );
+    if (!candidates.length) {
+      return null;
+    }
+    return candidates.find((el) => el.offsetParent !== null) ?? candidates[0];
+  };
+
+  const adjustForTarget = (segmentId: string) => {
+    const overlay = containerRef.current;
+    const target = getTargetForSegment(segmentId);
+    if (!overlay || !target) return;
+    const overlayRect = overlay.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const overlaps = !(
+      overlayRect.right < targetRect.left ||
+      overlayRect.left > targetRect.right ||
+      overlayRect.bottom < targetRect.top ||
+      overlayRect.top > targetRect.bottom
+    );
+    if (!overlaps) return;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const padding = 16;
+    let nextX = position.x;
+    let nextY = position.y;
+    const rightSpace = viewportWidth - targetRect.right - overlayRect.width - padding;
+    const leftSpace = targetRect.left - overlayRect.width - padding;
+    const belowSpace = viewportHeight - targetRect.bottom - overlayRect.height - padding;
+    if (rightSpace > 0) {
+      nextX = targetRect.right + padding;
+      nextY = Math.min(position.y, viewportHeight - overlayRect.height - padding);
+    } else if (leftSpace > 0) {
+      nextX = Math.max(padding, targetRect.left - overlayRect.width - padding);
+      nextY = Math.min(position.y, viewportHeight - overlayRect.height - padding);
+    } else if (belowSpace > 0) {
+      nextY = targetRect.bottom + padding;
+      nextX = Math.min(position.x, viewportWidth - overlayRect.width - padding);
+    } else {
+      nextY = Math.max(padding, targetRect.top - overlayRect.height - padding);
+      nextX = Math.min(position.x, viewportWidth - overlayRect.width - padding);
+    }
+    setPosition(clampPosition(nextX, nextY));
   };
 
   if (!isOpen) {
@@ -53,6 +122,7 @@ export default function ViolationNavigator({
 
   return (
     <motion.section
+      ref={containerRef}
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
@@ -76,7 +146,6 @@ export default function ViolationNavigator({
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
         <div
           onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           style={{
             display: "flex",
@@ -183,7 +252,10 @@ export default function ViolationNavigator({
               )}
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.35rem" }}>
                 <button
-                  onClick={() => onFocusSegment(violation.segmentBlockId)}
+                  onClick={() => {
+                    onFocusSegment(violation.segmentBlockId);
+                    window.setTimeout(() => adjustForTarget(violation.segmentBlockId), 220);
+                  }}
                   style={{
                     borderRadius: 999,
                     border: "1px solid #2563eb",
