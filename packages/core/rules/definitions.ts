@@ -22,6 +22,7 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
   "schedule-day-metadata": "policy-schedule-day",
   "field-trip-event": "policy-field-trip-event",
   "segment-block-timeline": "policy-coverage",
+  "employee-availability": "policy-coverage",
   "open-close-coverage": "policy-open-close",
   "medical-delegated-coverage": "policy-med-delegated",
   "cpr-current-required": "policy-cpr-current"
@@ -631,6 +632,120 @@ export const segmentBlockTimelineRule: RuleDefinition = {
   }
 };
 
+const normalizeDateOnly = (value: string) => value.split("T")[0];
+
+export const employeeAvailabilityRule: RuleDefinition = {
+  id: "employee-availability",
+  description:
+    "Ensures assignments only occur on days/times where each employee is available and not marked as requested time off",
+  evaluate: (context: RulesContext) => {
+    const violations: RuleViolation[] = [];
+    const citationId = getCitationId(
+      context,
+      "employee-availability",
+      DEFAULT_POLICY_CITATIONS["employee-availability"]
+    );
+
+    context.staffAssignments
+      .filter((assignment) => assignment.status !== "completed")
+      .forEach((assignment) => {
+        const employee = getEmployeeById(context, assignment.employeeId);
+        if (!employee) {
+          return;
+        }
+        const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+        if (!dayOfWeek) {
+          return;
+        }
+        const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+        const date = scheduleDay?.date ? normalizeDateOnly(scheduleDay.date) : undefined;
+        const daysOff = employee.requestedDaysOff ?? [];
+        const isRequestedOff = Boolean(date && daysOff.some((dayOff) => normalizeDateOnly(dayOff.date) === date));
+        if (isRequestedOff) {
+          violations.push(
+            buildViolation(
+              "employee-availability",
+              `${employee.name} is scheduled on a requested day off (${date})`,
+              "StaffAssignment",
+              assignment.id,
+              citationId,
+              "error",
+              {
+                employeeId: employee.id,
+                employeeName: employee.name,
+                dayOfWeek,
+                date,
+                reason: "requested-day-off",
+                relatedSegmentBlockIds: [assignment.segmentBlockId]
+              }
+            )
+          );
+          return;
+        }
+
+        const availabilityForDay = employee.availability?.find((day) => day.dayOfWeek === dayOfWeek);
+        if (!availabilityForDay) {
+          return;
+        }
+        const blocks = availabilityForDay.blocks ?? [];
+        if (blocks.length === 0) {
+          violations.push(
+            buildViolation(
+              "employee-availability",
+              `${employee.name} is not available on ${dayOfWeek.toUpperCase()} but has a scheduled assignment`,
+              "StaffAssignment",
+              assignment.id,
+              citationId,
+              "error",
+              {
+                employeeId: employee.id,
+                employeeName: employee.name,
+                dayOfWeek,
+                date,
+                reason: "not-available-day",
+                relatedSegmentBlockIds: [assignment.segmentBlockId]
+              }
+            )
+          );
+          return;
+        }
+
+        const assignmentStart = parseTimeToMinutes(assignment.startTime);
+        const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+        const fitsAvailability = blocks.some((block) => {
+          const blockStart = parseTimeToMinutes(block.startTime);
+          const blockEnd = parseTimeToMinutes(block.endTime);
+          return assignmentStart >= blockStart && assignmentEnd <= blockEnd;
+        });
+
+        if (!fitsAvailability) {
+          violations.push(
+            buildViolation(
+              "employee-availability",
+              `${employee.name} is scheduled outside availability on ${dayOfWeek.toUpperCase()} (${assignment.startTime}-${assignment.endTime})`,
+              "StaffAssignment",
+              assignment.id,
+              citationId,
+              "error",
+              {
+                employeeId: employee.id,
+                employeeName: employee.name,
+                dayOfWeek,
+                date,
+                reason: "outside-availability-window",
+                assignmentWindow: `${assignment.startTime}-${assignment.endTime}`,
+                availableWindows: blocks.map((block) => `${block.startTime}-${block.endTime}`),
+                relatedSegmentBlockIds: [assignment.segmentBlockId]
+              }
+            )
+          );
+        }
+      });
+
+    return violations;
+  }
+};
+
 export const shiftBreakLimitsRule: RuleDefinition = {
   id: "shift-break-limits",
   description: "Prevents exceeding max shift lengths or weekly hour caps",
@@ -1050,6 +1165,7 @@ export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
   scheduleDayMetadataRule,
   ratioSegmentRule,
   segmentBlockTimelineRule,
+  employeeAvailabilityRule,
   shiftBreakLimitsRule,
   openCloseCoverageRule,
   medicalDelegatedCoverageRule,

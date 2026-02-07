@@ -52,6 +52,8 @@ const formatDateLabel = (value?: string) => {
   return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 };
 
+const normalizeDateOnly = (value: string) => value.split("T")[0];
+
 const getDurationHours = (start: string, end: string) => {
   const [startHour, startMinute] = start.split(":").map(Number);
   const [endHour, endMinute] = end.split(":").map(Number);
@@ -198,6 +200,49 @@ export default function ScheduleMatrix({
     return map;
   }, {} as Record<DayOfWeek, SegmentBlock[]>);
 
+  const isEmployeeRequestedOff = (employee: Employee, day: DayOfWeek) => {
+    const dayDate = dayMetadataByDay[day]?.date;
+    if (!dayDate) {
+      return false;
+    }
+    const normalizedDayDate = normalizeDateOnly(dayDate);
+    return (employee.requestedDaysOff ?? []).some((dayOff) => normalizeDateOnly(dayOff.date) === normalizedDayDate);
+  };
+
+  const getAvailabilityForDay = (employee: Employee, day: DayOfWeek) =>
+    employee.availability?.find((entry) => entry.dayOfWeek === day);
+
+  const getAvailabilityViolationMessage = (
+    employee: Employee,
+    day: DayOfWeek,
+    startTime: string,
+    endTime: string
+  ) => {
+    if (isEmployeeRequestedOff(employee, day)) {
+      return "Employee requested this day off";
+    }
+    const availabilityDay = getAvailabilityForDay(employee, day);
+    if (!availabilityDay) {
+      return null;
+    }
+    const windows = availabilityDay.blocks ?? [];
+    if (windows.length === 0) {
+      return "Employee is unavailable this day";
+    }
+    const start = parseTimeToMinutes(startTime);
+    const end = parseTimeToMinutes(endTime);
+    const fitsWindow = windows.some((window) => {
+      const windowStart = parseTimeToMinutes(window.startTime);
+      const windowEnd = parseTimeToMinutes(window.endTime);
+      return start >= windowStart && end <= windowEnd;
+    });
+    if (fitsWindow) {
+      return null;
+    }
+    const labels = windows.map((window) => `${formatTime(window.startTime)}-${formatTime(window.endTime)}`);
+    return `Outside availability (${labels.join(", ")})`;
+  };
+
   useEffect(() => {
     if (!primaryFocusedSegmentId) return;
     const focusedSegment = segmentById[primaryFocusedSegmentId];
@@ -257,7 +302,7 @@ export default function ScheduleMatrix({
                 minWidth: 220
               }}
             >
-              Employee name
+              Employee
             </th>
             {daySequence.map((day) => {
               const dayMeta = dayMetadataByDay[day];
@@ -492,11 +537,16 @@ export default function ScheduleMatrix({
                     .slice(0, 2);
                   const operatingWindow = operatingWindowByDay[day];
                   const dayHours = getHoursForDay(member.id, day);
+                  const closedDay = isClosedDay(day);
+                  const hasRequestedDayOff = isEmployeeRequestedOff(member, day);
+                  const availabilityForDay = getAvailabilityForDay(member, day);
+                  const hasAvailabilityEntry = Boolean(availabilityForDay);
+                  const isAvailableDay = !hasAvailabilityEntry || (availabilityForDay?.blocks?.length ?? 0) > 0;
+                  const canCreateAssignment = !closedDay && !hasRequestedDayOff && isAvailableDay;
                   const isOverDaily = dayHours > member.maxHoursPerDay;
                   const cellBorder = isOverDaily ? "2px solid #dc2626" : "1px solid #e5e7eb";
                   const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
                   const isFocusedDay = focusedDay === day;
-                  const closedDay = isClosedDay(day);
 
                   return (
                     <td
@@ -551,6 +601,12 @@ export default function ScheduleMatrix({
                         {blocks.map((block) => {
                           const overlapMessage =
                             editing && editing.assignmentId === block.id ? getOverlapMessage(editing) : null;
+                          const availabilityMessage = getAvailabilityViolationMessage(
+                            member,
+                            day,
+                            block.startTime,
+                            block.endTime
+                          );
                           const isOpener = operatingWindow
                             ? Math.abs(parseTimeToMinutes(block.startTime) - operatingWindow.open) <=
                               openerWindowMinutes
@@ -568,6 +624,7 @@ export default function ScheduleMatrix({
                                 : "#ecfeff";
                           const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
                           const isFocused = focusedSet.has(block.segmentBlockId);
+                          const hasAvailabilityViolation = Boolean(availabilityMessage);
 
                           return (
                             <motion.div
@@ -580,8 +637,17 @@ export default function ScheduleMatrix({
                                 gap: "0.25rem",
                                 padding: "0.25rem 0.4rem",
                                 borderRadius: 8,
-                                background: isFocused ? "#fef3c7" : blockBackground,
-                                border: isFocused ? "2px solid #f59e0b" : blockBorder,
+                                background: hasAvailabilityViolation
+                                  ? "#fee2e2"
+                                  : isFocused
+                                    ? "#fef3c7"
+                                    : blockBackground,
+                                border: hasAvailabilityViolation
+                                  ? "2px solid #dc2626"
+                                  : isFocused
+                                    ? "2px solid #f59e0b"
+                                    : blockBorder,
+                                position: "relative",
                                 fontSize: "0.75rem",
                                 fontWeight: 600,
                                 cursor: "pointer",
@@ -604,7 +670,30 @@ export default function ScheduleMatrix({
                                   isNew: false
                                 });
                               }}
+                              title={availabilityMessage ?? undefined}
                             >
+                              {hasAvailabilityViolation && (
+                                <span
+                                  style={{
+                                    position: "absolute",
+                                    top: 4,
+                                    right: 4,
+                                    width: 16,
+                                    height: 16,
+                                    borderRadius: "50%",
+                                    border: "1px solid #dc2626",
+                                    background: "#fff",
+                                    color: "#b91c1c",
+                                    fontSize: "0.65rem",
+                                    fontWeight: 700,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}
+                                >
+                                  ?
+                                </span>
+                              )}
                               {editing?.assignmentId === block.id ? (
                                 <>
                                   <input
@@ -698,7 +787,7 @@ export default function ScheduleMatrix({
                             </motion.div>
                           );
                         })}
-                        {!closedDay && dayHours < member.maxHoursPerDay && (
+                        {canCreateAssignment && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
                             transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
@@ -740,6 +829,15 @@ export default function ScheduleMatrix({
                           >
                             Add block
                           </motion.button>
+                        )}
+                        {!closedDay && !canCreateAssignment && (
+                          <span style={{ fontSize: "0.7rem", color: "#b91c1c", fontWeight: 600 }}>
+                            {hasRequestedDayOff
+                              ? "Requested day off"
+                              : hasAvailabilityEntry
+                                ? "Unavailable this day"
+                                : "Unavailable"}
+                          </span>
                         )}
                         {!closedDay &&
                           editing?.isNew &&

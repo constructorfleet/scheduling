@@ -59,6 +59,7 @@ const RULE_TITLES: Record<string, string> = {
   "cpr-current-required": "CPR current required",
   "schedule-day-metadata": "Missing day details",
   "segment-block-timeline": "Clock block timeline issue",
+  "employee-availability": "Employee availability",
   "field-trip-event": "Field trip data issue",
   "certification-per-segment": "Certification coverage gap",
   "segment-coverage": "Coverage gap"
@@ -70,7 +71,9 @@ const RECOMMENDED_ACTIONS: Record<string, string> = {
   "field-trip-ratios": "Reconcile adult and leader counts with the ratio required for this trip.",
   "open-close-coverage": "Add the required opener/closer coverage and ensure a leader-qualified staff member is present.",
   "medical-delegated-coverage": "Assign medically delegated staff to meet the minimum requirement.",
-  "cpr-current-required": "Replace the staff member with a current CPR certification."
+  "cpr-current-required": "Replace the staff member with a current CPR certification.",
+  "employee-availability":
+    "Update employee availability/time-off settings or move the assignment inside an available window."
 };
 
 const RULE_POLICY_CITATIONS = {
@@ -79,7 +82,8 @@ const RULE_POLICY_CITATIONS = {
   "field-trip-ratios": policyCitations.fieldTrip.id,
   "open-close-coverage": policyCitations.leaderCoverage.id,
   "medical-delegated-coverage": policyCitations.breakPolicy.id,
-  "cpr-current-required": policyCitations.breakPolicy.id
+  "cpr-current-required": policyCitations.breakPolicy.id,
+  "employee-availability": policyCitations.breakPolicy.id
 } as const;
 
 const SEVERITY_MAP: Record<EngineRuleViolation["severity"], UiRuleViolation["severity"]> = {

@@ -361,4 +361,39 @@ describe("ScheduleMatrix", () => {
     const enrollmentInput = screen.getByRole("spinbutton");
     expect(enrollmentInput).toBeDisabled();
   });
+
+  it("prevents adding assignments when employee requested the day off", () => {
+    const dayOffStaff: Employee[] = [
+      {
+        ...baseStaff[0],
+        requestedDaysOff: [{ id: "off-1", date: "2026-02-02", note: "Vacation" }]
+      }
+    ];
+    renderMatrix({ staff: dayOffStaff });
+
+    expect(screen.queryByRole("button", { name: "Add block" })).not.toBeInTheDocument();
+    expect(screen.getByText("Requested day off")).toBeInTheDocument();
+  });
+
+  it("marks assignments that violate availability", () => {
+    const availabilityStaff: Employee[] = [
+      {
+        ...baseStaff[0],
+        availability: [
+          {
+            dayOfWeek: "mon",
+            blocks: [{ startTime: "10:00", endTime: "12:00" }]
+          }
+        ]
+      }
+    ];
+    renderMatrix({ staff: availabilityStaff });
+
+    const block = document.querySelector<HTMLElement>('[data-segment-id="segment-mon-open"]');
+    expect(block).not.toBeNull();
+    expect(block?.style.border).toContain("rgb(220, 38, 38)");
+    expect(block).toHaveAttribute("title");
+    expect(block?.getAttribute("title")).toContain("Outside availability");
+    expect(within(block as HTMLElement).getByText("?")).toBeInTheDocument();
+  });
 });

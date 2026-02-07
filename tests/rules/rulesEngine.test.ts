@@ -55,6 +55,8 @@ const createEmployee = (id: string, overrides: Partial<Employee> = {}): Employee
   leaderQualified: false,
   medicallyDelegated: false,
   cprCurrent: false,
+  availability: [],
+  requestedDaysOff: [],
   ...overrides
 });
 
@@ -724,6 +726,67 @@ describe("RulesEngine", () => {
       dayOfWeek: "mon"
     });
     expect(timelineViolations[0].message).toContain("invalid window");
+  });
+
+  test("flags assignments scheduled on an employee requested day off", () => {
+    const day = createScheduleDay("day-timeoff", {
+      date: "2026-02-16",
+      dayOfWeek: "mon"
+    });
+    const block = createSegmentBlock("block-timeoff", {
+      dayOfWeek: "mon",
+      scheduleDayId: day.id
+    });
+    const assignment = createAssignment("assign-timeoff", block.id, "emp-timeoff");
+    const employee = createEmployee("emp-timeoff", {
+      requestedDaysOff: [{ id: "off-1", date: "2026-02-16", note: "Personal" }]
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [employee]
+    });
+
+    const violations = engine.evaluate(context);
+    const availabilityViolation = violations.find((violation) => violation.ruleId === "employee-availability");
+    expect(availabilityViolation).toBeDefined();
+    expect(availabilityViolation?.message).toContain("requested day off");
+    expect(availabilityViolation?.target.id).toBe(assignment.id);
+  });
+
+  test("flags assignments outside configured availability windows", () => {
+    const day = createScheduleDay("day-availability", {
+      dayOfWeek: "mon"
+    });
+    const block = createSegmentBlock("block-availability", {
+      dayOfWeek: "mon",
+      scheduleDayId: day.id
+    });
+    const assignment = createAssignment("assign-availability", block.id, "emp-availability", {
+      startTime: "12:00",
+      endTime: "14:00"
+    });
+    const employee = createEmployee("emp-availability", {
+      availability: [
+        {
+          dayOfWeek: "mon",
+          blocks: [{ startTime: "08:00", endTime: "11:00" }]
+        }
+      ]
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [employee]
+    });
+
+    const violations = engine.evaluate(context);
+    const availabilityViolation = violations.find((violation) => violation.ruleId === "employee-availability");
+    expect(availabilityViolation).toBeDefined();
+    expect(availabilityViolation?.message).toContain("outside availability");
+    expect(availabilityViolation?.target.id).toBe(assignment.id);
   });
 
   test("flags overlapping assignments for the same employee/day", () => {
