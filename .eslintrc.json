@@ -20,7 +20,8 @@
     "dist-static/",
     "node_modules/",
     "apps/ui/data/generated/",
-    "apps/api/generated/"
+    "apps/api/generated/",
+    "scripts/"
   ],
   "rules": {
     "no-console": "warn",

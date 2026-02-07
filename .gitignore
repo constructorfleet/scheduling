@@ -5,3 +5,4 @@ dist/
 **/dist/
 dist-static/
 dist-static-*.tar.gz
+dist-api/
