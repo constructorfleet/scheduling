@@ -12,3 +12,10 @@ export const getPrisma = (): PrismaClient => {
   }
   return prismaClient;
 };
+
+export const resetPrisma = async () => {
+  if (prismaClient) {
+    await prismaClient.$disconnect();
+    prismaClient = null;
+  }
+};

@@ -2,8 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AuthSessionResponse } from '../models/AuthSessionResponse';
 import type { GenericOk } from '../models/GenericOk';
 import type { HealthResponse } from '../models/HealthResponse';
+import type { LoginPayload } from '../models/LoginPayload';
+import type { MeResponse } from '../models/MeResponse';
 import type { ScheduleSavePayload } from '../models/ScheduleSavePayload';
 import type { ScheduleWeekResponse } from '../models/ScheduleWeekResponse';
 import type { SettingsPayload } from '../models/SettingsPayload';
@@ -22,6 +25,47 @@ export class DefaultService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/health',
+        });
+    }
+    /**
+     * Authenticate a user and create a session
+     * @param requestBody
+     * @returns AuthSessionResponse Authenticated user context
+     * @throws ApiError
+     */
+    public static postApiAuthLogin(
+        requestBody: LoginPayload,
+    ): CancelablePromise<AuthSessionResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/login',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * Revoke current session and clear cookie
+     * @returns GenericOk Logout complete
+     * @throws ApiError
+     */
+    public static postApiAuthLogout(): CancelablePromise<GenericOk> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/logout',
+        });
+    }
+    /**
+     * Get current authenticated user
+     * @returns MeResponse Authenticated user profile
+     * @throws ApiError
+     */
+    public static getApiAuthMe(): CancelablePromise<MeResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/auth/me',
+            errors: {
+                401: `Not authenticated`,
+            },
         });
     }
     /**

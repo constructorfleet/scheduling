@@ -15,6 +15,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+  /api/auth/login:
+    post:
+      summary: Authenticate a user and create a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginPayload'
+      responses:
+        '200':
+          description: Authenticated user context
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSessionResponse'
+  /api/auth/logout:
+    post:
+      summary: Revoke current session and clear cookie
+      responses:
+        '200':
+          description: Logout complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+  /api/auth/me:
+    get:
+      summary: Get current authenticated user
+      responses:
+        '200':
+          description: Authenticated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Not authenticated
   /api/settings/{schoolId}:
     get:
       summary: Get settings for a school
@@ -97,6 +135,70 @@ components:
         status:
           type: string
       required: [status]
+    Role:
+      type: string
+      enum: [owner, director, scheduler, viewer]
+    LoginPayload:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        schoolId:
+          type: string
+      required: [email, password]
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+      required: [id, email, displayName]
+    SchoolMembership:
+      type: object
+      properties:
+        schoolId:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+      required: [schoolId, role]
+    SessionInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [id, expiresAt]
+    AuthSessionResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/AuthUser'
+        currentSchoolId:
+          type: string
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+        session:
+          $ref: '#/components/schemas/SessionInfo'
+      required: [user, currentSchoolId, memberships, session]
+    MeResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/AuthUser'
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+      required: [user, memberships]
     DayOfWeek:
       type: string
       enum: [mon, tue, wed, thu, fri, sat, sun]
