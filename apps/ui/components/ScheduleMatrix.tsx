@@ -156,13 +156,25 @@ export default function ScheduleMatrix({
     return dayAssignments.reduce((sum, assignment) => sum + getDurationHours(assignment.startTime, assignment.endTime), 0);
   };
 
+  const segmentBlocksByDay = daySequence.reduce<Record<DayOfWeek, SegmentBlock[]>>((map, day) => {
+    map[day] = segmentBlocks.filter((block) => block.dayOfWeek === day);
+    return map;
+  }, {} as Record<DayOfWeek, SegmentBlock[]>);
+
   useEffect(() => {
     if (!focusedSegmentId) return;
-    const target = document.querySelector<HTMLElement>(`[data-segment-id="${focusedSegmentId}"]`);
+    const focusedSegment = segmentById[focusedSegmentId];
+    const target =
+      document.querySelector<HTMLElement>(
+        `[data-segment-id="${focusedSegmentId}"]:not([data-segment-anchor="true"])`
+      ) ??
+      (focusedSegment
+        ? document.querySelector<HTMLElement>(`[data-day-column-header="${focusedSegment.dayOfWeek}"]`)
+        : null);
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
-  }, [focusedSegmentId]);
+  }, [focusedSegmentId, segmentById]);
 
   return (
     <motion.section
@@ -213,15 +225,19 @@ export default function ScheduleMatrix({
             {daySequence.map((day) => {
               const dayMeta = dayMetadataByDay[day];
               const fieldTripEvent = fieldTripEventsByDay[day];
+              const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
+              const isFocusedDay = focusedDay === day;
               return (
                 <th
                   key={`header-${day}`}
+                  data-day-column-header={day}
                   style={{
                     padding: "0.5rem",
                     border: "1px solid #e5e7eb",
-                    background: "#f8fafc",
+                    background: isFocusedDay ? "#e0ecff" : "#f8fafc",
                     minWidth: 200,
-                    verticalAlign: "top"
+                    verticalAlign: "top",
+                    boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
                   }}
                 >
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
@@ -345,7 +361,7 @@ export default function ScheduleMatrix({
               .flat()
               .reduce((sum, assignment) => sum + getDurationHours(assignment.startTime, assignment.endTime), 0);
             const overscheduled = totalHours > member.maxHoursPerWeek;
-            const badges = [];
+            const badges: string[] = [];
             if (member.leaderQualified) badges.push("Leader");
             if (member.cprCurrent) badges.push("CPR");
             if (member.medicallyDelegated) badges.push("Med Del");
@@ -394,6 +410,8 @@ export default function ScheduleMatrix({
                   const dayHours = getHoursForDay(member.id, day);
                   const isOverDaily = dayHours > member.maxHoursPerDay;
                   const cellBorder = isOverDaily ? "2px solid #dc2626" : "1px solid #e5e7eb";
+                  const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
+                  const isFocusedDay = focusedDay === day;
 
                   return (
                     <td
@@ -402,10 +420,24 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: "#fff",
+                        background: isFocusedDay ? "#f6faff" : "#fff",
                         position: "relative"
                       }}
                     >
+                      {segmentBlocksByDay[day]?.map((block) => (
+                        <span
+                          key={`anchor-${member.id}-${block.id}`}
+                          data-segment-anchor-id={block.id}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: 1,
+                            height: 1,
+                            overflow: "hidden"
+                          }}
+                        />
+                      ))}
                       {isOverDaily && (
                         <span
                           title="Over max hours"

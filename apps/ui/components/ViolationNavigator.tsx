@@ -68,15 +68,25 @@ export default function ViolationNavigator({
   };
 
   const getTargetForSegment = (segmentId: string) => {
-    const candidates = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        `[data-timeline-segment-id="${segmentId}"], [data-segment-id="${segmentId}"]`
-      )
-    );
-    if (!candidates.length) {
-      return null;
+    const visibleTimeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
+    if (visibleTimeline && visibleTimeline.offsetParent !== null) {
+      return visibleTimeline;
     }
-    return candidates.find((el) => el.offsetParent !== null) ?? candidates[0];
+    const visibleBlock = document.querySelector<HTMLElement>(
+      `[data-segment-id="${segmentId}"]`
+    );
+    if (visibleBlock && visibleBlock.offsetParent !== null) {
+      return visibleBlock;
+    }
+    const anchor = document.querySelector<HTMLElement>(`[data-segment-anchor-id="${segmentId}"]`);
+    const dayColumn = anchor?.closest("td")?.cellIndex;
+    if (typeof dayColumn === "number" && dayColumn > 0) {
+      const header = document.querySelector<HTMLElement>(`th:nth-child(${dayColumn + 1})[data-day-column-header]`);
+      if (header) {
+        return header;
+      }
+    }
+    return anchor;
   };
 
   const adjustForTarget = (segmentId: string) => {
