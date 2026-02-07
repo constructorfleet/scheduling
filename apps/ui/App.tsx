@@ -792,7 +792,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (authStatus !== "authenticated" || !canViewSchool) {
+    if (IS_TEST_ENV) {
       return;
     }
     let isActive = true;
