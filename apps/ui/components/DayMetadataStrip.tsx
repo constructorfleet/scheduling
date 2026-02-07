@@ -170,9 +170,9 @@ export default function DayMetadataStrip({
               <label style={{ fontSize: "0.75rem", color: "#374151" }}>Field trip selection</label>
               <select
                 value={
-                  fieldTripEvent?.isNoFieldTrip
-                    ? "no-field-trip"
-                    : fieldTripEvent?.fieldTripTypeId ?? ""
+                  fieldTripEvent?.fieldTripTypeId
+                    ? fieldTripEvent.fieldTripTypeId
+                    : "no-field-trip"
                 }
                 onChange={(event) => {
                   const value = event.target.value;
@@ -198,7 +198,7 @@ export default function DayMetadataStrip({
                 ))}
               </select>
               <p style={{ margin: 0, fontSize: "0.75rem", color: "#6b7280" }}>
-                {fieldTripEvent?.isNoFieldTrip
+                {!fieldTripEvent?.fieldTripTypeId
                   ? "No field trip assigned."
                   : `${fieldTripTypes.find((type) => type.id === fieldTripEvent?.fieldTripTypeId)?.name ?? ""}`}
               </p>

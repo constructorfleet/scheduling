@@ -275,9 +275,9 @@ export default function ScheduleMatrix({
                     <label style={{ fontSize: "0.7rem", color: "#475569" }}>Field trip</label>
                     <select
                       value={
-                        fieldTripEvent?.isNoFieldTrip
-                          ? "no-field-trip"
-                          : fieldTripEvent?.fieldTripTypeId ?? ""
+                        fieldTripEvent?.fieldTripTypeId
+                          ? fieldTripEvent.fieldTripTypeId
+                          : "no-field-trip"
                       }
                       onChange={(event) => {
                         if (!dayMeta) return;

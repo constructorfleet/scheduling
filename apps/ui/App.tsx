@@ -546,6 +546,7 @@ export default function App() {
           setFieldTripEventsState(
             (schedule.fieldTripEvents ?? []).map((event: FieldTripEvent) => ({
               ...event,
+              isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
               signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
             }))
           );

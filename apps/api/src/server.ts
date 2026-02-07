@@ -400,13 +400,14 @@ const buildServer = async () => {
       if (payload.fieldTripEvents?.length) {
         await tx.fieldTripEvent.createMany({
           data: payload.fieldTripEvents.map((event) => ({
+            // If no trip type is selected, default to "No Field Trip".
+            isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
             id: event.id,
             scheduleWeekId: weekId,
             dayOfWeek: event.dayOfWeek,
             segment: event.segment,
             scheduleDayId: event.scheduleDayId ?? null,
             fieldTripTypeId: event.fieldTripTypeId ?? null,
-            isNoFieldTrip: !!event.isNoFieldTrip,
             approverId: event.approverId ?? null,
             signedOffAt: event.signedOffAt ? new Date(event.signedOffAt) : null,
             notes: event.notes ?? null

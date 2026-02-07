@@ -117,11 +117,27 @@ export const ratioSegmentRule: RuleDefinition = {
         minStaff = schoolRules.closerCount;
       }
       const requiredStaff = Math.max(minStaff, requiredFromRatio);
-      // Only count real scheduled staff (ignore orphan/completed assignments).
-      const assigned = getAssignmentsForBlock(context, block.id).filter((assignment) => {
-        const employee = getEmployeeById(context, assignment.employeeId);
-        return Boolean(employee) && assignment.status !== "completed";
-      }).length;
+      // Count unique staff overlapping the block window, regardless of which segment-block id they came from.
+      const blockStart = parseTimeToMinutes(block.startTime);
+      const blockEnd = parseTimeToMinutes(block.endTime);
+      const assigned = new Set(
+        context.staffAssignments
+          .filter((assignment) => assignment.status !== "completed")
+          .filter((assignment) => {
+            const employee = getEmployeeById(context, assignment.employeeId);
+            if (!employee) {
+              return false;
+            }
+            const assignmentDay = getDayOfWeekForAssignment(context, assignment);
+            if (assignmentDay !== block.dayOfWeek) {
+              return false;
+            }
+            const assignmentStart = parseTimeToMinutes(assignment.startTime);
+            const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+            return assignmentStart < blockEnd && assignmentEnd > blockStart;
+          })
+          .map((assignment) => assignment.employeeId)
+      ).size;
       if (assigned < requiredStaff) {
         const citationId = getCitationId(
           context,
@@ -784,8 +800,7 @@ export const fieldTripEventIntegrityRule: RuleDefinition = {
         return;
       }
 
-      const noFieldTripSelected =
-        event.isNoFieldTrip === true || (!event.fieldTripTypeId && event.isNoFieldTrip !== false);
+      const noFieldTripSelected = !event.fieldTripTypeId || event.isNoFieldTrip === true;
       if (noFieldTripSelected) {
         return;
       }
