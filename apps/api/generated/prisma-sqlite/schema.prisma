@@ -137,16 +137,15 @@ model FieldTripEvent {
 }
 
 model SegmentBlock {
-  id                  String  @id @default(cuid())
-  scheduleWeekId      String
-  scheduleDayId       String?
-  dayOfWeek           String
-  segment             String
-  startTime           String
-  endTime             String
-  childCount          Int
-  requirementTemplate Json
-  status              String
+  id             String  @id @default(cuid())
+  scheduleWeekId String
+  scheduleDayId  String?
+  dayOfWeek      String
+  segment        String
+  startTime      String
+  endTime        String
+  childCount     Int
+  status         String
 
   scheduleWeek     ScheduleWeek      @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
   staffAssignments StaffAssignment[]

@@ -447,7 +447,7 @@ export default function ClockBlockTimeline({
                       scheduleDaysByDow[segment.dayOfWeek];
                     const ratioChildren =
                       (scheduleDay?.scheduleType ? scheduleTypeRatios[scheduleDay.scheduleType] : undefined) ?? 0;
-                    let minStaff = segment.requirementTemplate.minStaff ?? 0;
+                    let minStaff = 0;
                     if (segment.segment === "open" && (schoolRules?.openerCount ?? 0) > 0) {
                       minStaff = schoolRules?.openerCount ?? minStaff;
                     } else if (segment.segment === "close" && (schoolRules?.closerCount ?? 0) > 0) {

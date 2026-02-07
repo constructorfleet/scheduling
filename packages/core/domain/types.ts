@@ -16,14 +16,6 @@ export interface PolicyCitation {
   notes?: string;
 }
 
-export interface RatioProfile {
-  id: string;
-  childrenPerStaff: number;
-  leaderRequired?: boolean;
-  policyCitationId: string;
-  notes?: string;
-}
-
 export interface FieldTripType {
   id: string;
   name: string;
@@ -43,17 +35,6 @@ export interface OperatingHours {
   notes?: string;
 }
 
-export interface SegmentRequirementTemplate {
-  id: string;
-  ratioProfile: RatioProfile;
-  minStaff: number;
-  requiresCpr: boolean;
-  requiresMedicalDelegation: boolean;
-  requiresLeader: boolean;
-  policyCitationId: string;
-  notes?: string;
-}
-
 export interface SegmentBlock {
   id: string;
   scheduleWeekId: string;
@@ -63,7 +44,6 @@ export interface SegmentBlock {
   startTime: string;
   endTime: string;
   childCount: number;
-  requirementTemplate: SegmentRequirementTemplate;
   fieldTripEventId?: string;
   status: ScheduleStatus;
   operatingCapacityOverride?: number;

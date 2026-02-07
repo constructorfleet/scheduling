@@ -39,6 +39,26 @@ export const getFieldTripEventById = (
 ): FieldTripEvent | undefined =>
   context.fieldTripEvents.find((event) => event.id === eventId);
 
+export const getFieldTripEventForBlock = (
+  context: RulesContext,
+  block: SegmentBlock
+): FieldTripEvent | undefined => {
+  if (block.fieldTripEventId) {
+    return getFieldTripEventById(context, block.fieldTripEventId);
+  }
+  const scheduleDay = getScheduleDayById(context, block.scheduleDayId);
+  if (scheduleDay?.fieldTripEventId) {
+    return getFieldTripEventById(context, scheduleDay.fieldTripEventId);
+  }
+  return context.fieldTripEvents.find((event) => {
+    return (
+      event.scheduleWeekId === block.scheduleWeekId &&
+      event.dayOfWeek === block.dayOfWeek &&
+      event.segment === block.segment
+    );
+  });
+};
+
 export const getFieldTripTypeById = (
   context: RulesContext,
   typeId?: string

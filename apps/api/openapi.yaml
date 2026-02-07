@@ -353,47 +353,6 @@ components:
         notes:
           type: string
       required: [id, schoolId, name, minAdultStudentRatio, minLeaderStudentRatio]
-    RatioProfile:
-      type: object
-      properties:
-        id:
-          type: string
-        childrenPerStaff:
-          type: number
-        leaderRequired:
-          type: boolean
-        policyCitationId:
-          type: string
-        notes:
-          type: string
-      required: [id, childrenPerStaff, policyCitationId]
-    SegmentRequirementTemplate:
-      type: object
-      properties:
-        id:
-          type: string
-        ratioProfile:
-          $ref: '#/components/schemas/RatioProfile'
-        minStaff:
-          type: integer
-        requiresCpr:
-          type: boolean
-        requiresMedicalDelegation:
-          type: boolean
-        requiresLeader:
-          type: boolean
-        policyCitationId:
-          type: string
-        notes:
-          type: string
-      required:
-        - id
-        - ratioProfile
-        - minStaff
-        - requiresCpr
-        - requiresMedicalDelegation
-        - requiresLeader
-        - policyCitationId
     ScheduleWeek:
       type: object
       properties:
@@ -453,8 +412,6 @@ components:
           type: string
         childCount:
           type: integer
-        requirementTemplate:
-          $ref: '#/components/schemas/SegmentRequirementTemplate'
         fieldTripEventId:
           type: string
         status:
@@ -463,7 +420,7 @@ components:
           type: integer
         closedReason:
           type: string
-      required: [id, scheduleWeekId, dayOfWeek, segment, startTime, endTime, childCount, requirementTemplate, status]
+      required: [id, scheduleWeekId, dayOfWeek, segment, startTime, endTime, childCount, status]
     StaffAssignment:
       type: object
       properties:

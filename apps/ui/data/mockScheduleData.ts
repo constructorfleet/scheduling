@@ -6,9 +6,7 @@ import {
   FieldTripType,
   OperatingHours,
   PolicyCitation,
-  RatioProfile,
   SegmentBlock,
-  SegmentRequirementTemplate,
   StaffAssignment,
   Employee,
   ScheduleDay,
@@ -86,25 +84,6 @@ export const scheduleTypeOptions: {
     description: "School closed for the day."
   }
 ];
-
-const ratioProfile: RatioProfile = {
-  id: "ratio-preschool",
-  childrenPerStaff: 6,
-  leaderRequired: true,
-  policyCitationId: policyCitations.ratio.id,
-  notes: "1 staff per 6 children and one leader per segment"
-};
-
-export const requirementTemplate: SegmentRequirementTemplate = {
-  id: "template-all-day",
-  ratioProfile,
-  minStaff: 3,
-  requiresCpr: true,
-  requiresMedicalDelegation: true,
-  requiresLeader: true,
-  policyCitationId: policyCitations.ratio.id,
-  notes: "Standard preschool segment requirements"
-};
 
 export const segmentSlotDefinitions: Record<
   DaySegment,
@@ -282,7 +261,6 @@ const createSegmentBlocks = (): SegmentBlock[] => {
         startTime: slot.start,
         endTime: slot.end,
         childCount,
-        requirementTemplate,
         status: day === "mon" && segmentKey === "open" ? "draft" : "draft",
         fieldTripEventId: isFieldTrip ? "field-trip-1" : undefined,
         operatingCapacityOverride: isFieldTrip ? 22 : undefined

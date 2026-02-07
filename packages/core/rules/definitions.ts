@@ -216,20 +216,24 @@ export const certificationPerSegmentRule: RuleDefinition = {
     "Validates that each segment includes employees with current CPR, medical delegation, and leader qualifications when required",
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
+    const schoolRules = getSchoolRules(context);
     context.segmentBlocks.forEach((block) => {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
       const employees = assignedEmployeesForBlock(context, block.id);
-      const { requiresCpr, requiresMedicalDelegation, requiresLeader, policyCitationId } =
-        block.requirementTemplate;
       const citationId = getCitationId(
         context,
         "certification-per-segment",
-        policyCitationId
+        DEFAULT_POLICY_CITATIONS["certification-per-segment"]
       );
+      const requiresLeader =
+        (block.segment === "open" || block.segment === "close") &&
+        employees.some((employee) => {
+          return context.jobTitleRules?.[employee.jobTitle]?.requiresLeaderForOpenClose ?? false;
+        });
 
-      if (requiresCpr && !employees.some((employee) => employee.cprCurrent)) {
+      if (schoolRules.requireCurrentCpr && !employees.some((employee) => employee.cprCurrent)) {
         violations.push(
           buildViolation(
             "certification-per-segment",
@@ -242,7 +246,7 @@ export const certificationPerSegmentRule: RuleDefinition = {
       }
 
       if (
-        requiresMedicalDelegation &&
+        schoolRules.minimumMedicalDelegated > 0 &&
         !employees.some((employee) => employee.medicallyDelegated)
       ) {
         violations.push(
@@ -277,14 +281,22 @@ export const segmentCoverageRule: RuleDefinition = {
   description: "Enforces leader and medical coverage guardrails per segment",
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
+    const schoolRules = getSchoolRules(context);
     context.segmentBlocks.forEach((block) => {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
       const employees = assignedEmployeesForBlock(context, block.id);
-      const { requiresLeader, requiresMedicalDelegation, policyCitationId } =
-        block.requirementTemplate;
-      const citationId = getCitationId(context, "segment-coverage", policyCitationId);
+      const citationId = getCitationId(
+        context,
+        "segment-coverage",
+        DEFAULT_POLICY_CITATIONS["segment-coverage"]
+      );
+      const requiresLeader =
+        (block.segment === "open" || block.segment === "close") &&
+        employees.some((employee) => {
+          return context.jobTitleRules?.[employee.jobTitle]?.requiresLeaderForOpenClose ?? false;
+        });
 
       if (requiresLeader && !employees.some((employee) => employee.leaderQualified)) {
         violations.push(
@@ -299,7 +311,7 @@ export const segmentCoverageRule: RuleDefinition = {
       }
 
       if (
-        requiresMedicalDelegation &&
+        schoolRules.minimumMedicalDelegated > 0 &&
         !employees.some((employee) => employee.medicallyDelegated)
       ) {
         violations.push(

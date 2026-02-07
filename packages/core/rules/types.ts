@@ -17,6 +17,7 @@ export interface RulesContext {
   fieldTripEvents: FieldTripEvent[];
   fieldTripTypes: FieldTripType[];
   operatingHours: OperatingHours[];
+  scheduleTypeRatios?: Record<string, number>;
   schoolRules?: SchoolRules;
   jobTitleRules?: Record<string, JobTitleRule>;
   policyCitations?: PolicyCitation[];

@@ -6,9 +6,9 @@ import { applyDbEnv, isDebugEnabled } from "./config";
 import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
-import type { Prisma } from "../generated/prisma-client";
+import type { Prisma as SqlitePrisma } from "../generated/prisma-sqlite";
 
-type DbTransaction = Prisma.TransactionClient;
+type DbTransaction = SqlitePrisma.TransactionClient;
 
 type ScheduleWeekPayload = {
   schoolId: string;
@@ -50,7 +50,6 @@ type SegmentBlockPayload = {
   startTime: string;
   endTime: string;
   childCount: number;
-  requirementTemplate: Prisma.InputJsonValue;
   status: string;
 };
 
@@ -89,7 +88,7 @@ const buildServer = async () => {
 
   fastify.get("/api/settings/:schoolId", async (request) => {
     const { schoolId } = request.params as { schoolId: string };
-    const prisma = getPrisma();
+    const prisma = await getPrisma();
     const school = await prisma.school.findUnique({
       where: { id: schoolId },
       include: {
@@ -160,7 +159,7 @@ const buildServer = async () => {
       }>;
     };
 
-    const prisma = getPrisma();
+    const prisma = await getPrisma();
 
     const school = await prisma.$transaction(async (tx: DbTransaction) => {
       const upsertedSchool = await tx.school.upsert({
@@ -263,7 +262,7 @@ const buildServer = async () => {
 
   fastify.get("/api/schedule/:weekId", async (request) => {
     const { weekId } = request.params as { weekId: string };
-    const prisma = getPrisma();
+    const prisma = await getPrisma();
     const scheduleWeek = await prisma.scheduleWeek.findUnique({
       where: { id: weekId },
       include: {
@@ -289,7 +288,7 @@ const buildServer = async () => {
       fieldTripEvents: FieldTripEventPayload[];
     };
 
-    const prisma = getPrisma();
+    const prisma = await getPrisma();
     await prisma.$transaction(async (tx: DbTransaction) => {
       await tx.school.upsert({
         where: { id: payload.scheduleWeek.schoolId },
@@ -372,7 +371,6 @@ const buildServer = async () => {
             startTime: block.startTime,
             endTime: block.endTime,
             childCount: block.childCount,
-            requirementTemplate: block.requirementTemplate,
             status: block.status
           }))
         });

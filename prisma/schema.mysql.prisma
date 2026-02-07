@@ -144,7 +144,6 @@ model SegmentBlock {
   startTime           String
   endTime             String
   childCount          Int
-  requirementTemplate Json
   status              String
 
   scheduleWeek        ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)

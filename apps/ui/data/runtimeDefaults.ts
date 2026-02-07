@@ -7,7 +7,6 @@ import type {
   ScheduleDay,
   ScheduleStatus,
   SegmentBlock,
-  SegmentRequirementTemplate,
   StaffAssignment,
   Employee
 } from "@core/domain/types";
@@ -85,21 +84,6 @@ export const fieldTripEvents: FieldTripEvent[] = daySequence.map((day) => ({
   isNoFieldTrip: undefined,
   notes: undefined
 }));
-
-export const defaultRequirementTemplate: SegmentRequirementTemplate = {
-  id: "template-default",
-  ratioProfile: {
-    id: "ratio-default",
-    childrenPerStaff: 15,
-    leaderRequired: false,
-    policyCitationId: policyCitations.ratio.id
-  },
-  minStaff: 0,
-  requiresCpr: false,
-  requiresMedicalDelegation: false,
-  requiresLeader: false,
-  policyCitationId: policyCitations.ratio.id
-};
 
 export const segmentBlocks: SegmentBlock[] = [];
 export const staffAssignments: StaffAssignment[] = [];

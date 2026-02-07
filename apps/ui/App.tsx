@@ -9,7 +9,6 @@ import AuditTimeline from "./components/AuditTimeline";
 import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
 import {
   auditTimeline,
-  defaultRequirementTemplate,
   dayDisplayNames,
   daySequence,
   fieldTripEvents,
@@ -977,7 +976,6 @@ export default function App() {
               startTime,
               endTime,
               childCount: scheduleDay?.enrollmentCount ?? 0,
-              requirementTemplate: segmentBlocksState[0]?.requirementTemplate ?? defaultRequirementTemplate,
               status: "draft",
               scheduleDayId: scheduleDay?.id
             };

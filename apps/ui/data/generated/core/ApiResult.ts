@@ -7,5 +7,5 @@ export type ApiResult = {
     readonly ok: boolean;
     readonly status: number;
     readonly statusText: string;
-    readonly body: unknown;
+    readonly body: any;
 };

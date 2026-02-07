@@ -41,19 +41,6 @@ const segmentBlocks: SegmentBlock[] = [
     startTime: "07:00",
     endTime: "09:00",
     childCount: 12,
-    requirementTemplate: {
-      id: "req-1",
-      ratioProfile: {
-        id: "ratio-1",
-        childrenPerStaff: 10,
-        policyCitationId: "policy-1"
-      },
-      minStaff: 1,
-      requiresCpr: false,
-      requiresMedicalDelegation: false,
-      requiresLeader: false,
-      policyCitationId: "policy-1"
-    },
     status: "draft"
   }
 ];

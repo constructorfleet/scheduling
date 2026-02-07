@@ -5,7 +5,6 @@
 import type { DayOfWeek } from './DayOfWeek';
 import type { DaySegment } from './DaySegment';
 import type { ScheduleStatus } from './ScheduleStatus';
-import type { SegmentRequirementTemplate } from './SegmentRequirementTemplate';
 export type SegmentBlock = {
     id: string;
     scheduleWeekId: string;
@@ -15,7 +14,6 @@ export type SegmentBlock = {
     startTime: string;
     endTime: string;
     childCount: number;
-    requirementTemplate: SegmentRequirementTemplate;
     fieldTripEventId?: string;
     status: ScheduleStatus;
     operatingCapacityOverride?: number;

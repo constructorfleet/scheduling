@@ -9,29 +9,10 @@ import type {
   ScheduleDay,
   ScheduleStatus,
   SegmentBlock,
-  SegmentRequirementTemplate,
   StaffAssignment,
   OperatingHours
 } from "@core/domain/types";
 import type { RulesContext } from "@core/rules/types";
-
-const createRequirementTemplate = (
-  overrides: Partial<SegmentRequirementTemplate> = {}
-): SegmentRequirementTemplate => ({
-  id: overrides.id ?? "req-base",
-  ratioProfile: {
-    id: "ratio-base",
-    childrenPerStaff: 8,
-    leaderRequired: false,
-    policyCitationId: "policy-ratio"
-  },
-  minStaff: 0,
-  requiresCpr: false,
-  requiresMedicalDelegation: false,
-  requiresLeader: false,
-  policyCitationId: "policy-ratio",
-  ...overrides
-});
 
 const createSegmentBlock = (
   id: string,
@@ -44,7 +25,6 @@ const createSegmentBlock = (
   startTime: "08:00",
   endTime: "12:00",
   childCount: 20,
-  requirementTemplate: createRequirementTemplate(),
   status: "draft" as ScheduleStatus,
   ...overrides
 });
@@ -159,8 +139,7 @@ const engine = new RulesEngine();
 describe("RulesEngine", () => {
   test("flags ratio violations when assigned staff < required", () => {
     const block = createSegmentBlock("block-ratio", {
-      childCount: 18,
-      requirementTemplate: createRequirementTemplate({ minStaff: 0 })
+      childCount: 18
     });
     const assignment = createAssignment("assign-ratio", block.id, "emp-ratio");
     const context: RulesContext = withDefaultScheduleInfo({
@@ -223,8 +202,7 @@ describe("RulesEngine", () => {
 
   test("allows ratio compliance when ratio and minimums are met", () => {
     const block = createSegmentBlock("block-ratio-clean", {
-      childCount: 24,
-      requirementTemplate: createRequirementTemplate({ minStaff: 3 })
+      childCount: 24
     });
     const employees = [
       createEmployee("emp-ratio-clean-1"),
@@ -239,7 +217,13 @@ describe("RulesEngine", () => {
       staffAssignments: assignments,
       employees,
       fieldTripEvents: [],
-      fieldTripTypes: []
+      fieldTripTypes: [],
+      schoolRules: {
+        openerCount: 3,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      }
     });
 
     const violations = engine.evaluate(context);

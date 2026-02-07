@@ -226,7 +226,6 @@ exports.Prisma.SegmentBlockScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   childCount: 'childCount',
-  requirementTemplate: 'requirementTemplate',
   status: 'status'
 };
 

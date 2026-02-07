@@ -22,6 +22,14 @@ const dayDisplayNames: Record<DayOfWeek, string> = {
 };
 
 const daySequence: DayOfWeek[] = ["mon"];
+const scheduleDays = [
+  {
+    id: "day-1",
+    dayOfWeek: "mon" as DayOfWeek,
+    scheduleType: "regular"
+  }
+];
+const scheduleTypeRatios = { regular: 9 };
 
 const operatingHours: OperatingHours = {
   id: "ops-mon",
@@ -42,20 +50,6 @@ const operatingHoursByDay: Record<DayOfWeek, OperatingHours | undefined> = {
   sun: undefined
 };
 
-const requirementTemplate: SegmentBlock["requirementTemplate"] = {
-  id: "req-timeline",
-  ratioProfile: {
-    id: "ratio-timeline",
-    childrenPerStaff: 9,
-    policyCitationId: "policy-ratio"
-  },
-  minStaff: 1,
-  requiresCpr: false,
-  requiresMedicalDelegation: false,
-  requiresLeader: true,
-  policyCitationId: "policy-ratio"
-};
-
 const segment: SegmentBlock = {
   id: "block-mon-1",
   scheduleWeekId: "week-1",
@@ -64,7 +58,6 @@ const segment: SegmentBlock = {
   startTime: "08:00",
   endTime: "12:00",
   childCount: 18,
-  requirementTemplate,
   status: "draft"
 };
 
@@ -148,6 +141,8 @@ describe("ClockBlockTimeline", () => {
         employees={employees}
         violations={violations}
         focusedSegmentId={segment.id}
+        scheduleDays={scheduleDays}
+        scheduleTypeRatios={scheduleTypeRatios}
         onFocusSegment={focusSegment}
         daySequence={daySequence}
         dayDisplayNames={dayDisplayNames}
@@ -193,6 +188,8 @@ describe("ClockBlockTimeline", () => {
         employees={employees}
         violations={violations}
         focusedSegmentId={segment.id}
+        scheduleDays={scheduleDays}
+        scheduleTypeRatios={scheduleTypeRatios}
         onFocusSegment={focusSegment}
         daySequence={daySequence}
         dayDisplayNames={dayDisplayNames}
