@@ -416,6 +416,51 @@ describe("autoSchedule", () => {
       expect(fullTimeHours).toBeLessThanOrEqual(10);
     });
 
+    it("should extend a first assignment to the employee max daily shift when possible", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 12
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Eight Hour Erin", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8
+          }),
+          createEmployee("emp-2", "Coverage Chris", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 12
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 6 },
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const erinAssignment = result.staffAssignments.find(a => a.employeeId === "emp-1");
+
+      expect(erinAssignment).toBeDefined();
+      expect(erinAssignment?.startTime).toBe("06:30");
+      expect(erinAssignment?.endTime).toBe("14:30");
+    });
+
     it("should prioritize leader-qualified employees", () => {
       // Realistic scenario: Mix of leaders and assistants
       const context: AutoSchedulerContext = {
