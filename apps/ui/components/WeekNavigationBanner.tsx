@@ -24,6 +24,7 @@ interface WeekNavigationBannerProps {
   isAuditOpen: boolean;
   onOpenSettings: () => void;
   isSettingsOpen: boolean;
+  onAutoSchedule: () => void;
   apiStatus: {
     state: "loading" | "saving" | "saved" | "error" | "idle";
     message: string;
@@ -45,6 +46,7 @@ export default function WeekNavigationBanner({
   isAuditOpen,
   onOpenSettings,
   isSettingsOpen,
+  onAutoSchedule,
   apiStatus
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
@@ -238,6 +240,19 @@ export default function WeekNavigationBanner({
             </button>
           </div>
           <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              onClick={onAutoSchedule}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.4)",
+                background: "#10b981",
+                color: "#fff",
+                padding: "0.4rem 0.9rem",
+                fontWeight: 600
+              }}
+            >
+              ⚡ Auto
+            </button>
             <button
               onClick={() => onShiftWeek("prev")}
               style={{
