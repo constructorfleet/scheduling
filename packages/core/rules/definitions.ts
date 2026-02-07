@@ -5,8 +5,6 @@ import {
   getCitationId,
   getDayOfWeekForAssignment,
   getEmployeeById,
-  getFieldTripEventById,
-  getFieldTripEventForBlock,
   getFieldTripTypeById,
   parseTimeToMinutes,
   getOperatingHoursForDay,
@@ -96,18 +94,30 @@ export const ratioSegmentRule: RuleDefinition = {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
-      const fieldTripEvent = getFieldTripEventForBlock(context, block);
-      if (fieldTripEvent && !fieldTripEvent.isNoFieldTrip) {
-        return;
-      }
       const scheduleDay =
         getScheduleDayById(context, block.scheduleDayId) ??
         context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
       const scheduleType = scheduleDay?.scheduleType;
       const effectiveChildCount =
         typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
+      const activeFieldTripEvent = context.fieldTripEvents.find((event) => {
+        if (event.dayOfWeek !== block.dayOfWeek) {
+          return false;
+        }
+        if (event.scheduleDayId && scheduleDay?.id && event.scheduleDayId !== scheduleDay.id) {
+          return false;
+        }
+        return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
+      });
+      const activeFieldTripType = getFieldTripTypeById(context, activeFieldTripEvent?.fieldTripTypeId);
+      const fieldTripChildrenPerStaff =
+        activeFieldTripType && activeFieldTripType.minAdultStudentRatio > 0
+          ? 1 / activeFieldTripType.minAdultStudentRatio
+          : undefined;
       const childrenPerStaff =
-        (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ?? 1;
+        fieldTripChildrenPerStaff ??
+        (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ??
+        1;
       const requiredFromRatio = Math.ceil(effectiveChildCount / childrenPerStaff);
       const schoolRules = getSchoolRules(context);
       let minStaff = 0;
@@ -148,7 +158,8 @@ export const ratioSegmentRule: RuleDefinition = {
         violations.push(
           buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId, "error", {
             dayOfWeek: block.dayOfWeek,
-            childCount: effectiveChildCount
+            childCount: effectiveChildCount,
+            ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType"
           })
         );
       }
@@ -842,57 +853,62 @@ export const fieldTripEventIntegrityRule: RuleDefinition = {
 
 export const fieldTripRatiosRule: RuleDefinition = {
   id: "field-trip-ratios",
-  description: "Applies field trip ratios for adults and leaders in overridden segments",
+  description: "Applies field trip leader ratios for segments on days with field trips",
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
-      if (!block.fieldTripEventId) {
-        return;
-      }
-      const event = getFieldTripEventById(context, block.fieldTripEventId);
+      const scheduleDay =
+        getScheduleDayById(context, block.scheduleDayId) ??
+        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
+      const event = context.fieldTripEvents.find((candidate) => {
+        if (candidate.dayOfWeek !== block.dayOfWeek) {
+          return false;
+        }
+        if (candidate.scheduleDayId && scheduleDay?.id && candidate.scheduleDayId !== scheduleDay.id) {
+          return false;
+        }
+        return Boolean(candidate.fieldTripTypeId) && !candidate.isNoFieldTrip;
+      });
       const type = event && getFieldTripTypeById(context, event.fieldTripTypeId);
-      if (!event || !type) {
+      if (!event || !type || type.minLeaderStudentRatio <= 0) {
         return;
       }
-      const assignments = getAssignmentsForBlock(context, block.id);
-      const uniqueEmployeeIds = new Set(assignments.map((assignment) => assignment.employeeId));
-      const leaderCount = assignments
-        .map((assignment) => getEmployeeById(context, assignment.employeeId))
-        .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee))
-        .filter((employee) => employee.leaderQualified);
-      const requiredAdults = Math.max(1, Math.ceil(block.childCount * type.minAdultStudentRatio));
-      const requiredLeaders =
-        type.minLeaderStudentRatio > 0
-          ? Math.max(1, Math.ceil(block.childCount * type.minLeaderStudentRatio))
-          : 0;
-      if (uniqueEmployeeIds.size < requiredAdults) {
+      const effectiveChildCount =
+        typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
+      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount * type.minLeaderStudentRatio));
+      const blockStart = parseTimeToMinutes(block.startTime);
+      const blockEnd = parseTimeToMinutes(block.endTime);
+      const assignedLeaderIds = new Set(
+        context.staffAssignments
+          .filter((assignment) => assignment.status !== "completed")
+          .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === block.dayOfWeek)
+          .filter((assignment) => {
+            const assignmentStart = parseTimeToMinutes(assignment.startTime);
+            const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+            return assignmentStart < blockEnd && assignmentEnd > blockStart;
+          })
+          .map((assignment) => getEmployeeById(context, assignment.employeeId))
+          .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee?.leaderQualified))
+          .map((employee) => employee.id)
+      );
+      if (assignedLeaderIds.size < requiredLeaders) {
         const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
         violations.push(
           buildViolation(
             "field-trip-ratios",
-            `Field trip block ${block.id} needs ${requiredAdults} adults but only ${uniqueEmployeeIds.size} assigned`,
+            `Field trip ${block.dayOfWeek.toUpperCase()} ${block.segment} needs ${requiredLeaders} leaders but only ${assignedLeaderIds.size} assigned`,
             "SegmentBlock",
             block.id,
             citationId,
             "error",
-            { assignedAdults: uniqueEmployeeIds.size, requiredAdults }
-          )
-        );
-      }
-      if (requiredLeaders > 0 && leaderCount.length < requiredLeaders) {
-        const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
-        violations.push(
-          buildViolation(
-            "field-trip-ratios",
-            `Field trip block ${block.id} needs ${requiredLeaders} leaders but only ${leaderCount.length} assigned`,
-            "SegmentBlock",
-            block.id,
-            citationId,
-            "error",
-            { assignedLeaders: leaderCount.length, requiredLeaders }
+            {
+              assignedLeaders: assignedLeaderIds.size,
+              requiredLeaders,
+              dayOfWeek: block.dayOfWeek
+            }
           )
         );
       }

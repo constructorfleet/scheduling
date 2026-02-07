@@ -70,6 +70,16 @@ const FIELD_TRIP_OPTIONS = (fieldTripTypes: FieldTripType[]) => [
   }))
 ];
 
+const ratioToPair = (ratio: number) => {
+  if (!Number.isFinite(ratio) || ratio <= 0) {
+    return { adults: 1, students: 1 };
+  }
+  if (ratio >= 1) {
+    return { adults: Math.max(1, Math.round(ratio)), students: 1 };
+  }
+  return { adults: 1, students: Math.max(1, Math.round(1 / ratio)) };
+};
+
 export default function ScheduleMatrix({
   staff,
   assignments,
@@ -142,6 +152,14 @@ export default function ScheduleMatrix({
   );
 
   const fieldTripOptions = FIELD_TRIP_OPTIONS(fieldTripTypes);
+  const scheduleTypeOptionByValue = useMemo(
+    () => new Map(scheduleTypeOptions.map((option) => [option.value, option])),
+    [scheduleTypeOptions]
+  );
+  const fieldTripTypeById = useMemo(
+    () => new Map(fieldTripTypes.map((type) => [type.id, type])),
+    [fieldTripTypes]
+  );
   const getOverlapMessage = (payload: {
     assignmentId?: string;
     employeeId: string;
@@ -245,6 +263,21 @@ export default function ScheduleMatrix({
               const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
               const isFocusedDay = focusedDay === day;
               const closedDay = isClosedDay(day);
+              const scheduleTypeOption = dayMeta?.scheduleType
+                ? scheduleTypeOptionByValue.get(dayMeta.scheduleType)
+                : undefined;
+              const fieldTripType = fieldTripEvent?.fieldTripTypeId
+                ? fieldTripTypeById.get(fieldTripEvent.fieldTripTypeId)
+                : undefined;
+              const baseRatioLabel = scheduleTypeOption
+                ? `${scheduleTypeOption.ratio.adults}:${scheduleTypeOption.ratio.students}`
+                : "not set";
+              const fieldTripAdultRatioLabel = fieldTripType
+                ? `${ratioToPair(fieldTripType.minAdultStudentRatio).adults}:${ratioToPair(fieldTripType.minAdultStudentRatio).students}`
+                : undefined;
+              const fieldTripLeaderRatioLabel = fieldTripType && fieldTripType.minLeaderStudentRatio > 0
+                ? `${ratioToPair(fieldTripType.minLeaderStudentRatio).adults}:${ratioToPair(fieldTripType.minLeaderStudentRatio).students}`
+                : undefined;
               return (
                 <th
                   key={`header-${day}`}
@@ -358,32 +391,18 @@ export default function ScheduleMatrix({
                   ) : (
                     <span style={{ fontSize: "0.7rem", color: "#9ca3af" }}>Hours: not set</span>
                   )}
+                  <span style={{ fontSize: "0.7rem", color: "#475569" }}>
+                    Required ratio: {fieldTripAdultRatioLabel ? `${fieldTripAdultRatioLabel} (Field trip)` : baseRatioLabel}
+                  </span>
+                  {fieldTripAdultRatioLabel && (
+                    <span style={{ fontSize: "0.7rem", color: "#475569" }}>
+                      Leader ratio: {fieldTripLeaderRatioLabel ?? "not required"}
+                    </span>
+                  )}
                 </div>
               </th>
             );
           })}
-            <th
-              style={{
-                textAlign: "left",
-                padding: "0.75rem",
-                border: "1px solid #e5e7eb",
-                background: "#f8fafc",
-                minWidth: 140
-              }}
-            >
-              Total hours
-            </th>
-            <th
-              style={{
-                textAlign: "left",
-                padding: "0.75rem",
-                border: "1px solid #e5e7eb",
-                background: "#f8fafc",
-                minWidth: 140
-              }}
-            >
-              Over scheduled?
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -405,15 +424,43 @@ export default function ScheduleMatrix({
                 transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                style={{
+                  background: overscheduled ? "#fff1f2" : undefined
+                }}
               >
                 <td
                   style={{
                     border: "1px solid #e5e7eb",
                     padding: "0.75rem",
                     verticalAlign: "top",
-                    background: "#fff"
+                    background: overscheduled ? "#fff1f2" : "#fff",
+                    position: "relative"
                   }}
                 >
+                  {overscheduled && (
+                    <span
+                      title={`${member.name} is over weekly max hours (${totalHours.toFixed(1)} > ${member.maxHoursPerWeek}).`}
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        width: 18,
+                        height: 18,
+                        borderRadius: "50%",
+                        border: "1px solid #dc2626",
+                        background: "#fee2e2",
+                        color: "#b91c1c",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "help"
+                      }}
+                    >
+                      ?
+                    </span>
+                  )}
                   <div style={{ fontWeight: 600 }}>{member.name}</div>
                   <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>{member.jobTitle}</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem", marginTop: "0.4rem" }}>
@@ -431,6 +478,9 @@ export default function ScheduleMatrix({
                         {badge}
                       </span>
                     ))}
+                  </div>
+                  <div style={{ marginTop: "0.45rem", fontSize: "0.78rem", color: overscheduled ? "#b91c1c" : "#475569", fontWeight: 600 }}>
+                    Total hours: {totalHours.toFixed(1)}
                   </div>
                 </td>
                 {daySequence.map((day) => {
@@ -453,7 +503,7 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: closedDay ? "#f8fafc" : isFocusedDay ? "#f6faff" : "#fff",
+                        background: closedDay ? "#f8fafc" : isFocusedDay ? "#f6faff" : overscheduled ? "#fff7f8" : "#fff",
                         position: "relative"
                       }}
                     >
@@ -795,29 +845,6 @@ export default function ScheduleMatrix({
                     </td>
                   );
                 })}
-                <td
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    padding: "0.75rem",
-                    verticalAlign: "top",
-                    background: "#fff",
-                    fontWeight: 600
-                  }}
-                >
-                  {totalHours.toFixed(1)}
-                </td>
-                <td
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    padding: "0.75rem",
-                    verticalAlign: "top",
-                    background: "#fff",
-                    color: overscheduled ? "#b91c1c" : "#6b7280",
-                    fontWeight: 600
-                  }}
-                >
-                  {overscheduled ? "Yes" : "—"}
-                </td>
               </motion.tr>
             );
           })}

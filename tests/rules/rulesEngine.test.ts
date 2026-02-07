@@ -231,7 +231,7 @@ describe("RulesEngine", () => {
     expect(ratioViolations).toHaveLength(0);
   });
 
-  test("skips segment ratio checks for field-trip overrides", () => {
+  test("applies field-trip ratios as overrides for segment ratio checks", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-skip",
       name: "Museum Express",
@@ -264,7 +264,7 @@ describe("RulesEngine", () => {
 
     const violations = engine.evaluate(context);
     const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
-    expect(ratioViolations).toHaveLength(0);
+    expect(ratioViolations.length).toBeGreaterThan(0);
     const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
     expect(tripViolations.length).toBeGreaterThan(0);
     expect(tripViolations.every((v) => v.target.id === block.id)).toBe(true);
@@ -381,7 +381,7 @@ describe("RulesEngine", () => {
 
     const violations = engine.evaluate(context);
     const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
-    expect(tripViolations.length).toBe(2);
+    expect(tripViolations.length).toBe(1);
     expect(tripViolations.every((v) => v.target.id === block.id)).toBe(true);
   });
 
@@ -404,6 +404,7 @@ describe("RulesEngine", () => {
       signedOffAt: "2026-02-04T09:00:00Z"
     };
     const block = createSegmentBlock("block-trip-clean", {
+      dayOfWeek: "thu",
       childCount: 20,
       fieldTripEventId: fieldTripEvent.id
     });
@@ -448,6 +449,7 @@ describe("RulesEngine", () => {
       signedOffAt: "2026-02-04T11:00:00Z"
     };
     const block = createSegmentBlock("block-trip-leader-shortage", {
+      dayOfWeek: "thu",
       childCount: 20,
       fieldTripEventId: fieldTripEvent.id
     });
@@ -491,6 +493,7 @@ describe("RulesEngine", () => {
       fieldTripTypeId: fieldTripType.id
     };
     const block = createSegmentBlock("block-trip-no-leader-ratio", {
+      dayOfWeek: "thu",
       childCount: 20,
       fieldTripEventId: fieldTripEvent.id
     });
