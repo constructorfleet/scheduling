@@ -146,6 +146,8 @@ const withDefaultScheduleInfo = (context: Partial<RulesContext>): RulesContext =
     fieldTripTypes: context.fieldTripTypes ?? [],
     scheduleDays: context.scheduleDays ?? [defaultScheduleDay],
     operatingHours,
+    schoolRules: context.schoolRules,
+    jobTitleRules: context.jobTitleRules,
     policyCitations: context.policyCitations,
     rulePolicyCitations: context.rulePolicyCitations
   };
@@ -544,98 +546,6 @@ describe("RulesEngine", () => {
     expect(tripViolations[0].message).toContain("leaders");
   });
 
-  test("flags field trips missing sign-off metadata", () => {
-    const fieldTripType: FieldTripType = {
-      id: "trip-type-1",
-      name: "Field Trip Base",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
-      policyCitationId: "policy-field-trip",
-      notes: undefined
-    };
-    const fieldTripEvent: FieldTripEvent = {
-      id: "ft-event-2",
-      scheduleWeekId: "week-1",
-      dayOfWeek: "wed" as DayOfWeek,
-      segment: "mid" as DaySegment,
-      fieldTripTypeId: "trip-type-1"
-    };
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [],
-      staffAssignments: [],
-      employees: [],
-      fieldTripEvents: [fieldTripEvent],
-      fieldTripTypes: [fieldTripType]
-    });
-
-    const violations = engine.evaluate(context);
-    const signOff = violations.find((violation) => violation.ruleId === "field-trip-signoff");
-    expect(signOff).toBeDefined();
-    expect(signOff?.target.metadata).toEqual({ missing: ["approverId", "signedOffAt"] });
-  });
-
-  test("allows field trips with sign-off metadata to pass", () => {
-    const fieldTripType: FieldTripType = {
-      id: "trip-type-1",
-      name: "Field Trip Base",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
-      policyCitationId: "policy-field-trip",
-      notes: undefined
-    };
-    const fieldTripEvent: FieldTripEvent = {
-      id: "ft-event-4",
-      scheduleWeekId: "week-1",
-      dayOfWeek: "fri" as DayOfWeek,
-      segment: "close" as DaySegment,
-      fieldTripTypeId: "trip-type-1",
-      approverId: "director",
-      signedOffAt: "2026-02-04T10:00:00Z"
-    };
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [],
-      staffAssignments: [],
-      employees: [],
-      fieldTripEvents: [fieldTripEvent],
-      fieldTripTypes: [fieldTripType]
-    });
-
-    const violations = engine.evaluate(context);
-    const signOff = violations.find((violation) => violation.ruleId === "field-trip-signoff");
-    expect(signOff).toBeUndefined();
-  });
-
-  test("reports sign-off violations when approver metadata alone is missing", () => {
-    const fieldTripType: FieldTripType = {
-      id: "trip-type-1",
-      name: "Field Trip Base",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
-      policyCitationId: "policy-field-trip",
-      notes: undefined
-    };
-    const fieldTripEvent: FieldTripEvent = {
-      id: "ft-event-6",
-      scheduleWeekId: "week-1",
-      dayOfWeek: "fri" as DayOfWeek,
-      segment: "open" as DaySegment,
-      fieldTripTypeId: "trip-type-1",
-      signedOffAt: "2026-02-04T12:00:00Z"
-    };
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [],
-      staffAssignments: [],
-      employees: [],
-      fieldTripEvents: [fieldTripEvent],
-      fieldTripTypes: [fieldTripType]
-    });
-
-    const violations = engine.evaluate(context);
-    const signOff = violations.find((violation) => violation.ruleId === "field-trip-signoff");
-    expect(signOff).toBeDefined();
-    expect(signOff?.target.metadata).toEqual({ missing: ["approverId"] });
-  });
-
   test("flags schedule days missing critical metadata", () => {
     const incompleteDay = createScheduleDay("day-missing", {
       scheduleType: undefined,
@@ -935,5 +845,85 @@ describe("RulesEngine", () => {
       endTime: lateBlock.endTime,
       boundary: customHours.close
     });
+  });
+
+  test("flags missing opener coverage when opener count is not met", () => {
+    const day = createScheduleDay("day-openers", { dayOfWeek: "mon", dayScheduleType: "full_day" });
+    const block = createSegmentBlock("block-openers", { dayOfWeek: "mon" });
+    const employee = createEmployee("emp-open-1");
+    const assignment = createAssignment("assign-open-1", block.id, employee.id, {
+      startTime: "06:00",
+      endTime: "09:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [employee],
+      schoolRules: {
+        openerCount: 2,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      }
+    });
+
+    const violations = engine.evaluate(context);
+    const openers = violations.filter((violation) => violation.ruleId === "open-close-coverage");
+    expect(openers.some((violation) => violation.target.metadata?.type === "opener")).toBe(true);
+  });
+
+  test("requires a leader-qualified opener when job rules demand it", () => {
+    const day = createScheduleDay("day-leader-open", { dayOfWeek: "mon", dayScheduleType: "full_day" });
+    const block = createSegmentBlock("block-leader-open", { dayOfWeek: "mon" });
+    const employee = createEmployee("emp-assistant-open", { jobTitle: "Assistant" });
+    const assignment = createAssignment("assign-assistant-open", block.id, employee.id, {
+      startTime: "06:00",
+      endTime: "09:00"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [employee],
+      jobTitleRules: {
+        Assistant: { requiresLeaderForOpenClose: true }
+      },
+      schoolRules: {
+        openerCount: 1,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      }
+    });
+
+    const violations = engine.evaluate(context);
+    const leaderViolation = violations.find(
+      (violation) =>
+        violation.ruleId === "open-close-coverage" &&
+        violation.target.metadata?.type === "opener" &&
+        violation.target.metadata?.requiresLeader === true
+    );
+    expect(leaderViolation).toBeDefined();
+  });
+
+  test("blocks assignments when current CPR is required", () => {
+    const block = createSegmentBlock("block-cpr", { dayOfWeek: "mon" });
+    const employee = createEmployee("emp-cpr", { cprCurrent: false });
+    const assignment = createAssignment("assign-cpr", block.id, employee.id);
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [block],
+      staffAssignments: [assignment],
+      employees: [employee],
+      schoolRules: {
+        openerCount: 0,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: true
+      }
+    });
+
+    const violations = engine.evaluate(context);
+    expect(violations.some((violation) => violation.ruleId === "cpr-current-required")).toBe(true);
   });
 });

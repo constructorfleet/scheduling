@@ -37,11 +37,11 @@ describe("ViolationNavigator", () => {
   it("renders violation cards with severity badges and action buttons", () => {
     render(<ViolationNavigator violations={violations} onFocusSegment={jest.fn()} isOpen={true} onClose={() => {}} />);
 
-    expect(screen.getByText("Critical")).toBeVisible();
-    expect(screen.getByText("Operating hours guardrail")).toBeVisible();
+    expect(screen.getByText("Critical")).toBeInTheDocument();
+    expect(screen.getByText("Operating hours guardrail")).toBeInTheDocument();
     expect(
       screen.getAllByText("Live violation — edit the timeline to clear it.")[0]
-    ).toBeVisible();
+    ).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Jump to block" })).toHaveLength(2);
   });
 

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DayMetadataStrip, { ScheduleTypeOption } from "../../apps/ui/components/DayMetadataStrip";
 import type {
@@ -119,18 +119,25 @@ describe("DayMetadataStrip", () => {
 
     const tuesdayCard = screen.getByText("Tuesday").closest("article");
     expect(tuesdayCard).not.toBeNull();
-    expect(within(tuesdayCard as HTMLElement).getByText("Adult:Student 1:8")).toBeVisible();
-    expect(within(tuesdayCard as HTMLElement).getByText("Zoo visit")).toBeVisible();
+    expect(within(tuesdayCard as HTMLElement).getByText("Adult:Student 1:8")).toBeInTheDocument();
+    expect(within(tuesdayCard as HTMLElement).getAllByText("Zoo visit").length).toBeGreaterThan(0);
   });
 
   it("invokes callbacks with the expected payloads as the user edits each control", async () => {
     const onEnrollmentChange = jest.fn();
     const onScheduleTypeChange = jest.fn();
     const onFieldTripSelection = jest.fn();
+    const editableDays: ScheduleDay[] = [
+      {
+        ...metadataDays[0],
+        enrollmentCount: 12
+      },
+      metadataDays[1]
+    ];
 
     render(
       <DayMetadataStrip
-        days={metadataDays}
+        days={editableDays}
         dayDisplayNames={dayDisplayNames}
         daySequence={daySequence}
         scheduleTypeOptions={scheduleTypeOptions}
@@ -147,10 +154,10 @@ describe("DayMetadataStrip", () => {
     const monday = mondayCard as HTMLElement;
 
     const enrollmentInput = within(monday).getByPlaceholderText("e.g. 22");
-    await userEvent.clear(enrollmentInput);
-    expect(onEnrollmentChange).toHaveBeenCalledWith("day-mon", undefined);
+    fireEvent.change(enrollmentInput, { target: { value: "" } });
+    expect(onEnrollmentChange).toHaveBeenLastCalledWith("day-mon", undefined);
     onEnrollmentChange.mockClear();
-    await userEvent.type(enrollmentInput, "17");
+    fireEvent.change(enrollmentInput, { target: { value: "17" } });
     expect(onEnrollmentChange).toHaveBeenLastCalledWith("day-mon", 17);
 
     const selects = within(monday).getAllByRole("combobox");

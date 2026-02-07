@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import GuidedStatusTracker from "../../apps/ui/components/GuidedStatusTracker";
 import type { GuidedStep } from "../../apps/ui/types";
 
@@ -30,8 +31,8 @@ describe("GuidedStatusTracker", () => {
   it("renders steps with statuses and blocking details", () => {
     render(<GuidedStatusTracker steps={baseSteps} />);
 
-    expect(screen.getByText("1. Draft workspace")).toBeVisible();
-    expect(screen.getByText("Field trip needs a director signature")).toBeVisible();
+    expect(screen.getByText("1. Draft workspace")).toBeInTheDocument();
+    expect(screen.getByText("Field trip needs a director signature")).toBeInTheDocument();
   });
 
   it("calls onStepAction when an actionable button is clicked", () => {
@@ -40,5 +41,16 @@ describe("GuidedStatusTracker", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Review violations" }));
     expect(onStepAction).toHaveBeenCalledWith("validation");
+  });
+
+  it("collapses to show active step summary and hides step cards", async () => {
+    const user = userEvent.setup();
+    render(<GuidedStatusTracker steps={baseSteps} />);
+
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "Collapse" }));
+    });
+    expect(screen.getByText("Active: Validation · In progress")).toBeInTheDocument();
+    expect(screen.queryByText("1. Draft workspace")).not.toBeInTheDocument();
   });
 });

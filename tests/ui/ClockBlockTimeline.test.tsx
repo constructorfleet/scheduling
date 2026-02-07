@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ClockBlockTimeline from "../../apps/ui/components/ClockBlockTimeline";
 import { segmentSlotDefinitions } from "../../apps/ui/data/mockScheduleData";
@@ -184,6 +184,7 @@ describe("ClockBlockTimeline", () => {
     const focusSegment = jest.fn();
     const autoBalance = jest.fn();
     const addClockBlock = jest.fn();
+    const user = userEvent.setup();
 
     render(
       <ClockBlockTimeline
@@ -202,12 +203,21 @@ describe("ClockBlockTimeline", () => {
       />
     );
 
-    fireEvent.change(screen.getByLabelText("Start time (HH:MM)"), { target: { value: "09:00" } });
-    fireEvent.change(screen.getByLabelText("End time (HH:MM)"), { target: { value: "12:15" } });
-    fireEvent.change(screen.getByLabelText("Child count"), { target: { value: "22" } });
+    const startInput = screen.getByLabelText("Start time (HH:MM)");
+    const endInput = screen.getByLabelText("End time (HH:MM)");
+    const childCountInput = screen.getByLabelText("Child count");
 
-    await userEvent.selectOptions(screen.getByLabelText("Staff member (optional)"), "emp-assistant");
-    await userEvent.click(screen.getByRole("button", { name: "Save clock block" }));
+    await act(async () => {
+      await user.clear(startInput);
+      await user.type(startInput, "09:00");
+      await user.clear(endInput);
+      await user.type(endInput, "12:15");
+      await user.clear(childCountInput);
+      await user.type(childCountInput, "22");
+
+      await user.selectOptions(screen.getByLabelText("Staff member (optional)"), "emp-assistant");
+      await user.click(screen.getByRole("button", { name: "Save clock block" }));
+    });
 
     expect(addClockBlock).toHaveBeenCalledWith({
       dayOfWeek: "mon",
