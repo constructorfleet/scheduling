@@ -823,17 +823,75 @@ export default function App() {
         completeApiAction("Schedule loaded");
         if (!isActive) return;
         if (schedule) {
-          const loadedScheduleDays = (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
+          const loadedScheduleDaysRaw = (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
             ...day,
             date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
           }));
+          const loadedScheduleDaysByDow = new Map(
+            loadedScheduleDaysRaw.map((day) => [day.dayOfWeek, day] as const)
+          );
+          const loadedScheduleDays: ScheduleDay[] = daySequence.map((dayOfWeek, index) => {
+            const existing = loadedScheduleDaysByDow.get(dayOfWeek);
+            const defaultDate = addDays(currentWeekStartDateIso, index);
+            const isClosed = closedDaysState.includes(dayOfWeek);
+            const defaultScheduleType = isClosed ? CLOSED_SCHEDULE_TYPE : undefined;
+            const defaultDayScheduleType: ScheduleDay["dayScheduleType"] = isClosed ? "closed" : "full_day";
+            const defaultEnrollment = isClosed ? 0 : undefined;
+            if (existing) {
+              const normalizedScheduleType = existing.scheduleType ?? defaultScheduleType;
+              return {
+                ...existing,
+                scheduleWeekId: currentWeekId,
+                dayOfWeek,
+                date: existing.date ?? defaultDate,
+                scheduleType: normalizedScheduleType,
+                dayScheduleType:
+                  existing.dayScheduleType ??
+                  ((normalizedScheduleType === CLOSED_SCHEDULE_TYPE ? "closed" : "full_day") as ScheduleDay["dayScheduleType"]),
+                enrollmentCount:
+                  normalizedScheduleType === CLOSED_SCHEDULE_TYPE ? (existing.enrollmentCount ?? 0) : existing.enrollmentCount,
+                fieldTripEventId: existing.fieldTripEventId ?? `${currentWeekId}-field-trip-${dayOfWeek}`
+              };
+            }
+            return {
+              id: `${currentWeekId}-day-${dayOfWeek}`,
+              scheduleWeekId: currentWeekId,
+              date: defaultDate,
+              dayOfWeek,
+              scheduleType: defaultScheduleType,
+              dayScheduleType: defaultDayScheduleType,
+              enrollmentCount: defaultEnrollment,
+              fieldTripEventId: `${currentWeekId}-field-trip-${dayOfWeek}`
+            };
+          });
+
+          const scheduleDayIdByDow = new Map(loadedScheduleDays.map((day) => [day.dayOfWeek, day.id] as const));
           const loadedSegmentBlocks = schedule.segmentBlocks ?? [];
           const loadedStaffAssignments = schedule.staffAssignments ?? [];
-          const loadedFieldTripEvents = (schedule.fieldTripEvents ?? []).map((event: FieldTripEvent) => ({
-            ...event,
-            isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
-            signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
-          }));
+          const loadedFieldTripByDay = new Map(
+            (schedule.fieldTripEvents ?? []).map((event) => [event.dayOfWeek, event] as const)
+          );
+          const loadedFieldTripEvents: FieldTripEvent[] = daySequence.map((dayOfWeek) => {
+            const event = loadedFieldTripByDay.get(dayOfWeek);
+            if (event) {
+              return {
+                ...event,
+                scheduleWeekId: currentWeekId,
+                dayOfWeek,
+                scheduleDayId: event.scheduleDayId ?? scheduleDayIdByDow.get(dayOfWeek),
+                isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
+                signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
+              };
+            }
+            return {
+              id: `${currentWeekId}-field-trip-${dayOfWeek}`,
+              scheduleWeekId: currentWeekId,
+              dayOfWeek,
+              segment: "mid" as const,
+              scheduleDayId: scheduleDayIdByDow.get(dayOfWeek),
+              isNoFieldTrip: true
+            };
+          });
           const loadedSnapshot: ScheduleSnapshot = {
             scheduleDays: loadedScheduleDays,
             segmentBlocks: loadedSegmentBlocks,
