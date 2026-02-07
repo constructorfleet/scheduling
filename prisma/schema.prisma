@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../apps/api/generated/prisma-sqlite"
+  output   = "../apps/api/generated/prisma-client"
 }
 
 datasource db {

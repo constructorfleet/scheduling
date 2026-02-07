@@ -12295,7 +12295,6 @@ export namespace Prisma {
     startTime: number
     endTime: number
     childCount: number
-    requirementTemplate: number
     status: number
     _all: number
   }
@@ -12342,7 +12341,6 @@ export namespace Prisma {
     startTime?: true
     endTime?: true
     childCount?: true
-    requirementTemplate?: true
     status?: true
     _all?: true
   }
@@ -12442,7 +12440,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonValue
     status: string
     _count: SegmentBlockCountAggregateOutputType | null
     _avg: SegmentBlockAvgAggregateOutputType | null
@@ -12474,7 +12471,6 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     childCount?: boolean
-    requirementTemplate?: boolean
     status?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     staffAssignments?: boolean | SegmentBlock$staffAssignmentsArgs<ExtArgs>
@@ -12490,7 +12486,6 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     childCount?: boolean
-    requirementTemplate?: boolean
     status?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["segmentBlock"]>
@@ -12504,7 +12499,6 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     childCount?: boolean
-    requirementTemplate?: boolean
     status?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["segmentBlock"]>
@@ -12518,11 +12512,10 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     childCount?: boolean
-    requirementTemplate?: boolean
     status?: boolean
   }
 
-  export type SegmentBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "scheduleDayId" | "dayOfWeek" | "segment" | "startTime" | "endTime" | "childCount" | "requirementTemplate" | "status", ExtArgs["result"]["segmentBlock"]>
+  export type SegmentBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "scheduleDayId" | "dayOfWeek" | "segment" | "startTime" | "endTime" | "childCount" | "status", ExtArgs["result"]["segmentBlock"]>
   export type SegmentBlockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     staffAssignments?: boolean | SegmentBlock$staffAssignmentsArgs<ExtArgs>
@@ -12550,7 +12543,6 @@ export namespace Prisma {
       startTime: string
       endTime: string
       childCount: number
-      requirementTemplate: Prisma.JsonValue
       status: string
     }, ExtArgs["result"]["segmentBlock"]>
     composites: {}
@@ -12985,7 +12977,6 @@ export namespace Prisma {
     readonly startTime: FieldRef<"SegmentBlock", 'String'>
     readonly endTime: FieldRef<"SegmentBlock", 'String'>
     readonly childCount: FieldRef<"SegmentBlock", 'Int'>
-    readonly requirementTemplate: FieldRef<"SegmentBlock", 'Json'>
     readonly status: FieldRef<"SegmentBlock", 'String'>
   }
     
@@ -14685,7 +14676,6 @@ export namespace Prisma {
     startTime: 'startTime',
     endTime: 'endTime',
     childCount: 'childCount',
-    requirementTemplate: 'requirementTemplate',
     status: 'status'
   };
 
@@ -15484,7 +15474,6 @@ export namespace Prisma {
     startTime?: StringFilter<"SegmentBlock"> | string
     endTime?: StringFilter<"SegmentBlock"> | string
     childCount?: IntFilter<"SegmentBlock"> | number
-    requirementTemplate?: JsonFilter<"SegmentBlock">
     status?: StringFilter<"SegmentBlock"> | string
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     staffAssignments?: StaffAssignmentListRelationFilter
@@ -15499,7 +15488,6 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     childCount?: SortOrder
-    requirementTemplate?: SortOrder
     status?: SortOrder
     scheduleWeek?: ScheduleWeekOrderByWithRelationInput
     staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
@@ -15517,7 +15505,6 @@ export namespace Prisma {
     startTime?: StringFilter<"SegmentBlock"> | string
     endTime?: StringFilter<"SegmentBlock"> | string
     childCount?: IntFilter<"SegmentBlock"> | number
-    requirementTemplate?: JsonFilter<"SegmentBlock">
     status?: StringFilter<"SegmentBlock"> | string
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     staffAssignments?: StaffAssignmentListRelationFilter
@@ -15532,7 +15519,6 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     childCount?: SortOrder
-    requirementTemplate?: SortOrder
     status?: SortOrder
     _count?: SegmentBlockCountOrderByAggregateInput
     _avg?: SegmentBlockAvgOrderByAggregateInput
@@ -15553,7 +15539,6 @@ export namespace Prisma {
     startTime?: StringWithAggregatesFilter<"SegmentBlock"> | string
     endTime?: StringWithAggregatesFilter<"SegmentBlock"> | string
     childCount?: IntWithAggregatesFilter<"SegmentBlock"> | number
-    requirementTemplate?: JsonWithAggregatesFilter<"SegmentBlock">
     status?: StringWithAggregatesFilter<"SegmentBlock"> | string
   }
 
@@ -16368,7 +16353,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutSegmentBlocksInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutSegmentBlockInput
@@ -16383,7 +16367,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutSegmentBlockInput
   }
@@ -16396,7 +16379,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutSegmentBlocksNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutSegmentBlockNestedInput
@@ -16411,7 +16393,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockNestedInput
   }
@@ -16425,7 +16406,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
   }
 
@@ -16437,7 +16417,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
   }
 
@@ -16450,7 +16429,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
   }
 
@@ -17255,7 +17233,6 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     childCount?: SortOrder
-    requirementTemplate?: SortOrder
     status?: SortOrder
   }
 
@@ -19073,7 +19050,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutSegmentBlockInput
   }
@@ -19086,7 +19062,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutSegmentBlockInput
   }
@@ -19270,7 +19245,6 @@ export namespace Prisma {
     startTime?: StringFilter<"SegmentBlock"> | string
     endTime?: StringFilter<"SegmentBlock"> | string
     childCount?: IntFilter<"SegmentBlock"> | number
-    requirementTemplate?: JsonFilter<"SegmentBlock">
     status?: StringFilter<"SegmentBlock"> | string
   }
 
@@ -19627,7 +19601,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutSegmentBlocksInput
   }
@@ -19641,7 +19614,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
   }
 
@@ -19706,7 +19678,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutSegmentBlocksNestedInput
   }
@@ -19720,7 +19691,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
   }
 
@@ -19969,7 +19939,6 @@ export namespace Prisma {
     startTime: string
     endTime: string
     childCount: number
-    requirementTemplate: JsonNullValueInput | InputJsonValue
     status: string
   }
 
@@ -20043,7 +20012,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
     staffAssignments?: StaffAssignmentUpdateManyWithoutSegmentBlockNestedInput
   }
@@ -20056,7 +20024,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockNestedInput
   }
@@ -20069,7 +20036,6 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
-    requirementTemplate?: JsonNullValueInput | InputJsonValue
     status?: StringFieldUpdateOperationsInput | string
   }
 

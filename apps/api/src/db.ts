@@ -1,25 +1,12 @@
 import { applyDbEnv } from "./config";
+import { PrismaClient } from "../generated/prisma-client";
 
-let prismaPromise: Promise<any> | null = null;
+let prismaClient: PrismaClient | null = null;
 
-const loadPrismaClient = async (dbType: string) => {
-  switch (dbType) {
-    case "postgres":
-      return import("../generated/prisma-postgres");
-    case "sqlite":
-    default:
-      return import("../generated/prisma-sqlite");
+export const getPrisma = (): PrismaClient => {
+  if (!prismaClient) {
+    applyDbEnv();
+    prismaClient = new PrismaClient();
   }
-};
-
-export const getPrisma = async () => {
-  if (!prismaPromise) {
-    prismaPromise = (async () => {
-      const { dbType } = applyDbEnv();
-      const module = await loadPrismaClient(dbType);
-      const PrismaClient = module.PrismaClient as new (options?: Record<string, unknown>) => any;
-      return new PrismaClient();
-    })();
-  }
-  return prismaPromise;
+  return prismaClient;
 };
