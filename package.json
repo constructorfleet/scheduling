@@ -1,6 +1,6 @@
 {
   "name": "daycare-scheduler",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Standalone scheduling application for managing daycare staff schedules",
   "main": "dist/index.js",
   "scripts": {
