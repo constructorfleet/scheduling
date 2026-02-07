@@ -21,6 +21,7 @@
     "api:openapi:client": "openapi --input apps/api/openapi.yaml --output apps/ui/data/generated --client fetch --useUnionTypes",
     "preview": "vite preview",
     "start": "vite preview",
+    "test:e2e:server": "vite --host 127.0.0.1 --port 4174",
     "test:e2e": "playwright test",
     "orchestrate": "ts-node orchestrate.ts",
     "test:unit": "jest",
