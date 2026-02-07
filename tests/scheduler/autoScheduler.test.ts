@@ -432,12 +432,6 @@ describe("autoSchedule", () => {
             medicallyDelegated: true,
             cprCurrent: true,
             maxHoursPerDay: 8
-          }),
-          createEmployee("emp-2", "Coverage Chris", {
-            leaderQualified: true,
-            medicallyDelegated: true,
-            cprCurrent: true,
-            maxHoursPerDay: 12
           })
         ],
         fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
@@ -447,7 +441,7 @@ describe("autoSchedule", () => {
         scheduleTypeRatios: { full_day: 6 },
         schoolRules: {
           openerCount: 1,
-          closerCount: 1,
+          closerCount: 0,
           minimumMedicalDelegated: 1,
           requireCurrentCpr: true
         }
@@ -459,6 +453,47 @@ describe("autoSchedule", () => {
       expect(erinAssignment).toBeDefined();
       expect(erinAssignment?.startTime).toBe("06:30");
       expect(erinAssignment?.endTime).toBe("14:30");
+    });
+
+    it("should seed opener and closer staffing with longest shifts first", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 8
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Opener One", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-2", "Opener Two", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-3", "Closer One", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-4", "Closer Two", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 20 },
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 2,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const mondayAssignments = result.staffAssignments.filter(a => {
+        const block = result.segmentBlocks.find(b => b.id === a.segmentBlockId);
+        return block?.dayOfWeek === "mon";
+      });
+      const openers = mondayAssignments.filter(a => a.startTime === "06:30");
+      const closers = mondayAssignments.filter(a => a.endTime === "18:00");
+
+      expect(openers.length).toBeGreaterThanOrEqual(2);
+      expect(closers.length).toBeGreaterThanOrEqual(2);
     });
 
     it("should prioritize leader-qualified employees", () => {

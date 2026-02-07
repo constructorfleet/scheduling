@@ -70,13 +70,18 @@ export function validateDayMetadata(scheduleDays: ScheduleDay[]): MissingMetadat
 }
 
 /**
- * Generates initial staff assignments based on violations
- * This creates basic segment blocks for each day and then lets violation fixing handle staffing
+ * Generates initial segment blocks and seeds baseline staffing.
+ * Seeding order:
+ * 1) Required opener count with longest open-start shifts.
+ * 2) Required closer count with longest close-ending shifts.
+ * 3) Remaining violations are handled by iterative fixing.
  */
 function generateInitialAssignments(
     context: AutoSchedulerContext
 ): { assignments: StaffAssignment[]; segmentBlocks: SegmentBlock[]; } {
     const createdSegmentBlocks: SegmentBlock[] = [];
+    const seededAssignments: StaffAssignment[] = [];
+    const openedDays: ScheduleDay[] = [];
 
     // Create segment blocks for each schedule day that needs them
     for (const day of context.scheduleDays) {
@@ -137,10 +142,63 @@ function generateInitialAssignments(
 
             createdSegmentBlocks.push(segmentBlock);
         }
+
+        openedDays.push(day);
     }
 
-    // Return empty assignments - let violation fixing populate them
-    return { assignments: [], segmentBlocks: createdSegmentBlocks };
+    const openerCount = Math.max(0, context.schoolRules?.openerCount ?? 0);
+    const closerCount = Math.max(0, context.schoolRules?.closerCount ?? 0);
+
+    if (openerCount <= 0 && closerCount <= 0) {
+        return { assignments: seededAssignments, segmentBlocks: createdSegmentBlocks };
+    }
+
+    const seedingContext: AutoSchedulerContext = {
+        ...context,
+        segmentBlocks: createdSegmentBlocks
+    };
+
+    for (const day of openedDays) {
+        const openBlock = createdSegmentBlocks.find(
+            block => block.scheduleDayId === day.id && block.segment === "open"
+        );
+        const closeBlock = createdSegmentBlocks.find(
+            block => block.scheduleDayId === day.id && block.segment === "close"
+        );
+        if (!openBlock || !closeBlock) {
+            continue;
+        }
+
+        for (let i = 0; i < openerCount; i++) {
+            const bestOpener = findBestOpeningSeedCandidate(seedingContext, seededAssignments, day, openBlock);
+            if (!bestOpener) break;
+            seededAssignments.push({
+                id: `auto-seed-open-${ day.dayOfWeek }-${ i }-${ bestOpener.employee.id }`,
+                segmentBlockId: openBlock.id,
+                employeeId: bestOpener.employee.id,
+                assignmentSource: "template",
+                startTime: bestOpener.window.startTime,
+                endTime: bestOpener.window.endTime,
+                status: "scheduled"
+            });
+        }
+
+        for (let i = 0; i < closerCount; i++) {
+            const bestCloser = findBestClosingSeedCandidate(seedingContext, seededAssignments, day, closeBlock);
+            if (!bestCloser) break;
+            seededAssignments.push({
+                id: `auto-seed-close-${ day.dayOfWeek }-${ i }-${ bestCloser.employee.id }`,
+                segmentBlockId: closeBlock.id,
+                employeeId: bestCloser.employee.id,
+                assignmentSource: "template",
+                startTime: bestCloser.window.startTime,
+                endTime: bestCloser.window.endTime,
+                status: "scheduled"
+            });
+        }
+    }
+
+    return { assignments: seededAssignments, segmentBlocks: createdSegmentBlocks };
 }
 
 /**
@@ -335,6 +393,115 @@ function getPreferredAssignmentWindow(
     }
 
     return { startTime, endTime };
+}
+
+function getPreferredClosingAssignmentWindow(
+    context: AutoSchedulerContext,
+    assignments: StaffAssignment[],
+    employee: Employee,
+    block: SegmentBlock
+): { startTime: string; endTime: string; } | null {
+    const operatingHours = getOperatingHoursForBlock(context, block);
+    const closeMinutes = operatingHours ? timeToMinutes(operatingHours.close) : timeToMinutes(block.endTime);
+    const openMinutes = operatingHours ? timeToMinutes(operatingHours.open) : timeToMinutes(block.startTime);
+    const blockStartMinutes = timeToMinutes(block.startTime);
+
+    const hoursOnDay = getEmployeeHoursOnDay(assignments, employee.id, block.dayOfWeek, context.segmentBlocks);
+    const hoursOnWeek = getEmployeeHoursOnWeek(assignments, employee.id);
+    const remainingDayMinutes = Math.floor((employee.maxHoursPerDay - hoursOnDay) * 60);
+    const remainingWeekMinutes = Math.floor((employee.maxHoursPerWeek - hoursOnWeek) * 60);
+    const remainingMinutes = Math.min(remainingDayMinutes, remainingWeekMinutes);
+    if (remainingMinutes <= 0) {
+        return null;
+    }
+
+    let preferredStartMinutes = Math.max(openMinutes, closeMinutes - remainingMinutes);
+    if (employee.availability && employee.availability.length > 0) {
+        const dayAvailability = employee.availability.find(a => a.dayOfWeek === block.dayOfWeek);
+        const candidateWindows = (dayAvailability?.blocks ?? [])
+            .map(window => ({
+                start: timeToMinutes(window.startTime),
+                end: timeToMinutes(window.endTime)
+            }))
+            .filter(window => closeMinutes <= window.end && closeMinutes > window.start);
+        if (candidateWindows.length === 0) {
+            return null;
+        }
+        preferredStartMinutes = Math.min(
+            ...candidateWindows.map(window => Math.max(preferredStartMinutes, window.start))
+        );
+    }
+
+    if (preferredStartMinutes > blockStartMinutes || preferredStartMinutes >= closeMinutes) {
+        return null;
+    }
+
+    const startTime = minutesToTime(preferredStartMinutes);
+    const endTime = minutesToTime(closeMinutes);
+    if (hasOverlappingAssignment(assignments, employee.id, block.dayOfWeek, startTime, endTime, context.segmentBlocks)) {
+        return null;
+    }
+    return { startTime, endTime };
+}
+
+function getCandidateScore(employee: Employee): number {
+    return (employee.leaderQualified ? 2 : 0) + (employee.medicallyDelegated ? 1 : 0) + (employee.cprCurrent ? 1 : 0);
+}
+
+function findBestOpeningSeedCandidate(
+    context: AutoSchedulerContext,
+    assignments: StaffAssignment[],
+    day: ScheduleDay,
+    openBlock: SegmentBlock
+): { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } | null {
+    const candidates = context.employees
+        .filter(emp => emp.employmentStatus === "active")
+        .filter(emp => isEmployeeAvailable(emp, day.dayOfWeek, openBlock.startTime, openBlock.endTime, day.date))
+        .map(employee => {
+            const window = getPreferredAssignmentWindow(context, assignments, employee, openBlock);
+            if (!window) return null;
+            return {
+                employee,
+                window,
+                duration: timeToMinutes(window.endTime) - timeToMinutes(window.startTime)
+            };
+        })
+        .filter((candidate): candidate is { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } => Boolean(candidate))
+        .sort((a, b) => {
+            if (b.duration !== a.duration) {
+                return b.duration - a.duration;
+            }
+            return getCandidateScore(b.employee) - getCandidateScore(a.employee);
+        });
+    return candidates[0] ?? null;
+}
+
+function findBestClosingSeedCandidate(
+    context: AutoSchedulerContext,
+    assignments: StaffAssignment[],
+    day: ScheduleDay,
+    closeBlock: SegmentBlock
+): { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } | null {
+    const candidates = context.employees
+        .filter(emp => emp.employmentStatus === "active")
+        .filter(emp => isEmployeeAvailable(emp, day.dayOfWeek, closeBlock.startTime, closeBlock.endTime, day.date))
+        .map(employee => {
+            const window = getPreferredClosingAssignmentWindow(context, assignments, employee, closeBlock);
+            if (!window) return null;
+            return {
+                employee,
+                window,
+                duration: timeToMinutes(window.endTime) - timeToMinutes(window.startTime)
+            };
+        })
+        .filter((candidate): candidate is { employee: Employee; window: { startTime: string; endTime: string; }; duration: number; } => Boolean(candidate))
+        .sort((a, b) => {
+            if (b.duration !== a.duration) {
+                return b.duration - a.duration;
+            }
+            return getCandidateScore(b.employee) - getCandidateScore(a.employee);
+        });
+    return candidates[0] ?? null;
 }
 
 /**
