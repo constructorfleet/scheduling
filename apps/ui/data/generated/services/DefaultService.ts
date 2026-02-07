@@ -83,6 +83,10 @@ export class DefaultService {
             path: {
                 'schoolId': schoolId,
             },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
     /**
@@ -104,6 +108,10 @@ export class DefaultService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
     /**
@@ -120,6 +128,10 @@ export class DefaultService {
             url: '/api/schedule/{weekId}',
             path: {
                 'weekId': weekId,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
             },
         });
     }
@@ -142,6 +154,34 @@ export class DefaultService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
+        });
+    }
+    /**
+     * Clear staff assignments for a schedule week
+     * @param weekId
+     * @returns any Delete result
+     * @throws ApiError
+     */
+    public static deleteApiScheduleStaffAssignments(
+        weekId: string,
+    ): CancelablePromise<{
+        ok: boolean;
+        deleted: number;
+    }> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/schedule/{weekId}/staff-assignments',
+            path: {
+                'weekId': weekId,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
 }

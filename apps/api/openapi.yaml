@@ -44,6 +44,8 @@ paths:
   /api/auth/me:
     get:
       summary: Get current authenticated user
+      security:
+        - cookieAuth: []
       responses:
         '200':
           description: Authenticated user profile
@@ -56,6 +58,8 @@ paths:
   /api/settings/{schoolId}:
     get:
       summary: Get settings for a school
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: schoolId
@@ -69,8 +73,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
     put:
       summary: Save settings for a school
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: schoolId
@@ -90,9 +100,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettingsSaveResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
   /api/schedule/{weekId}:
     get:
       summary: Get schedule week
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: weekId
@@ -106,8 +122,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduleWeekResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
     put:
       summary: Save schedule week
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: weekId
@@ -127,7 +149,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericOk'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
+  /api/schedule/{weekId}/staff-assignments:
+    delete:
+      summary: Clear staff assignments for a schedule week
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  deleted:
+                    type: integer
+                required: [ok, deleted]
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sched_session
   schemas:
     HealthResponse:
       type: object

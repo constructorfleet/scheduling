@@ -1,4 +1,4 @@
-import Fastify, { type FastifyRequest } from "fastify";
+import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import fastifyCookie from "@fastify/cookie";
@@ -16,6 +16,7 @@ import {
   SESSION_COOKIE_NAME,
   verifyPassword
 } from "./auth";
+import { canAccessSchoolWithRole } from "./access";
 import type { Prisma as CorePrisma } from "../generated/prisma-client";
 import type {
   DayOfWeek,
@@ -218,6 +219,24 @@ const buildServer = async () => {
     };
   };
 
+  const requireRoleForSchool = async (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    schoolId: string,
+    requiredRole: Role
+  ) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      reply.code(401).send({ message: "Authentication required." });
+      return null;
+    }
+    if (!canAccessSchoolWithRole(auth, schoolId, requiredRole)) {
+      reply.code(403).send({ message: "Insufficient access for this school." });
+      return null;
+    }
+    return auth;
+  };
+
   fastify.get("/api/health", async () => ({ status: "ok" }));
 
   fastify.get("/api/openapi.yaml", async (_, reply) => {
@@ -353,8 +372,11 @@ const buildServer = async () => {
     return reply.sendFile("index.html");
   });
 
-  fastify.get("/api/settings/:schoolId", async (request) => {
+  fastify.get("/api/settings/:schoolId", async (request, reply) => {
     const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireRoleForSchool(request, reply, schoolId, "viewer"))) {
+      return;
+    }
     const prisma = getPrisma();
     const school = await prisma.school.findUnique({
       where: { id: schoolId },
@@ -383,8 +405,11 @@ const buildServer = async () => {
     };
   });
 
-  fastify.put("/api/settings/:schoolId", async (request) => {
+  fastify.put("/api/settings/:schoolId", async (request, reply) => {
     const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireRoleForSchool(request, reply, schoolId, "director"))) {
+      return;
+    }
     const payload = request.body as {
       school?: {
         name: string;
@@ -685,6 +710,9 @@ const buildServer = async () => {
     if (!scheduleWeek) {
       return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
     }
+    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "viewer"))) {
+      return;
+    }
     return {
       ...scheduleWeek,
       auditEvents: scheduleWeek.auditEvents.map((event) => ({
@@ -706,6 +734,16 @@ const buildServer = async () => {
   fastify.delete("/api/schedule/:weekId/staff-assignments", async (request, reply) => {
     const { weekId } = request.params as { weekId: string };
     const prisma = getPrisma();
+    const scheduleWeek = await prisma.scheduleWeek.findUnique({
+      where: { id: weekId },
+      select: { schoolId: true }
+    });
+    if (!scheduleWeek) {
+      return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
+    }
+    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "scheduler"))) {
+      return;
+    }
     try {
       await backupBeforeWrite();
     } catch (error) {
@@ -743,14 +781,19 @@ const buildServer = async () => {
         startDate: true
       }
     });
-
-    const scheduleWeekPayload = payload.scheduleWeek;
-    const resolvedSchoolId = scheduleWeekPayload?.schoolId ?? existingWeek?.schoolId;
-    if (!resolvedSchoolId) {
+    const targetSchoolId = existingWeek?.schoolId ?? payload.scheduleWeek?.schoolId;
+    if (!targetSchoolId) {
       return reply.code(400).send({
         message: "Cannot save schedule chunk before scheduleWeek exists. Include scheduleWeek in the first save."
       });
     }
+    const auth = await requireRoleForSchool(request, reply, targetSchoolId, "scheduler");
+    if (!auth) {
+      return;
+    }
+
+    const scheduleWeekPayload = payload.scheduleWeek;
+    const resolvedSchoolId: string = targetSchoolId;
 
     const resolvedLabel = scheduleWeekPayload?.label ?? existingWeek?.label ?? null;
     const resolvedStatus = scheduleWeekPayload?.status ?? existingWeek?.status ?? "draft";
@@ -932,7 +975,7 @@ const buildServer = async () => {
               id: event.id,
               scheduleWeekId: weekId,
               timestamp: new Date(event.timestamp),
-              user: event.user,
+              user: auth.displayName,
               action: event.action,
               citationId: event.policyCitation?.id ?? null,
               citationName: event.policyCitation?.name ?? null,
@@ -943,7 +986,7 @@ const buildServer = async () => {
             update: {
               scheduleWeekId: weekId,
               timestamp: new Date(event.timestamp),
-              user: event.user,
+              user: auth.displayName,
               action: event.action,
               citationId: event.policyCitation?.id ?? null,
               citationName: event.policyCitation?.name ?? null,
