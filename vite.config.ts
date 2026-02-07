@@ -5,6 +5,11 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   root: ".",
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@core": path.resolve(__dirname, "packages/core")
+    }
+  },
   build: {
     outDir: path.resolve(__dirname, "dist/ui"),
     emptyOutDir: true,
