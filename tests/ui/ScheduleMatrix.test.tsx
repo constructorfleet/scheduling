@@ -464,4 +464,26 @@ describe("ScheduleMatrix", () => {
     });
     expect(onReassignUnlinkedStaff).toHaveBeenCalledWith("emp-missing", "emp-1");
   });
+
+  it("shows configured availability blocks for the employee/day", () => {
+    const availabilityStaff: Employee[] = [
+      {
+        ...baseStaff[0],
+        availability: [
+          {
+            dayOfWeek: "mon",
+            blocks: [
+              { startTime: "08:00", endTime: "11:00" },
+              { startTime: "12:00", endTime: "16:00" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    renderMatrix({ staff: availabilityStaff });
+
+    expect(screen.getByText("Available")).toBeInTheDocument();
+    expect(screen.getByText("8:00 AM-11:00 AM, 12:00 PM-4:00 PM")).toBeInTheDocument();
+  });
 });

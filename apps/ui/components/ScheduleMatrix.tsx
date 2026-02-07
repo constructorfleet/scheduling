@@ -597,6 +597,10 @@ export default function ScheduleMatrix({
                   const closedDay = isClosedDay(day);
                   const hasRequestedDayOff = isEmployeeRequestedOff(member, day);
                   const availabilityForDay = getAvailabilityForDay(member, day);
+                  const availabilityBlocks = availabilityForDay?.blocks ?? [];
+                  const availabilityLabels = availabilityBlocks.map(
+                    (window) => `${formatTime(window.startTime)}-${formatTime(window.endTime)}`
+                  );
                   const hasAvailabilityEntry = Boolean(availabilityForDay);
                   const isAvailableDay = !hasAvailabilityEntry || (availabilityForDay?.blocks?.length ?? 0) > 0;
                   const canCreateAssignment = !closedDay && !hasRequestedDayOff && isAvailableDay;
@@ -655,6 +659,26 @@ export default function ScheduleMatrix({
                         </span>
                       )}
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                        {!closedDay && !hasRequestedDayOff && availabilityLabels.length > 0 && (
+                          <div
+                            style={{
+                              borderRadius: 8,
+                              border: "1px solid #c7d2fe",
+                              background: "#eef2ff",
+                              padding: "0.25rem 0.4rem",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.2rem"
+                            }}
+                          >
+                            <span style={{ fontSize: "0.68rem", color: "#4338ca", fontWeight: 700 }}>
+                              Available
+                            </span>
+                            <span style={{ fontSize: "0.68rem", color: "#312e81", fontWeight: 600 }}>
+                              {availabilityLabels.join(", ")}
+                            </span>
+                          </div>
+                        )}
                         {blocks.map((block) => {
                           const overlapMessage =
                             editing && editing.assignmentId === block.id ? getOverlapMessage(editing) : null;
