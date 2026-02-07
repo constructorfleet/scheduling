@@ -483,7 +483,7 @@ describe("ScheduleMatrix", () => {
 
     renderMatrix({ staff: availabilityStaff });
 
-    expect(screen.getByText("Available")).toBeInTheDocument();
-    expect(screen.getByText("8:00 AM-11:00 AM, 12:00 PM-4:00 PM")).toBeInTheDocument();
+    expect(screen.getByText("Availability")).toBeInTheDocument();
+    expect(screen.getByText("8:00 AM-11:00 AM · 12:00 PM-4:00 PM")).toBeInTheDocument();
   });
 });
