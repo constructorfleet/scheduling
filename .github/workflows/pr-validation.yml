@@ -1,0 +1,151 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version-bump:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine bump level
+        id: semver
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          level="patch"
+
+          labels="$(echo "$PR_LABELS" | tr '[:upper:]' '[:lower:]')"
+          title="$(echo "$PR_TITLE" | tr '[:upper:]' '[:lower:]')"
+          body="$(echo "${PR_BODY:-}" | tr '[:upper:]' '[:lower:]')"
+
+          if [[ "$labels" == *"semver:major"* ]] || [[ "$title" == *"breaking change"* ]] || [[ "$body" == *"breaking change"* ]] || [[ "$title" == *"!:"* ]]; then
+            level="major"
+          elif [[ "$labels" == *"semver:minor"* ]] || [[ "$title" == feat:* ]]; then
+            level="minor"
+          elif [[ "$labels" == *"semver:patch"* ]]; then
+            level="patch"
+          fi
+
+          echo "level=$level" >> "$GITHUB_OUTPUT"
+
+      - name: Bump version
+        env:
+          BUMP_LEVEL: ${{ steps.semver.outputs.level }}
+        run: npm version "$BUMP_LEVEL" --no-git-tag-version
+
+      - name: Commit and push version bump
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "No version changes detected."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version [skip ci]"
+          git push
+
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate OpenAPI client
+        run: npm run api:openapi:client
+
+      - name: Check generated client committed
+        run: git diff --exit-code
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Tests with coverage
+        run: npm test -- --coverage --coverageReporters=json-summary --coverageReporters=text-summary --runInBand
+
+      - name: Build
+        run: npm run build
+
+      - name: Build API
+        run: npm run api:build
+
+      - name: Comment coverage report on PR
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = "coverage/coverage-summary.json";
+            const marker = "<!-- coverage-report -->";
+            let body = `${marker}\n## Test Coverage\nCoverage report was not generated.`;
+
+            if (fs.existsSync(path)) {
+              const summary = JSON.parse(fs.readFileSync(path, "utf8"));
+              const total = summary.total || {};
+              const pct = (k) => typeof total[k]?.pct === "number" ? `${total[k].pct.toFixed(2)}%` : "N/A";
+              body = `${marker}
+            ## Test Coverage
+            | Metric | Coverage |
+            | --- | --- |
+            | Lines | ${pct("lines")} |
+            | Statements | ${pct("statements")} |
+            | Functions | ${pct("functions")} |
+            | Branches | ${pct("branches")} |`;
+            }
+
+            const prNumber = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+
+            const existing = comments.find((c) => c.user?.type === "Bot" && c.body?.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body
+              });
+            }

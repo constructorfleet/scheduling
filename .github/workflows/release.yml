@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  tag-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read package version
+        id: version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push git tag
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          tag="v$VERSION"
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$tag"
+          git push origin "$tag"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:${{ steps.version.outputs.value }}
+            ${{ steps.image.outputs.name }}:v${{ steps.version.outputs.value }}
