@@ -114,6 +114,7 @@ const renderMatrix = (overrides?: Partial<{
   render(
     <ScheduleMatrix
       staff={overrides?.staff ?? baseStaff}
+      employeeOptions={baseStaff}
       assignments={overrides?.assignments ?? assignments}
       segmentBlocks={overrides?.segmentBlocks ?? segmentBlocks}
       days={overrides?.days ?? baseDays}
@@ -129,6 +130,7 @@ const renderMatrix = (overrides?: Partial<{
       onUpdateAssignmentTime={onUpdateAssignmentTime}
       onDeleteAssignment={jest.fn()}
       onCreateAssignment={onCreateAssignment}
+      onReassignUnlinkedStaff={jest.fn()}
     />
   );
   return { onCreateAssignment, onUpdateAssignmentTime };
@@ -143,6 +145,7 @@ describe("ScheduleMatrix", () => {
     const { container } = render(
       <ScheduleMatrix
         staff={baseStaff}
+        employeeOptions={baseStaff}
         assignments={assignments}
         segmentBlocks={segmentBlocks}
         days={baseDays}
@@ -158,6 +161,7 @@ describe("ScheduleMatrix", () => {
         onUpdateAssignmentTime={jest.fn()}
         onDeleteAssignment={jest.fn()}
         onCreateAssignment={jest.fn()}
+        onReassignUnlinkedStaff={jest.fn()}
         focusedSegmentIds={["segment-mon-open"]}
       />
     );
@@ -243,6 +247,7 @@ describe("ScheduleMatrix", () => {
     render(
       <ScheduleMatrix
         staff={baseStaff}
+        employeeOptions={baseStaff}
         assignments={assignments}
         segmentBlocks={segmentBlocks}
         days={baseDays}
@@ -258,6 +263,7 @@ describe("ScheduleMatrix", () => {
         onUpdateAssignmentTime={jest.fn()}
         onDeleteAssignment={onDeleteAssignment}
         onCreateAssignment={jest.fn()}
+        onReassignUnlinkedStaff={jest.fn()}
       />
     );
     const block = screen.getByText("7:00 AM");
@@ -395,5 +401,67 @@ describe("ScheduleMatrix", () => {
     expect(block).toHaveAttribute("title");
     expect(block?.getAttribute("title")).toContain("Outside availability");
     expect(within(block as HTMLElement).getByText("?")).toBeInTheDocument();
+  });
+
+  it("allows reassigning unlinked staff rows to an existing employee", async () => {
+    const user = userEvent.setup();
+    const onReassignUnlinkedStaff = jest.fn();
+    const unlinkedStaff: Employee[] = [
+      ...baseStaff,
+      {
+        id: "emp-missing",
+        name: "Unlinked staff (emp-missing)",
+        jobTitle: "Unknown",
+        maxHoursPerDay: 24,
+        maxHoursPerWeek: 168,
+        employmentStatus: "active",
+        leaderQualified: false,
+        medicallyDelegated: false,
+        cprCurrent: true
+      }
+    ];
+    const unlinkedAssignments: StaffAssignment[] = [
+      ...assignments,
+      {
+        id: "assign-unlinked",
+        segmentBlockId: "segment-mon-open",
+        employeeId: "emp-missing",
+        assignmentSource: "manual_adjustment",
+        startTime: "10:00",
+        endTime: "12:00",
+        status: "scheduled"
+      }
+    ];
+
+    render(
+      <ScheduleMatrix
+        staff={unlinkedStaff}
+        employeeOptions={baseStaff}
+        assignments={unlinkedAssignments}
+        segmentBlocks={segmentBlocks}
+        days={baseDays}
+        daySequence={daySequence}
+        dayDisplayNames={dayDisplayNames}
+        scheduleTypeOptions={scheduleTypeOptions}
+        fieldTripTypes={[]}
+        fieldTripEventsByDay={baseFieldTripEventsByDay}
+        operatingHoursByDay={baseOperatingHoursByDay}
+        onEnrollmentChange={jest.fn()}
+        onScheduleTypeChange={jest.fn()}
+        onFieldTripSelection={jest.fn()}
+        onUpdateAssignmentTime={jest.fn()}
+        onDeleteAssignment={jest.fn()}
+        onCreateAssignment={jest.fn()}
+        onReassignUnlinkedStaff={onReassignUnlinkedStaff}
+      />
+    );
+
+    await act(async () => {
+      await user.selectOptions(screen.getByDisplayValue("Assign to employee"), "emp-1");
+    });
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "Assign" }));
+    });
+    expect(onReassignUnlinkedStaff).toHaveBeenCalledWith("emp-missing", "emp-1");
   });
 });

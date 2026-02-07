@@ -1164,6 +1164,40 @@ export default function App() {
     );
   };
 
+  const handleReassignUnlinkedStaff = (fromEmployeeId: string, toEmployeeId: string) => {
+    if (!fromEmployeeId || !toEmployeeId || fromEmployeeId === toEmployeeId) {
+      return;
+    }
+    applyScheduleChange(
+      (current) => {
+        const rewritten = current.staffAssignments.map((assignment) =>
+          assignment.employeeId === fromEmployeeId
+            ? { ...assignment, employeeId: toEmployeeId }
+            : assignment
+        );
+        const uniqueByCoverage = new Map<string, (typeof rewritten)[number]>();
+        rewritten.forEach((assignment) => {
+          const key = [
+            assignment.segmentBlockId,
+            assignment.employeeId,
+            assignment.startTime,
+            assignment.endTime
+          ].join("|");
+          if (!uniqueByCoverage.has(key)) {
+            uniqueByCoverage.set(key, assignment);
+          }
+        });
+        return {
+          staffAssignments: Array.from(uniqueByCoverage.values())
+        };
+      },
+      {
+        action: "Reassigned unlinked staff",
+        notes: `${fromEmployeeId} -> ${toEmployeeId}`
+      }
+    );
+  };
+
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
     const nextWithClosed = ensureClosedScheduleType(next);
     setScheduleTypeOptionsState(nextWithClosed);
@@ -1272,6 +1306,7 @@ export default function App() {
       >
         <ScheduleMatrix
           staff={scheduleStaff}
+          employeeOptions={employeesDerived}
           assignments={staffAssignmentsState}
           segmentBlocks={segmentBlocksState}
           days={scheduleDaysState}
@@ -1286,6 +1321,7 @@ export default function App() {
           onFieldTripSelection={handleFieldTripSelection}
           onUpdateAssignmentTime={handleUpdateAssignmentTime}
           onDeleteAssignment={handleDeleteAssignment}
+          onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
           onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
             applyScheduleChange(
               (current) => {

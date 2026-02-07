@@ -16,6 +16,7 @@ import { parseTimeToMinutes } from "@core/rules/utils";
 
 interface ScheduleMatrixProps {
   staff: Employee[];
+  employeeOptions: Employee[];
   assignments: StaffAssignment[];
   segmentBlocks: SegmentBlock[];
   days: ScheduleDay[];
@@ -31,6 +32,7 @@ interface ScheduleMatrixProps {
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
   onDeleteAssignment: (assignmentId: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
+  onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
   focusedSegmentIds?: string[] | null;
 }
 
@@ -85,6 +87,7 @@ const ratioToPair = (ratio: number) => {
 
 export default function ScheduleMatrix({
   staff,
+  employeeOptions,
   assignments,
   segmentBlocks,
   days,
@@ -100,6 +103,7 @@ export default function ScheduleMatrix({
   onUpdateAssignmentTime,
   onDeleteAssignment,
   onCreateAssignment,
+  onReassignUnlinkedStaff,
   focusedSegmentIds
 }: ScheduleMatrixProps) {
   const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
@@ -112,6 +116,7 @@ export default function ScheduleMatrix({
     endTime: string;
     isNew: boolean;
   } | null>(null);
+  const [reassignmentTargetBySource, setReassignmentTargetBySource] = useState<Record<string, string>>({});
   const openerWindowMinutes = 15;
   const closerWindowMinutes = 15;
   const dayMetadataByDay = Object.fromEntries(days.map((day) => [day.dayOfWeek, day]));
@@ -455,6 +460,8 @@ export default function ScheduleMatrix({
         <tbody>
           {staff.map((member) => {
             const employeeAssignments = assignmentsByEmployeeDay[member.id] ?? ({} as Record<DayOfWeek, StaffAssignment[]>);
+            const isUnlinkedStaff = member.jobTitle === "Unknown";
+            const reassignmentTarget = reassignmentTargetBySource[member.id] ?? "";
             const totalHours = Object.values(employeeAssignments)
               .flat()
               .reduce((sum, assignment) => sum + getDurationHours(assignment.startTime, assignment.endTime), 0);
@@ -510,6 +517,56 @@ export default function ScheduleMatrix({
                   )}
                   <div style={{ fontWeight: 600 }}>{member.name}</div>
                   <div style={{ color: "#6b7280", fontSize: "0.8rem" }}>{member.jobTitle}</div>
+                  {isUnlinkedStaff && (
+                    <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.35rem", alignItems: "center" }}>
+                      <select
+                        value={reassignmentTarget}
+                        onChange={(event) =>
+                          setReassignmentTargetBySource((prev) => ({
+                            ...prev,
+                            [member.id]: event.target.value
+                          }))
+                        }
+                        style={{
+                          borderRadius: 8,
+                          border: "1px solid #d1d5db",
+                          padding: "0.25rem 0.45rem",
+                          fontSize: "0.75rem",
+                          minWidth: 150
+                        }}
+                      >
+                        <option value="">Assign to employee</option>
+                        {employeeOptions.map((employee) => (
+                          <option key={`reassign-${member.id}-${employee.id}`} value={employee.id}>
+                            {employee.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        disabled={!reassignmentTarget}
+                        onClick={() => {
+                          if (!reassignmentTarget) return;
+                          onReassignUnlinkedStaff(member.id, reassignmentTarget);
+                          setReassignmentTargetBySource((prev) => {
+                            const next = { ...prev };
+                            delete next[member.id];
+                            return next;
+                          });
+                        }}
+                        style={{
+                          borderRadius: 999,
+                          border: "1px solid #bfdbfe",
+                          background: reassignmentTarget ? "#eff6ff" : "#f1f5f9",
+                          color: reassignmentTarget ? "#1d4ed8" : "#94a3b8",
+                          padding: "0.25rem 0.65rem",
+                          fontSize: "0.75rem"
+                        }}
+                      >
+                        Assign
+                      </button>
+                    </div>
+                  )}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem", marginTop: "0.4rem" }}>
                     {badges.map((badge) => (
                       <span
