@@ -1,7 +1,6 @@
 import { RuleDefinition } from "./types";
 import {
     calculateDurationHours,
-    getAssignmentsForBlock,
     getCitationId,
     getDayOfWeekForAssignment,
     getEmployeeById,
@@ -11,7 +10,7 @@ import {
     getScheduleDayById
 } from "./utils";
 import type { RulesContext, RuleViolation } from "./types";
-import type { SegmentBlock, StaffAssignment } from "../domain/types";
+import type { DayOfWeek, StaffAssignment } from "../domain/types";
 
 const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "ratio-segment": "policy-ratio",
@@ -26,21 +25,6 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "open-close-coverage": "policy-open-close",
     "medical-delegated-coverage": "policy-med-delegated",
     "cpr-current-required": "policy-cpr-current"
-};
-
-const assignedEmployeesForBlock = (context: RulesContext, blockId: string) => {
-    const assignments = getAssignmentsForBlock(context, blockId);
-    const unique: Record<string, boolean> = {};
-    const employees = assignments
-        .map((assignment) => getEmployeeById(context, assignment.employeeId))
-        .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee));
-    return employees.filter((employee) => {
-        if (unique[ employee.id ]) {
-            return false;
-        }
-        unique[ employee.id ] = true;
-        return true;
-    });
 };
 
 const buildViolation = (
@@ -95,16 +79,6 @@ const normalizeChildrenPerStaff = (value: number) => {
     return Math.max(1, Math.ceil(value));
 };
 
-const isClosedScheduleDay = (context: RulesContext, block: SegmentBlock) => {
-    const scheduleDay =
-        getScheduleDayById(context, block.scheduleDayId) ??
-        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-    if (!scheduleDay) {
-        return false;
-    }
-    return scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed";
-};
-
 type DayAssignmentWithEmployee = {
     assignment: StaffAssignment;
     employee: NonNullable<ReturnType<typeof getEmployeeById>>;
@@ -120,7 +94,7 @@ type CoverageInterval = {
 
 const getActiveAssignmentsForDay = (
     context: RulesContext,
-    dayOfWeek: SegmentBlock[ "dayOfWeek" ]
+    dayOfWeek: DayOfWeek
 ): DayAssignmentWithEmployee[] =>
     context.staffAssignments
         .filter((assignment) => assignment.status !== "completed")
@@ -329,12 +303,7 @@ export const ratioSegmentRule: RuleDefinition = {
             const effectiveChildCount =
                 typeof day.enrollmentCount === "number"
                     ? day.enrollmentCount
-                    : Math.max(
-                        0,
-                        ...context.segmentBlocks
-                            .filter((block) => block.dayOfWeek === day.dayOfWeek)
-                            .map((block) => block.childCount)
-                    );
+                    : 0;
             const activeFieldTripEvent = context.fieldTripEvents.find((event) => {
                 if (event.dayOfWeek !== day.dayOfWeek) {
                     return false;
@@ -433,14 +402,18 @@ export const ratioSegmentRule: RuleDefinition = {
             });
             const citationId = getCitationId(context, "ratio-segment", DEFAULT_POLICY_CITATIONS[ "ratio-segment" ]);
             mergedIntervals.forEach((interval, intervalIndex) => {
-                const relatedBlocks = context.segmentBlocks.filter((block) => {
-                    if (block.dayOfWeek !== day.dayOfWeek) {
-                        return false;
-                    }
-                    const blockStart = parseTimeToMinutes(block.startTime);
-                    const blockEnd = parseTimeToMinutes(block.endTime);
-                    return blockStart < interval.end && blockEnd > interval.start;
-                });
+                const relatedSegmentBlockIds = Array.from(
+                    new Set(
+                        dayAssignments
+                            .filter((assignment) => {
+                                const assignmentStart = parseTimeToMinutes(assignment.startTime);
+                                const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+                                return assignmentStart < interval.end && assignmentEnd > interval.start;
+                            })
+                            .map((assignment) => assignment.segmentBlockId)
+                            .filter((segmentBlockId) => Boolean(segmentBlockId))
+                    )
+                );
                 const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
                 const message =
                     `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
@@ -464,7 +437,7 @@ export const ratioSegmentRule: RuleDefinition = {
                             ratioChildrenPerStaff: normalizedChildrenPerStaff,
                             startTime: formatMinutesAsTime(interval.start),
                             endTime: formatMinutesAsTime(interval.end),
-                            relatedSegmentBlockIds: relatedBlocks.map((block) => block.id)
+                            relatedSegmentBlockIds
                         }
                     )
                 );
@@ -551,61 +524,144 @@ export const scheduleDayMetadataRule: RuleDefinition = {
 export const certificationPerSegmentRule: RuleDefinition = {
     id: "certification-per-segment",
     description:
-        "Validates that each segment includes employees with current CPR, medical delegation, and leader qualifications when required",
+        "Validates assignment coverage includes CPR, medical delegation, and leader qualifications when required",
     evaluate: (context: RulesContext) => {
         const violations: RuleViolation[] = [];
         const schoolRules = getSchoolRules(context);
-        context.segmentBlocks.forEach((block) => {
-            if (isClosedScheduleDay(context, block)) {
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
                 return;
             }
-            const employees = assignedEmployeesForBlock(context, block.id);
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
+            }
+
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
             const citationId = getCitationId(
                 context,
                 "certification-per-segment",
                 DEFAULT_POLICY_CITATIONS[ "certification-per-segment" ]
             );
-            const requiresLeader =
-                (block.segment === "open" || block.segment === "close") &&
-                employees.some((employee) => {
-                    return context.jobTitleRules?.[ employee.jobTitle ]?.requiresLeaderForOpenClose ?? false;
-                });
 
-            if (schoolRules.requireCurrentCpr && !employees.some((employee) => employee.cprCurrent)) {
+            if (schoolRules.requireCurrentCpr) {
+                const cprCoverage = evaluateMinimumCoverage(
+                    dayAssignments,
+                    windowStart,
+                    windowEnd,
+                    1,
+                    (entry) => entry.employee.cprCurrent
+                );
+                if (cprCoverage.failingIntervals.length > 0) {
+                    const firstGap = cprCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "certification-per-segment",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours lack an employee with current CPR certification`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                dayOfWeek: day.dayOfWeek,
+                                operatingHoursId: operatingHours.id,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
+                }
+            }
+
+            if (schoolRules.minimumMedicalDelegated > 0) {
+                const medCoverage = evaluateMinimumCoverage(
+                    dayAssignments,
+                    windowStart,
+                    windowEnd,
+                    1,
+                    (entry) => entry.employee.medicallyDelegated
+                );
+                if (medCoverage.failingIntervals.length > 0) {
+                    const firstGap = medCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "certification-per-segment",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours lack medically delegated staff`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                dayOfWeek: day.dayOfWeek,
+                                operatingHoursId: operatingHours.id,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
+                }
+            }
+
+            const openWindowEnd = Math.min(windowStart + schoolRules.openerWindowMinutes, windowEnd);
+            const closeWindowStart = Math.max(windowEnd - schoolRules.closerWindowMinutes, windowStart);
+            const openerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                windowStart,
+                openWindowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (openerLeaderGaps.length > 0) {
+                const firstGap = openerLeaderGaps[ 0 ];
                 violations.push(
                     buildViolation(
                         "certification-per-segment",
-                        `Segment ${ block.dayOfWeek }/${ block.segment } lacks an employee with current CPR certification`,
-                        "SegmentBlock",
-                        block.id,
-                        citationId
+                        `${ day.dayOfWeek.toUpperCase() } opener window lacks a leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "opener",
+                            dayOfWeek: day.dayOfWeek,
+                            operatingHoursId: operatingHours.id,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
                     )
                 );
             }
 
-            if (
-                schoolRules.minimumMedicalDelegated > 0 &&
-                !employees.some((employee) => employee.medicallyDelegated)
-            ) {
+            const closerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                closeWindowStart,
+                windowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (closerLeaderGaps.length > 0) {
+                const firstGap = closerLeaderGaps[ 0 ];
                 violations.push(
                     buildViolation(
                         "certification-per-segment",
-                        `Segment ${ block.dayOfWeek }/${ block.segment } lacks medically delegated staff`,
-                        "SegmentBlock",
-                        block.id,
-                        citationId
-                    )
-                );
-            }
-
-            if (requiresLeader && !employees.some((employee) => employee.leaderQualified)) {
-                violations.push(
-                    buildViolation(
-                        "certification-per-segment",
-                        `Segment ${ block.dayOfWeek }/${ block.segment } lacks a leader-qualified employee`,
-                        "SegmentBlock",
-                        block.id,
-                        citationId
+                        `${ day.dayOfWeek.toUpperCase() } closer window lacks a leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "closer",
+                            dayOfWeek: day.dayOfWeek,
+                            operatingHoursId: operatingHours.id,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
                     )
                 );
             }
@@ -616,47 +672,76 @@ export const certificationPerSegmentRule: RuleDefinition = {
 
 export const segmentCoverageRule: RuleDefinition = {
     id: "segment-coverage",
-    description: "Enforces leader and medical coverage guardrails per segment",
+    description: "Enforces leader and medical coverage guardrails from assignment windows",
     evaluate: (context: RulesContext) => {
         const violations: RuleViolation[] = [];
         const schoolRules = getSchoolRules(context);
-        context.segmentBlocks.forEach((block) => {
-            if (isClosedScheduleDay(context, block)) {
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
                 return;
             }
-            const blockStart = parseTimeToMinutes(block.startTime);
-            const blockEnd = parseTimeToMinutes(block.endTime);
-            if (blockEnd <= blockStart) {
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
                 return;
             }
-            const dayAssignments = getActiveAssignmentsForDay(context, block.dayOfWeek);
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
             const citationId = getCitationId(
                 context,
                 "segment-coverage",
                 DEFAULT_POLICY_CITATIONS[ "segment-coverage" ]
             );
-            const leaderCoverageGaps =
-                block.segment === "open" || block.segment === "close"
-                    ? evaluateConditionalLeaderCoverage(
-                        dayAssignments,
-                        blockStart,
-                        blockEnd,
-                        (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
-                        (entry) => entry.employee.leaderQualified
-                    )
-                    : [];
+            const openerWindowEnd = Math.min(windowStart + schoolRules.openerWindowMinutes, windowEnd);
+            const closerWindowStart = Math.max(windowEnd - schoolRules.closerWindowMinutes, windowStart);
+            const openerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                windowStart,
+                openerWindowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            const closerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                closerWindowStart,
+                windowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
 
-            if (leaderCoverageGaps.length > 0) {
-                const firstGap = leaderCoverageGaps[ 0 ];
+            if (openerLeaderGaps.length > 0) {
+                const firstGap = openerLeaderGaps[ 0 ];
                 violations.push(
                     buildViolation(
                         "segment-coverage",
-                        `Segment ${ block.dayOfWeek }/${ block.segment } needs at least one leader-qualified employee`,
-                        "SegmentBlock",
-                        block.id,
+                        `${ day.dayOfWeek.toUpperCase() } opener window needs at least one leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
                         citationId,
                         "error",
                         {
+                            type: "opener",
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
+            if (closerLeaderGaps.length > 0) {
+                const firstGap = closerLeaderGaps[ 0 ];
+                violations.push(
+                    buildViolation(
+                        "segment-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } closer window needs at least one leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "closer",
                             startTime: formatMinutesAsTime(firstGap.start),
                             endTime: formatMinutesAsTime(firstGap.end)
                         }
@@ -667,31 +752,30 @@ export const segmentCoverageRule: RuleDefinition = {
             if (schoolRules.minimumMedicalDelegated > 0) {
                 const medicalCoverage = evaluateMinimumCoverage(
                     dayAssignments,
-                    blockStart,
-                    blockEnd,
+                    windowStart,
+                    windowEnd,
                     1,
                     (entry) => entry.employee.medicallyDelegated
                 );
-                if (medicalCoverage.failingIntervals.length === 0) {
-                    return;
+                if (medicalCoverage.failingIntervals.length > 0) {
+                    const firstGap = medicalCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "segment-coverage",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours need medically delegated coverage`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                required: 1,
+                                actual: medicalCoverage.minimumActual,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
                 }
-                const firstGap = medicalCoverage.failingIntervals[ 0 ];
-                violations.push(
-                    buildViolation(
-                        "segment-coverage",
-                        `Segment ${ block.dayOfWeek }/${ block.segment } needs medically delegated coverage`,
-                        "SegmentBlock",
-                        block.id,
-                        citationId,
-                        "error",
-                        {
-                            required: 1,
-                            actual: medicalCoverage.minimumActual,
-                            startTime: formatMinutesAsTime(firstGap.start),
-                            endTime: formatMinutesAsTime(firstGap.end)
-                        }
-                    )
-                );
             }
         });
         return violations;
@@ -700,7 +784,7 @@ export const segmentCoverageRule: RuleDefinition = {
 
 export const segmentBlockTimelineRule: RuleDefinition = {
     id: "segment-block-timeline",
-    description: "Detects invalid clock windows and overlapping shifts for the same employee",
+    description: "Detects invalid assignment windows and overlapping shifts for the same employee",
     evaluate: (context: RulesContext) => {
         const violations: RuleViolation[] = [];
         const citationId = getCitationId(
@@ -708,54 +792,39 @@ export const segmentBlockTimelineRule: RuleDefinition = {
             "segment-block-timeline",
             DEFAULT_POLICY_CITATIONS[ "segment-block-timeline" ]
         );
-        context.segmentBlocks.forEach((block) => {
-            if (isClosedScheduleDay(context, block)) {
-                return;
-            }
-            const blockAssignments = getAssignmentsForBlock(context, block.id).filter(
-                (assignment) => assignment.status !== "completed"
-            );
-            const scheduleDay =
-                getScheduleDayById(context, block.scheduleDayId) ??
-                context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-            const operatingHours = getOperatingHoursForDay(
-                context,
-                block.dayOfWeek,
-                scheduleDay?.dayScheduleType
-            );
-            if (blockAssignments.length === 0) {
-                return;
-            }
-            const windows = blockAssignments.map((assignment) => ({
-                entity: "StaffAssignment" as const,
-                id: assignment.id,
-                startTime: assignment.startTime,
-                endTime: assignment.endTime,
-                metadata: { relatedSegmentBlockIds: [ block.id ] as string[] }
-            }));
-
-            windows.forEach((window) => {
-                const start = parseTimeToMinutes(window.startTime);
-                const end = parseTimeToMinutes(window.endTime);
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (!dayOfWeek) {
+                    return;
+                }
+                const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+                if (scheduleDay?.scheduleType === "closed" || scheduleDay?.dayScheduleType === "closed") {
+                    return;
+                }
+                const start = parseTimeToMinutes(assignment.startTime);
+                const end = parseTimeToMinutes(assignment.endTime);
                 if (start >= end) {
                     violations.push(
                         buildViolation(
                             "segment-block-timeline",
-                            `Schedule block ${ block.dayOfWeek.toUpperCase() } ${ window.startTime }-${ window.endTime } has an invalid window`,
-                            window.entity,
-                            window.id,
+                            `Schedule block ${ dayOfWeek.toUpperCase() } ${ assignment.startTime }-${ assignment.endTime } has an invalid window`,
+                            "StaffAssignment",
+                            assignment.id,
                             citationId,
                             "error",
                             {
-                                startTime: window.startTime,
-                                endTime: window.endTime,
-                                dayOfWeek: block.dayOfWeek,
-                                ...window.metadata
+                                startTime: assignment.startTime,
+                                endTime: assignment.endTime,
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
                             }
                         )
                     );
                     return;
                 }
+                const operatingHours = getOperatingHoursForDay(context, dayOfWeek, scheduleDay?.dayScheduleType);
                 if (!operatingHours) {
                     return;
                 }
@@ -765,17 +834,17 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                     violations.push(
                         buildViolation(
                             "segment-block-timeline",
-                            `Schedule block on ${ block.dayOfWeek.toUpperCase() } starts before operating hours (${ operatingHours.open })`,
-                            window.entity,
-                            window.id,
+                            `Schedule block on ${ dayOfWeek.toUpperCase() } starts before operating hours (${ operatingHours.open })`,
+                            "StaffAssignment",
+                            assignment.id,
                             citationId,
                             "error",
                             {
                                 operatingHoursId: operatingHours.id,
-                                startTime: window.startTime,
+                                startTime: assignment.startTime,
                                 boundary: operatingHours.open,
-                                dayOfWeek: block.dayOfWeek,
-                                ...window.metadata
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
                             }
                         )
                     );
@@ -784,23 +853,22 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                     violations.push(
                         buildViolation(
                             "segment-block-timeline",
-                            `Schedule block on ${ block.dayOfWeek.toUpperCase() } ends after operating hours (${ operatingHours.close })`,
-                            window.entity,
-                            window.id,
+                            `Schedule block on ${ dayOfWeek.toUpperCase() } ends after operating hours (${ operatingHours.close })`,
+                            "StaffAssignment",
+                            assignment.id,
                             citationId,
                             "error",
                             {
                                 operatingHoursId: operatingHours.id,
-                                endTime: window.endTime,
+                                endTime: assignment.endTime,
                                 boundary: operatingHours.close,
-                                dayOfWeek: block.dayOfWeek,
-                                ...window.metadata
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
                             }
                         )
                     );
                 }
             });
-        });
 
         const assignmentsByEmployeeDay: Record<string, StaffAssignment[]> = {};
         context.staffAssignments.forEach((assignment) => {
@@ -1175,27 +1243,35 @@ export const openCloseCoverageRule: RuleDefinition = {
 
 export const medicalDelegatedCoverageRule: RuleDefinition = {
     id: "medical-delegated-coverage",
-    description: "Requires minimum medically delegated staff per segment block",
+    description: "Requires minimum medically delegated staff across operating hours",
     evaluate: (context: RulesContext) => {
         const violations: RuleViolation[] = [];
         const rules = getSchoolRules(context);
         if (rules.minimumMedicalDelegated <= 0) {
             return violations;
         }
-        context.segmentBlocks.forEach((block) => {
-            if (isClosedScheduleDay(context, block)) {
+
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
                 return;
             }
-            const blockStart = parseTimeToMinutes(block.startTime);
-            const blockEnd = parseTimeToMinutes(block.endTime);
-            if (blockEnd <= blockStart) {
+
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
                 return;
             }
-            const dayAssignments = getActiveAssignmentsForDay(context, block.dayOfWeek);
+
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
             const coverage = evaluateMinimumCoverage(
                 dayAssignments,
-                blockStart,
-                blockEnd,
+                windowStart,
+                windowEnd,
                 rules.minimumMedicalDelegated,
                 (entry) => entry.employee.medicallyDelegated
             );
@@ -1208,21 +1284,31 @@ export const medicalDelegatedCoverageRule: RuleDefinition = {
                 DEFAULT_POLICY_CITATIONS[ "medical-delegated-coverage" ]
             );
             const firstGap = coverage.failingIntervals[ 0 ];
+            const relatedSegmentBlockIds = Array.from(
+                new Set(
+                    dayAssignments
+                        .map((entry) => entry.assignment.segmentBlockId)
+                        .filter((segmentBlockId) => Boolean(segmentBlockId))
+                )
+            );
             violations.push(
                 buildViolation(
                     "medical-delegated-coverage",
-                    `${ block.dayOfWeek.toUpperCase() } ${ block.segment } requires ${ rules.minimumMedicalDelegated } medically delegated staff`,
-                    "SegmentBlock",
-                    block.id,
+                    `${ day.dayOfWeek.toUpperCase() } operating hours require ${ rules.minimumMedicalDelegated } medically delegated staff`,
+                    "ScheduleDay",
+                    day.id,
                     citationId,
                     "error",
                     {
                         required: rules.minimumMedicalDelegated,
                         actual: coverage.minimumActual,
-                        dayOfWeek: block.dayOfWeek,
+                        dayOfWeek: day.dayOfWeek,
+                        operatingHoursId: operatingHours.id,
+                        boundaryStart: operatingHours.open,
+                        boundaryEnd: operatingHours.close,
                         startTime: formatMinutesAsTime(firstGap.start),
                         endTime: formatMinutesAsTime(firstGap.end),
-                        relatedSegmentBlockIds: [ block.id ]
+                        relatedSegmentBlockIds
                     }
                 )
             );
@@ -1326,21 +1412,18 @@ export const fieldTripEventIntegrityRule: RuleDefinition = {
 
 export const fieldTripRatiosRule: RuleDefinition = {
     id: "field-trip-ratios",
-    description: "Applies field trip leader ratios for segments on days with field trips",
+    description: "Applies field trip leader ratios across assignment windows on days with field trips",
     evaluate: (context: RulesContext) => {
         const violations: RuleViolation[] = [];
-        context.segmentBlocks.forEach((block) => {
-            if (isClosedScheduleDay(context, block)) {
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
                 return;
             }
-            const scheduleDay =
-                getScheduleDayById(context, block.scheduleDayId) ??
-                context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
             const event = context.fieldTripEvents.find((candidate) => {
-                if (candidate.dayOfWeek !== block.dayOfWeek) {
+                if (candidate.dayOfWeek !== day.dayOfWeek) {
                     return false;
                 }
-                if (candidate.scheduleDayId && scheduleDay?.id && candidate.scheduleDayId !== scheduleDay.id) {
+                if (candidate.scheduleDayId && candidate.scheduleDayId !== day.id) {
                     return false;
                 }
                 return Boolean(candidate.fieldTripTypeId) && !candidate.isNoFieldTrip;
@@ -1349,40 +1432,44 @@ export const fieldTripRatiosRule: RuleDefinition = {
             if (!event || !type || type.leaderRatioStudents <= 0) {
                 return;
             }
-            const effectiveChildCount =
-                typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
+            const effectiveChildCount = typeof day.enrollmentCount === "number" ? day.enrollmentCount : 0;
             // Field trip ratios: leaderRatioAdults:leaderRatioStudents (e.g., 1:30 ratio)
             const childrenPerLeader = type.leaderRatioStudents / type.leaderRatioAdults;
             const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / childrenPerLeader));
-            const blockStart = parseTimeToMinutes(block.startTime);
-            const blockEnd = parseTimeToMinutes(block.endTime);
-            const assignedLeaderIds = new Set(
-                context.staffAssignments
-                    .filter((assignment) => assignment.status !== "completed")
-                    .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === block.dayOfWeek)
-                    .filter((assignment) => {
-                        const assignmentStart = parseTimeToMinutes(assignment.startTime);
-                        const assignmentEnd = parseTimeToMinutes(assignment.endTime);
-                        return assignmentStart < blockEnd && assignmentEnd > blockStart;
-                    })
-                    .map((assignment) => getEmployeeById(context, assignment.employeeId))
-                    .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee?.leaderQualified))
-                    .map((employee) => employee.id)
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
+            }
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const leaderCoverage = evaluateMinimumCoverage(
+                dayAssignments,
+                windowStart,
+                windowEnd,
+                requiredLeaders,
+                (entry) => entry.employee.leaderQualified
             );
-            if (assignedLeaderIds.size < requiredLeaders) {
+            if (leaderCoverage.failingIntervals.length > 0) {
+                const firstGap = leaderCoverage.failingIntervals[ 0 ];
                 const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
                 violations.push(
                     buildViolation(
                         "field-trip-ratios",
-                        `Field trip ${ block.dayOfWeek.toUpperCase() } ${ block.segment } needs ${ requiredLeaders } leaders but only ${ assignedLeaderIds.size } assigned`,
-                        "SegmentBlock",
-                        block.id,
+                        `Field trip ${ day.dayOfWeek.toUpperCase() } needs ${ requiredLeaders } leaders but only ${ leaderCoverage.minimumActual } assigned`,
+                        "ScheduleDay",
+                        day.id,
                         citationId,
                         "error",
                         {
-                            assignedLeaders: assignedLeaderIds.size,
+                            assignedLeaders: leaderCoverage.minimumActual,
                             requiredLeaders,
-                            dayOfWeek: block.dayOfWeek
+                            dayOfWeek: day.dayOfWeek,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
                         }
                     )
                 );
