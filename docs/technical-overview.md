@@ -5,9 +5,9 @@ This reference explains how the Scheduling workspace hangs together so any engin
 
 ## Architecture at a Glance
 - **Static HTML5 frontend.** `apps/ui` contains the guided React workspace built for offline-first delivery; the entry point wires into `index.html` and relies on `vite.config.ts` for build-time asset bundling.
-- **Domain layer.** `src/domain` encapsulates entities such as `School`, `Staff`, `Schedule`, `PolicyCitation`, `RatioProfile`, and `Certification`. Business rules—validation hooks, derived booleans, state transitions—reside close to these models.
-- **Rules engine.** `src/rules/RulesEngine.ts` orchestrates the compliance checks described in the charter: ratio coverage, certification expiration, break enforcement, field-trip overrides, coverage gaps, substitute parity, and approval gating. The engine exposes `violationRecords` that the UI consumes to render `ViolationNavigator`, the guided tracker, and the publish CTA state.
-- **Storage & persistence.** Local storage (IndexedDB snapshots or JSON-based journals) lives under `src/storage`. Every scheduling action produces a journal entry so offline edits can replay, audit trails stay complete, and data can later sync or export.
+- **Domain layer.** `packages/core/domain` encapsulates entities such as `School`, `Staff`, `Schedule`, `PolicyCitation`, `RatioProfile`, and `Certification`. Business rules—validation hooks, derived booleans, state transitions—reside close to these models.
+- **Rules engine.** `packages/core/rules/RulesEngine.ts` orchestrates the compliance checks described in the charter: ratio coverage, certification expiration, break enforcement, field-trip overrides, coverage gaps, substitute parity, and approval gating. The engine exposes `violationRecords` that the UI consumes to render `ViolationNavigator`, the guided tracker, and the publish CTA state.
+- **Storage & persistence.** Local storage (IndexedDB snapshots or JSON-based journals) lives under `packages/core/storage`. Every scheduling action produces a journal entry so offline edits can replay, audit trails stay complete, and data can later sync or export.
 - **Agent orchestration.** `orchestrate.ts` drives the agent phases, routing specs from `AGENTS.md`, `PROJECT.md`, and `DOMAIN_MODEL.md` into the appropriate outputs (`artifacts/*`). Each phase (Product, Solution, Data Model, etc.) publishes artifacts that downstream agents reference; documentation is the final handoff.
 
 ## Core Data Model

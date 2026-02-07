@@ -4,7 +4,7 @@
 This guide describes how the scheduling app’s automation layers (rule-engine Jest suites, RTL component specs, Playwright journeys, and audit-ready artifacts) keep every policy violation traceable and teachable without a live walkthrough. It also captures the blockers, tools, and next steps the Documentation & QA agents highlight so onboarding leans on the documentation itself.
 
 ## Testing philosophy
-- **Compliance-first traceability.** Each QA rule listed in `RULES_TEST_CASES.md` links a policy citation to a violation/clean fixture pair in `tests/rules/rulesEngine.test.ts`, so the UI’s violation navigator can point back to the exact rule definition in `src/rules/definitions.ts` and the underlying operating policy.
+- **Compliance-first traceability.** Each QA rule listed in `RULES_TEST_CASES.md` links a policy citation to a violation/clean fixture pair in `tests/rules/rulesEngine.test.ts`, so the UI’s violation navigator can point back to the exact rule definition in `packages/core/rules/definitions.ts` and the underlying operating policy.
 - **Data-driven revalidation.** There is no “mark addressed” button—`GuidedStatusTracker` guides directors to the unresolved field trip, ratio, or clock block, and the rules engine clears every violation automatically once the submitted metadata is compliant.
 - **Auditable automation.** Every Jest or Playwright run creates validation data (`test-results/`) that can be attached to release notes, QA dashboards, or compliance reports, ensuring the same scripts executed in each school deployment produce identical outputs.
 - **Offline parity.** The available automation runs locally (Vite dev server + Playwright, Jest with `ts-jest` and `jsdom`), so even air-gapped deployments can execute the same commands and capture JSON/journal snapshots for auditors.
@@ -21,13 +21,13 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 | QA-RULE-030 Segment block overlaps are disallowed | Flags overlapping assignments within the same day so auto-balance can reflow staff. | `tests/rules/rulesEngine.test.ts` (overlap fixtures) + `tests/e2e/workspace-interactions.spec.ts` verifying the violation navigator steers directors back to the conflicting blocks. |
 
 ### Timeline integrity (QA-RULE-029—030)
-- The `segment-block-timeline` rule (see `src/rules/definitions.ts:240-309`) validates every `SegmentBlock` for a positive clock window and no overlaps within its day, producing actionable violations that carry the block metadata for downstream reporting. `RULES_TEST_CASES.md:169-182` keeps the QA-ID/citation pair aligned with the fixtures used in `tests/rules/rulesEngine.test.ts:907-968` so auditors can replay a violation straight from the documentation. 
+- The `segment-block-timeline` rule (see `packages/core/rules/definitions.ts:240-309`) validates every `SegmentBlock` for a positive clock window and no overlaps within its day, producing actionable violations that carry the block metadata for downstream reporting. `RULES_TEST_CASES.md:169-182` keeps the QA-ID/citation pair aligned with the fixtures used in `tests/rules/rulesEngine.test.ts:907-968` so auditors can replay a violation straight from the documentation. 
 - Component tests (`tests/ui/DayMetadataStrip.test.tsx`, `tests/ui/ClockBlockTimeline.test.tsx`) and the workspace-focused Playwright journeys ensure the guided metadata flows, auto-balance hints, and `aria-pressed` focus semantics reflect the same rule payloads; new QA-RULE references now appear in the feature/coverage matrix and QA catalog so onboarding scripts can point learners to the exact fixtures and commands. 
 - Every rerun of `npm test -- tests/rules/rulesEngine.test.ts` or the narrower `tests/ui/ClockBlockTimeline.test.tsx` suite should capture `test-results/segment-block-timeline.json` (or similar) with the QA rule ID so release notes and compliance decks cite both the policy and automation path before publishing. 
 
 ## Automation layers
 ### Rule engine & helpers (Jest)
-- `tests/rules/rulesEngine.test.ts` walks through every QA rule ID, firing compliant and violating fixtures so auditors can replay a violation from the UI back to the policy citation exported alongside `src/rules/definitions.ts`.
+- `tests/rules/rulesEngine.test.ts` walks through every QA rule ID, firing compliant and violating fixtures so auditors can replay a violation from the UI back to the policy citation exported alongside `packages/core/rules/definitions.ts`.
 - Utility suites such as `tests/utils/rulesUtils.test.ts` protect the shared math helpers (`parseTimeToMinutes`, ratio calculations, clock block duration checks) that keep coverage consistent when block windows span midnight or combine non-contiguous assignments.
 - Jest uses `ts-jest`, the `jsdom` environment configured in `jest.config.ts`, and DOM helpers from `tests/setupTests.ts` so the React components and rule engine agree on the same helpers and mocking story.
 

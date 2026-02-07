@@ -71,19 +71,11 @@ npm test
 
 ```
 scheduling/
-├── src/
-│   ├── domain/           # Domain model entities
-│   │   ├── School.ts
-│   │   ├── Staff.ts
-│   │   ├── Schedule.ts
-│   │   └── ...
-│   ├── rules/            # Compliance rules engine
-│   │   ├── RulesEngine.ts
-│   │   ├── rules/
-│   │   └── ...
-│   ├── storage/          # Data persistence (IndexedDB)
-│   │   └── ...
-│   └── index.ts
+├── packages/
+│   └── core/             # Shared domain + rules + storage
+│       ├── domain/
+│       ├── rules/
+│       └── storage/
 ├── apps/
 │   ├── ui/               # React workspace (Vite entry: apps/ui/main.tsx)
 │   │   ├── components/

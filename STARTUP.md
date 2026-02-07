@@ -7,7 +7,7 @@
 
 - ✅ Agent orchestration system implemented (9 specialized agents)
 - ✅ Project specifications in markdown (PROJECT.md, AGENTS.md, BACKLOG.md, DOMAIN_MODEL.md)
-- ✅ Project structure created (src/domain, src/rules, apps/ui, src/storage, tests/)
+- ✅ Project structure created (packages/core/domain, packages/core/rules, apps/ui, packages/core/storage, tests/)
 - ✅ Documentation created (README, KICKOFF, AGENT_GUIDE, PROJECT_MAP)
 - ✅ Orchestration script created (orchestrate.ts)
 - ✅ Artifacts directory with README (for storing agent outputs)
@@ -167,7 +167,7 @@ Once orchestration is complete and approved:
 
 ```bash
 # Develop domain entities based on phase-3 output
-# src/domain/
+# packages/core/domain/
 ```
 
 - [ ] Implement School entity
@@ -179,7 +179,7 @@ Once orchestration is complete and approved:
 
 ```bash
 # Implement rules based on phase-4 output
-# src/rules/
+# packages/core/rules/
 ```
 
 - [ ] Implement compliance rules
@@ -201,7 +201,7 @@ Once orchestration is complete and approved:
 
 ```bash
 # Implement persistence based on architecture
-# src/storage/
+# packages/core/storage/
 ```
 
 - [ ] Set up IndexedDB or equivalent

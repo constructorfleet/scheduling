@@ -1,6 +1,6 @@
 # Rules Engine Detailed Test Cases
 
-These cases cover every planned rules engine rule so the rules engine fulfills the QA agent definition of done (critical compliance paths). Once rules are implemented under `src/rules/`, link each case back to the policy catalog and the test fixtures that exercise the scenario.
+These cases cover every planned rules engine rule so the rules engine fulfills the QA agent definition of done (critical compliance paths). Once rules are implemented under `packages/core/rules/`, link each case back to the policy catalog and the test fixtures that exercise the scenario.
 
 ## Rule: ratio-segment (Staff-student/time-segment ratios)
 - **Source:** `artifacts/phase-1-discovery/rules-catalog.md:4` (segment-level ratio ceilings)
@@ -125,7 +125,7 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Verification:** `tests/rules/rulesEngine.test.ts` (`ft-event-6` fixture confirms the selective metadata and violation).
 
 ## Rule: schedule-day-metadata (Day-level metadata completeness)
-- **Source:** `DOMAIN_MODEL.md:306-313` (Schedule day captures schedule type, enrollment, and field trip metadata) plus `src/rules/definitions.ts:67-125`.
+- **Source:** `DOMAIN_MODEL.md:306-313` (Schedule day captures schedule type, enrollment, and field trip metadata) plus `packages/core/rules/definitions.ts:67-125`.
 
 ### QA-RULE-022 – Schedule day missing required metadata (violation)
 - **Preconditions:** a `ScheduleDay` without `scheduleType`, `enrollmentCount`, or `fieldTripEventId`.
@@ -144,7 +144,7 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Verification:** `tests/rules/rulesEngine.test.ts:778-799` (the `day-missing-event` fixture explicitly asserts the violation and metadata payload).
 
 ## Rule: field-trip-event (Field trip event integrity)
-- **Source:** `DOMAIN_MODEL.md:263-292` (FieldTripEvent lifecycle) and `src/rules/definitions.ts:400-438`.
+- **Source:** `DOMAIN_MODEL.md:263-292` (FieldTripEvent lifecycle) and `packages/core/rules/definitions.ts:400-438`.
 
 ### QA-RULE-025 – Event missing both type and “No Field Trip” flag (violation)
 - **Preconditions:** `FieldTripEvent` lacks `isNoFieldTrip` and `fieldTripTypeId`, yet is linked to a `ScheduleDay`.
@@ -167,7 +167,7 @@ These cases cover every planned rules engine rule so the rules engine fulfills t
 - **Verification:** `tests/rules/rulesEngine.test.ts:855-878` (`ft-event-no-trip` proves the rule skips validation when the event marks “No Field Trip”).
 
 ## Rule: segment-block-timeline (Segment clock window validation)
-- **Source:** `src/rules/definitions.ts:240-309`
+- **Source:** `packages/core/rules/definitions.ts:240-309`
 
 ### QA-RULE-029 – Segment block with invalid window (violation)
 - **Preconditions:** a `SegmentBlock` whose `startTime` is the same as or after `endTime` (e.g., `startTime = "12:00"`, `endTime = "10:00"`).
