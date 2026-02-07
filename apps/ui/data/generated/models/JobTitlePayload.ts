@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { SchoolRecord } from './SchoolRecord';
-export type SettingsSaveResponse = {
-    school: SchoolRecord;
+export type JobTitlePayload = {
+    title: string;
+    leaderQualified: boolean;
+    requiresLeaderForOpenClose: boolean;
 };
 

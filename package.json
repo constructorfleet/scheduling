@@ -24,7 +24,7 @@
     "orchestrate": "ts-node orchestrate.ts",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint src apps tests",
+    "lint": "eslint packages apps tests",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist coverage"
     ,

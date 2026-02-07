@@ -14,7 +14,7 @@ import {
   ScheduleDay,
   ScheduleStatus,
   ScheduleType
-} from "../../../src/domain/types";
+} from "@core/domain/types";
 import { RuleViolation, AuditEvent } from "../types";
 
 export const policyCitations: Record<string, PolicyCitation> = {

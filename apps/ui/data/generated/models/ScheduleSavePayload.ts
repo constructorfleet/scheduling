@@ -2,16 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { FieldTripEvent } from './FieldTripEvent';
+import type { ScheduleDay } from './ScheduleDay';
+import type { ScheduleWeek } from './ScheduleWeek';
+import type { SegmentBlock } from './SegmentBlock';
+import type { StaffAssignment } from './StaffAssignment';
 export type ScheduleSavePayload = {
-    scheduleWeek: {
-        schoolId: string;
-        label?: string;
-        status: string;
-        startDate?: string;
-    };
-    scheduleDays: Array<any>;
-    segmentBlocks: Array<any>;
-    staffAssignments: Array<any>;
-    fieldTripEvents: Array<any>;
+    scheduleWeek: ScheduleWeek;
+    scheduleDays: Array<ScheduleDay>;
+    segmentBlocks: Array<SegmentBlock>;
+    staffAssignments: Array<StaffAssignment>;
+    fieldTripEvents: Array<FieldTripEvent>;
 };
 

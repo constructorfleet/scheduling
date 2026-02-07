@@ -7,7 +7,7 @@ import type {
   FieldTripType,
   ScheduleDay,
   ScheduleType
-} from "../../src/domain/types";
+} from "@core/domain/types";
 
 const daySequence: DayOfWeek[] = ["mon", "tue"];
 

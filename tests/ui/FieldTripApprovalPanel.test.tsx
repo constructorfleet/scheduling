@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import FieldTripApprovalPanel from "../../apps/ui/components/FieldTripApprovalPanel";
-import type { DayOfWeek, FieldTripEvent } from "../../src/domain/types";
+import type { DayOfWeek, FieldTripEvent } from "@core/domain/types";
 
 const tripType = {
   id: "ft-test",

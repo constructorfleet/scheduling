@@ -1,5 +1,5 @@
-import { calculateDurationHours, getCitationId, parseTimeToMinutes } from "../../src/rules/utils";
-import type { RulesContext } from "../../src/rules/types";
+import { calculateDurationHours, getCitationId, parseTimeToMinutes } from "@core/rules/utils";
+import type { RulesContext } from "@core/rules/types";
 
 describe("rules/utils", () => {
   describe("parseTimeToMinutes", () => {

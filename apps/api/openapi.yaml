@@ -97,6 +97,27 @@ components:
         status:
           type: string
       required: [status]
+    DayOfWeek:
+      type: string
+      enum: [mon, tue, wed, thu, fri, sat, sun]
+    DaySegment:
+      type: string
+      enum: [open, mid, close]
+    ScheduleStatus:
+      type: string
+      enum: [draft, ready_for_review, submitted, approved, archived]
+    DayScheduleType:
+      type: string
+      enum: [closed, in_house, full_day, school_day]
+    AssignmentSource:
+      type: string
+      enum: [template, manual_adjustment, field_trip_override, import]
+    EnrollmentSource:
+      type: string
+      enum: [roster, manual_adjustment, override]
+    EmploymentStatus:
+      type: string
+      enum: [active, on_leave, archived]
     SchoolSettings:
       type: object
       properties:
@@ -105,7 +126,7 @@ components:
         closedDays:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/DayOfWeek'
         openerCount:
           type: integer
         closerCount:
@@ -121,7 +142,34 @@ components:
         - closerCount
         - minimumMedicalDelegated
         - requireCurrentCpr
-    ScheduleType:
+    SchoolRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        closedDays:
+          type: array
+          items:
+            type: string
+        openerCount:
+          type: integer
+        closerCount:
+          type: integer
+        minimumMedicalDelegated:
+          type: integer
+        requireCurrentCpr:
+          type: boolean
+      required:
+        - id
+        - name
+        - closedDays
+        - openerCount
+        - closerCount
+        - minimumMedicalDelegated
+        - requireCurrentCpr
+    ScheduleTypePayload:
       type: object
       properties:
         value:
@@ -139,7 +187,25 @@ components:
         description:
           type: string
       required: [value, label, ratio]
-    JobTitle:
+    ScheduleTypeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
+        value:
+          type: string
+        label:
+          type: string
+        ratioAdults:
+          type: integer
+        ratioStudents:
+          type: integer
+        description:
+          type: string
+      required: [id, schoolId, value, label, ratioAdults, ratioStudents]
+    JobTitlePayload:
       type: object
       properties:
         title:
@@ -149,9 +215,54 @@ components:
         requiresLeaderForOpenClose:
           type: boolean
       required: [title, leaderQualified, requiresLeaderForOpenClose]
-    Employee:
+    JobTitleResponse:
       type: object
       properties:
+        id:
+          type: string
+        schoolId:
+          type: string
+        title:
+          type: string
+        leaderQualified:
+          type: boolean
+        requiresLeaderForOpenClose:
+          type: boolean
+      required: [id, schoolId, title, leaderQualified, requiresLeaderForOpenClose]
+    EmployeePayload:
+      type: object
+      properties:
+        name:
+          type: string
+        jobTitle:
+          type: string
+        maxHoursPerDay:
+          type: integer
+        maxHoursPerWeek:
+          type: integer
+        employmentStatus:
+          $ref: '#/components/schemas/EmploymentStatus'
+        medicallyDelegated:
+          type: boolean
+        cprCurrent:
+          type: boolean
+        notes:
+          type: string
+      required:
+        - name
+        - jobTitle
+        - maxHoursPerDay
+        - maxHoursPerWeek
+        - employmentStatus
+        - medicallyDelegated
+        - cprCurrent
+    EmployeeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
         name:
           type: string
         jobTitle:
@@ -169,6 +280,8 @@ components:
         notes:
           type: string
       required:
+        - id
+        - schoolId
         - name
         - jobTitle
         - maxHoursPerDay
@@ -176,9 +289,27 @@ components:
         - employmentStatus
         - medicallyDelegated
         - cprCurrent
-    OperatingHours:
+    OperatingHoursPayload:
       type: object
       properties:
+        scheduleType:
+          type: string
+        daysOfWeek:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayOfWeek'
+        open:
+          type: string
+        close:
+          type: string
+      required: [scheduleType, daysOfWeek, open, close]
+    OperatingHoursResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
         scheduleType:
           type: string
         daysOfWeek:
@@ -189,8 +320,8 @@ components:
           type: string
         close:
           type: string
-      required: [scheduleType, daysOfWeek, open, close]
-    FieldTripType:
+      required: [id, schoolId, scheduleType, daysOfWeek, open, close]
+    FieldTripTypePayload:
       type: object
       properties:
         name:
@@ -204,6 +335,182 @@ components:
         notes:
           type: string
       required: [name, minAdultStudentRatio, minLeaderStudentRatio]
+    FieldTripTypeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
+        name:
+          type: string
+        minAdultStudentRatio:
+          type: number
+        minLeaderStudentRatio:
+          type: number
+        policyCitationId:
+          type: string
+        notes:
+          type: string
+      required: [id, schoolId, name, minAdultStudentRatio, minLeaderStudentRatio]
+    RatioProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        childrenPerStaff:
+          type: number
+        leaderRequired:
+          type: boolean
+        policyCitationId:
+          type: string
+        notes:
+          type: string
+      required: [id, childrenPerStaff, policyCitationId]
+    SegmentRequirementTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        ratioProfile:
+          $ref: '#/components/schemas/RatioProfile'
+        minStaff:
+          type: integer
+        requiresCpr:
+          type: boolean
+        requiresMedicalDelegation:
+          type: boolean
+        requiresLeader:
+          type: boolean
+        policyCitationId:
+          type: string
+        notes:
+          type: string
+      required:
+        - id
+        - ratioProfile
+        - minStaff
+        - requiresCpr
+        - requiresMedicalDelegation
+        - requiresLeader
+        - policyCitationId
+    ScheduleWeek:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
+        label:
+          type: string
+        status:
+          $ref: '#/components/schemas/ScheduleStatus'
+        startDate:
+          type: string
+      required: [id, schoolId, status]
+    ScheduleDay:
+      type: object
+      properties:
+        id:
+          type: string
+        scheduleWeekId:
+          type: string
+        date:
+          type: string
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        scheduleType:
+          type: string
+        enrollmentCount:
+          type: integer
+        enrollmentSource:
+          $ref: '#/components/schemas/EnrollmentSource'
+        fieldTripEventId:
+          type: string
+        operatingCapacityOverride:
+          type: integer
+        notes:
+          type: string
+        dayScheduleType:
+          $ref: '#/components/schemas/DayScheduleType'
+      required: [id, scheduleWeekId, date, dayOfWeek]
+    SegmentBlock:
+      type: object
+      properties:
+        id:
+          type: string
+        scheduleWeekId:
+          type: string
+        scheduleDayId:
+          type: string
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        segment:
+          $ref: '#/components/schemas/DaySegment'
+        startTime:
+          type: string
+        endTime:
+          type: string
+        childCount:
+          type: integer
+        requirementTemplate:
+          $ref: '#/components/schemas/SegmentRequirementTemplate'
+        fieldTripEventId:
+          type: string
+        status:
+          $ref: '#/components/schemas/ScheduleStatus'
+        operatingCapacityOverride:
+          type: integer
+        closedReason:
+          type: string
+      required: [id, scheduleWeekId, dayOfWeek, segment, startTime, endTime, childCount, requirementTemplate, status]
+    StaffAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+        segmentBlockId:
+          type: string
+        employeeId:
+          type: string
+        assignmentSource:
+          $ref: '#/components/schemas/AssignmentSource'
+        startTime:
+          type: string
+        endTime:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, active, on_break, completed]
+        notes:
+          type: string
+      required: [id, segmentBlockId, employeeId, assignmentSource, startTime, endTime, status]
+    FieldTripEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        scheduleWeekId:
+          type: string
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        segment:
+          $ref: '#/components/schemas/DaySegment'
+        scheduleDayId:
+          type: string
+        fieldTripTypeId:
+          type: string
+        isNoFieldTrip:
+          type: boolean
+        approverId:
+          type: string
+        signedOffAt:
+          type: string
+        policyCitationId:
+          type: string
+        notes:
+          type: string
+      required: [id, scheduleWeekId, dayOfWeek, segment]
     SettingsPayload:
       type: object
       properties:
@@ -212,23 +519,23 @@ components:
         scheduleTypes:
           type: array
           items:
-            $ref: '#/components/schemas/ScheduleType'
+            $ref: '#/components/schemas/ScheduleTypePayload'
         jobTitles:
           type: array
           items:
-            $ref: '#/components/schemas/JobTitle'
+            $ref: '#/components/schemas/JobTitlePayload'
         employees:
           type: array
           items:
-            $ref: '#/components/schemas/Employee'
+            $ref: '#/components/schemas/EmployeePayload'
         operatingHours:
           type: array
           items:
-            $ref: '#/components/schemas/OperatingHours'
+            $ref: '#/components/schemas/OperatingHoursPayload'
         fieldTripTypes:
           type: array
           items:
-            $ref: '#/components/schemas/FieldTripType'
+            $ref: '#/components/schemas/FieldTripTypePayload'
       required:
         - school
         - scheduleTypes
@@ -240,63 +547,87 @@ components:
       type: object
       properties:
         school:
-          type: object
+          $ref: '#/components/schemas/SchoolRecord'
+          nullable: true
         scheduleTypes:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/ScheduleTypeResponse'
         jobTitles:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/JobTitleResponse'
         employees:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/EmployeeResponse'
         operatingHours:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/OperatingHoursResponse'
         fieldTripTypes:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/FieldTripTypeResponse'
       required: [school]
     SettingsSaveResponse:
       type: object
       properties:
         school:
-          type: object
+          $ref: '#/components/schemas/SchoolRecord'
       required: [school]
     ScheduleSavePayload:
       type: object
       properties:
         scheduleWeek:
-          type: object
-          properties:
-            schoolId:
-              type: string
-            label:
-              type: string
-            status:
-              type: string
-            startDate:
-              type: string
-          required: [schoolId, status]
+          $ref: '#/components/schemas/ScheduleWeek'
         scheduleDays:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/ScheduleDay'
         segmentBlocks:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/SegmentBlock'
         staffAssignments:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/StaffAssignment'
         fieldTripEvents:
           type: array
-          items: {}
+          items:
+            $ref: '#/components/schemas/FieldTripEvent'
       required: [scheduleWeek, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents]
     ScheduleWeekResponse:
       type: object
       properties:
         id:
           type: string
-      additionalProperties: true
+        schoolId:
+          type: string
+        label:
+          type: string
+        status:
+          $ref: '#/components/schemas/ScheduleStatus'
+        startDate:
+          type: string
+        scheduleDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleDay'
+        segmentBlocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SegmentBlock'
+        staffAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/StaffAssignment'
+        fieldTripEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldTripEvent'
+      required: [id, schoolId, status, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents]
     GenericOk:
       type: object
       properties:

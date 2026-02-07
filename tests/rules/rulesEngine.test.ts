@@ -1,4 +1,4 @@
-import { RulesEngine } from "../../src/rules";
+import { RulesEngine } from "@core/rules";
 import type {
   AssignmentSource,
   DaySegment,
@@ -12,8 +12,8 @@ import type {
   SegmentRequirementTemplate,
   StaffAssignment,
   OperatingHours
-} from "../../src/domain/types";
-import type { RulesContext } from "../../src/rules/types";
+} from "@core/domain/types";
+import type { RulesContext } from "@core/rules/types";
 
 const createRequirementTemplate = (
   overrides: Partial<SegmentRequirementTemplate> = {}

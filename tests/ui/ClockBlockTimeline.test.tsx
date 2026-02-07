@@ -8,7 +8,7 @@ import type {
   SegmentBlock,
   StaffAssignment,
   OperatingHours
-} from "../../src/domain/types";
+} from "@core/domain/types";
 import type { RuleViolation } from "../../apps/ui/types";
 
 const dayDisplayNames: Record<DayOfWeek, string> = {

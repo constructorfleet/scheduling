@@ -1,4 +1,4 @@
-import { DayOfWeek, FieldTripEvent, FieldTripType, ScheduleDay, ScheduleType } from "../../../src/domain/types";
+import { DayOfWeek, FieldTripEvent, FieldTripType, ScheduleDay, ScheduleType } from "@core/domain/types";
 
 export interface ScheduleTypeOption {
   value: ScheduleType;

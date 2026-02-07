@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   DayOfWeek,
@@ -10,9 +10,9 @@ import {
   ScheduleType,
   SegmentBlock,
   StaffAssignment
-} from "../../../src/domain/types";
+} from "@core/domain/types";
 import { ScheduleTypeOption, FieldTripSelection } from "./DayMetadataStrip";
-import { parseTimeToMinutes } from "../../../src/rules/utils";
+import { parseTimeToMinutes } from "@core/rules/utils";
 
 interface ScheduleMatrixProps {
   staff: Employee[];
@@ -30,6 +30,7 @@ interface ScheduleMatrixProps {
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
+  focusedSegmentId?: string | null;
 }
 
 const formatTime = (value: string) => {
@@ -73,7 +74,8 @@ export default function ScheduleMatrix({
   onScheduleTypeChange,
   onFieldTripSelection,
   onUpdateAssignmentTime,
-  onCreateAssignment
+  onCreateAssignment,
+  focusedSegmentId
 }: ScheduleMatrixProps) {
   const [editing, setEditing] = useState<{
     assignmentId?: string;
@@ -153,6 +155,14 @@ export default function ScheduleMatrix({
     const dayAssignments = assignmentsByEmployeeDay[employeeId]?.[dayOfWeek] ?? [];
     return dayAssignments.reduce((sum, assignment) => sum + getDurationHours(assignment.startTime, assignment.endTime), 0);
   };
+
+  useEffect(() => {
+    if (!focusedSegmentId) return;
+    const target = document.querySelector<HTMLElement>(`[data-segment-id="${focusedSegmentId}"]`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+    }
+  }, [focusedSegmentId]);
 
   return (
     <motion.section
@@ -440,6 +450,7 @@ export default function ScheduleMatrix({
                                 ? "rgba(132, 0, 255, 0.25)"
                                 : "#ecfeff";
                           const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
+                          const isFocused = focusedSegmentId === block.segmentBlockId;
 
                           return (
                             <motion.div
@@ -456,8 +467,10 @@ export default function ScheduleMatrix({
                                 border: blockBorder,
                                 fontSize: "0.75rem",
                                 fontWeight: 600,
-                                cursor: "pointer"
+                                cursor: "pointer",
+                                boxShadow: isFocused ? "0 0 0 2px rgba(37, 99, 235, 0.6)" : "none"
                               }}
+                              data-segment-id={block.segmentBlockId}
                               onClick={() =>
                                 setEditing({
                                   assignmentId: block.id,

@@ -25,9 +25,13 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["packages/core/*"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "apps/ui/**/*.ts", "apps/ui/**/*.tsx", "apps/api/**/*.ts", "apps/api/**/*.d.ts", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
+  "include": ["packages/core/**/*.ts", "packages/core/**/*.tsx", "apps/ui/**/*.ts", "apps/ui/**/*.tsx", "apps/api/**/*.ts", "apps/api/**/*.d.ts", "tests/**/*.ts", "tests/**/*.tsx", "*.ts"],
   "exclude": [
     "node_modules",
     "dist",

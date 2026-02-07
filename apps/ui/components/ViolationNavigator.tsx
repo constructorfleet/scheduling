@@ -132,11 +132,11 @@ export default function ViolationNavigator({
             No active violations.
           </div>
         ) : (
-          violations.map((violation) => {
+          violations.map((violation, index) => {
           const severity = severityStyles[violation.severity];
           return (
             <article
-              key={violation.id}
+              key={`${violation.id}-${index}`}
             style={{
               borderRadius: 12,
               border: "1px solid #e5e7eb",

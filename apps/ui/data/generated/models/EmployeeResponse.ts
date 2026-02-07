@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Employee = {
+export type EmployeeResponse = {
+    id: string;
+    schoolId: string;
     name: string;
     jobTitle: string;
     maxHoursPerDay: number;

@@ -26,15 +26,22 @@ import {
 import { GuidedStep, RuleViolation as UiRuleViolation } from "./types";
 import {
   DayOfWeek,
+  Employee,
   FieldTripEvent,
   OperatingHours,
   PolicyCitation,
+  ScheduleDay,
   ScheduleStatus,
   ScheduleType,
   SegmentBlock
-} from "../../src/domain/types";
-import { createRulesEngine } from "../../src/rules/engine";
-import type { RuleViolation as EngineRuleViolation, RulesContext } from "../../src/rules/types";
+} from "@core/domain/types";
+import type {
+  EmployeePayload,
+  FieldTripTypePayload,
+  ScheduleTypePayload as ScheduleTypePayloadModel
+} from "./data/generated";
+import { createRulesEngine } from "@core/rules/engine";
+import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
 import { fetchSchedule, fetchSettings, saveSchedule, saveSettings } from "./data/apiClient";
 
 const RULE_TITLES: Record<string, string> = {
@@ -78,6 +85,16 @@ const SEVERITY_MAP: Record<EngineRuleViolation["severity"], UiRuleViolation["sev
 const POLICY_CITATION_LIST = Object.values(policyCitations);
 
 type WeekDirection = "prev" | "next";
+
+const DAY_OF_WEEK_VALUES: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const isDayOfWeek = (value: string): value is DayOfWeek =>
+  DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
+
+const EMPLOYMENT_STATUS_VALUES: Employee["employmentStatus"][] = ["active", "on_leave", "archived"];
+const coerceEmploymentStatus = (value: string | undefined): Employee["employmentStatus"] =>
+  EMPLOYMENT_STATUS_VALUES.includes(value as Employee["employmentStatus"])
+    ? (value as Employee["employmentStatus"])
+    : "active";
 
 const formatWeekRange = (startDate: Date) => {
   const endDate = new Date(startDate);
@@ -269,11 +286,31 @@ export default function App() {
         minimumMedicalDelegated: schoolRules.minimumMedicalDelegated,
         requireCurrentCpr: schoolRules.requireCurrentCpr
       },
-      scheduleTypes: overrides.scheduleTypes ?? scheduleTypeOptionsState,
+      scheduleTypes: (overrides.scheduleTypes ?? scheduleTypeOptionsState).map((type) => ({
+        value: type.value,
+        label: type.label,
+        ratio: type.ratio,
+        description: type.description
+      })) as ScheduleTypePayloadModel[],
       jobTitles: overrides.jobTitles ?? jobTitlesState,
-      employees: overrides.employees ?? employeesState,
+      employees: (overrides.employees ?? employeesState).map((employee) => ({
+        name: employee.name,
+        jobTitle: employee.jobTitle,
+        maxHoursPerDay: employee.maxHoursPerDay,
+        maxHoursPerWeek: employee.maxHoursPerWeek,
+        employmentStatus: employee.employmentStatus,
+        medicallyDelegated: employee.medicallyDelegated,
+        cprCurrent: employee.cprCurrent,
+        notes: employee.notes
+      })) as EmployeePayload[],
       operatingHours: overrides.operatingHours ?? operatingHoursConfigState,
-      fieldTripTypes: overrides.fieldTripTypes ?? fieldTripTypesState
+      fieldTripTypes: (overrides.fieldTripTypes ?? fieldTripTypesState).map((trip) => ({
+        name: trip.name,
+        minAdultStudentRatio: trip.minAdultStudentRatio,
+        minLeaderStudentRatio: trip.minLeaderStudentRatio,
+        policyCitationId: trip.policyCitationId,
+        notes: trip.notes
+      })) as FieldTripTypePayload[]
     };
   };
 
@@ -295,7 +332,11 @@ export default function App() {
         if (!isActive) return;
         if (settings?.school) {
           setSchoolName(settings.school.name ?? schoolName);
-          setClosedDaysState(settings.school.closedDays ?? closedDaysState);
+          setClosedDaysState(
+            (settings.school.closedDays ?? closedDaysState).filter((day): day is DayOfWeek =>
+              isDayOfWeek(day)
+            )
+          );
           setSchoolRulesState({
             openerCount: settings.school.openerCount ?? schoolRulesState.openerCount,
             closerCount: settings.school.closerCount ?? schoolRulesState.closerCount,
@@ -305,17 +346,20 @@ export default function App() {
           });
           if (settings.scheduleTypes?.length) {
             setScheduleTypeOptionsState(
-              settings.scheduleTypes.map((type: any) => ({
+              settings.scheduleTypes.map((type) => ({
                 value: type.value,
                 label: type.label,
-                ratio: { adults: type.ratioAdults ?? type.ratio?.adults ?? 1, students: type.ratioStudents ?? type.ratio?.students ?? 1 },
+                ratio: {
+                  adults: type.ratioAdults ?? 1,
+                  students: type.ratioStudents ?? 1
+                },
                 description: type.description ?? ""
               }))
             );
           }
           if (settings.jobTitles?.length) {
             setJobTitlesState(
-              settings.jobTitles.map((title: any) => ({
+              settings.jobTitles.map((title) => ({
                 id: title.id,
                 title: title.title,
                 leaderQualified: title.leaderQualified,
@@ -324,21 +368,37 @@ export default function App() {
             );
           }
           if (settings.employees?.length) {
-            setEmployeesState(settings.employees);
+            const jobTitleLookup = new Map(
+              (settings.jobTitles ?? []).map((title) => [title.title, title.leaderQualified])
+            );
+            setEmployeesState(
+              settings.employees.map((employee) => ({
+                ...employee,
+                leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
+                employmentStatus: coerceEmploymentStatus(employee.employmentStatus)
+              }))
+            );
           }
           if (settings.operatingHours?.length) {
             setOperatingHoursConfigState(
-              settings.operatingHours.map((entry: any) => ({
+              settings.operatingHours.map((entry) => ({
                 id: entry.id,
                 scheduleType: entry.scheduleType,
-                daysOfWeek: entry.daysOfWeek ?? [],
+                daysOfWeek: (entry.daysOfWeek ?? []).filter((day): day is DayOfWeek =>
+                  isDayOfWeek(day)
+                ),
                 open: entry.open,
                 close: entry.close
               }))
             );
           }
           if (settings.fieldTripTypes?.length) {
-            setFieldTripTypesState(settings.fieldTripTypes);
+            setFieldTripTypesState(
+              settings.fieldTripTypes.map((trip) => ({
+                ...trip,
+                policyCitationId: trip.policyCitationId ?? "policy-field-trip"
+              }))
+            );
           }
         }
       } catch (error) {
@@ -355,7 +415,7 @@ export default function App() {
           }
           if (schedule.scheduleDays?.length) {
             setScheduleDaysState(
-              schedule.scheduleDays.map((day: any) => ({
+              schedule.scheduleDays.map((day: ScheduleDay) => ({
                 ...day,
                 date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
               }))
@@ -369,7 +429,7 @@ export default function App() {
           }
           if (schedule.fieldTripEvents?.length) {
             setFieldTripEventsState(
-              schedule.fieldTripEvents.map((event: any) => ({
+              schedule.fieldTripEvents.map((event: FieldTripEvent) => ({
                 ...event,
                 signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
               }))
@@ -401,6 +461,7 @@ export default function App() {
     scheduleSaveTimer.current = setTimeout(() => {
       saveSchedule(weekMeta.id, {
         scheduleWeek: {
+          id: weekMeta.id,
           schoolId: selectedSchoolId,
           label: weekMeta.label,
           status: scheduleStatusOverride ?? weekMeta.status,
@@ -604,8 +665,10 @@ export default function App() {
     }
   };
 
-  const handleFocusSegment = (_segmentId: string) => {
-    // Timeline view removed in favor of the matrix; keep for navigator actions.
+  const [focusedSegmentId, setFocusedSegmentId] = useState<string | null>(null);
+
+  const handleFocusSegment = (segmentId: string) => {
+    setFocusedSegmentId(segmentId);
   };
 
   const handlePublish = () => {
@@ -776,6 +839,7 @@ export default function App() {
             ]);
             setSegmentBlocksState((prev) => [...prev, newBlock]);
           }}
+          focusedSegmentId={focusedSegmentId}
         />
       </motion.div>
 

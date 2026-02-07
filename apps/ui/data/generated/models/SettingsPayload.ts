@@ -2,18 +2,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Employee } from './Employee';
-import type { FieldTripType } from './FieldTripType';
-import type { JobTitle } from './JobTitle';
-import type { OperatingHours } from './OperatingHours';
-import type { ScheduleType } from './ScheduleType';
+import type { EmployeePayload } from './EmployeePayload';
+import type { FieldTripTypePayload } from './FieldTripTypePayload';
+import type { JobTitlePayload } from './JobTitlePayload';
+import type { OperatingHoursPayload } from './OperatingHoursPayload';
+import type { ScheduleTypePayload } from './ScheduleTypePayload';
 import type { SchoolSettings } from './SchoolSettings';
 export type SettingsPayload = {
     school: SchoolSettings;
-    scheduleTypes: Array<ScheduleType>;
-    jobTitles: Array<JobTitle>;
-    employees: Array<Employee>;
-    operatingHours: Array<OperatingHours>;
-    fieldTripTypes: Array<FieldTripType>;
+    scheduleTypes: Array<ScheduleTypePayload>;
+    jobTitles: Array<JobTitlePayload>;
+    employees: Array<EmployeePayload>;
+    operatingHours: Array<OperatingHoursPayload>;
+    fieldTripTypes: Array<FieldTripTypePayload>;
 };
 

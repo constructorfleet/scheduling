@@ -2,8 +2,4 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { SchoolRecord } from './SchoolRecord';
-export type SettingsSaveResponse = {
-    school: SchoolRecord;
-};
-
+export type ScheduleStatus = 'draft' | 'ready_for_review' | 'submitted' | 'approved' | 'archived';

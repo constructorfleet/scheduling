@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ScheduleType = {
+export type ScheduleTypePayload = {
     value: string;
     label: string;
     ratio: {

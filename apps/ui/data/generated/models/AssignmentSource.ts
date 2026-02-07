@@ -2,9 +2,4 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type JobTitle = {
-    title: string;
-    leaderQualified: boolean;
-    requiresLeaderForOpenClose: boolean;
-};
-
+export type AssignmentSource = 'template' | 'manual_adjustment' | 'field_trip_override' | 'import';

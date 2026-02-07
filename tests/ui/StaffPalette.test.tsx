@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import StaffPalette from "../../apps/ui/components/StaffPalette";
-import type { Employee, StaffAssignment } from "../../src/domain/types";
+import type { Employee, StaffAssignment } from "@core/domain/types";
 
 describe("StaffPalette", () => {
   const staff: Employee[] = [

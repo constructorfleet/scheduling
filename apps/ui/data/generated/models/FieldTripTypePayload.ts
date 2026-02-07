@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type FieldTripType = {
+export type FieldTripTypePayload = {
     name: string;
     minAdultStudentRatio: number;
     minLeaderStudentRatio: number;
