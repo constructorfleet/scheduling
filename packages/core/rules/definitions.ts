@@ -83,6 +83,17 @@ const formatMinutesAsTime = (value: number) => {
   return `${hours}:${minutes}`;
 };
 
+const normalizeChildrenPerStaff = (value: number) => {
+  if (!Number.isFinite(value) || value <= 0) {
+    return 1;
+  }
+  const rounded = Math.round(value);
+  if (Math.abs(value - rounded) < 1e-6) {
+    return Math.max(1, rounded);
+  }
+  return Math.max(1, Math.ceil(value));
+};
+
 const isClosedScheduleDay = (context: RulesContext, block: SegmentBlock) => {
   const scheduleDay =
     getScheduleDayById(context, block.scheduleDayId) ??
@@ -136,7 +147,8 @@ export const ratioSegmentRule: RuleDefinition = {
         fieldTripChildrenPerStaff ??
         (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ??
         1;
-      const requiredFromRatio = Math.ceil(effectiveChildCount / childrenPerStaff);
+      const normalizedChildrenPerStaff = normalizeChildrenPerStaff(childrenPerStaff);
+      const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
       const openMinutes = parseTimeToMinutes(hours.open);
       const closeMinutes = parseTimeToMinutes(hours.close);
       if (closeMinutes <= openMinutes) {
@@ -224,7 +236,7 @@ export const ratioSegmentRule: RuleDefinition = {
         const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
         const message =
           `${day.dayOfWeek.toUpperCase()} ${formatMinutesAsTime(interval.start)}-${formatMinutesAsTime(interval.end)} ` +
-          `requires ${interval.required} staff (min ${interval.minStaff}, ratio ${childrenPerStaff} from ${sourceLabel}, children ${effectiveChildCount}) ` +
+          `requires ${interval.required} staff (min ${interval.minStaff}, ratio ${normalizedChildrenPerStaff} from ${sourceLabel}, children ${effectiveChildCount}) ` +
           `but only ${interval.assigned} assigned`;
         violations.push(
           buildViolation(
