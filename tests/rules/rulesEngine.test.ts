@@ -240,8 +240,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-skip",
       name: "Museum Express",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 10, // 1:10 ratio (1 leader per 10 children)
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
@@ -356,8 +356,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-1",
       name: "Museum",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 10, // 1:10 ratio (1 leader per 10 children)
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
@@ -394,8 +394,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-2",
       name: "Zoo",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 10, // 1:10 ratio (1 leader per 10 children)
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
@@ -439,8 +439,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-3",
       name: "Botanical Garden",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 10, // 1:10 ratio (1 leader per 10 children)
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
@@ -485,8 +485,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-no-leader-ratio",
       name: "Community Walk",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 0, // disabled
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
@@ -624,8 +624,8 @@ describe("RulesEngine", () => {
     const fieldTripType: FieldTripType = {
       id: "trip-type-guard",
       name: "Guarded Trip",
-      minAdultStudentRatio: 0.2,
-      minLeaderStudentRatio: 0.1,
+      minAdultStudentRatio: 5, // 1:5 ratio (1 adult per 5 children)
+      minLeaderStudentRatio: 10, // 1:10 ratio (1 leader per 10 children)
       policyCitationId: "policy-field-trip",
       notes: undefined
     };
