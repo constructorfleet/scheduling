@@ -72,7 +72,7 @@ This overview aligns with the Domain & Model Layer described in `artifacts/phase
 
 ### ShiftBreak
 - `id`, `assignment_id`, `start_time`, `end_time`, `break_type`, `approved_by`, `approved_at`, `policy_citation_id`, `notes`.
-- Captures required rest/meal coverage. The rules engine blocks any break that would drop coverage below the `SegmentBlock.required_staff` floor or conflict with overlapping clock blocks.
+- Captures required rest/meal coverage. The rules engine blocks any break that would drop coverage below the `SegmentBlock.required_staff` floor or conflict with overlapping schdule blocks.
 
 ### SubstituteRequest
 - `id`, `original_assignment_id`, `segment_block_id`, `replacement_employee_id`, `requested_by`, `requested_at`, `state`, `reason`, `approver_id`, `approved_at`, `policy_citation_id`, `notes`.

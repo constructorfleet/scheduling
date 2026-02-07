@@ -10,9 +10,9 @@
 ## Core Task Flows
 ### 1. Draft a Weekly Plan Using Clock-in/Clock-out Segments
 1. Pick school + week from the `Week Navigation Banner`; the workspace loads an empty timeline for each day, showing operating hours and existing field trips.
-2. Drag staff from the palette onto the timeline, hold to extend a clock block, or click “Add Clock Block” to set exact HH:MM AM/PM start & end times; the grid supports multiple non-contiguous blocks per day and auto-runs the rules engine, flagging violations instantly.
+2. Drag staff from the palette onto the timeline, hold to extend a schdule block, or click “Add Clock Block” to set exact HH:MM AM/PM start & end times; the grid supports multiple non-contiguous blocks per day and auto-runs the rules engine, flagging violations instantly.
 3. Once the calendar shows all required coverage, the guided tracker on the right re-evaluates the Draft → Validation → Ready states; the publish button shifts from disabled to enabled only when every live violation clears.
-Minimum steps: 3 actions (select week → place clock blocks → confirm tracker turns green).
+Minimum steps: 3 actions (select week → place schdule blocks → confirm tracker turns green).
 
 ### 2. Set Daily Metadata: Schedule Type, Enrollment, Field Trip Selection
 1. Use the per-day metadata strip above each column to enter the enrolled-child count, choose a schedule type (Regular, Extended, Enrichment, etc.), and pick a field trip type or “No Field Trip.”
@@ -28,7 +28,7 @@ Minimum steps: 3 actions (open settings → edit roster/ratios → confirm valid
 
 ### 4. Resolve Violations with Live Guidance
 1. Select a violation from the Conflict Navigator panel; the grid column flashes, and an inline card reveals the precise policy, severity, and suggested fix.
-2. Apply the fix directly (add staff, extend a clock block, log a break, change enrollment, swap the schedule type, pick a field trip profile) and watch the violation disappear only when the rules engine confirms the change.
+2. Apply the fix directly (add staff, extend a schdule block, log a break, change enrollment, swap the schedule type, pick a field trip profile) and watch the violation disappear only when the rules engine confirms the change.
 3. The tracker moves the workflow onto the next pending step until all active violations are cleared; the “Review ready” badge appears in green alongside audit events that detail who changed what.
 Minimum steps: 3 actions (open navigator → implement fix → confirmed auto-validation).
 
@@ -62,11 +62,11 @@ Minimum steps: 3 actions (view operating hours → create block(s) → confirm t
 ├───────────────┬─────────────────────────────────────────────────────────────────────┤
 │ Staff palette │ Timeline grid (each column = day, rows = hourly timeline)        │
 │ - Filter controls (cert, availability)                                           │
-│ - Quick buttons (Add clock block, Auto-fill ratios)                              │
+│ - Quick buttons (Add schdule block, Auto-fill ratios)                              │
 ├───────────────┼─────────────────────────────────────────────────────────────────────┤
 │               │ Day metadata strip: [Enrollment input] [Schedule type v] [Field Trip v] │
 │               │ Timeline axis: 6:00a → 6:00p (adjustable)                              │
-│               │ Clock blocks show staff chip, certifications, ratio badges, breaks     │
+│               │ Schedule blocks show staff chip, certifications, ratio badges, breaks     │
 │               │ Violation pins stack in top-right corner of each block               │
 │               │ Drag handles extend start/end times, double-click opens exact editor │
 ├───────────────┴─────────────────────────────────────────────────────────────────────┤
@@ -126,7 +126,7 @@ Minimum steps: 3 actions (view operating hours → create block(s) → confirm t
 
 - **ClockBlockTimeline (Schedule Grid)**
   - Purpose: allow staff to be placed into precise clock segments and show coverage per day.
-  - Inputs: clock block data, operating hours, violation badges, ratio badges, assigned staff metadata.
+  - Inputs: schdule block data, operating hours, violation badges, ratio badges, assigned staff metadata.
   - Interactions: drag/drop to assign, stretch handles to resize, double-click for precise HH:MM edit, split blocks for non-contiguous coverage.
 
 - **StaffPalette**
@@ -140,7 +140,7 @@ Minimum steps: 3 actions (view operating hours → create block(s) → confirm t
   - Interactions: fill approver + timestamp, show lock state until complete, surface ratio differences per type, warn if deleting referenced type.
 
 - **ConflictNavigator**
-  - Purpose: list live violations tied to clock blocks or metadata and direct users to fixes.
+  - Purpose: list live violations tied to schdule blocks or metadata and direct users to fixes.
   - Inputs: violation payloads, severity, linked day/times, suggested action.
   - Interactions: click to focus grid blocks, show policy cite tooltip, auto-highlight affected staff.
 

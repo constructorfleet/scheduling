@@ -10,7 +10,7 @@
 - `ScheduleWeek` 1→* `ScheduleDay`, `SegmentBlock`, `FieldTripEvent`, `ScheduleSnapshot`, `AuditEvent`, `ChangeJournalEntry`.
 - `ScheduleDay` 1→* `SegmentBlock`, 1→1 `FieldTripEvent`, 1→* `ValidationViolation`. It stores the selected `ScheduleType`, enrollment headcount, and field-trip decision so rules know which ratios to apply.
 - `SegmentBlock` 1→* `EnrollmentGroup`, `StaffAssignment`; it references a `SegmentRequirementTemplate`, optionally a `FieldTripEvent`, and enforces `required_staff` derived from either the base `RatioProfile` or the `FieldTripType`.
-- `EnrollmentGroup` ↔ `SegmentBlock` (1→*). Child counts aggregate to feed `SegmentBlock.coverage_gap` indicators across multiple non-contiguous clock blocks.
+- `EnrollmentGroup` ↔ `SegmentBlock` (1→*). Child counts aggregate to feed `SegmentBlock.coverage_gap` indicators across multiple non-contiguous schdule blocks.
 - `StaffAssignment` connects to `SegmentBlock`, `Employee`, and optional `SubstituteRequest`; `ShiftBreak`s 1→* `StaffAssignment`, and each break references a `PolicyCitation` for the covered regulation.
 - `ValidationViolation` references `ScheduleDay`, `SegmentBlock`, `StaffAssignment`, or `FieldTripEvent` so reviewers can inspect the entity that keeps a violation `active`.
 
