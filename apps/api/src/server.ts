@@ -65,6 +65,11 @@ const normalizeRequestedDaysOff = (value: unknown): EmployeeTimeOffRequest[] => 
   return normalized;
 };
 
+const normalizeDayList = (days: string[]) =>
+  [...days].map((day) => day.toLowerCase()).sort();
+
+const dayListKey = (days: string[]) => JSON.stringify(normalizeDayList(days));
+
 type ScheduleWeekPayload = {
   schoolId: string;
   label?: string;
@@ -254,33 +259,56 @@ const buildServer = async () => {
         }
       });
 
-      await tx.scheduleType.deleteMany({ where: { schoolId } });
-      await tx.jobTitle.deleteMany({ where: { schoolId } });
-      await tx.operatingHours.deleteMany({ where: { schoolId } });
-      await tx.fieldTripType.deleteMany({ where: { schoolId } });
-
       if (payload.scheduleTypes?.length) {
-        await tx.scheduleType.createMany({
-          data: payload.scheduleTypes.map((type) => ({
-            schoolId,
-            value: type.value,
-            label: type.label,
-            ratioAdults: type.ratio.adults,
-            ratioStudents: type.ratio.students,
-            description: type.description ?? null
-          }))
-        });
+        for (const type of payload.scheduleTypes) {
+          await tx.scheduleType.upsert({
+            where: {
+              schoolId_value: {
+                schoolId,
+                value: type.value
+              }
+            },
+            create: {
+              schoolId,
+              value: type.value,
+              label: type.label,
+              ratioAdults: type.ratio.adults,
+              ratioStudents: type.ratio.students,
+              description: type.description ?? null
+            },
+            update: {
+              label: type.label,
+              ratioAdults: type.ratio.adults,
+              ratioStudents: type.ratio.students,
+              description: type.description ?? null
+            }
+          });
+        }
       }
 
       if (payload.jobTitles?.length) {
-        await tx.jobTitle.createMany({
-          data: payload.jobTitles.map((title) => ({
-            schoolId,
-            title: title.title,
-            leaderQualified: title.leaderQualified,
-            requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
-          }))
-        });
+        const existingJobTitles = await tx.jobTitle.findMany({ where: { schoolId } });
+        for (const title of payload.jobTitles) {
+          const existing = existingJobTitles.find((entry) => entry.title === title.title);
+          if (existing) {
+            await tx.jobTitle.update({
+              where: { id: existing.id },
+              data: {
+                leaderQualified: title.leaderQualified,
+                requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
+              }
+            });
+            continue;
+          }
+          await tx.jobTitle.create({
+            data: {
+              schoolId,
+              title: title.title,
+              leaderQualified: title.leaderQualified,
+              requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
+            }
+          });
+        }
       }
 
       if (Array.isArray(payload.employees) && payload.employees.length > 0) {
@@ -343,41 +371,71 @@ const buildServer = async () => {
           keptEmployeeIds.add(created.id);
         }
 
-        if (keptEmployeeIds.size > 0) {
-          await tx.employee.deleteMany({
-            where: {
-              schoolId,
-              id: {
-                notIn: Array.from(keptEmployeeIds)
+      }
+
+      if (payload.operatingHours?.length) {
+        const existingOperatingHours = await tx.operatingHours.findMany({ where: { schoolId } });
+        for (const entry of payload.operatingHours) {
+          const targetDaysKey = dayListKey(entry.daysOfWeek);
+          const existing = existingOperatingHours.find((record) => {
+            if (record.scheduleType !== entry.scheduleType || record.open !== entry.open || record.close !== entry.close) {
+              return false;
+            }
+            if (!Array.isArray(record.daysOfWeek)) {
+              return false;
+            }
+            return dayListKey(record.daysOfWeek.map((day) => String(day))) === targetDaysKey;
+          });
+          if (existing) {
+            await tx.operatingHours.update({
+              where: { id: existing.id },
+              data: {
+                daysOfWeek: normalizeDayList(entry.daysOfWeek),
+                open: entry.open,
+                close: entry.close
               }
+            });
+            continue;
+          }
+          await tx.operatingHours.create({
+            data: {
+              schoolId,
+              scheduleType: entry.scheduleType,
+              daysOfWeek: normalizeDayList(entry.daysOfWeek),
+              open: entry.open,
+              close: entry.close
             }
           });
         }
       }
 
-      if (payload.operatingHours?.length) {
-        await tx.operatingHours.createMany({
-          data: payload.operatingHours.map((entry) => ({
-            schoolId,
-            scheduleType: entry.scheduleType,
-            daysOfWeek: entry.daysOfWeek,
-            open: entry.open,
-            close: entry.close
-          }))
-        });
-      }
-
       if (payload.fieldTripTypes?.length) {
-        await tx.fieldTripType.createMany({
-          data: payload.fieldTripTypes.map((trip) => ({
-            schoolId,
-            name: trip.name,
-            minAdultStudentRatio: trip.minAdultStudentRatio,
-            minLeaderStudentRatio: trip.minLeaderStudentRatio,
-            policyCitationId: trip.policyCitationId ?? null,
-            notes: trip.notes ?? null
-          }))
-        });
+        const existingFieldTripTypes = await tx.fieldTripType.findMany({ where: { schoolId } });
+        for (const trip of payload.fieldTripTypes) {
+          const existing = existingFieldTripTypes.find((entry) => entry.name === trip.name);
+          if (existing) {
+            await tx.fieldTripType.update({
+              where: { id: existing.id },
+              data: {
+                minAdultStudentRatio: trip.minAdultStudentRatio,
+                minLeaderStudentRatio: trip.minLeaderStudentRatio,
+                policyCitationId: trip.policyCitationId ?? null,
+                notes: trip.notes ?? null
+              }
+            });
+            continue;
+          }
+          await tx.fieldTripType.create({
+            data: {
+              schoolId,
+              name: trip.name,
+              minAdultStudentRatio: trip.minAdultStudentRatio,
+              minLeaderStudentRatio: trip.minLeaderStudentRatio,
+              policyCitationId: trip.policyCitationId ?? null,
+              notes: trip.notes ?? null
+            }
+          });
+        }
       }
 
       return upsertedSchool;
@@ -463,62 +521,98 @@ const buildServer = async () => {
         }
       });
 
-      await tx.staffAssignment.deleteMany({ where: { scheduleWeekId: weekId } });
-      await tx.segmentBlock.deleteMany({ where: { scheduleWeekId: weekId } });
-      await tx.scheduleDay.deleteMany({ where: { scheduleWeekId: weekId } });
-      await tx.fieldTripEvent.deleteMany({ where: { scheduleWeekId: weekId } });
-      await tx.auditEvent.deleteMany({ where: { scheduleWeekId: weekId } });
-
       if (payload.scheduleDays?.length) {
-        await tx.scheduleDay.createMany({
-          data: payload.scheduleDays.map((day) => ({
-            id: day.id,
-            scheduleWeekId: weekId,
-            date: day.date ? new Date(day.date) : null,
-            dayOfWeek: day.dayOfWeek,
-            scheduleType: day.scheduleType ?? null,
-            enrollmentCount: day.enrollmentCount ?? null,
-            enrollmentSource: day.enrollmentSource ?? null,
-            fieldTripEventId: day.fieldTripEventId ?? null,
-            operatingCapacityOverride: day.operatingCapacityOverride ?? null,
-            notes: day.notes ?? null,
-            dayScheduleType: day.dayScheduleType ?? null
-          }))
-        });
+        for (const day of payload.scheduleDays) {
+          await tx.scheduleDay.upsert({
+            where: { id: day.id },
+            create: {
+              id: day.id,
+              scheduleWeekId: weekId,
+              date: day.date ? new Date(day.date) : null,
+              dayOfWeek: day.dayOfWeek,
+              scheduleType: day.scheduleType ?? null,
+              enrollmentCount: day.enrollmentCount ?? null,
+              enrollmentSource: day.enrollmentSource ?? null,
+              fieldTripEventId: day.fieldTripEventId ?? null,
+              operatingCapacityOverride: day.operatingCapacityOverride ?? null,
+              notes: day.notes ?? null,
+              dayScheduleType: day.dayScheduleType ?? null
+            },
+            update: {
+              scheduleWeekId: weekId,
+              date: day.date ? new Date(day.date) : null,
+              dayOfWeek: day.dayOfWeek,
+              scheduleType: day.scheduleType ?? null,
+              enrollmentCount: day.enrollmentCount ?? null,
+              enrollmentSource: day.enrollmentSource ?? null,
+              fieldTripEventId: day.fieldTripEventId ?? null,
+              operatingCapacityOverride: day.operatingCapacityOverride ?? null,
+              notes: day.notes ?? null,
+              dayScheduleType: day.dayScheduleType ?? null
+            }
+          });
+        }
       }
 
       if (payload.fieldTripEvents?.length) {
-        await tx.fieldTripEvent.createMany({
-          data: payload.fieldTripEvents.map((event) => ({
-            // If no trip type is selected, default to "No Field Trip".
-            isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
-            id: event.id,
-            scheduleWeekId: weekId,
-            dayOfWeek: event.dayOfWeek,
-            segment: event.segment,
-            scheduleDayId: event.scheduleDayId ?? null,
-            fieldTripTypeId: event.fieldTripTypeId ?? null,
-            approverId: event.approverId ?? null,
-            signedOffAt: event.signedOffAt ? new Date(event.signedOffAt) : null,
-            notes: event.notes ?? null
-          }))
-        });
+        for (const event of payload.fieldTripEvents) {
+          await tx.fieldTripEvent.upsert({
+            where: { id: event.id },
+            create: {
+              // If no trip type is selected, default to "No Field Trip".
+              isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
+              id: event.id,
+              scheduleWeekId: weekId,
+              dayOfWeek: event.dayOfWeek,
+              segment: event.segment,
+              scheduleDayId: event.scheduleDayId ?? null,
+              fieldTripTypeId: event.fieldTripTypeId ?? null,
+              approverId: event.approverId ?? null,
+              signedOffAt: event.signedOffAt ? new Date(event.signedOffAt) : null,
+              notes: event.notes ?? null
+            },
+            update: {
+              scheduleWeekId: weekId,
+              dayOfWeek: event.dayOfWeek,
+              segment: event.segment,
+              scheduleDayId: event.scheduleDayId ?? null,
+              fieldTripTypeId: event.fieldTripTypeId ?? null,
+              isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
+              approverId: event.approverId ?? null,
+              signedOffAt: event.signedOffAt ? new Date(event.signedOffAt) : null,
+              notes: event.notes ?? null
+            }
+          });
+        }
       }
 
       if (payload.segmentBlocks?.length) {
-        await tx.segmentBlock.createMany({
-          data: payload.segmentBlocks.map((block) => ({
-            id: block.id,
-            scheduleWeekId: weekId,
-            scheduleDayId: block.scheduleDayId ?? null,
-            dayOfWeek: block.dayOfWeek,
-            segment: block.segment,
-            startTime: block.startTime,
-            endTime: block.endTime,
-            childCount: block.childCount,
-            status: block.status
-          }))
-        });
+        for (const block of payload.segmentBlocks) {
+          await tx.segmentBlock.upsert({
+            where: { id: block.id },
+            create: {
+              id: block.id,
+              scheduleWeekId: weekId,
+              scheduleDayId: block.scheduleDayId ?? null,
+              dayOfWeek: block.dayOfWeek,
+              segment: block.segment,
+              startTime: block.startTime,
+              endTime: block.endTime,
+              childCount: block.childCount,
+              status: block.status
+            },
+            update: {
+              scheduleWeekId: weekId,
+              scheduleDayId: block.scheduleDayId ?? null,
+              dayOfWeek: block.dayOfWeek,
+              segment: block.segment,
+              startTime: block.startTime,
+              endTime: block.endTime,
+              childCount: block.childCount,
+              status: block.status
+            }
+          });
+        }
       }
 
       if (payload.staffAssignments?.length) {
@@ -530,36 +624,63 @@ const buildServer = async () => {
           }
           uniqueAssignments.set(assignment.id, assignment);
         });
-        await tx.staffAssignment.createMany({
-          data: Array.from(uniqueAssignments.values()).map((assignment) => ({
-            id: assignment.id,
-            scheduleWeekId: weekId,
-            segmentBlockId: assignment.segmentBlockId,
-            employeeId: assignment.employeeId,
-            assignmentSource: assignment.assignmentSource,
-            startTime: assignment.startTime,
-            endTime: assignment.endTime,
-            status: assignment.status,
-            notes: assignment.notes ?? null
-          }))
-        });
+        for (const assignment of Array.from(uniqueAssignments.values())) {
+          await tx.staffAssignment.upsert({
+            where: { id: assignment.id },
+            create: {
+              id: assignment.id,
+              scheduleWeekId: weekId,
+              segmentBlockId: assignment.segmentBlockId,
+              employeeId: assignment.employeeId,
+              assignmentSource: assignment.assignmentSource,
+              startTime: assignment.startTime,
+              endTime: assignment.endTime,
+              status: assignment.status,
+              notes: assignment.notes ?? null
+            },
+            update: {
+              scheduleWeekId: weekId,
+              segmentBlockId: assignment.segmentBlockId,
+              employeeId: assignment.employeeId,
+              assignmentSource: assignment.assignmentSource,
+              startTime: assignment.startTime,
+              endTime: assignment.endTime,
+              status: assignment.status,
+              notes: assignment.notes ?? null
+            }
+          });
+        }
       }
 
       if (payload.auditEvents?.length) {
-        await tx.auditEvent.createMany({
-          data: payload.auditEvents.map((event) => ({
-            id: event.id,
-            scheduleWeekId: weekId,
-            timestamp: new Date(event.timestamp),
-            user: event.user,
-            action: event.action,
-            citationId: event.policyCitation?.id ?? null,
-            citationName: event.policyCitation?.name ?? null,
-            citationDoc: event.policyCitation?.document ?? null,
-            citationSection: event.policyCitation?.section ?? null,
-            notes: event.notes ?? null
-          }))
-        });
+        for (const event of payload.auditEvents) {
+          await tx.auditEvent.upsert({
+            where: { id: event.id },
+            create: {
+              id: event.id,
+              scheduleWeekId: weekId,
+              timestamp: new Date(event.timestamp),
+              user: event.user,
+              action: event.action,
+              citationId: event.policyCitation?.id ?? null,
+              citationName: event.policyCitation?.name ?? null,
+              citationDoc: event.policyCitation?.document ?? null,
+              citationSection: event.policyCitation?.section ?? null,
+              notes: event.notes ?? null
+            },
+            update: {
+              scheduleWeekId: weekId,
+              timestamp: new Date(event.timestamp),
+              user: event.user,
+              action: event.action,
+              citationId: event.policyCitation?.id ?? null,
+              citationName: event.policyCitation?.name ?? null,
+              citationDoc: event.policyCitation?.document ?? null,
+              citationSection: event.policyCitation?.section ?? null,
+              notes: event.notes ?? null
+            }
+          });
+        }
       }
     });
 
