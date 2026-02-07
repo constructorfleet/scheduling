@@ -17,6 +17,7 @@ export interface RuleViolation {
   title: string;
   severity: "critical" | "warning" | "info";
   description: string;
+  dayLabel?: string;
   segmentBlockId: string;
   relatedSegmentBlockIds?: string[];
   policyCitation: PolicyCitation;

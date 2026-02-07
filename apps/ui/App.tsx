@@ -353,25 +353,20 @@ export default function App() {
   }, [scheduleTypeOptionsState]);
 
   const derivedOperatingHours = useMemo<OperatingHours[]>(() => {
-    const entries: OperatingHours[] = [];
-    operatingHoursConfigState.forEach((entry) => {
-      entry.daysOfWeek.forEach((day) => {
-        if (closedDaysState.includes(day)) {
-          return;
+    return daySequence
+      .map((day) => {
+        const hours = operatingHoursByDay[day];
+        if (!hours) {
+          return undefined;
         }
-        entries.push({
-          id: `hours-${entry.scheduleType}-${day}`,
-          schoolId: selectedSchoolId,
-          dayOfWeek: day,
-          dayScheduleType: "full_day",
-          open: entry.open,
-          close: entry.close,
-          notes: `${entry.scheduleType} operating hours`
-        });
-      });
-    });
-    return entries;
-  }, [operatingHoursConfigState, selectedSchoolId, closedDaysState]);
+        const scheduleDay = scheduleDaysState.find((item) => item.dayOfWeek === day);
+        return {
+          ...hours,
+          dayScheduleType: scheduleDay?.dayScheduleType ?? "full_day"
+        };
+      })
+      .filter((entry): entry is OperatingHours => Boolean(entry));
+  }, [daySequence, operatingHoursByDay, scheduleDaysState]);
 
   const buildSettingsPayload = (overrides: Partial<{
     schoolName: string;
@@ -751,11 +746,43 @@ export default function App() {
         ? `${segmentLabel} overlaps ${relatedLabel}.`
         : engineViolation.message;
 
+      const dayFromMetadata = String(engineViolation.target.metadata?.dayOfWeek ?? "");
+      let dayOfWeek: DayOfWeek | undefined = isDayOfWeek(dayFromMetadata) ? dayFromMetadata : undefined;
+      if (!dayOfWeek && segmentBlockId) {
+        const block = segmentBlocksState.find((item) => item.id === segmentBlockId);
+        dayOfWeek = block?.dayOfWeek;
+      }
+      if (!dayOfWeek && engineViolation.target.entity === "ScheduleDay") {
+        const day = scheduleDaysState.find((item) => item.id === engineViolation.target.id);
+        dayOfWeek = day?.dayOfWeek;
+      }
+      if (!dayOfWeek && engineViolation.target.entity === "FieldTripEvent") {
+        const event = fieldTripEventsState.find((item) => item.id === engineViolation.target.id);
+        dayOfWeek = event?.dayOfWeek;
+      }
+      if (!dayOfWeek && engineViolation.target.entity === "StaffAssignment") {
+        const assignment = staffAssignmentsState.find((item) => item.id === engineViolation.target.id);
+        const block = assignment
+          ? segmentBlocksState.find((item) => item.id === assignment.segmentBlockId)
+          : undefined;
+        dayOfWeek = block?.dayOfWeek;
+      }
+      const dayRecord = dayOfWeek
+        ? scheduleDaysState.find((item) => item.dayOfWeek === dayOfWeek)
+        : undefined;
+      const formattedDate = dayRecord?.date
+        ? new Date(dayRecord.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+        : undefined;
+      const dayLabel = dayOfWeek
+        ? `${dayDisplayNames[dayOfWeek]}${formattedDate ? ` ${formattedDate}` : ""}`
+        : undefined;
+
       return {
         id: engineViolation.id,
         title: RULE_TITLES[engineViolation.ruleId] ?? engineViolation.ruleId,
         severity: SEVERITY_MAP[engineViolation.severity] ?? "warning",
         description,
+        dayLabel,
         segmentBlockId,
         relatedSegmentBlockIds,
         policyCitation: citation,

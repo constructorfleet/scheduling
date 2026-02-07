@@ -40,6 +40,17 @@ const formatTime = (value: string) => {
   return `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
 
+const formatDateLabel = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+  return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+
 const getDurationHours = (start: string, end: string) => {
   const [startHour, startMinute] = start.split(":").map(Number);
   const [endHour, endMinute] = end.split(":").map(Number);
@@ -249,6 +260,9 @@ export default function ScheduleMatrix({
                 >
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
                     <span style={{ fontWeight: 700 }}>{dayDisplayNames[day]}</span>
+                    <span style={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
+                      {formatDateLabel(dayMeta?.date)}
+                    </span>
                     <label style={{ fontSize: "0.7rem", color: "#475569" }}>Schedule type</label>
                     <select
                       value={dayMeta?.scheduleType ?? ""}

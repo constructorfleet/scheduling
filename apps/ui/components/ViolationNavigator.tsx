@@ -249,6 +249,11 @@ export default function ViolationNavigator({
                 </span>
               </div>
               <p style={{ margin: 0, color: "#4b5563" }}>{violation.description}</p>
+              {violation.dayLabel && (
+                <p style={{ margin: 0, fontSize: "0.8rem", color: "#1d4ed8", fontWeight: 600 }}>
+                  Day: {violation.dayLabel}
+                </p>
+              )}
               <p style={{ margin: 0, fontSize: "0.85rem", color: "#6b7280" }}>
                 Citation: {violation.policyCitation.name} ({violation.policyCitation.section})
               </p>

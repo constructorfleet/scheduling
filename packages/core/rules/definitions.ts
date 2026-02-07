@@ -576,6 +576,9 @@ export const openCloseCoverageRule: RuleDefinition = {
     const citationId = getCitationId(context, "open-close-coverage", DEFAULT_POLICY_CITATIONS["open-close-coverage"]);
 
     (context.scheduleDays ?? []).forEach((day) => {
+      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+        return;
+      }
       const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
       if (!hours) {
         return;
