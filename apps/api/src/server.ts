@@ -6,35 +6,9 @@ import { applyDbEnv, isDebugEnabled } from "./config";
 import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
+import type { Prisma } from "../generated/prisma-client";
 
-type DbCreateArgs<T> = { data: T };
-type DbDeleteArgs<T> = { where: T };
-type DbUpsertArgs<TCreate, TUpdate, TWhere> = {
-  where: TWhere;
-  create: TCreate;
-  update: TUpdate;
-};
-
-type DbModelClient<TCreate = unknown, TUpdate = unknown, TWhere = unknown, TFind = unknown> = {
-  createMany: (args: DbCreateArgs<TCreate[]>) => Promise<unknown>;
-  deleteMany: (args: DbDeleteArgs<TWhere>) => Promise<unknown>;
-  upsert: (args: DbUpsertArgs<TCreate, TUpdate, TWhere>) => Promise<unknown>;
-  findUnique: (args: { where: TWhere; include?: Record<string, boolean> }) => Promise<TFind | null>;
-};
-
-type DbTransaction = {
-  school: DbModelClient<unknown, unknown, { id: string }, Record<string, unknown>>;
-  scheduleType: DbModelClient<unknown, unknown, { schoolId: string }>;
-  jobTitle: DbModelClient<unknown, unknown, { schoolId: string }>;
-  employee: DbModelClient<unknown, unknown, { schoolId: string }>;
-  operatingHours: DbModelClient<unknown, unknown, { schoolId: string }>;
-  fieldTripType: DbModelClient<unknown, unknown, { schoolId: string }>;
-  scheduleWeek: DbModelClient<unknown, unknown, { id: string }, Record<string, unknown>>;
-  scheduleDay: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
-  fieldTripEvent: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
-  segmentBlock: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
-  staffAssignment: DbModelClient<unknown, unknown, { scheduleWeekId: string }>;
-};
+type DbTransaction = Prisma.TransactionClient;
 
 type ScheduleWeekPayload = {
   schoolId: string;
@@ -76,7 +50,7 @@ type SegmentBlockPayload = {
   startTime: string;
   endTime: string;
   childCount: number;
-  requirementTemplate: unknown;
+  requirementTemplate: Prisma.InputJsonValue;
   status: string;
 };
 
@@ -115,7 +89,7 @@ const buildServer = async () => {
 
   fastify.get("/api/settings/:schoolId", async (request) => {
     const { schoolId } = request.params as { schoolId: string };
-    const prisma = await getPrisma();
+    const prisma = getPrisma();
     const school = await prisma.school.findUnique({
       where: { id: schoolId },
       include: {
@@ -186,7 +160,7 @@ const buildServer = async () => {
       }>;
     };
 
-    const prisma = await getPrisma();
+    const prisma = getPrisma();
 
     const school = await prisma.$transaction(async (tx: DbTransaction) => {
       const upsertedSchool = await tx.school.upsert({
@@ -289,7 +263,7 @@ const buildServer = async () => {
 
   fastify.get("/api/schedule/:weekId", async (request) => {
     const { weekId } = request.params as { weekId: string };
-    const prisma = await getPrisma();
+    const prisma = getPrisma();
     const scheduleWeek = await prisma.scheduleWeek.findUnique({
       where: { id: weekId },
       include: {
@@ -315,7 +289,7 @@ const buildServer = async () => {
       fieldTripEvents: FieldTripEventPayload[];
     };
 
-    const prisma = await getPrisma();
+    const prisma = getPrisma();
     await prisma.$transaction(async (tx: DbTransaction) => {
       await tx.school.upsert({
         where: { id: payload.scheduleWeek.schoolId },

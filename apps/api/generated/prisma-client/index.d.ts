@@ -1,0 +1,20203 @@
+
+/**
+ * Client
+**/
+
+import * as runtime from './runtime/library.js';
+import $Types = runtime.Types // general types
+import $Public = runtime.Types.Public
+import $Utils = runtime.Types.Utils
+import $Extensions = runtime.Types.Extensions
+import $Result = runtime.Types.Result
+
+export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
+
+/**
+ * Model School
+ * 
+ */
+export type School = $Result.DefaultSelection<Prisma.$SchoolPayload>
+/**
+ * Model ScheduleType
+ * 
+ */
+export type ScheduleType = $Result.DefaultSelection<Prisma.$ScheduleTypePayload>
+/**
+ * Model JobTitle
+ * 
+ */
+export type JobTitle = $Result.DefaultSelection<Prisma.$JobTitlePayload>
+/**
+ * Model Employee
+ * 
+ */
+export type Employee = $Result.DefaultSelection<Prisma.$EmployeePayload>
+/**
+ * Model OperatingHours
+ * 
+ */
+export type OperatingHours = $Result.DefaultSelection<Prisma.$OperatingHoursPayload>
+/**
+ * Model FieldTripType
+ * 
+ */
+export type FieldTripType = $Result.DefaultSelection<Prisma.$FieldTripTypePayload>
+/**
+ * Model ScheduleWeek
+ * 
+ */
+export type ScheduleWeek = $Result.DefaultSelection<Prisma.$ScheduleWeekPayload>
+/**
+ * Model ScheduleDay
+ * 
+ */
+export type ScheduleDay = $Result.DefaultSelection<Prisma.$ScheduleDayPayload>
+/**
+ * Model FieldTripEvent
+ * 
+ */
+export type FieldTripEvent = $Result.DefaultSelection<Prisma.$FieldTripEventPayload>
+/**
+ * Model SegmentBlock
+ * 
+ */
+export type SegmentBlock = $Result.DefaultSelection<Prisma.$SegmentBlockPayload>
+/**
+ * Model StaffAssignment
+ * 
+ */
+export type StaffAssignment = $Result.DefaultSelection<Prisma.$StaffAssignmentPayload>
+
+/**
+ * ##  Prisma Client ʲˢ
+ *
+ * Type-safe database client for TypeScript & Node.js
+ * @example
+ * ```
+ * const prisma = new PrismaClient()
+ * // Fetch zero or more Schools
+ * const schools = await prisma.school.findMany()
+ * ```
+ *
+ *
+ * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ */
+export class PrismaClient<
+  ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
+> {
+  [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
+
+    /**
+   * ##  Prisma Client ʲˢ
+   *
+   * Type-safe database client for TypeScript & Node.js
+   * @example
+   * ```
+   * const prisma = new PrismaClient()
+   * // Fetch zero or more Schools
+   * const schools = await prisma.school.findMany()
+   * ```
+   *
+   *
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   */
+
+  constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
+  $on<V extends U>(eventType: V, callback: (event: V extends 'query' ? Prisma.QueryEvent : Prisma.LogEvent) => void): PrismaClient;
+
+  /**
+   * Connect with the database
+   */
+  $connect(): $Utils.JsPromise<void>;
+
+  /**
+   * Disconnect from the database
+   */
+  $disconnect(): $Utils.JsPromise<void>;
+
+/**
+   * Executes a prepared raw query and returns the number of affected rows.
+   * @example
+   * ```
+   * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
+   * ```
+   *
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
+
+  /**
+   * Executes a raw query and returns the number of affected rows.
+   * Susceptible to SQL injections, see documentation.
+   * @example
+   * ```
+   * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
+   * ```
+   *
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
+
+  /**
+   * Performs a prepared raw query and returns the `SELECT` data.
+   * @example
+   * ```
+   * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
+   * ```
+   *
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
+
+  /**
+   * Performs a raw query and returns the `SELECT` data.
+   * Susceptible to SQL injections, see documentation.
+   * @example
+   * ```
+   * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
+   * ```
+   *
+   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   */
+  $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
+
+
+  /**
+   * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
+   * @example
+   * ```
+   * const [george, bob, alice] = await prisma.$transaction([
+   *   prisma.user.create({ data: { name: 'George' } }),
+   *   prisma.user.create({ data: { name: 'Bob' } }),
+   *   prisma.user.create({ data: { name: 'Alice' } }),
+   * ])
+   * ```
+   * 
+   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   */
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+
+  $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
+
+
+  $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
+    extArgs: ExtArgs
+  }>>
+
+      /**
+   * `prisma.school`: Exposes CRUD operations for the **School** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Schools
+    * const schools = await prisma.school.findMany()
+    * ```
+    */
+  get school(): Prisma.SchoolDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.scheduleType`: Exposes CRUD operations for the **ScheduleType** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ScheduleTypes
+    * const scheduleTypes = await prisma.scheduleType.findMany()
+    * ```
+    */
+  get scheduleType(): Prisma.ScheduleTypeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jobTitle`: Exposes CRUD operations for the **JobTitle** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JobTitles
+    * const jobTitles = await prisma.jobTitle.findMany()
+    * ```
+    */
+  get jobTitle(): Prisma.JobTitleDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.employee`: Exposes CRUD operations for the **Employee** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Employees
+    * const employees = await prisma.employee.findMany()
+    * ```
+    */
+  get employee(): Prisma.EmployeeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.operatingHours`: Exposes CRUD operations for the **OperatingHours** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OperatingHours
+    * const operatingHours = await prisma.operatingHours.findMany()
+    * ```
+    */
+  get operatingHours(): Prisma.OperatingHoursDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fieldTripType`: Exposes CRUD operations for the **FieldTripType** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FieldTripTypes
+    * const fieldTripTypes = await prisma.fieldTripType.findMany()
+    * ```
+    */
+  get fieldTripType(): Prisma.FieldTripTypeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.scheduleWeek`: Exposes CRUD operations for the **ScheduleWeek** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ScheduleWeeks
+    * const scheduleWeeks = await prisma.scheduleWeek.findMany()
+    * ```
+    */
+  get scheduleWeek(): Prisma.ScheduleWeekDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.scheduleDay`: Exposes CRUD operations for the **ScheduleDay** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ScheduleDays
+    * const scheduleDays = await prisma.scheduleDay.findMany()
+    * ```
+    */
+  get scheduleDay(): Prisma.ScheduleDayDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fieldTripEvent`: Exposes CRUD operations for the **FieldTripEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FieldTripEvents
+    * const fieldTripEvents = await prisma.fieldTripEvent.findMany()
+    * ```
+    */
+  get fieldTripEvent(): Prisma.FieldTripEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.segmentBlock`: Exposes CRUD operations for the **SegmentBlock** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SegmentBlocks
+    * const segmentBlocks = await prisma.segmentBlock.findMany()
+    * ```
+    */
+  get segmentBlock(): Prisma.SegmentBlockDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.staffAssignment`: Exposes CRUD operations for the **StaffAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StaffAssignments
+    * const staffAssignments = await prisma.staffAssignment.findMany()
+    * ```
+    */
+  get staffAssignment(): Prisma.StaffAssignmentDelegate<ExtArgs, ClientOptions>;
+}
+
+export namespace Prisma {
+  export import DMMF = runtime.DMMF
+
+  export type PrismaPromise<T> = $Public.PrismaPromise<T>
+
+  /**
+   * Validator
+   */
+  export import validator = runtime.Public.validator
+
+  /**
+   * Prisma Errors
+   */
+  export import PrismaClientKnownRequestError = runtime.PrismaClientKnownRequestError
+  export import PrismaClientUnknownRequestError = runtime.PrismaClientUnknownRequestError
+  export import PrismaClientRustPanicError = runtime.PrismaClientRustPanicError
+  export import PrismaClientInitializationError = runtime.PrismaClientInitializationError
+  export import PrismaClientValidationError = runtime.PrismaClientValidationError
+
+  /**
+   * Re-export of sql-template-tag
+   */
+  export import sql = runtime.sqltag
+  export import empty = runtime.empty
+  export import join = runtime.join
+  export import raw = runtime.raw
+  export import Sql = runtime.Sql
+
+
+
+  /**
+   * Decimal.js
+   */
+  export import Decimal = runtime.Decimal
+
+  export type DecimalJsLike = runtime.DecimalJsLike
+
+  /**
+   * Metrics
+   */
+  export type Metrics = runtime.Metrics
+  export type Metric<T> = runtime.Metric<T>
+  export type MetricHistogram = runtime.MetricHistogram
+  export type MetricHistogramBucket = runtime.MetricHistogramBucket
+
+  /**
+  * Extensions
+  */
+  export import Extension = $Extensions.UserArgs
+  export import getExtensionContext = runtime.Extensions.getExtensionContext
+  export import Args = $Public.Args
+  export import Payload = $Public.Payload
+  export import Result = $Public.Result
+  export import Exact = $Public.Exact
+
+  /**
+   * Prisma Client JS version: 6.19.2
+   * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+   */
+  export type PrismaVersion = {
+    client: string
+  }
+
+  export const prismaVersion: PrismaVersion
+
+  /**
+   * Utility Types
+   */
+
+
+  export import Bytes = runtime.Bytes
+  export import JsonObject = runtime.JsonObject
+  export import JsonArray = runtime.JsonArray
+  export import JsonValue = runtime.JsonValue
+  export import InputJsonObject = runtime.InputJsonObject
+  export import InputJsonArray = runtime.InputJsonArray
+  export import InputJsonValue = runtime.InputJsonValue
+
+  /**
+   * Types of the values used to represent different kinds of `null` values when working with JSON fields.
+   *
+   * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+   */
+  namespace NullTypes {
+    /**
+    * Type of `Prisma.DbNull`.
+    *
+    * You cannot use other instances of this class. Please use the `Prisma.DbNull` value.
+    *
+    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+    */
+    class DbNull {
+      private DbNull: never
+      private constructor()
+    }
+
+    /**
+    * Type of `Prisma.JsonNull`.
+    *
+    * You cannot use other instances of this class. Please use the `Prisma.JsonNull` value.
+    *
+    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+    */
+    class JsonNull {
+      private JsonNull: never
+      private constructor()
+    }
+
+    /**
+    * Type of `Prisma.AnyNull`.
+    *
+    * You cannot use other instances of this class. Please use the `Prisma.AnyNull` value.
+    *
+    * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+    */
+    class AnyNull {
+      private AnyNull: never
+      private constructor()
+    }
+  }
+
+  /**
+   * Helper for filtering JSON entries that have `null` on the database (empty on the db)
+   *
+   * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+   */
+  export const DbNull: NullTypes.DbNull
+
+  /**
+   * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
+   *
+   * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+   */
+  export const JsonNull: NullTypes.JsonNull
+
+  /**
+   * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
+   *
+   * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
+   */
+  export const AnyNull: NullTypes.AnyNull
+
+  type SelectAndInclude = {
+    select: any
+    include: any
+  }
+
+  type SelectAndOmit = {
+    select: any
+    omit: any
+  }
+
+  /**
+   * Get the type of the value, that the Promise holds.
+   */
+  export type PromiseType<T extends PromiseLike<any>> = T extends PromiseLike<infer U> ? U : T;
+
+  /**
+   * Get the return type of a function which returns a Promise.
+   */
+  export type PromiseReturnType<T extends (...args: any) => $Utils.JsPromise<any>> = PromiseType<ReturnType<T>>
+
+  /**
+   * From T, pick a set of properties whose keys are in the union K
+   */
+  type Prisma__Pick<T, K extends keyof T> = {
+      [P in K]: T[P];
+  };
+
+
+  export type Enumerable<T> = T | Array<T>;
+
+  export type RequiredKeys<T> = {
+    [K in keyof T]-?: {} extends Prisma__Pick<T, K> ? never : K
+  }[keyof T]
+
+  export type TruthyKeys<T> = keyof {
+    [K in keyof T as T[K] extends false | undefined | null ? never : K]: K
+  }
+
+  export type TrueKeys<T> = TruthyKeys<Prisma__Pick<T, RequiredKeys<T>>>
+
+  /**
+   * Subset
+   * @desc From `T` pick properties that exist in `U`. Simple version of Intersection
+   */
+  export type Subset<T, U> = {
+    [key in keyof T]: key extends keyof U ? T[key] : never;
+  };
+
+  /**
+   * SelectSubset
+   * @desc From `T` pick properties that exist in `U`. Simple version of Intersection.
+   * Additionally, it validates, if both select and include are present. If the case, it errors.
+   */
+  export type SelectSubset<T, U> = {
+    [key in keyof T]: key extends keyof U ? T[key] : never
+  } &
+    (T extends SelectAndInclude
+      ? 'Please either choose `select` or `include`.'
+      : T extends SelectAndOmit
+        ? 'Please either choose `select` or `omit`.'
+        : {})
+
+  /**
+   * Subset + Intersection
+   * @desc From `T` pick properties that exist in `U` and intersect `K`
+   */
+  export type SubsetIntersection<T, U, K> = {
+    [key in keyof T]: key extends keyof U ? T[key] : never
+  } &
+    K
+
+  type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+  /**
+   * XOR is needed to have a real mutually exclusive union type
+   * https://stackoverflow.com/questions/42123407/does-typescript-support-mutually-exclusive-types
+   */
+  type XOR<T, U> =
+    T extends object ?
+    U extends object ?
+      (Without<T, U> & U) | (Without<U, T> & T)
+    : U : T
+
+
+  /**
+   * Is T a Record?
+   */
+  type IsObject<T extends any> = T extends Array<any>
+  ? False
+  : T extends Date
+  ? False
+  : T extends Uint8Array
+  ? False
+  : T extends BigInt
+  ? False
+  : T extends object
+  ? True
+  : False
+
+
+  /**
+   * If it's T[], return T
+   */
+  export type UnEnumerate<T extends unknown> = T extends Array<infer U> ? U : T
+
+  /**
+   * From ts-toolbelt
+   */
+
+  type __Either<O extends object, K extends Key> = Omit<O, K> &
+    {
+      // Merge all but K
+      [P in K]: Prisma__Pick<O, P & keyof O> // With K possibilities
+    }[K]
+
+  type EitherStrict<O extends object, K extends Key> = Strict<__Either<O, K>>
+
+  type EitherLoose<O extends object, K extends Key> = ComputeRaw<__Either<O, K>>
+
+  type _Either<
+    O extends object,
+    K extends Key,
+    strict extends Boolean
+  > = {
+    1: EitherStrict<O, K>
+    0: EitherLoose<O, K>
+  }[strict]
+
+  type Either<
+    O extends object,
+    K extends Key,
+    strict extends Boolean = 1
+  > = O extends unknown ? _Either<O, K, strict> : never
+
+  export type Union = any
+
+  type PatchUndefined<O extends object, O1 extends object> = {
+    [K in keyof O]: O[K] extends undefined ? At<O1, K> : O[K]
+  } & {}
+
+  /** Helper Types for "Merge" **/
+  export type IntersectOf<U extends Union> = (
+    U extends unknown ? (k: U) => void : never
+  ) extends (k: infer I) => void
+    ? I
+    : never
+
+  export type Overwrite<O extends object, O1 extends object> = {
+      [K in keyof O]: K extends keyof O1 ? O1[K] : O[K];
+  } & {};
+
+  type _Merge<U extends object> = IntersectOf<Overwrite<U, {
+      [K in keyof U]-?: At<U, K>;
+  }>>;
+
+  type Key = string | number | symbol;
+  type AtBasic<O extends object, K extends Key> = K extends keyof O ? O[K] : never;
+  type AtStrict<O extends object, K extends Key> = O[K & keyof O];
+  type AtLoose<O extends object, K extends Key> = O extends unknown ? AtStrict<O, K> : never;
+  export type At<O extends object, K extends Key, strict extends Boolean = 1> = {
+      1: AtStrict<O, K>;
+      0: AtLoose<O, K>;
+  }[strict];
+
+  export type ComputeRaw<A extends any> = A extends Function ? A : {
+    [K in keyof A]: A[K];
+  } & {};
+
+  export type OptionalFlat<O> = {
+    [K in keyof O]?: O[K];
+  } & {};
+
+  type _Record<K extends keyof any, T> = {
+    [P in K]: T;
+  };
+
+  // cause typescript not to expand types and preserve names
+  type NoExpand<T> = T extends unknown ? T : never;
+
+  // this type assumes the passed object is entirely optional
+  type AtLeast<O extends object, K extends string> = NoExpand<
+    O extends unknown
+    ? | (K extends keyof O ? { [P in K]: O[P] } & O : O)
+      | {[P in keyof O as P extends K ? P : never]-?: O[P]} & O
+    : never>;
+
+  type _Strict<U, _U = U> = U extends unknown ? U & OptionalFlat<_Record<Exclude<Keys<_U>, keyof U>, never>> : never;
+
+  export type Strict<U extends object> = ComputeRaw<_Strict<U>>;
+  /** End Helper Types for "Merge" **/
+
+  export type Merge<U extends object> = ComputeRaw<_Merge<Strict<U>>>;
+
+  /**
+  A [[Boolean]]
+  */
+  export type Boolean = True | False
+
+  // /**
+  // 1
+  // */
+  export type True = 1
+
+  /**
+  0
+  */
+  export type False = 0
+
+  export type Not<B extends Boolean> = {
+    0: 1
+    1: 0
+  }[B]
+
+  export type Extends<A1 extends any, A2 extends any> = [A1] extends [never]
+    ? 0 // anything `never` is false
+    : A1 extends A2
+    ? 1
+    : 0
+
+  export type Has<U extends Union, U1 extends Union> = Not<
+    Extends<Exclude<U1, U>, U1>
+  >
+
+  export type Or<B1 extends Boolean, B2 extends Boolean> = {
+    0: {
+      0: 0
+      1: 1
+    }
+    1: {
+      0: 1
+      1: 1
+    }
+  }[B1][B2]
+
+  export type Keys<U extends Union> = U extends unknown ? keyof U : never
+
+  type Cast<A, B> = A extends B ? A : B;
+
+  export const type: unique symbol;
+
+
+
+  /**
+   * Used by group by
+   */
+
+  export type GetScalarType<T, O> = O extends object ? {
+    [P in keyof T]: P extends keyof O
+      ? O[P]
+      : never
+  } : never
+
+  type FieldPaths<
+    T,
+    U = Omit<T, '_avg' | '_sum' | '_count' | '_min' | '_max'>
+  > = IsObject<T> extends True ? U : T
+
+  type GetHavingFields<T> = {
+    [K in keyof T]: Or<
+      Or<Extends<'OR', K>, Extends<'AND', K>>,
+      Extends<'NOT', K>
+    > extends True
+      ? // infer is only needed to not hit TS limit
+        // based on the brilliant idea of Pierre-Antoine Mills
+        // https://github.com/microsoft/TypeScript/issues/30188#issuecomment-478938437
+        T[K] extends infer TK
+        ? GetHavingFields<UnEnumerate<TK> extends object ? Merge<UnEnumerate<TK>> : never>
+        : never
+      : {} extends FieldPaths<T[K]>
+      ? never
+      : K
+  }[keyof T]
+
+  /**
+   * Convert tuple to union
+   */
+  type _TupleToUnion<T> = T extends (infer E)[] ? E : never
+  type TupleToUnion<K extends readonly any[]> = _TupleToUnion<K>
+  type MaybeTupleToUnion<T> = T extends any[] ? TupleToUnion<T> : T
+
+  /**
+   * Like `Pick`, but additionally can also accept an array of keys
+   */
+  type PickEnumerable<T, K extends Enumerable<keyof T> | keyof T> = Prisma__Pick<T, MaybeTupleToUnion<K>>
+
+  /**
+   * Exclude all keys with underscores
+   */
+  type ExcludeUnderscoreKeys<T extends string> = T extends `_${string}` ? never : T
+
+
+  export type FieldRef<Model, FieldType> = runtime.FieldRef<Model, FieldType>
+
+  type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRef<Model, FieldType>
+
+
+  export const ModelName: {
+    School: 'School',
+    ScheduleType: 'ScheduleType',
+    JobTitle: 'JobTitle',
+    Employee: 'Employee',
+    OperatingHours: 'OperatingHours',
+    FieldTripType: 'FieldTripType',
+    ScheduleWeek: 'ScheduleWeek',
+    ScheduleDay: 'ScheduleDay',
+    FieldTripEvent: 'FieldTripEvent',
+    SegmentBlock: 'SegmentBlock',
+    StaffAssignment: 'StaffAssignment'
+  };
+
+  export type ModelName = (typeof ModelName)[keyof typeof ModelName]
+
+
+  export type Datasources = {
+    db?: Datasource
+  }
+
+  interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
+    returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
+  }
+
+  export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> = {
+    globalOmitOptions: {
+      omit: GlobalOmitOptions
+    }
+    meta: {
+      modelProps: "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment"
+      txIsolationLevel: Prisma.TransactionIsolationLevel
+    }
+    model: {
+      School: {
+        payload: Prisma.$SchoolPayload<ExtArgs>
+        fields: Prisma.SchoolFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SchoolFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SchoolFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          findFirst: {
+            args: Prisma.SchoolFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SchoolFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          findMany: {
+            args: Prisma.SchoolFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+          }
+          create: {
+            args: Prisma.SchoolCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          createMany: {
+            args: Prisma.SchoolCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SchoolCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+          }
+          delete: {
+            args: Prisma.SchoolDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          update: {
+            args: Prisma.SchoolUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          deleteMany: {
+            args: Prisma.SchoolDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SchoolUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SchoolUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>[]
+          }
+          upsert: {
+            args: Prisma.SchoolUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SchoolPayload>
+          }
+          aggregate: {
+            args: Prisma.SchoolAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSchool>
+          }
+          groupBy: {
+            args: Prisma.SchoolGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SchoolGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SchoolCountArgs<ExtArgs>
+            result: $Utils.Optional<SchoolCountAggregateOutputType> | number
+          }
+        }
+      }
+      ScheduleType: {
+        payload: Prisma.$ScheduleTypePayload<ExtArgs>
+        fields: Prisma.ScheduleTypeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ScheduleTypeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ScheduleTypeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          findFirst: {
+            args: Prisma.ScheduleTypeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ScheduleTypeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          findMany: {
+            args: Prisma.ScheduleTypeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>[]
+          }
+          create: {
+            args: Prisma.ScheduleTypeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          createMany: {
+            args: Prisma.ScheduleTypeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ScheduleTypeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>[]
+          }
+          delete: {
+            args: Prisma.ScheduleTypeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          update: {
+            args: Prisma.ScheduleTypeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          deleteMany: {
+            args: Prisma.ScheduleTypeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ScheduleTypeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ScheduleTypeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>[]
+          }
+          upsert: {
+            args: Prisma.ScheduleTypeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypePayload>
+          }
+          aggregate: {
+            args: Prisma.ScheduleTypeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateScheduleType>
+          }
+          groupBy: {
+            args: Prisma.ScheduleTypeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleTypeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ScheduleTypeCountArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleTypeCountAggregateOutputType> | number
+          }
+        }
+      }
+      JobTitle: {
+        payload: Prisma.$JobTitlePayload<ExtArgs>
+        fields: Prisma.JobTitleFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JobTitleFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JobTitleFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          findFirst: {
+            args: Prisma.JobTitleFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JobTitleFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          findMany: {
+            args: Prisma.JobTitleFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>[]
+          }
+          create: {
+            args: Prisma.JobTitleCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          createMany: {
+            args: Prisma.JobTitleCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.JobTitleCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>[]
+          }
+          delete: {
+            args: Prisma.JobTitleDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          update: {
+            args: Prisma.JobTitleUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          deleteMany: {
+            args: Prisma.JobTitleDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JobTitleUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.JobTitleUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>[]
+          }
+          upsert: {
+            args: Prisma.JobTitleUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JobTitlePayload>
+          }
+          aggregate: {
+            args: Prisma.JobTitleAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJobTitle>
+          }
+          groupBy: {
+            args: Prisma.JobTitleGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JobTitleGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JobTitleCountArgs<ExtArgs>
+            result: $Utils.Optional<JobTitleCountAggregateOutputType> | number
+          }
+        }
+      }
+      Employee: {
+        payload: Prisma.$EmployeePayload<ExtArgs>
+        fields: Prisma.EmployeeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmployeeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmployeeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          findFirst: {
+            args: Prisma.EmployeeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmployeeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          findMany: {
+            args: Prisma.EmployeeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>[]
+          }
+          create: {
+            args: Prisma.EmployeeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          createMany: {
+            args: Prisma.EmployeeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EmployeeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>[]
+          }
+          delete: {
+            args: Prisma.EmployeeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          update: {
+            args: Prisma.EmployeeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          deleteMany: {
+            args: Prisma.EmployeeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmployeeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EmployeeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>[]
+          }
+          upsert: {
+            args: Prisma.EmployeeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmployeePayload>
+          }
+          aggregate: {
+            args: Prisma.EmployeeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmployee>
+          }
+          groupBy: {
+            args: Prisma.EmployeeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmployeeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmployeeCountArgs<ExtArgs>
+            result: $Utils.Optional<EmployeeCountAggregateOutputType> | number
+          }
+        }
+      }
+      OperatingHours: {
+        payload: Prisma.$OperatingHoursPayload<ExtArgs>
+        fields: Prisma.OperatingHoursFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OperatingHoursFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OperatingHoursFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          findFirst: {
+            args: Prisma.OperatingHoursFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OperatingHoursFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          findMany: {
+            args: Prisma.OperatingHoursFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
+          }
+          create: {
+            args: Prisma.OperatingHoursCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          createMany: {
+            args: Prisma.OperatingHoursCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.OperatingHoursCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
+          }
+          delete: {
+            args: Prisma.OperatingHoursDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          update: {
+            args: Prisma.OperatingHoursUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          deleteMany: {
+            args: Prisma.OperatingHoursDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OperatingHoursUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.OperatingHoursUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>[]
+          }
+          upsert: {
+            args: Prisma.OperatingHoursUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OperatingHoursPayload>
+          }
+          aggregate: {
+            args: Prisma.OperatingHoursAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOperatingHours>
+          }
+          groupBy: {
+            args: Prisma.OperatingHoursGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OperatingHoursGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OperatingHoursCountArgs<ExtArgs>
+            result: $Utils.Optional<OperatingHoursCountAggregateOutputType> | number
+          }
+        }
+      }
+      FieldTripType: {
+        payload: Prisma.$FieldTripTypePayload<ExtArgs>
+        fields: Prisma.FieldTripTypeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FieldTripTypeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FieldTripTypeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          findFirst: {
+            args: Prisma.FieldTripTypeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FieldTripTypeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          findMany: {
+            args: Prisma.FieldTripTypeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>[]
+          }
+          create: {
+            args: Prisma.FieldTripTypeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          createMany: {
+            args: Prisma.FieldTripTypeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FieldTripTypeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>[]
+          }
+          delete: {
+            args: Prisma.FieldTripTypeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          update: {
+            args: Prisma.FieldTripTypeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          deleteMany: {
+            args: Prisma.FieldTripTypeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FieldTripTypeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FieldTripTypeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>[]
+          }
+          upsert: {
+            args: Prisma.FieldTripTypeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripTypePayload>
+          }
+          aggregate: {
+            args: Prisma.FieldTripTypeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFieldTripType>
+          }
+          groupBy: {
+            args: Prisma.FieldTripTypeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FieldTripTypeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FieldTripTypeCountArgs<ExtArgs>
+            result: $Utils.Optional<FieldTripTypeCountAggregateOutputType> | number
+          }
+        }
+      }
+      ScheduleWeek: {
+        payload: Prisma.$ScheduleWeekPayload<ExtArgs>
+        fields: Prisma.ScheduleWeekFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ScheduleWeekFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ScheduleWeekFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          findFirst: {
+            args: Prisma.ScheduleWeekFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ScheduleWeekFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          findMany: {
+            args: Prisma.ScheduleWeekFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>[]
+          }
+          create: {
+            args: Prisma.ScheduleWeekCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          createMany: {
+            args: Prisma.ScheduleWeekCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ScheduleWeekCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>[]
+          }
+          delete: {
+            args: Prisma.ScheduleWeekDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          update: {
+            args: Prisma.ScheduleWeekUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          deleteMany: {
+            args: Prisma.ScheduleWeekDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ScheduleWeekUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ScheduleWeekUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>[]
+          }
+          upsert: {
+            args: Prisma.ScheduleWeekUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleWeekPayload>
+          }
+          aggregate: {
+            args: Prisma.ScheduleWeekAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateScheduleWeek>
+          }
+          groupBy: {
+            args: Prisma.ScheduleWeekGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleWeekGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ScheduleWeekCountArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleWeekCountAggregateOutputType> | number
+          }
+        }
+      }
+      ScheduleDay: {
+        payload: Prisma.$ScheduleDayPayload<ExtArgs>
+        fields: Prisma.ScheduleDayFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ScheduleDayFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ScheduleDayFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          findFirst: {
+            args: Prisma.ScheduleDayFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ScheduleDayFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          findMany: {
+            args: Prisma.ScheduleDayFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>[]
+          }
+          create: {
+            args: Prisma.ScheduleDayCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          createMany: {
+            args: Prisma.ScheduleDayCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ScheduleDayCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>[]
+          }
+          delete: {
+            args: Prisma.ScheduleDayDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          update: {
+            args: Prisma.ScheduleDayUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          deleteMany: {
+            args: Prisma.ScheduleDayDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ScheduleDayUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ScheduleDayUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>[]
+          }
+          upsert: {
+            args: Prisma.ScheduleDayUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleDayPayload>
+          }
+          aggregate: {
+            args: Prisma.ScheduleDayAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateScheduleDay>
+          }
+          groupBy: {
+            args: Prisma.ScheduleDayGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleDayGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ScheduleDayCountArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleDayCountAggregateOutputType> | number
+          }
+        }
+      }
+      FieldTripEvent: {
+        payload: Prisma.$FieldTripEventPayload<ExtArgs>
+        fields: Prisma.FieldTripEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FieldTripEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FieldTripEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          findFirst: {
+            args: Prisma.FieldTripEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FieldTripEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          findMany: {
+            args: Prisma.FieldTripEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>[]
+          }
+          create: {
+            args: Prisma.FieldTripEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          createMany: {
+            args: Prisma.FieldTripEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FieldTripEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>[]
+          }
+          delete: {
+            args: Prisma.FieldTripEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          update: {
+            args: Prisma.FieldTripEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.FieldTripEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FieldTripEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FieldTripEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.FieldTripEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FieldTripEventPayload>
+          }
+          aggregate: {
+            args: Prisma.FieldTripEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFieldTripEvent>
+          }
+          groupBy: {
+            args: Prisma.FieldTripEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FieldTripEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FieldTripEventCountArgs<ExtArgs>
+            result: $Utils.Optional<FieldTripEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      SegmentBlock: {
+        payload: Prisma.$SegmentBlockPayload<ExtArgs>
+        fields: Prisma.SegmentBlockFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SegmentBlockFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SegmentBlockFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          findFirst: {
+            args: Prisma.SegmentBlockFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SegmentBlockFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          findMany: {
+            args: Prisma.SegmentBlockFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>[]
+          }
+          create: {
+            args: Prisma.SegmentBlockCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          createMany: {
+            args: Prisma.SegmentBlockCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SegmentBlockCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>[]
+          }
+          delete: {
+            args: Prisma.SegmentBlockDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          update: {
+            args: Prisma.SegmentBlockUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          deleteMany: {
+            args: Prisma.SegmentBlockDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SegmentBlockUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SegmentBlockUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>[]
+          }
+          upsert: {
+            args: Prisma.SegmentBlockUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SegmentBlockPayload>
+          }
+          aggregate: {
+            args: Prisma.SegmentBlockAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSegmentBlock>
+          }
+          groupBy: {
+            args: Prisma.SegmentBlockGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SegmentBlockGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SegmentBlockCountArgs<ExtArgs>
+            result: $Utils.Optional<SegmentBlockCountAggregateOutputType> | number
+          }
+        }
+      }
+      StaffAssignment: {
+        payload: Prisma.$StaffAssignmentPayload<ExtArgs>
+        fields: Prisma.StaffAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StaffAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.StaffAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StaffAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.StaffAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.StaffAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.StaffAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StaffAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.StaffAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          update: {
+            args: Prisma.StaffAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.StaffAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StaffAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.StaffAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StaffAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.StaffAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStaffAssignment>
+          }
+          groupBy: {
+            args: Prisma.StaffAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StaffAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StaffAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<StaffAssignmentCountAggregateOutputType> | number
+          }
+        }
+      }
+    }
+  } & {
+    other: {
+      payload: any
+      operations: {
+        $executeRaw: {
+          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
+          result: any
+        }
+        $executeRawUnsafe: {
+          args: [query: string, ...values: any[]],
+          result: any
+        }
+        $queryRaw: {
+          args: [query: TemplateStringsArray | Prisma.Sql, ...values: any[]],
+          result: any
+        }
+        $queryRawUnsafe: {
+          args: [query: string, ...values: any[]],
+          result: any
+        }
+      }
+    }
+  }
+  export const defineExtension: $Extensions.ExtendsHook<"define", Prisma.TypeMapCb, $Extensions.DefaultArgs>
+  export type DefaultPrismaClient = PrismaClient
+  export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
+  export interface PrismaClientOptions {
+    /**
+     * Overwrites the datasource url from your schema.prisma file
+     */
+    datasources?: Datasources
+    /**
+     * Overwrites the datasource url from your schema.prisma file
+     */
+    datasourceUrl?: string
+    /**
+     * @default "colorless"
+     */
+    errorFormat?: ErrorFormat
+    /**
+     * @example
+     * ```
+     * // Shorthand for `emit: 'stdout'`
+     * log: ['query', 'info', 'warn', 'error']
+     * 
+     * // Emit as events only
+     * log: [
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
+     * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
+     * ```
+     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+     */
+    log?: (LogLevel | LogDefinition)[]
+    /**
+     * The default values for transactionOptions
+     * maxWait ?= 2000
+     * timeout ?= 5000
+     */
+    transactionOptions?: {
+      maxWait?: number
+      timeout?: number
+      isolationLevel?: Prisma.TransactionIsolationLevel
+    }
+    /**
+     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     */
+    adapter?: runtime.SqlDriverAdapterFactory | null
+    /**
+     * Global configuration for omitting model fields by default.
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   omit: {
+     *     user: {
+     *       password: true
+     *     }
+     *   }
+     * })
+     * ```
+     */
+    omit?: Prisma.GlobalOmitConfig
+  }
+  export type GlobalOmitConfig = {
+    school?: SchoolOmit
+    scheduleType?: ScheduleTypeOmit
+    jobTitle?: JobTitleOmit
+    employee?: EmployeeOmit
+    operatingHours?: OperatingHoursOmit
+    fieldTripType?: FieldTripTypeOmit
+    scheduleWeek?: ScheduleWeekOmit
+    scheduleDay?: ScheduleDayOmit
+    fieldTripEvent?: FieldTripEventOmit
+    segmentBlock?: SegmentBlockOmit
+    staffAssignment?: StaffAssignmentOmit
+  }
+
+  /* Types for Logging */
+  export type LogLevel = 'info' | 'query' | 'warn' | 'error'
+  export type LogDefinition = {
+    level: LogLevel
+    emit: 'stdout' | 'event'
+  }
+
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
+
+  export type QueryEvent = {
+    timestamp: Date
+    query: string
+    params: string
+    duration: number
+    target: string
+  }
+
+  export type LogEvent = {
+    timestamp: Date
+    message: string
+    target: string
+  }
+  /* End Types for Logging */
+
+
+  export type PrismaAction =
+    | 'findUnique'
+    | 'findUniqueOrThrow'
+    | 'findMany'
+    | 'findFirst'
+    | 'findFirstOrThrow'
+    | 'create'
+    | 'createMany'
+    | 'createManyAndReturn'
+    | 'update'
+    | 'updateMany'
+    | 'updateManyAndReturn'
+    | 'upsert'
+    | 'delete'
+    | 'deleteMany'
+    | 'executeRaw'
+    | 'queryRaw'
+    | 'aggregate'
+    | 'count'
+    | 'runCommandRaw'
+    | 'findRaw'
+    | 'groupBy'
+
+  // tested in getLogLevel.test.ts
+  export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
+
+  /**
+   * `PrismaClient` proxy available in interactive transactions.
+   */
+  export type TransactionClient = Omit<Prisma.DefaultPrismaClient, runtime.ITXClientDenyList>
+
+  export type Datasource = {
+    url?: string
+  }
+
+  /**
+   * Count Types
+   */
+
+
+  /**
+   * Count Type SchoolCountOutputType
+   */
+
+  export type SchoolCountOutputType = {
+    scheduleTypes: number
+    jobTitles: number
+    employees: number
+    operatingHours: number
+    fieldTripTypes: number
+    scheduleWeeks: number
+  }
+
+  export type SchoolCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleTypes?: boolean | SchoolCountOutputTypeCountScheduleTypesArgs
+    jobTitles?: boolean | SchoolCountOutputTypeCountJobTitlesArgs
+    employees?: boolean | SchoolCountOutputTypeCountEmployeesArgs
+    operatingHours?: boolean | SchoolCountOutputTypeCountOperatingHoursArgs
+    fieldTripTypes?: boolean | SchoolCountOutputTypeCountFieldTripTypesArgs
+    scheduleWeeks?: boolean | SchoolCountOutputTypeCountScheduleWeeksArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SchoolCountOutputType
+     */
+    select?: SchoolCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountScheduleTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleTypeWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountJobTitlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobTitleWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountEmployeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmployeeWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountOperatingHoursArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OperatingHoursWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountFieldTripTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FieldTripTypeWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountScheduleWeeksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleWeekWhereInput
+  }
+
+
+  /**
+   * Count Type ScheduleWeekCountOutputType
+   */
+
+  export type ScheduleWeekCountOutputType = {
+    scheduleDays: number
+    segmentBlocks: number
+    staffAssignments: number
+    fieldTripEvents: number
+  }
+
+  export type ScheduleWeekCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleDays?: boolean | ScheduleWeekCountOutputTypeCountScheduleDaysArgs
+    segmentBlocks?: boolean | ScheduleWeekCountOutputTypeCountSegmentBlocksArgs
+    staffAssignments?: boolean | ScheduleWeekCountOutputTypeCountStaffAssignmentsArgs
+    fieldTripEvents?: boolean | ScheduleWeekCountOutputTypeCountFieldTripEventsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeekCountOutputType
+     */
+    select?: ScheduleWeekCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeCountScheduleDaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleDayWhereInput
+  }
+
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeCountSegmentBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SegmentBlockWhereInput
+  }
+
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeCountStaffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffAssignmentWhereInput
+  }
+
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeCountFieldTripEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FieldTripEventWhereInput
+  }
+
+
+  /**
+   * Count Type SegmentBlockCountOutputType
+   */
+
+  export type SegmentBlockCountOutputType = {
+    staffAssignments: number
+  }
+
+  export type SegmentBlockCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    staffAssignments?: boolean | SegmentBlockCountOutputTypeCountStaffAssignmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SegmentBlockCountOutputType without action
+   */
+  export type SegmentBlockCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlockCountOutputType
+     */
+    select?: SegmentBlockCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SegmentBlockCountOutputType without action
+   */
+  export type SegmentBlockCountOutputTypeCountStaffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffAssignmentWhereInput
+  }
+
+
+  /**
+   * Models
+   */
+
+  /**
+   * Model School
+   */
+
+  export type AggregateSchool = {
+    _count: SchoolCountAggregateOutputType | null
+    _avg: SchoolAvgAggregateOutputType | null
+    _sum: SchoolSumAggregateOutputType | null
+    _min: SchoolMinAggregateOutputType | null
+    _max: SchoolMaxAggregateOutputType | null
+  }
+
+  export type SchoolAvgAggregateOutputType = {
+    openerCount: number | null
+    closerCount: number | null
+    minimumMedicalDelegated: number | null
+  }
+
+  export type SchoolSumAggregateOutputType = {
+    openerCount: number | null
+    closerCount: number | null
+    minimumMedicalDelegated: number | null
+  }
+
+  export type SchoolMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    openerCount: number | null
+    closerCount: number | null
+    minimumMedicalDelegated: number | null
+    requireCurrentCpr: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SchoolMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    openerCount: number | null
+    closerCount: number | null
+    minimumMedicalDelegated: number | null
+    requireCurrentCpr: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SchoolCountAggregateOutputType = {
+    id: number
+    name: number
+    closedDays: number
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SchoolAvgAggregateInputType = {
+    openerCount?: true
+    closerCount?: true
+    minimumMedicalDelegated?: true
+  }
+
+  export type SchoolSumAggregateInputType = {
+    openerCount?: true
+    closerCount?: true
+    minimumMedicalDelegated?: true
+  }
+
+  export type SchoolMinAggregateInputType = {
+    id?: true
+    name?: true
+    openerCount?: true
+    closerCount?: true
+    minimumMedicalDelegated?: true
+    requireCurrentCpr?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SchoolMaxAggregateInputType = {
+    id?: true
+    name?: true
+    openerCount?: true
+    closerCount?: true
+    minimumMedicalDelegated?: true
+    requireCurrentCpr?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SchoolCountAggregateInputType = {
+    id?: true
+    name?: true
+    closedDays?: true
+    openerCount?: true
+    closerCount?: true
+    minimumMedicalDelegated?: true
+    requireCurrentCpr?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SchoolAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which School to aggregate.
+     */
+    where?: SchoolWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Schools to fetch.
+     */
+    orderBy?: SchoolOrderByWithRelationInput | SchoolOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SchoolWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Schools from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Schools.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Schools
+    **/
+    _count?: true | SchoolCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SchoolAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SchoolSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SchoolMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SchoolMaxAggregateInputType
+  }
+
+  export type GetSchoolAggregateType<T extends SchoolAggregateArgs> = {
+        [P in keyof T & keyof AggregateSchool]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSchool[P]>
+      : GetScalarType<T[P], AggregateSchool[P]>
+  }
+
+
+
+
+  export type SchoolGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SchoolWhereInput
+    orderBy?: SchoolOrderByWithAggregationInput | SchoolOrderByWithAggregationInput[]
+    by: SchoolScalarFieldEnum[] | SchoolScalarFieldEnum
+    having?: SchoolScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SchoolCountAggregateInputType | true
+    _avg?: SchoolAvgAggregateInputType
+    _sum?: SchoolSumAggregateInputType
+    _min?: SchoolMinAggregateInputType
+    _max?: SchoolMaxAggregateInputType
+  }
+
+  export type SchoolGroupByOutputType = {
+    id: string
+    name: string
+    closedDays: JsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: SchoolCountAggregateOutputType | null
+    _avg: SchoolAvgAggregateOutputType | null
+    _sum: SchoolSumAggregateOutputType | null
+    _min: SchoolMinAggregateOutputType | null
+    _max: SchoolMaxAggregateOutputType | null
+  }
+
+  type GetSchoolGroupByPayload<T extends SchoolGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SchoolGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SchoolGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SchoolGroupByOutputType[P]>
+            : GetScalarType<T[P], SchoolGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SchoolSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    closedDays?: boolean
+    openerCount?: boolean
+    closerCount?: boolean
+    minimumMedicalDelegated?: boolean
+    requireCurrentCpr?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
+    jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
+    employees?: boolean | School$employeesArgs<ExtArgs>
+    operatingHours?: boolean | School$operatingHoursArgs<ExtArgs>
+    fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
+    scheduleWeeks?: boolean | School$scheduleWeeksArgs<ExtArgs>
+    _count?: boolean | SchoolCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["school"]>
+
+  export type SchoolSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    closedDays?: boolean
+    openerCount?: boolean
+    closerCount?: boolean
+    minimumMedicalDelegated?: boolean
+    requireCurrentCpr?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["school"]>
+
+  export type SchoolSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    closedDays?: boolean
+    openerCount?: boolean
+    closerCount?: boolean
+    minimumMedicalDelegated?: boolean
+    requireCurrentCpr?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["school"]>
+
+  export type SchoolSelectScalar = {
+    id?: boolean
+    name?: boolean
+    closedDays?: boolean
+    openerCount?: boolean
+    closerCount?: boolean
+    minimumMedicalDelegated?: boolean
+    requireCurrentCpr?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SchoolOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "closedDays" | "openerCount" | "closerCount" | "minimumMedicalDelegated" | "requireCurrentCpr" | "createdAt" | "updatedAt", ExtArgs["result"]["school"]>
+  export type SchoolInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
+    jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
+    employees?: boolean | School$employeesArgs<ExtArgs>
+    operatingHours?: boolean | School$operatingHoursArgs<ExtArgs>
+    fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
+    scheduleWeeks?: boolean | School$scheduleWeeksArgs<ExtArgs>
+    _count?: boolean | SchoolCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SchoolIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type SchoolIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $SchoolPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "School"
+    objects: {
+      scheduleTypes: Prisma.$ScheduleTypePayload<ExtArgs>[]
+      jobTitles: Prisma.$JobTitlePayload<ExtArgs>[]
+      employees: Prisma.$EmployeePayload<ExtArgs>[]
+      operatingHours: Prisma.$OperatingHoursPayload<ExtArgs>[]
+      fieldTripTypes: Prisma.$FieldTripTypePayload<ExtArgs>[]
+      scheduleWeeks: Prisma.$ScheduleWeekPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      closedDays: Prisma.JsonValue
+      openerCount: number
+      closerCount: number
+      minimumMedicalDelegated: number
+      requireCurrentCpr: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["school"]>
+    composites: {}
+  }
+
+  type SchoolGetPayload<S extends boolean | null | undefined | SchoolDefaultArgs> = $Result.GetResult<Prisma.$SchoolPayload, S>
+
+  type SchoolCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SchoolFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SchoolCountAggregateInputType | true
+    }
+
+  export interface SchoolDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['School'], meta: { name: 'School' } }
+    /**
+     * Find zero or one School that matches the filter.
+     * @param {SchoolFindUniqueArgs} args - Arguments to find a School
+     * @example
+     * // Get one School
+     * const school = await prisma.school.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SchoolFindUniqueArgs>(args: SelectSubset<T, SchoolFindUniqueArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one School that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SchoolFindUniqueOrThrowArgs} args - Arguments to find a School
+     * @example
+     * // Get one School
+     * const school = await prisma.school.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SchoolFindUniqueOrThrowArgs>(args: SelectSubset<T, SchoolFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first School that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolFindFirstArgs} args - Arguments to find a School
+     * @example
+     * // Get one School
+     * const school = await prisma.school.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SchoolFindFirstArgs>(args?: SelectSubset<T, SchoolFindFirstArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first School that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolFindFirstOrThrowArgs} args - Arguments to find a School
+     * @example
+     * // Get one School
+     * const school = await prisma.school.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SchoolFindFirstOrThrowArgs>(args?: SelectSubset<T, SchoolFindFirstOrThrowArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Schools that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Schools
+     * const schools = await prisma.school.findMany()
+     * 
+     * // Get first 10 Schools
+     * const schools = await prisma.school.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const schoolWithIdOnly = await prisma.school.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SchoolFindManyArgs>(args?: SelectSubset<T, SchoolFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a School.
+     * @param {SchoolCreateArgs} args - Arguments to create a School.
+     * @example
+     * // Create one School
+     * const School = await prisma.school.create({
+     *   data: {
+     *     // ... data to create a School
+     *   }
+     * })
+     * 
+     */
+    create<T extends SchoolCreateArgs>(args: SelectSubset<T, SchoolCreateArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Schools.
+     * @param {SchoolCreateManyArgs} args - Arguments to create many Schools.
+     * @example
+     * // Create many Schools
+     * const school = await prisma.school.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SchoolCreateManyArgs>(args?: SelectSubset<T, SchoolCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Schools and returns the data saved in the database.
+     * @param {SchoolCreateManyAndReturnArgs} args - Arguments to create many Schools.
+     * @example
+     * // Create many Schools
+     * const school = await prisma.school.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Schools and only return the `id`
+     * const schoolWithIdOnly = await prisma.school.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SchoolCreateManyAndReturnArgs>(args?: SelectSubset<T, SchoolCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a School.
+     * @param {SchoolDeleteArgs} args - Arguments to delete one School.
+     * @example
+     * // Delete one School
+     * const School = await prisma.school.delete({
+     *   where: {
+     *     // ... filter to delete one School
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SchoolDeleteArgs>(args: SelectSubset<T, SchoolDeleteArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one School.
+     * @param {SchoolUpdateArgs} args - Arguments to update one School.
+     * @example
+     * // Update one School
+     * const school = await prisma.school.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SchoolUpdateArgs>(args: SelectSubset<T, SchoolUpdateArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Schools.
+     * @param {SchoolDeleteManyArgs} args - Arguments to filter Schools to delete.
+     * @example
+     * // Delete a few Schools
+     * const { count } = await prisma.school.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SchoolDeleteManyArgs>(args?: SelectSubset<T, SchoolDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Schools.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Schools
+     * const school = await prisma.school.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SchoolUpdateManyArgs>(args: SelectSubset<T, SchoolUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Schools and returns the data updated in the database.
+     * @param {SchoolUpdateManyAndReturnArgs} args - Arguments to update many Schools.
+     * @example
+     * // Update many Schools
+     * const school = await prisma.school.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Schools and only return the `id`
+     * const schoolWithIdOnly = await prisma.school.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SchoolUpdateManyAndReturnArgs>(args: SelectSubset<T, SchoolUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one School.
+     * @param {SchoolUpsertArgs} args - Arguments to update or create a School.
+     * @example
+     * // Update or create a School
+     * const school = await prisma.school.upsert({
+     *   create: {
+     *     // ... data to create a School
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the School we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SchoolUpsertArgs>(args: SelectSubset<T, SchoolUpsertArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Schools.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolCountArgs} args - Arguments to filter Schools to count.
+     * @example
+     * // Count the number of Schools
+     * const count = await prisma.school.count({
+     *   where: {
+     *     // ... the filter for the Schools we want to count
+     *   }
+     * })
+    **/
+    count<T extends SchoolCountArgs>(
+      args?: Subset<T, SchoolCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SchoolCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a School.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SchoolAggregateArgs>(args: Subset<T, SchoolAggregateArgs>): Prisma.PrismaPromise<GetSchoolAggregateType<T>>
+
+    /**
+     * Group by School.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SchoolGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SchoolGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SchoolGroupByArgs['orderBy'] }
+        : { orderBy?: SchoolGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SchoolGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSchoolGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the School model
+   */
+  readonly fields: SchoolFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for School.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SchoolClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleTypes<T extends School$scheduleTypesArgs<ExtArgs> = {}>(args?: Subset<T, School$scheduleTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobTitles<T extends School$jobTitlesArgs<ExtArgs> = {}>(args?: Subset<T, School$jobTitlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    employees<T extends School$employeesArgs<ExtArgs> = {}>(args?: Subset<T, School$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    operatingHours<T extends School$operatingHoursArgs<ExtArgs> = {}>(args?: Subset<T, School$operatingHoursArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fieldTripTypes<T extends School$fieldTripTypesArgs<ExtArgs> = {}>(args?: Subset<T, School$fieldTripTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    scheduleWeeks<T extends School$scheduleWeeksArgs<ExtArgs> = {}>(args?: Subset<T, School$scheduleWeeksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the School model
+   */
+  interface SchoolFieldRefs {
+    readonly id: FieldRef<"School", 'String'>
+    readonly name: FieldRef<"School", 'String'>
+    readonly closedDays: FieldRef<"School", 'Json'>
+    readonly openerCount: FieldRef<"School", 'Int'>
+    readonly closerCount: FieldRef<"School", 'Int'>
+    readonly minimumMedicalDelegated: FieldRef<"School", 'Int'>
+    readonly requireCurrentCpr: FieldRef<"School", 'Boolean'>
+    readonly createdAt: FieldRef<"School", 'DateTime'>
+    readonly updatedAt: FieldRef<"School", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * School findUnique
+   */
+  export type SchoolFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter, which School to fetch.
+     */
+    where: SchoolWhereUniqueInput
+  }
+
+  /**
+   * School findUniqueOrThrow
+   */
+  export type SchoolFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter, which School to fetch.
+     */
+    where: SchoolWhereUniqueInput
+  }
+
+  /**
+   * School findFirst
+   */
+  export type SchoolFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter, which School to fetch.
+     */
+    where?: SchoolWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Schools to fetch.
+     */
+    orderBy?: SchoolOrderByWithRelationInput | SchoolOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Schools.
+     */
+    cursor?: SchoolWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Schools from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Schools.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Schools.
+     */
+    distinct?: SchoolScalarFieldEnum | SchoolScalarFieldEnum[]
+  }
+
+  /**
+   * School findFirstOrThrow
+   */
+  export type SchoolFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter, which School to fetch.
+     */
+    where?: SchoolWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Schools to fetch.
+     */
+    orderBy?: SchoolOrderByWithRelationInput | SchoolOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Schools.
+     */
+    cursor?: SchoolWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Schools from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Schools.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Schools.
+     */
+    distinct?: SchoolScalarFieldEnum | SchoolScalarFieldEnum[]
+  }
+
+  /**
+   * School findMany
+   */
+  export type SchoolFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter, which Schools to fetch.
+     */
+    where?: SchoolWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Schools to fetch.
+     */
+    orderBy?: SchoolOrderByWithRelationInput | SchoolOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Schools.
+     */
+    cursor?: SchoolWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Schools from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Schools.
+     */
+    skip?: number
+    distinct?: SchoolScalarFieldEnum | SchoolScalarFieldEnum[]
+  }
+
+  /**
+   * School create
+   */
+  export type SchoolCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * The data needed to create a School.
+     */
+    data: XOR<SchoolCreateInput, SchoolUncheckedCreateInput>
+  }
+
+  /**
+   * School createMany
+   */
+  export type SchoolCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Schools.
+     */
+    data: SchoolCreateManyInput | SchoolCreateManyInput[]
+  }
+
+  /**
+   * School createManyAndReturn
+   */
+  export type SchoolCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * The data used to create many Schools.
+     */
+    data: SchoolCreateManyInput | SchoolCreateManyInput[]
+  }
+
+  /**
+   * School update
+   */
+  export type SchoolUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * The data needed to update a School.
+     */
+    data: XOR<SchoolUpdateInput, SchoolUncheckedUpdateInput>
+    /**
+     * Choose, which School to update.
+     */
+    where: SchoolWhereUniqueInput
+  }
+
+  /**
+   * School updateMany
+   */
+  export type SchoolUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Schools.
+     */
+    data: XOR<SchoolUpdateManyMutationInput, SchoolUncheckedUpdateManyInput>
+    /**
+     * Filter which Schools to update
+     */
+    where?: SchoolWhereInput
+    /**
+     * Limit how many Schools to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * School updateManyAndReturn
+   */
+  export type SchoolUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * The data used to update Schools.
+     */
+    data: XOR<SchoolUpdateManyMutationInput, SchoolUncheckedUpdateManyInput>
+    /**
+     * Filter which Schools to update
+     */
+    where?: SchoolWhereInput
+    /**
+     * Limit how many Schools to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * School upsert
+   */
+  export type SchoolUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * The filter to search for the School to update in case it exists.
+     */
+    where: SchoolWhereUniqueInput
+    /**
+     * In case the School found by the `where` argument doesn't exist, create a new School with this data.
+     */
+    create: XOR<SchoolCreateInput, SchoolUncheckedCreateInput>
+    /**
+     * In case the School was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SchoolUpdateInput, SchoolUncheckedUpdateInput>
+  }
+
+  /**
+   * School delete
+   */
+  export type SchoolDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    /**
+     * Filter which School to delete.
+     */
+    where: SchoolWhereUniqueInput
+  }
+
+  /**
+   * School deleteMany
+   */
+  export type SchoolDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Schools to delete
+     */
+    where?: SchoolWhereInput
+    /**
+     * Limit how many Schools to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * School.scheduleTypes
+   */
+  export type School$scheduleTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    where?: ScheduleTypeWhereInput
+    orderBy?: ScheduleTypeOrderByWithRelationInput | ScheduleTypeOrderByWithRelationInput[]
+    cursor?: ScheduleTypeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ScheduleTypeScalarFieldEnum | ScheduleTypeScalarFieldEnum[]
+  }
+
+  /**
+   * School.jobTitles
+   */
+  export type School$jobTitlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    where?: JobTitleWhereInput
+    orderBy?: JobTitleOrderByWithRelationInput | JobTitleOrderByWithRelationInput[]
+    cursor?: JobTitleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobTitleScalarFieldEnum | JobTitleScalarFieldEnum[]
+  }
+
+  /**
+   * School.employees
+   */
+  export type School$employeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    where?: EmployeeWhereInput
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    cursor?: EmployeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
+  }
+
+  /**
+   * School.operatingHours
+   */
+  export type School$operatingHoursArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    where?: OperatingHoursWhereInput
+    orderBy?: OperatingHoursOrderByWithRelationInput | OperatingHoursOrderByWithRelationInput[]
+    cursor?: OperatingHoursWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OperatingHoursScalarFieldEnum | OperatingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * School.fieldTripTypes
+   */
+  export type School$fieldTripTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    where?: FieldTripTypeWhereInput
+    orderBy?: FieldTripTypeOrderByWithRelationInput | FieldTripTypeOrderByWithRelationInput[]
+    cursor?: FieldTripTypeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FieldTripTypeScalarFieldEnum | FieldTripTypeScalarFieldEnum[]
+  }
+
+  /**
+   * School.scheduleWeeks
+   */
+  export type School$scheduleWeeksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    where?: ScheduleWeekWhereInput
+    orderBy?: ScheduleWeekOrderByWithRelationInput | ScheduleWeekOrderByWithRelationInput[]
+    cursor?: ScheduleWeekWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ScheduleWeekScalarFieldEnum | ScheduleWeekScalarFieldEnum[]
+  }
+
+  /**
+   * School without action
+   */
+  export type SchoolDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ScheduleType
+   */
+
+  export type AggregateScheduleType = {
+    _count: ScheduleTypeCountAggregateOutputType | null
+    _avg: ScheduleTypeAvgAggregateOutputType | null
+    _sum: ScheduleTypeSumAggregateOutputType | null
+    _min: ScheduleTypeMinAggregateOutputType | null
+    _max: ScheduleTypeMaxAggregateOutputType | null
+  }
+
+  export type ScheduleTypeAvgAggregateOutputType = {
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeSumAggregateOutputType = {
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    value: string | null
+    label: string | null
+    ratioAdults: number | null
+    ratioStudents: number | null
+    description: string | null
+  }
+
+  export type ScheduleTypeMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    value: string | null
+    label: string | null
+    ratioAdults: number | null
+    ratioStudents: number | null
+    description: string | null
+  }
+
+  export type ScheduleTypeCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    value: number
+    label: number
+    ratioAdults: number
+    ratioStudents: number
+    description: number
+    _all: number
+  }
+
+
+  export type ScheduleTypeAvgAggregateInputType = {
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeSumAggregateInputType = {
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    value?: true
+    label?: true
+    ratioAdults?: true
+    ratioStudents?: true
+    description?: true
+  }
+
+  export type ScheduleTypeMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    value?: true
+    label?: true
+    ratioAdults?: true
+    ratioStudents?: true
+    description?: true
+  }
+
+  export type ScheduleTypeCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    value?: true
+    label?: true
+    ratioAdults?: true
+    ratioStudents?: true
+    description?: true
+    _all?: true
+  }
+
+  export type ScheduleTypeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleType to aggregate.
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypes to fetch.
+     */
+    orderBy?: ScheduleTypeOrderByWithRelationInput | ScheduleTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ScheduleTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ScheduleTypes
+    **/
+    _count?: true | ScheduleTypeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ScheduleTypeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ScheduleTypeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ScheduleTypeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ScheduleTypeMaxAggregateInputType
+  }
+
+  export type GetScheduleTypeAggregateType<T extends ScheduleTypeAggregateArgs> = {
+        [P in keyof T & keyof AggregateScheduleType]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateScheduleType[P]>
+      : GetScalarType<T[P], AggregateScheduleType[P]>
+  }
+
+
+
+
+  export type ScheduleTypeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleTypeWhereInput
+    orderBy?: ScheduleTypeOrderByWithAggregationInput | ScheduleTypeOrderByWithAggregationInput[]
+    by: ScheduleTypeScalarFieldEnum[] | ScheduleTypeScalarFieldEnum
+    having?: ScheduleTypeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ScheduleTypeCountAggregateInputType | true
+    _avg?: ScheduleTypeAvgAggregateInputType
+    _sum?: ScheduleTypeSumAggregateInputType
+    _min?: ScheduleTypeMinAggregateInputType
+    _max?: ScheduleTypeMaxAggregateInputType
+  }
+
+  export type ScheduleTypeGroupByOutputType = {
+    id: string
+    schoolId: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description: string | null
+    _count: ScheduleTypeCountAggregateOutputType | null
+    _avg: ScheduleTypeAvgAggregateOutputType | null
+    _sum: ScheduleTypeSumAggregateOutputType | null
+    _min: ScheduleTypeMinAggregateOutputType | null
+    _max: ScheduleTypeMaxAggregateOutputType | null
+  }
+
+  type GetScheduleTypeGroupByPayload<T extends ScheduleTypeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ScheduleTypeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ScheduleTypeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ScheduleTypeGroupByOutputType[P]>
+            : GetScalarType<T[P], ScheduleTypeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ScheduleTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    value?: boolean
+    label?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    description?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleType"]>
+
+  export type ScheduleTypeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    value?: boolean
+    label?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    description?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleType"]>
+
+  export type ScheduleTypeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    value?: boolean
+    label?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    description?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleType"]>
+
+  export type ScheduleTypeSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    value?: boolean
+    label?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    description?: boolean
+  }
+
+  export type ScheduleTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "value" | "label" | "ratioAdults" | "ratioStudents" | "description", ExtArgs["result"]["scheduleType"]>
+  export type ScheduleTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type ScheduleTypeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type ScheduleTypeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $ScheduleTypePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ScheduleType"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      value: string
+      label: string
+      ratioAdults: number
+      ratioStudents: number
+      description: string | null
+    }, ExtArgs["result"]["scheduleType"]>
+    composites: {}
+  }
+
+  type ScheduleTypeGetPayload<S extends boolean | null | undefined | ScheduleTypeDefaultArgs> = $Result.GetResult<Prisma.$ScheduleTypePayload, S>
+
+  type ScheduleTypeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ScheduleTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ScheduleTypeCountAggregateInputType | true
+    }
+
+  export interface ScheduleTypeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ScheduleType'], meta: { name: 'ScheduleType' } }
+    /**
+     * Find zero or one ScheduleType that matches the filter.
+     * @param {ScheduleTypeFindUniqueArgs} args - Arguments to find a ScheduleType
+     * @example
+     * // Get one ScheduleType
+     * const scheduleType = await prisma.scheduleType.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ScheduleTypeFindUniqueArgs>(args: SelectSubset<T, ScheduleTypeFindUniqueArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ScheduleType that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ScheduleTypeFindUniqueOrThrowArgs} args - Arguments to find a ScheduleType
+     * @example
+     * // Get one ScheduleType
+     * const scheduleType = await prisma.scheduleType.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ScheduleTypeFindUniqueOrThrowArgs>(args: SelectSubset<T, ScheduleTypeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleType that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeFindFirstArgs} args - Arguments to find a ScheduleType
+     * @example
+     * // Get one ScheduleType
+     * const scheduleType = await prisma.scheduleType.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ScheduleTypeFindFirstArgs>(args?: SelectSubset<T, ScheduleTypeFindFirstArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleType that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeFindFirstOrThrowArgs} args - Arguments to find a ScheduleType
+     * @example
+     * // Get one ScheduleType
+     * const scheduleType = await prisma.scheduleType.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ScheduleTypeFindFirstOrThrowArgs>(args?: SelectSubset<T, ScheduleTypeFindFirstOrThrowArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ScheduleTypes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ScheduleTypes
+     * const scheduleTypes = await prisma.scheduleType.findMany()
+     * 
+     * // Get first 10 ScheduleTypes
+     * const scheduleTypes = await prisma.scheduleType.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const scheduleTypeWithIdOnly = await prisma.scheduleType.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ScheduleTypeFindManyArgs>(args?: SelectSubset<T, ScheduleTypeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ScheduleType.
+     * @param {ScheduleTypeCreateArgs} args - Arguments to create a ScheduleType.
+     * @example
+     * // Create one ScheduleType
+     * const ScheduleType = await prisma.scheduleType.create({
+     *   data: {
+     *     // ... data to create a ScheduleType
+     *   }
+     * })
+     * 
+     */
+    create<T extends ScheduleTypeCreateArgs>(args: SelectSubset<T, ScheduleTypeCreateArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ScheduleTypes.
+     * @param {ScheduleTypeCreateManyArgs} args - Arguments to create many ScheduleTypes.
+     * @example
+     * // Create many ScheduleTypes
+     * const scheduleType = await prisma.scheduleType.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ScheduleTypeCreateManyArgs>(args?: SelectSubset<T, ScheduleTypeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ScheduleTypes and returns the data saved in the database.
+     * @param {ScheduleTypeCreateManyAndReturnArgs} args - Arguments to create many ScheduleTypes.
+     * @example
+     * // Create many ScheduleTypes
+     * const scheduleType = await prisma.scheduleType.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ScheduleTypes and only return the `id`
+     * const scheduleTypeWithIdOnly = await prisma.scheduleType.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ScheduleTypeCreateManyAndReturnArgs>(args?: SelectSubset<T, ScheduleTypeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ScheduleType.
+     * @param {ScheduleTypeDeleteArgs} args - Arguments to delete one ScheduleType.
+     * @example
+     * // Delete one ScheduleType
+     * const ScheduleType = await prisma.scheduleType.delete({
+     *   where: {
+     *     // ... filter to delete one ScheduleType
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ScheduleTypeDeleteArgs>(args: SelectSubset<T, ScheduleTypeDeleteArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ScheduleType.
+     * @param {ScheduleTypeUpdateArgs} args - Arguments to update one ScheduleType.
+     * @example
+     * // Update one ScheduleType
+     * const scheduleType = await prisma.scheduleType.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ScheduleTypeUpdateArgs>(args: SelectSubset<T, ScheduleTypeUpdateArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ScheduleTypes.
+     * @param {ScheduleTypeDeleteManyArgs} args - Arguments to filter ScheduleTypes to delete.
+     * @example
+     * // Delete a few ScheduleTypes
+     * const { count } = await prisma.scheduleType.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ScheduleTypeDeleteManyArgs>(args?: SelectSubset<T, ScheduleTypeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ScheduleTypes
+     * const scheduleType = await prisma.scheduleType.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ScheduleTypeUpdateManyArgs>(args: SelectSubset<T, ScheduleTypeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleTypes and returns the data updated in the database.
+     * @param {ScheduleTypeUpdateManyAndReturnArgs} args - Arguments to update many ScheduleTypes.
+     * @example
+     * // Update many ScheduleTypes
+     * const scheduleType = await prisma.scheduleType.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ScheduleTypes and only return the `id`
+     * const scheduleTypeWithIdOnly = await prisma.scheduleType.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ScheduleTypeUpdateManyAndReturnArgs>(args: SelectSubset<T, ScheduleTypeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ScheduleType.
+     * @param {ScheduleTypeUpsertArgs} args - Arguments to update or create a ScheduleType.
+     * @example
+     * // Update or create a ScheduleType
+     * const scheduleType = await prisma.scheduleType.upsert({
+     *   create: {
+     *     // ... data to create a ScheduleType
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ScheduleType we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ScheduleTypeUpsertArgs>(args: SelectSubset<T, ScheduleTypeUpsertArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ScheduleTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeCountArgs} args - Arguments to filter ScheduleTypes to count.
+     * @example
+     * // Count the number of ScheduleTypes
+     * const count = await prisma.scheduleType.count({
+     *   where: {
+     *     // ... the filter for the ScheduleTypes we want to count
+     *   }
+     * })
+    **/
+    count<T extends ScheduleTypeCountArgs>(
+      args?: Subset<T, ScheduleTypeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ScheduleTypeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ScheduleType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ScheduleTypeAggregateArgs>(args: Subset<T, ScheduleTypeAggregateArgs>): Prisma.PrismaPromise<GetScheduleTypeAggregateType<T>>
+
+    /**
+     * Group by ScheduleType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ScheduleTypeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ScheduleTypeGroupByArgs['orderBy'] }
+        : { orderBy?: ScheduleTypeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ScheduleTypeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetScheduleTypeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ScheduleType model
+   */
+  readonly fields: ScheduleTypeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ScheduleType.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ScheduleTypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ScheduleType model
+   */
+  interface ScheduleTypeFieldRefs {
+    readonly id: FieldRef<"ScheduleType", 'String'>
+    readonly schoolId: FieldRef<"ScheduleType", 'String'>
+    readonly value: FieldRef<"ScheduleType", 'String'>
+    readonly label: FieldRef<"ScheduleType", 'String'>
+    readonly ratioAdults: FieldRef<"ScheduleType", 'Int'>
+    readonly ratioStudents: FieldRef<"ScheduleType", 'Int'>
+    readonly description: FieldRef<"ScheduleType", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ScheduleType findUnique
+   */
+  export type ScheduleTypeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleType to fetch.
+     */
+    where: ScheduleTypeWhereUniqueInput
+  }
+
+  /**
+   * ScheduleType findUniqueOrThrow
+   */
+  export type ScheduleTypeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleType to fetch.
+     */
+    where: ScheduleTypeWhereUniqueInput
+  }
+
+  /**
+   * ScheduleType findFirst
+   */
+  export type ScheduleTypeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleType to fetch.
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypes to fetch.
+     */
+    orderBy?: ScheduleTypeOrderByWithRelationInput | ScheduleTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleTypes.
+     */
+    cursor?: ScheduleTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleTypes.
+     */
+    distinct?: ScheduleTypeScalarFieldEnum | ScheduleTypeScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleType findFirstOrThrow
+   */
+  export type ScheduleTypeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleType to fetch.
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypes to fetch.
+     */
+    orderBy?: ScheduleTypeOrderByWithRelationInput | ScheduleTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleTypes.
+     */
+    cursor?: ScheduleTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleTypes.
+     */
+    distinct?: ScheduleTypeScalarFieldEnum | ScheduleTypeScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleType findMany
+   */
+  export type ScheduleTypeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypes to fetch.
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypes to fetch.
+     */
+    orderBy?: ScheduleTypeOrderByWithRelationInput | ScheduleTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ScheduleTypes.
+     */
+    cursor?: ScheduleTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypes.
+     */
+    skip?: number
+    distinct?: ScheduleTypeScalarFieldEnum | ScheduleTypeScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleType create
+   */
+  export type ScheduleTypeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ScheduleType.
+     */
+    data: XOR<ScheduleTypeCreateInput, ScheduleTypeUncheckedCreateInput>
+  }
+
+  /**
+   * ScheduleType createMany
+   */
+  export type ScheduleTypeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ScheduleTypes.
+     */
+    data: ScheduleTypeCreateManyInput | ScheduleTypeCreateManyInput[]
+  }
+
+  /**
+   * ScheduleType createManyAndReturn
+   */
+  export type ScheduleTypeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * The data used to create many ScheduleTypes.
+     */
+    data: ScheduleTypeCreateManyInput | ScheduleTypeCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleType update
+   */
+  export type ScheduleTypeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ScheduleType.
+     */
+    data: XOR<ScheduleTypeUpdateInput, ScheduleTypeUncheckedUpdateInput>
+    /**
+     * Choose, which ScheduleType to update.
+     */
+    where: ScheduleTypeWhereUniqueInput
+  }
+
+  /**
+   * ScheduleType updateMany
+   */
+  export type ScheduleTypeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ScheduleTypes.
+     */
+    data: XOR<ScheduleTypeUpdateManyMutationInput, ScheduleTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleTypes to update
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * Limit how many ScheduleTypes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleType updateManyAndReturn
+   */
+  export type ScheduleTypeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * The data used to update ScheduleTypes.
+     */
+    data: XOR<ScheduleTypeUpdateManyMutationInput, ScheduleTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleTypes to update
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * Limit how many ScheduleTypes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleType upsert
+   */
+  export type ScheduleTypeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ScheduleType to update in case it exists.
+     */
+    where: ScheduleTypeWhereUniqueInput
+    /**
+     * In case the ScheduleType found by the `where` argument doesn't exist, create a new ScheduleType with this data.
+     */
+    create: XOR<ScheduleTypeCreateInput, ScheduleTypeUncheckedCreateInput>
+    /**
+     * In case the ScheduleType was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ScheduleTypeUpdateInput, ScheduleTypeUncheckedUpdateInput>
+  }
+
+  /**
+   * ScheduleType delete
+   */
+  export type ScheduleTypeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+    /**
+     * Filter which ScheduleType to delete.
+     */
+    where: ScheduleTypeWhereUniqueInput
+  }
+
+  /**
+   * ScheduleType deleteMany
+   */
+  export type ScheduleTypeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleTypes to delete
+     */
+    where?: ScheduleTypeWhereInput
+    /**
+     * Limit how many ScheduleTypes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleType without action
+   */
+  export type ScheduleTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleType
+     */
+    select?: ScheduleTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleType
+     */
+    omit?: ScheduleTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JobTitle
+   */
+
+  export type AggregateJobTitle = {
+    _count: JobTitleCountAggregateOutputType | null
+    _min: JobTitleMinAggregateOutputType | null
+    _max: JobTitleMaxAggregateOutputType | null
+  }
+
+  export type JobTitleMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    title: string | null
+    leaderQualified: boolean | null
+    requiresLeaderForOpenClose: boolean | null
+  }
+
+  export type JobTitleMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    title: string | null
+    leaderQualified: boolean | null
+    requiresLeaderForOpenClose: boolean | null
+  }
+
+  export type JobTitleCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    title: number
+    leaderQualified: number
+    requiresLeaderForOpenClose: number
+    _all: number
+  }
+
+
+  export type JobTitleMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    title?: true
+    leaderQualified?: true
+    requiresLeaderForOpenClose?: true
+  }
+
+  export type JobTitleMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    title?: true
+    leaderQualified?: true
+    requiresLeaderForOpenClose?: true
+  }
+
+  export type JobTitleCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    title?: true
+    leaderQualified?: true
+    requiresLeaderForOpenClose?: true
+    _all?: true
+  }
+
+  export type JobTitleAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobTitle to aggregate.
+     */
+    where?: JobTitleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobTitles to fetch.
+     */
+    orderBy?: JobTitleOrderByWithRelationInput | JobTitleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JobTitleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobTitles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobTitles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JobTitles
+    **/
+    _count?: true | JobTitleCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JobTitleMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JobTitleMaxAggregateInputType
+  }
+
+  export type GetJobTitleAggregateType<T extends JobTitleAggregateArgs> = {
+        [P in keyof T & keyof AggregateJobTitle]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJobTitle[P]>
+      : GetScalarType<T[P], AggregateJobTitle[P]>
+  }
+
+
+
+
+  export type JobTitleGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobTitleWhereInput
+    orderBy?: JobTitleOrderByWithAggregationInput | JobTitleOrderByWithAggregationInput[]
+    by: JobTitleScalarFieldEnum[] | JobTitleScalarFieldEnum
+    having?: JobTitleScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JobTitleCountAggregateInputType | true
+    _min?: JobTitleMinAggregateInputType
+    _max?: JobTitleMaxAggregateInputType
+  }
+
+  export type JobTitleGroupByOutputType = {
+    id: string
+    schoolId: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+    _count: JobTitleCountAggregateOutputType | null
+    _min: JobTitleMinAggregateOutputType | null
+    _max: JobTitleMaxAggregateOutputType | null
+  }
+
+  type GetJobTitleGroupByPayload<T extends JobTitleGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JobTitleGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JobTitleGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JobTitleGroupByOutputType[P]>
+            : GetScalarType<T[P], JobTitleGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JobTitleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    title?: boolean
+    leaderQualified?: boolean
+    requiresLeaderForOpenClose?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobTitle"]>
+
+  export type JobTitleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    title?: boolean
+    leaderQualified?: boolean
+    requiresLeaderForOpenClose?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobTitle"]>
+
+  export type JobTitleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    title?: boolean
+    leaderQualified?: boolean
+    requiresLeaderForOpenClose?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jobTitle"]>
+
+  export type JobTitleSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    title?: boolean
+    leaderQualified?: boolean
+    requiresLeaderForOpenClose?: boolean
+  }
+
+  export type JobTitleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "title" | "leaderQualified" | "requiresLeaderForOpenClose", ExtArgs["result"]["jobTitle"]>
+  export type JobTitleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type JobTitleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type JobTitleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $JobTitlePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JobTitle"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      title: string
+      leaderQualified: boolean
+      requiresLeaderForOpenClose: boolean
+    }, ExtArgs["result"]["jobTitle"]>
+    composites: {}
+  }
+
+  type JobTitleGetPayload<S extends boolean | null | undefined | JobTitleDefaultArgs> = $Result.GetResult<Prisma.$JobTitlePayload, S>
+
+  type JobTitleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JobTitleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JobTitleCountAggregateInputType | true
+    }
+
+  export interface JobTitleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JobTitle'], meta: { name: 'JobTitle' } }
+    /**
+     * Find zero or one JobTitle that matches the filter.
+     * @param {JobTitleFindUniqueArgs} args - Arguments to find a JobTitle
+     * @example
+     * // Get one JobTitle
+     * const jobTitle = await prisma.jobTitle.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JobTitleFindUniqueArgs>(args: SelectSubset<T, JobTitleFindUniqueArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JobTitle that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JobTitleFindUniqueOrThrowArgs} args - Arguments to find a JobTitle
+     * @example
+     * // Get one JobTitle
+     * const jobTitle = await prisma.jobTitle.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JobTitleFindUniqueOrThrowArgs>(args: SelectSubset<T, JobTitleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobTitle that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleFindFirstArgs} args - Arguments to find a JobTitle
+     * @example
+     * // Get one JobTitle
+     * const jobTitle = await prisma.jobTitle.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JobTitleFindFirstArgs>(args?: SelectSubset<T, JobTitleFindFirstArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JobTitle that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleFindFirstOrThrowArgs} args - Arguments to find a JobTitle
+     * @example
+     * // Get one JobTitle
+     * const jobTitle = await prisma.jobTitle.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JobTitleFindFirstOrThrowArgs>(args?: SelectSubset<T, JobTitleFindFirstOrThrowArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JobTitles that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JobTitles
+     * const jobTitles = await prisma.jobTitle.findMany()
+     * 
+     * // Get first 10 JobTitles
+     * const jobTitles = await prisma.jobTitle.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const jobTitleWithIdOnly = await prisma.jobTitle.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends JobTitleFindManyArgs>(args?: SelectSubset<T, JobTitleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JobTitle.
+     * @param {JobTitleCreateArgs} args - Arguments to create a JobTitle.
+     * @example
+     * // Create one JobTitle
+     * const JobTitle = await prisma.jobTitle.create({
+     *   data: {
+     *     // ... data to create a JobTitle
+     *   }
+     * })
+     * 
+     */
+    create<T extends JobTitleCreateArgs>(args: SelectSubset<T, JobTitleCreateArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JobTitles.
+     * @param {JobTitleCreateManyArgs} args - Arguments to create many JobTitles.
+     * @example
+     * // Create many JobTitles
+     * const jobTitle = await prisma.jobTitle.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JobTitleCreateManyArgs>(args?: SelectSubset<T, JobTitleCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many JobTitles and returns the data saved in the database.
+     * @param {JobTitleCreateManyAndReturnArgs} args - Arguments to create many JobTitles.
+     * @example
+     * // Create many JobTitles
+     * const jobTitle = await prisma.jobTitle.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many JobTitles and only return the `id`
+     * const jobTitleWithIdOnly = await prisma.jobTitle.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends JobTitleCreateManyAndReturnArgs>(args?: SelectSubset<T, JobTitleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a JobTitle.
+     * @param {JobTitleDeleteArgs} args - Arguments to delete one JobTitle.
+     * @example
+     * // Delete one JobTitle
+     * const JobTitle = await prisma.jobTitle.delete({
+     *   where: {
+     *     // ... filter to delete one JobTitle
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JobTitleDeleteArgs>(args: SelectSubset<T, JobTitleDeleteArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JobTitle.
+     * @param {JobTitleUpdateArgs} args - Arguments to update one JobTitle.
+     * @example
+     * // Update one JobTitle
+     * const jobTitle = await prisma.jobTitle.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JobTitleUpdateArgs>(args: SelectSubset<T, JobTitleUpdateArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JobTitles.
+     * @param {JobTitleDeleteManyArgs} args - Arguments to filter JobTitles to delete.
+     * @example
+     * // Delete a few JobTitles
+     * const { count } = await prisma.jobTitle.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JobTitleDeleteManyArgs>(args?: SelectSubset<T, JobTitleDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobTitles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JobTitles
+     * const jobTitle = await prisma.jobTitle.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JobTitleUpdateManyArgs>(args: SelectSubset<T, JobTitleUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JobTitles and returns the data updated in the database.
+     * @param {JobTitleUpdateManyAndReturnArgs} args - Arguments to update many JobTitles.
+     * @example
+     * // Update many JobTitles
+     * const jobTitle = await prisma.jobTitle.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more JobTitles and only return the `id`
+     * const jobTitleWithIdOnly = await prisma.jobTitle.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends JobTitleUpdateManyAndReturnArgs>(args: SelectSubset<T, JobTitleUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one JobTitle.
+     * @param {JobTitleUpsertArgs} args - Arguments to update or create a JobTitle.
+     * @example
+     * // Update or create a JobTitle
+     * const jobTitle = await prisma.jobTitle.upsert({
+     *   create: {
+     *     // ... data to create a JobTitle
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JobTitle we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JobTitleUpsertArgs>(args: SelectSubset<T, JobTitleUpsertArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JobTitles.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleCountArgs} args - Arguments to filter JobTitles to count.
+     * @example
+     * // Count the number of JobTitles
+     * const count = await prisma.jobTitle.count({
+     *   where: {
+     *     // ... the filter for the JobTitles we want to count
+     *   }
+     * })
+    **/
+    count<T extends JobTitleCountArgs>(
+      args?: Subset<T, JobTitleCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JobTitleCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JobTitle.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JobTitleAggregateArgs>(args: Subset<T, JobTitleAggregateArgs>): Prisma.PrismaPromise<GetJobTitleAggregateType<T>>
+
+    /**
+     * Group by JobTitle.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JobTitleGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JobTitleGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JobTitleGroupByArgs['orderBy'] }
+        : { orderBy?: JobTitleGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JobTitleGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJobTitleGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JobTitle model
+   */
+  readonly fields: JobTitleFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JobTitle.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JobTitleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JobTitle model
+   */
+  interface JobTitleFieldRefs {
+    readonly id: FieldRef<"JobTitle", 'String'>
+    readonly schoolId: FieldRef<"JobTitle", 'String'>
+    readonly title: FieldRef<"JobTitle", 'String'>
+    readonly leaderQualified: FieldRef<"JobTitle", 'Boolean'>
+    readonly requiresLeaderForOpenClose: FieldRef<"JobTitle", 'Boolean'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JobTitle findUnique
+   */
+  export type JobTitleFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter, which JobTitle to fetch.
+     */
+    where: JobTitleWhereUniqueInput
+  }
+
+  /**
+   * JobTitle findUniqueOrThrow
+   */
+  export type JobTitleFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter, which JobTitle to fetch.
+     */
+    where: JobTitleWhereUniqueInput
+  }
+
+  /**
+   * JobTitle findFirst
+   */
+  export type JobTitleFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter, which JobTitle to fetch.
+     */
+    where?: JobTitleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobTitles to fetch.
+     */
+    orderBy?: JobTitleOrderByWithRelationInput | JobTitleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobTitles.
+     */
+    cursor?: JobTitleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobTitles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobTitles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobTitles.
+     */
+    distinct?: JobTitleScalarFieldEnum | JobTitleScalarFieldEnum[]
+  }
+
+  /**
+   * JobTitle findFirstOrThrow
+   */
+  export type JobTitleFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter, which JobTitle to fetch.
+     */
+    where?: JobTitleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobTitles to fetch.
+     */
+    orderBy?: JobTitleOrderByWithRelationInput | JobTitleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JobTitles.
+     */
+    cursor?: JobTitleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobTitles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobTitles.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JobTitles.
+     */
+    distinct?: JobTitleScalarFieldEnum | JobTitleScalarFieldEnum[]
+  }
+
+  /**
+   * JobTitle findMany
+   */
+  export type JobTitleFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter, which JobTitles to fetch.
+     */
+    where?: JobTitleWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JobTitles to fetch.
+     */
+    orderBy?: JobTitleOrderByWithRelationInput | JobTitleOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JobTitles.
+     */
+    cursor?: JobTitleWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JobTitles from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JobTitles.
+     */
+    skip?: number
+    distinct?: JobTitleScalarFieldEnum | JobTitleScalarFieldEnum[]
+  }
+
+  /**
+   * JobTitle create
+   */
+  export type JobTitleCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JobTitle.
+     */
+    data: XOR<JobTitleCreateInput, JobTitleUncheckedCreateInput>
+  }
+
+  /**
+   * JobTitle createMany
+   */
+  export type JobTitleCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JobTitles.
+     */
+    data: JobTitleCreateManyInput | JobTitleCreateManyInput[]
+  }
+
+  /**
+   * JobTitle createManyAndReturn
+   */
+  export type JobTitleCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * The data used to create many JobTitles.
+     */
+    data: JobTitleCreateManyInput | JobTitleCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * JobTitle update
+   */
+  export type JobTitleUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JobTitle.
+     */
+    data: XOR<JobTitleUpdateInput, JobTitleUncheckedUpdateInput>
+    /**
+     * Choose, which JobTitle to update.
+     */
+    where: JobTitleWhereUniqueInput
+  }
+
+  /**
+   * JobTitle updateMany
+   */
+  export type JobTitleUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JobTitles.
+     */
+    data: XOR<JobTitleUpdateManyMutationInput, JobTitleUncheckedUpdateManyInput>
+    /**
+     * Filter which JobTitles to update
+     */
+    where?: JobTitleWhereInput
+    /**
+     * Limit how many JobTitles to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobTitle updateManyAndReturn
+   */
+  export type JobTitleUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * The data used to update JobTitles.
+     */
+    data: XOR<JobTitleUpdateManyMutationInput, JobTitleUncheckedUpdateManyInput>
+    /**
+     * Filter which JobTitles to update
+     */
+    where?: JobTitleWhereInput
+    /**
+     * Limit how many JobTitles to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * JobTitle upsert
+   */
+  export type JobTitleUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JobTitle to update in case it exists.
+     */
+    where: JobTitleWhereUniqueInput
+    /**
+     * In case the JobTitle found by the `where` argument doesn't exist, create a new JobTitle with this data.
+     */
+    create: XOR<JobTitleCreateInput, JobTitleUncheckedCreateInput>
+    /**
+     * In case the JobTitle was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JobTitleUpdateInput, JobTitleUncheckedUpdateInput>
+  }
+
+  /**
+   * JobTitle delete
+   */
+  export type JobTitleDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+    /**
+     * Filter which JobTitle to delete.
+     */
+    where: JobTitleWhereUniqueInput
+  }
+
+  /**
+   * JobTitle deleteMany
+   */
+  export type JobTitleDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JobTitles to delete
+     */
+    where?: JobTitleWhereInput
+    /**
+     * Limit how many JobTitles to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JobTitle without action
+   */
+  export type JobTitleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitle
+     */
+    select?: JobTitleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JobTitle
+     */
+    omit?: JobTitleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobTitleInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Employee
+   */
+
+  export type AggregateEmployee = {
+    _count: EmployeeCountAggregateOutputType | null
+    _avg: EmployeeAvgAggregateOutputType | null
+    _sum: EmployeeSumAggregateOutputType | null
+    _min: EmployeeMinAggregateOutputType | null
+    _max: EmployeeMaxAggregateOutputType | null
+  }
+
+  export type EmployeeAvgAggregateOutputType = {
+    maxHoursPerDay: number | null
+    maxHoursPerWeek: number | null
+  }
+
+  export type EmployeeSumAggregateOutputType = {
+    maxHoursPerDay: number | null
+    maxHoursPerWeek: number | null
+  }
+
+  export type EmployeeMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    jobTitle: string | null
+    maxHoursPerDay: number | null
+    maxHoursPerWeek: number | null
+    employmentStatus: string | null
+    medicallyDelegated: boolean | null
+    cprCurrent: boolean | null
+    notes: string | null
+  }
+
+  export type EmployeeMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    jobTitle: string | null
+    maxHoursPerDay: number | null
+    maxHoursPerWeek: number | null
+    employmentStatus: string | null
+    medicallyDelegated: boolean | null
+    cprCurrent: boolean | null
+    notes: string | null
+  }
+
+  export type EmployeeCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    name: number
+    jobTitle: number
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: number
+    medicallyDelegated: number
+    cprCurrent: number
+    notes: number
+    _all: number
+  }
+
+
+  export type EmployeeAvgAggregateInputType = {
+    maxHoursPerDay?: true
+    maxHoursPerWeek?: true
+  }
+
+  export type EmployeeSumAggregateInputType = {
+    maxHoursPerDay?: true
+    maxHoursPerWeek?: true
+  }
+
+  export type EmployeeMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    jobTitle?: true
+    maxHoursPerDay?: true
+    maxHoursPerWeek?: true
+    employmentStatus?: true
+    medicallyDelegated?: true
+    cprCurrent?: true
+    notes?: true
+  }
+
+  export type EmployeeMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    jobTitle?: true
+    maxHoursPerDay?: true
+    maxHoursPerWeek?: true
+    employmentStatus?: true
+    medicallyDelegated?: true
+    cprCurrent?: true
+    notes?: true
+  }
+
+  export type EmployeeCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    jobTitle?: true
+    maxHoursPerDay?: true
+    maxHoursPerWeek?: true
+    employmentStatus?: true
+    medicallyDelegated?: true
+    cprCurrent?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type EmployeeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Employee to aggregate.
+     */
+    where?: EmployeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Employees to fetch.
+     */
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmployeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Employees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Employees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Employees
+    **/
+    _count?: true | EmployeeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EmployeeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EmployeeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmployeeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmployeeMaxAggregateInputType
+  }
+
+  export type GetEmployeeAggregateType<T extends EmployeeAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmployee]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmployee[P]>
+      : GetScalarType<T[P], AggregateEmployee[P]>
+  }
+
+
+
+
+  export type EmployeeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmployeeWhereInput
+    orderBy?: EmployeeOrderByWithAggregationInput | EmployeeOrderByWithAggregationInput[]
+    by: EmployeeScalarFieldEnum[] | EmployeeScalarFieldEnum
+    having?: EmployeeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmployeeCountAggregateInputType | true
+    _avg?: EmployeeAvgAggregateInputType
+    _sum?: EmployeeSumAggregateInputType
+    _min?: EmployeeMinAggregateInputType
+    _max?: EmployeeMaxAggregateInputType
+  }
+
+  export type EmployeeGroupByOutputType = {
+    id: string
+    schoolId: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes: string | null
+    _count: EmployeeCountAggregateOutputType | null
+    _avg: EmployeeAvgAggregateOutputType | null
+    _sum: EmployeeSumAggregateOutputType | null
+    _min: EmployeeMinAggregateOutputType | null
+    _max: EmployeeMaxAggregateOutputType | null
+  }
+
+  type GetEmployeeGroupByPayload<T extends EmployeeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmployeeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmployeeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmployeeGroupByOutputType[P]>
+            : GetScalarType<T[P], EmployeeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmployeeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    jobTitle?: boolean
+    maxHoursPerDay?: boolean
+    maxHoursPerWeek?: boolean
+    employmentStatus?: boolean
+    medicallyDelegated?: boolean
+    cprCurrent?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["employee"]>
+
+  export type EmployeeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    jobTitle?: boolean
+    maxHoursPerDay?: boolean
+    maxHoursPerWeek?: boolean
+    employmentStatus?: boolean
+    medicallyDelegated?: boolean
+    cprCurrent?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["employee"]>
+
+  export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    jobTitle?: boolean
+    maxHoursPerDay?: boolean
+    maxHoursPerWeek?: boolean
+    employmentStatus?: boolean
+    medicallyDelegated?: boolean
+    cprCurrent?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["employee"]>
+
+  export type EmployeeSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    jobTitle?: boolean
+    maxHoursPerDay?: boolean
+    maxHoursPerWeek?: boolean
+    employmentStatus?: boolean
+    medicallyDelegated?: boolean
+    cprCurrent?: boolean
+    notes?: boolean
+  }
+
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes", ExtArgs["result"]["employee"]>
+  export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type EmployeeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $EmployeePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Employee"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      name: string
+      jobTitle: string
+      maxHoursPerDay: number
+      maxHoursPerWeek: number
+      employmentStatus: string
+      medicallyDelegated: boolean
+      cprCurrent: boolean
+      notes: string | null
+    }, ExtArgs["result"]["employee"]>
+    composites: {}
+  }
+
+  type EmployeeGetPayload<S extends boolean | null | undefined | EmployeeDefaultArgs> = $Result.GetResult<Prisma.$EmployeePayload, S>
+
+  type EmployeeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmployeeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EmployeeCountAggregateInputType | true
+    }
+
+  export interface EmployeeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Employee'], meta: { name: 'Employee' } }
+    /**
+     * Find zero or one Employee that matches the filter.
+     * @param {EmployeeFindUniqueArgs} args - Arguments to find a Employee
+     * @example
+     * // Get one Employee
+     * const employee = await prisma.employee.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmployeeFindUniqueArgs>(args: SelectSubset<T, EmployeeFindUniqueArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Employee that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EmployeeFindUniqueOrThrowArgs} args - Arguments to find a Employee
+     * @example
+     * // Get one Employee
+     * const employee = await prisma.employee.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmployeeFindUniqueOrThrowArgs>(args: SelectSubset<T, EmployeeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Employee that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeFindFirstArgs} args - Arguments to find a Employee
+     * @example
+     * // Get one Employee
+     * const employee = await prisma.employee.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmployeeFindFirstArgs>(args?: SelectSubset<T, EmployeeFindFirstArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Employee that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeFindFirstOrThrowArgs} args - Arguments to find a Employee
+     * @example
+     * // Get one Employee
+     * const employee = await prisma.employee.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmployeeFindFirstOrThrowArgs>(args?: SelectSubset<T, EmployeeFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Employees that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Employees
+     * const employees = await prisma.employee.findMany()
+     * 
+     * // Get first 10 Employees
+     * const employees = await prisma.employee.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const employeeWithIdOnly = await prisma.employee.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EmployeeFindManyArgs>(args?: SelectSubset<T, EmployeeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Employee.
+     * @param {EmployeeCreateArgs} args - Arguments to create a Employee.
+     * @example
+     * // Create one Employee
+     * const Employee = await prisma.employee.create({
+     *   data: {
+     *     // ... data to create a Employee
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmployeeCreateArgs>(args: SelectSubset<T, EmployeeCreateArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Employees.
+     * @param {EmployeeCreateManyArgs} args - Arguments to create many Employees.
+     * @example
+     * // Create many Employees
+     * const employee = await prisma.employee.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmployeeCreateManyArgs>(args?: SelectSubset<T, EmployeeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Employees and returns the data saved in the database.
+     * @param {EmployeeCreateManyAndReturnArgs} args - Arguments to create many Employees.
+     * @example
+     * // Create many Employees
+     * const employee = await prisma.employee.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Employees and only return the `id`
+     * const employeeWithIdOnly = await prisma.employee.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EmployeeCreateManyAndReturnArgs>(args?: SelectSubset<T, EmployeeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Employee.
+     * @param {EmployeeDeleteArgs} args - Arguments to delete one Employee.
+     * @example
+     * // Delete one Employee
+     * const Employee = await prisma.employee.delete({
+     *   where: {
+     *     // ... filter to delete one Employee
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmployeeDeleteArgs>(args: SelectSubset<T, EmployeeDeleteArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Employee.
+     * @param {EmployeeUpdateArgs} args - Arguments to update one Employee.
+     * @example
+     * // Update one Employee
+     * const employee = await prisma.employee.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmployeeUpdateArgs>(args: SelectSubset<T, EmployeeUpdateArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Employees.
+     * @param {EmployeeDeleteManyArgs} args - Arguments to filter Employees to delete.
+     * @example
+     * // Delete a few Employees
+     * const { count } = await prisma.employee.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmployeeDeleteManyArgs>(args?: SelectSubset<T, EmployeeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Employees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Employees
+     * const employee = await prisma.employee.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmployeeUpdateManyArgs>(args: SelectSubset<T, EmployeeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Employees and returns the data updated in the database.
+     * @param {EmployeeUpdateManyAndReturnArgs} args - Arguments to update many Employees.
+     * @example
+     * // Update many Employees
+     * const employee = await prisma.employee.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Employees and only return the `id`
+     * const employeeWithIdOnly = await prisma.employee.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EmployeeUpdateManyAndReturnArgs>(args: SelectSubset<T, EmployeeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Employee.
+     * @param {EmployeeUpsertArgs} args - Arguments to update or create a Employee.
+     * @example
+     * // Update or create a Employee
+     * const employee = await prisma.employee.upsert({
+     *   create: {
+     *     // ... data to create a Employee
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Employee we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmployeeUpsertArgs>(args: SelectSubset<T, EmployeeUpsertArgs<ExtArgs>>): Prisma__EmployeeClient<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Employees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeCountArgs} args - Arguments to filter Employees to count.
+     * @example
+     * // Count the number of Employees
+     * const count = await prisma.employee.count({
+     *   where: {
+     *     // ... the filter for the Employees we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmployeeCountArgs>(
+      args?: Subset<T, EmployeeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmployeeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Employee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmployeeAggregateArgs>(args: Subset<T, EmployeeAggregateArgs>): Prisma.PrismaPromise<GetEmployeeAggregateType<T>>
+
+    /**
+     * Group by Employee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmployeeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmployeeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmployeeGroupByArgs['orderBy'] }
+        : { orderBy?: EmployeeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmployeeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmployeeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Employee model
+   */
+  readonly fields: EmployeeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Employee.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Employee model
+   */
+  interface EmployeeFieldRefs {
+    readonly id: FieldRef<"Employee", 'String'>
+    readonly schoolId: FieldRef<"Employee", 'String'>
+    readonly name: FieldRef<"Employee", 'String'>
+    readonly jobTitle: FieldRef<"Employee", 'String'>
+    readonly maxHoursPerDay: FieldRef<"Employee", 'Int'>
+    readonly maxHoursPerWeek: FieldRef<"Employee", 'Int'>
+    readonly employmentStatus: FieldRef<"Employee", 'String'>
+    readonly medicallyDelegated: FieldRef<"Employee", 'Boolean'>
+    readonly cprCurrent: FieldRef<"Employee", 'Boolean'>
+    readonly notes: FieldRef<"Employee", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Employee findUnique
+   */
+  export type EmployeeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter, which Employee to fetch.
+     */
+    where: EmployeeWhereUniqueInput
+  }
+
+  /**
+   * Employee findUniqueOrThrow
+   */
+  export type EmployeeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter, which Employee to fetch.
+     */
+    where: EmployeeWhereUniqueInput
+  }
+
+  /**
+   * Employee findFirst
+   */
+  export type EmployeeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter, which Employee to fetch.
+     */
+    where?: EmployeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Employees to fetch.
+     */
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Employees.
+     */
+    cursor?: EmployeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Employees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Employees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Employees.
+     */
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
+  }
+
+  /**
+   * Employee findFirstOrThrow
+   */
+  export type EmployeeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter, which Employee to fetch.
+     */
+    where?: EmployeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Employees to fetch.
+     */
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Employees.
+     */
+    cursor?: EmployeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Employees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Employees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Employees.
+     */
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
+  }
+
+  /**
+   * Employee findMany
+   */
+  export type EmployeeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter, which Employees to fetch.
+     */
+    where?: EmployeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Employees to fetch.
+     */
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Employees.
+     */
+    cursor?: EmployeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Employees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Employees.
+     */
+    skip?: number
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
+  }
+
+  /**
+   * Employee create
+   */
+  export type EmployeeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Employee.
+     */
+    data: XOR<EmployeeCreateInput, EmployeeUncheckedCreateInput>
+  }
+
+  /**
+   * Employee createMany
+   */
+  export type EmployeeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Employees.
+     */
+    data: EmployeeCreateManyInput | EmployeeCreateManyInput[]
+  }
+
+  /**
+   * Employee createManyAndReturn
+   */
+  export type EmployeeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * The data used to create many Employees.
+     */
+    data: EmployeeCreateManyInput | EmployeeCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Employee update
+   */
+  export type EmployeeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Employee.
+     */
+    data: XOR<EmployeeUpdateInput, EmployeeUncheckedUpdateInput>
+    /**
+     * Choose, which Employee to update.
+     */
+    where: EmployeeWhereUniqueInput
+  }
+
+  /**
+   * Employee updateMany
+   */
+  export type EmployeeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Employees.
+     */
+    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyInput>
+    /**
+     * Filter which Employees to update
+     */
+    where?: EmployeeWhereInput
+    /**
+     * Limit how many Employees to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Employee updateManyAndReturn
+   */
+  export type EmployeeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * The data used to update Employees.
+     */
+    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyInput>
+    /**
+     * Filter which Employees to update
+     */
+    where?: EmployeeWhereInput
+    /**
+     * Limit how many Employees to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Employee upsert
+   */
+  export type EmployeeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Employee to update in case it exists.
+     */
+    where: EmployeeWhereUniqueInput
+    /**
+     * In case the Employee found by the `where` argument doesn't exist, create a new Employee with this data.
+     */
+    create: XOR<EmployeeCreateInput, EmployeeUncheckedCreateInput>
+    /**
+     * In case the Employee was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmployeeUpdateInput, EmployeeUncheckedUpdateInput>
+  }
+
+  /**
+   * Employee delete
+   */
+  export type EmployeeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    /**
+     * Filter which Employee to delete.
+     */
+    where: EmployeeWhereUniqueInput
+  }
+
+  /**
+   * Employee deleteMany
+   */
+  export type EmployeeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Employees to delete
+     */
+    where?: EmployeeWhereInput
+    /**
+     * Limit how many Employees to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Employee without action
+   */
+  export type EmployeeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model OperatingHours
+   */
+
+  export type AggregateOperatingHours = {
+    _count: OperatingHoursCountAggregateOutputType | null
+    _min: OperatingHoursMinAggregateOutputType | null
+    _max: OperatingHoursMaxAggregateOutputType | null
+  }
+
+  export type OperatingHoursMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    scheduleType: string | null
+    open: string | null
+    close: string | null
+  }
+
+  export type OperatingHoursMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    scheduleType: string | null
+    open: string | null
+    close: string | null
+  }
+
+  export type OperatingHoursCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    scheduleType: number
+    daysOfWeek: number
+    open: number
+    close: number
+    _all: number
+  }
+
+
+  export type OperatingHoursMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    scheduleType?: true
+    open?: true
+    close?: true
+  }
+
+  export type OperatingHoursMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    scheduleType?: true
+    open?: true
+    close?: true
+  }
+
+  export type OperatingHoursCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    scheduleType?: true
+    daysOfWeek?: true
+    open?: true
+    close?: true
+    _all?: true
+  }
+
+  export type OperatingHoursAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OperatingHours to aggregate.
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OperatingHours to fetch.
+     */
+    orderBy?: OperatingHoursOrderByWithRelationInput | OperatingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OperatingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OperatingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OperatingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OperatingHours
+    **/
+    _count?: true | OperatingHoursCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OperatingHoursMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OperatingHoursMaxAggregateInputType
+  }
+
+  export type GetOperatingHoursAggregateType<T extends OperatingHoursAggregateArgs> = {
+        [P in keyof T & keyof AggregateOperatingHours]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOperatingHours[P]>
+      : GetScalarType<T[P], AggregateOperatingHours[P]>
+  }
+
+
+
+
+  export type OperatingHoursGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OperatingHoursWhereInput
+    orderBy?: OperatingHoursOrderByWithAggregationInput | OperatingHoursOrderByWithAggregationInput[]
+    by: OperatingHoursScalarFieldEnum[] | OperatingHoursScalarFieldEnum
+    having?: OperatingHoursScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OperatingHoursCountAggregateInputType | true
+    _min?: OperatingHoursMinAggregateInputType
+    _max?: OperatingHoursMaxAggregateInputType
+  }
+
+  export type OperatingHoursGroupByOutputType = {
+    id: string
+    schoolId: string
+    scheduleType: string
+    daysOfWeek: JsonValue
+    open: string
+    close: string
+    _count: OperatingHoursCountAggregateOutputType | null
+    _min: OperatingHoursMinAggregateOutputType | null
+    _max: OperatingHoursMaxAggregateOutputType | null
+  }
+
+  type GetOperatingHoursGroupByPayload<T extends OperatingHoursGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OperatingHoursGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OperatingHoursGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OperatingHoursGroupByOutputType[P]>
+            : GetScalarType<T[P], OperatingHoursGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OperatingHoursSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    scheduleType?: boolean
+    daysOfWeek?: boolean
+    open?: boolean
+    close?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["operatingHours"]>
+
+  export type OperatingHoursSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    scheduleType?: boolean
+    daysOfWeek?: boolean
+    open?: boolean
+    close?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["operatingHours"]>
+
+  export type OperatingHoursSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    scheduleType?: boolean
+    daysOfWeek?: boolean
+    open?: boolean
+    close?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["operatingHours"]>
+
+  export type OperatingHoursSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    scheduleType?: boolean
+    daysOfWeek?: boolean
+    open?: boolean
+    close?: boolean
+  }
+
+  export type OperatingHoursOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "scheduleType" | "daysOfWeek" | "open" | "close", ExtArgs["result"]["operatingHours"]>
+  export type OperatingHoursInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type OperatingHoursIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type OperatingHoursIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $OperatingHoursPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OperatingHours"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      scheduleType: string
+      daysOfWeek: Prisma.JsonValue
+      open: string
+      close: string
+    }, ExtArgs["result"]["operatingHours"]>
+    composites: {}
+  }
+
+  type OperatingHoursGetPayload<S extends boolean | null | undefined | OperatingHoursDefaultArgs> = $Result.GetResult<Prisma.$OperatingHoursPayload, S>
+
+  type OperatingHoursCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OperatingHoursFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OperatingHoursCountAggregateInputType | true
+    }
+
+  export interface OperatingHoursDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OperatingHours'], meta: { name: 'OperatingHours' } }
+    /**
+     * Find zero or one OperatingHours that matches the filter.
+     * @param {OperatingHoursFindUniqueArgs} args - Arguments to find a OperatingHours
+     * @example
+     * // Get one OperatingHours
+     * const operatingHours = await prisma.operatingHours.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OperatingHoursFindUniqueArgs>(args: SelectSubset<T, OperatingHoursFindUniqueArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OperatingHours that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OperatingHoursFindUniqueOrThrowArgs} args - Arguments to find a OperatingHours
+     * @example
+     * // Get one OperatingHours
+     * const operatingHours = await prisma.operatingHours.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OperatingHoursFindUniqueOrThrowArgs>(args: SelectSubset<T, OperatingHoursFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OperatingHours that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursFindFirstArgs} args - Arguments to find a OperatingHours
+     * @example
+     * // Get one OperatingHours
+     * const operatingHours = await prisma.operatingHours.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OperatingHoursFindFirstArgs>(args?: SelectSubset<T, OperatingHoursFindFirstArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OperatingHours that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursFindFirstOrThrowArgs} args - Arguments to find a OperatingHours
+     * @example
+     * // Get one OperatingHours
+     * const operatingHours = await prisma.operatingHours.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OperatingHoursFindFirstOrThrowArgs>(args?: SelectSubset<T, OperatingHoursFindFirstOrThrowArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OperatingHours that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OperatingHours
+     * const operatingHours = await prisma.operatingHours.findMany()
+     * 
+     * // Get first 10 OperatingHours
+     * const operatingHours = await prisma.operatingHours.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const operatingHoursWithIdOnly = await prisma.operatingHours.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OperatingHoursFindManyArgs>(args?: SelectSubset<T, OperatingHoursFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OperatingHours.
+     * @param {OperatingHoursCreateArgs} args - Arguments to create a OperatingHours.
+     * @example
+     * // Create one OperatingHours
+     * const OperatingHours = await prisma.operatingHours.create({
+     *   data: {
+     *     // ... data to create a OperatingHours
+     *   }
+     * })
+     * 
+     */
+    create<T extends OperatingHoursCreateArgs>(args: SelectSubset<T, OperatingHoursCreateArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OperatingHours.
+     * @param {OperatingHoursCreateManyArgs} args - Arguments to create many OperatingHours.
+     * @example
+     * // Create many OperatingHours
+     * const operatingHours = await prisma.operatingHours.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OperatingHoursCreateManyArgs>(args?: SelectSubset<T, OperatingHoursCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many OperatingHours and returns the data saved in the database.
+     * @param {OperatingHoursCreateManyAndReturnArgs} args - Arguments to create many OperatingHours.
+     * @example
+     * // Create many OperatingHours
+     * const operatingHours = await prisma.operatingHours.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many OperatingHours and only return the `id`
+     * const operatingHoursWithIdOnly = await prisma.operatingHours.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends OperatingHoursCreateManyAndReturnArgs>(args?: SelectSubset<T, OperatingHoursCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a OperatingHours.
+     * @param {OperatingHoursDeleteArgs} args - Arguments to delete one OperatingHours.
+     * @example
+     * // Delete one OperatingHours
+     * const OperatingHours = await prisma.operatingHours.delete({
+     *   where: {
+     *     // ... filter to delete one OperatingHours
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OperatingHoursDeleteArgs>(args: SelectSubset<T, OperatingHoursDeleteArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OperatingHours.
+     * @param {OperatingHoursUpdateArgs} args - Arguments to update one OperatingHours.
+     * @example
+     * // Update one OperatingHours
+     * const operatingHours = await prisma.operatingHours.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OperatingHoursUpdateArgs>(args: SelectSubset<T, OperatingHoursUpdateArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OperatingHours.
+     * @param {OperatingHoursDeleteManyArgs} args - Arguments to filter OperatingHours to delete.
+     * @example
+     * // Delete a few OperatingHours
+     * const { count } = await prisma.operatingHours.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OperatingHoursDeleteManyArgs>(args?: SelectSubset<T, OperatingHoursDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OperatingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OperatingHours
+     * const operatingHours = await prisma.operatingHours.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OperatingHoursUpdateManyArgs>(args: SelectSubset<T, OperatingHoursUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OperatingHours and returns the data updated in the database.
+     * @param {OperatingHoursUpdateManyAndReturnArgs} args - Arguments to update many OperatingHours.
+     * @example
+     * // Update many OperatingHours
+     * const operatingHours = await prisma.operatingHours.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more OperatingHours and only return the `id`
+     * const operatingHoursWithIdOnly = await prisma.operatingHours.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends OperatingHoursUpdateManyAndReturnArgs>(args: SelectSubset<T, OperatingHoursUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one OperatingHours.
+     * @param {OperatingHoursUpsertArgs} args - Arguments to update or create a OperatingHours.
+     * @example
+     * // Update or create a OperatingHours
+     * const operatingHours = await prisma.operatingHours.upsert({
+     *   create: {
+     *     // ... data to create a OperatingHours
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OperatingHours we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OperatingHoursUpsertArgs>(args: SelectSubset<T, OperatingHoursUpsertArgs<ExtArgs>>): Prisma__OperatingHoursClient<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OperatingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursCountArgs} args - Arguments to filter OperatingHours to count.
+     * @example
+     * // Count the number of OperatingHours
+     * const count = await prisma.operatingHours.count({
+     *   where: {
+     *     // ... the filter for the OperatingHours we want to count
+     *   }
+     * })
+    **/
+    count<T extends OperatingHoursCountArgs>(
+      args?: Subset<T, OperatingHoursCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OperatingHoursCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OperatingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OperatingHoursAggregateArgs>(args: Subset<T, OperatingHoursAggregateArgs>): Prisma.PrismaPromise<GetOperatingHoursAggregateType<T>>
+
+    /**
+     * Group by OperatingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OperatingHoursGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OperatingHoursGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OperatingHoursGroupByArgs['orderBy'] }
+        : { orderBy?: OperatingHoursGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OperatingHoursGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOperatingHoursGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OperatingHours model
+   */
+  readonly fields: OperatingHoursFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OperatingHours.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OperatingHoursClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OperatingHours model
+   */
+  interface OperatingHoursFieldRefs {
+    readonly id: FieldRef<"OperatingHours", 'String'>
+    readonly schoolId: FieldRef<"OperatingHours", 'String'>
+    readonly scheduleType: FieldRef<"OperatingHours", 'String'>
+    readonly daysOfWeek: FieldRef<"OperatingHours", 'Json'>
+    readonly open: FieldRef<"OperatingHours", 'String'>
+    readonly close: FieldRef<"OperatingHours", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OperatingHours findUnique
+   */
+  export type OperatingHoursFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter, which OperatingHours to fetch.
+     */
+    where: OperatingHoursWhereUniqueInput
+  }
+
+  /**
+   * OperatingHours findUniqueOrThrow
+   */
+  export type OperatingHoursFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter, which OperatingHours to fetch.
+     */
+    where: OperatingHoursWhereUniqueInput
+  }
+
+  /**
+   * OperatingHours findFirst
+   */
+  export type OperatingHoursFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter, which OperatingHours to fetch.
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OperatingHours to fetch.
+     */
+    orderBy?: OperatingHoursOrderByWithRelationInput | OperatingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OperatingHours.
+     */
+    cursor?: OperatingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OperatingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OperatingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OperatingHours.
+     */
+    distinct?: OperatingHoursScalarFieldEnum | OperatingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * OperatingHours findFirstOrThrow
+   */
+  export type OperatingHoursFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter, which OperatingHours to fetch.
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OperatingHours to fetch.
+     */
+    orderBy?: OperatingHoursOrderByWithRelationInput | OperatingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OperatingHours.
+     */
+    cursor?: OperatingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OperatingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OperatingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OperatingHours.
+     */
+    distinct?: OperatingHoursScalarFieldEnum | OperatingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * OperatingHours findMany
+   */
+  export type OperatingHoursFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter, which OperatingHours to fetch.
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OperatingHours to fetch.
+     */
+    orderBy?: OperatingHoursOrderByWithRelationInput | OperatingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OperatingHours.
+     */
+    cursor?: OperatingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OperatingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OperatingHours.
+     */
+    skip?: number
+    distinct?: OperatingHoursScalarFieldEnum | OperatingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * OperatingHours create
+   */
+  export type OperatingHoursCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * The data needed to create a OperatingHours.
+     */
+    data: XOR<OperatingHoursCreateInput, OperatingHoursUncheckedCreateInput>
+  }
+
+  /**
+   * OperatingHours createMany
+   */
+  export type OperatingHoursCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OperatingHours.
+     */
+    data: OperatingHoursCreateManyInput | OperatingHoursCreateManyInput[]
+  }
+
+  /**
+   * OperatingHours createManyAndReturn
+   */
+  export type OperatingHoursCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * The data used to create many OperatingHours.
+     */
+    data: OperatingHoursCreateManyInput | OperatingHoursCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OperatingHours update
+   */
+  export type OperatingHoursUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * The data needed to update a OperatingHours.
+     */
+    data: XOR<OperatingHoursUpdateInput, OperatingHoursUncheckedUpdateInput>
+    /**
+     * Choose, which OperatingHours to update.
+     */
+    where: OperatingHoursWhereUniqueInput
+  }
+
+  /**
+   * OperatingHours updateMany
+   */
+  export type OperatingHoursUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OperatingHours.
+     */
+    data: XOR<OperatingHoursUpdateManyMutationInput, OperatingHoursUncheckedUpdateManyInput>
+    /**
+     * Filter which OperatingHours to update
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * Limit how many OperatingHours to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OperatingHours updateManyAndReturn
+   */
+  export type OperatingHoursUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * The data used to update OperatingHours.
+     */
+    data: XOR<OperatingHoursUpdateManyMutationInput, OperatingHoursUncheckedUpdateManyInput>
+    /**
+     * Filter which OperatingHours to update
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * Limit how many OperatingHours to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * OperatingHours upsert
+   */
+  export type OperatingHoursUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * The filter to search for the OperatingHours to update in case it exists.
+     */
+    where: OperatingHoursWhereUniqueInput
+    /**
+     * In case the OperatingHours found by the `where` argument doesn't exist, create a new OperatingHours with this data.
+     */
+    create: XOR<OperatingHoursCreateInput, OperatingHoursUncheckedCreateInput>
+    /**
+     * In case the OperatingHours was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OperatingHoursUpdateInput, OperatingHoursUncheckedUpdateInput>
+  }
+
+  /**
+   * OperatingHours delete
+   */
+  export type OperatingHoursDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+    /**
+     * Filter which OperatingHours to delete.
+     */
+    where: OperatingHoursWhereUniqueInput
+  }
+
+  /**
+   * OperatingHours deleteMany
+   */
+  export type OperatingHoursDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OperatingHours to delete
+     */
+    where?: OperatingHoursWhereInput
+    /**
+     * Limit how many OperatingHours to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OperatingHours without action
+   */
+  export type OperatingHoursDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OperatingHours
+     */
+    select?: OperatingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OperatingHours
+     */
+    omit?: OperatingHoursOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OperatingHoursInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FieldTripType
+   */
+
+  export type AggregateFieldTripType = {
+    _count: FieldTripTypeCountAggregateOutputType | null
+    _avg: FieldTripTypeAvgAggregateOutputType | null
+    _sum: FieldTripTypeSumAggregateOutputType | null
+    _min: FieldTripTypeMinAggregateOutputType | null
+    _max: FieldTripTypeMaxAggregateOutputType | null
+  }
+
+  export type FieldTripTypeAvgAggregateOutputType = {
+    minAdultStudentRatio: number | null
+    minLeaderStudentRatio: number | null
+  }
+
+  export type FieldTripTypeSumAggregateOutputType = {
+    minAdultStudentRatio: number | null
+    minLeaderStudentRatio: number | null
+  }
+
+  export type FieldTripTypeMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    minAdultStudentRatio: number | null
+    minLeaderStudentRatio: number | null
+    policyCitationId: string | null
+    notes: string | null
+  }
+
+  export type FieldTripTypeMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    minAdultStudentRatio: number | null
+    minLeaderStudentRatio: number | null
+    policyCitationId: string | null
+    notes: string | null
+  }
+
+  export type FieldTripTypeCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    name: number
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId: number
+    notes: number
+    _all: number
+  }
+
+
+  export type FieldTripTypeAvgAggregateInputType = {
+    minAdultStudentRatio?: true
+    minLeaderStudentRatio?: true
+  }
+
+  export type FieldTripTypeSumAggregateInputType = {
+    minAdultStudentRatio?: true
+    minLeaderStudentRatio?: true
+  }
+
+  export type FieldTripTypeMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    minAdultStudentRatio?: true
+    minLeaderStudentRatio?: true
+    policyCitationId?: true
+    notes?: true
+  }
+
+  export type FieldTripTypeMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    minAdultStudentRatio?: true
+    minLeaderStudentRatio?: true
+    policyCitationId?: true
+    notes?: true
+  }
+
+  export type FieldTripTypeCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    minAdultStudentRatio?: true
+    minLeaderStudentRatio?: true
+    policyCitationId?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type FieldTripTypeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FieldTripType to aggregate.
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripTypes to fetch.
+     */
+    orderBy?: FieldTripTypeOrderByWithRelationInput | FieldTripTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FieldTripTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FieldTripTypes
+    **/
+    _count?: true | FieldTripTypeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FieldTripTypeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FieldTripTypeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FieldTripTypeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FieldTripTypeMaxAggregateInputType
+  }
+
+  export type GetFieldTripTypeAggregateType<T extends FieldTripTypeAggregateArgs> = {
+        [P in keyof T & keyof AggregateFieldTripType]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFieldTripType[P]>
+      : GetScalarType<T[P], AggregateFieldTripType[P]>
+  }
+
+
+
+
+  export type FieldTripTypeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FieldTripTypeWhereInput
+    orderBy?: FieldTripTypeOrderByWithAggregationInput | FieldTripTypeOrderByWithAggregationInput[]
+    by: FieldTripTypeScalarFieldEnum[] | FieldTripTypeScalarFieldEnum
+    having?: FieldTripTypeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FieldTripTypeCountAggregateInputType | true
+    _avg?: FieldTripTypeAvgAggregateInputType
+    _sum?: FieldTripTypeSumAggregateInputType
+    _min?: FieldTripTypeMinAggregateInputType
+    _max?: FieldTripTypeMaxAggregateInputType
+  }
+
+  export type FieldTripTypeGroupByOutputType = {
+    id: string
+    schoolId: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId: string | null
+    notes: string | null
+    _count: FieldTripTypeCountAggregateOutputType | null
+    _avg: FieldTripTypeAvgAggregateOutputType | null
+    _sum: FieldTripTypeSumAggregateOutputType | null
+    _min: FieldTripTypeMinAggregateOutputType | null
+    _max: FieldTripTypeMaxAggregateOutputType | null
+  }
+
+  type GetFieldTripTypeGroupByPayload<T extends FieldTripTypeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FieldTripTypeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FieldTripTypeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FieldTripTypeGroupByOutputType[P]>
+            : GetScalarType<T[P], FieldTripTypeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FieldTripTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    minAdultStudentRatio?: boolean
+    minLeaderStudentRatio?: boolean
+    policyCitationId?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripType"]>
+
+  export type FieldTripTypeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    minAdultStudentRatio?: boolean
+    minLeaderStudentRatio?: boolean
+    policyCitationId?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripType"]>
+
+  export type FieldTripTypeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    minAdultStudentRatio?: boolean
+    minLeaderStudentRatio?: boolean
+    policyCitationId?: boolean
+    notes?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripType"]>
+
+  export type FieldTripTypeSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    minAdultStudentRatio?: boolean
+    minLeaderStudentRatio?: boolean
+    policyCitationId?: boolean
+    notes?: boolean
+  }
+
+  export type FieldTripTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "minAdultStudentRatio" | "minLeaderStudentRatio" | "policyCitationId" | "notes", ExtArgs["result"]["fieldTripType"]>
+  export type FieldTripTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type FieldTripTypeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type FieldTripTypeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $FieldTripTypePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FieldTripType"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      name: string
+      minAdultStudentRatio: number
+      minLeaderStudentRatio: number
+      policyCitationId: string | null
+      notes: string | null
+    }, ExtArgs["result"]["fieldTripType"]>
+    composites: {}
+  }
+
+  type FieldTripTypeGetPayload<S extends boolean | null | undefined | FieldTripTypeDefaultArgs> = $Result.GetResult<Prisma.$FieldTripTypePayload, S>
+
+  type FieldTripTypeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FieldTripTypeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FieldTripTypeCountAggregateInputType | true
+    }
+
+  export interface FieldTripTypeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FieldTripType'], meta: { name: 'FieldTripType' } }
+    /**
+     * Find zero or one FieldTripType that matches the filter.
+     * @param {FieldTripTypeFindUniqueArgs} args - Arguments to find a FieldTripType
+     * @example
+     * // Get one FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FieldTripTypeFindUniqueArgs>(args: SelectSubset<T, FieldTripTypeFindUniqueArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FieldTripType that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FieldTripTypeFindUniqueOrThrowArgs} args - Arguments to find a FieldTripType
+     * @example
+     * // Get one FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FieldTripTypeFindUniqueOrThrowArgs>(args: SelectSubset<T, FieldTripTypeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FieldTripType that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeFindFirstArgs} args - Arguments to find a FieldTripType
+     * @example
+     * // Get one FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FieldTripTypeFindFirstArgs>(args?: SelectSubset<T, FieldTripTypeFindFirstArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FieldTripType that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeFindFirstOrThrowArgs} args - Arguments to find a FieldTripType
+     * @example
+     * // Get one FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FieldTripTypeFindFirstOrThrowArgs>(args?: SelectSubset<T, FieldTripTypeFindFirstOrThrowArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FieldTripTypes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FieldTripTypes
+     * const fieldTripTypes = await prisma.fieldTripType.findMany()
+     * 
+     * // Get first 10 FieldTripTypes
+     * const fieldTripTypes = await prisma.fieldTripType.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fieldTripTypeWithIdOnly = await prisma.fieldTripType.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FieldTripTypeFindManyArgs>(args?: SelectSubset<T, FieldTripTypeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FieldTripType.
+     * @param {FieldTripTypeCreateArgs} args - Arguments to create a FieldTripType.
+     * @example
+     * // Create one FieldTripType
+     * const FieldTripType = await prisma.fieldTripType.create({
+     *   data: {
+     *     // ... data to create a FieldTripType
+     *   }
+     * })
+     * 
+     */
+    create<T extends FieldTripTypeCreateArgs>(args: SelectSubset<T, FieldTripTypeCreateArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FieldTripTypes.
+     * @param {FieldTripTypeCreateManyArgs} args - Arguments to create many FieldTripTypes.
+     * @example
+     * // Create many FieldTripTypes
+     * const fieldTripType = await prisma.fieldTripType.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FieldTripTypeCreateManyArgs>(args?: SelectSubset<T, FieldTripTypeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FieldTripTypes and returns the data saved in the database.
+     * @param {FieldTripTypeCreateManyAndReturnArgs} args - Arguments to create many FieldTripTypes.
+     * @example
+     * // Create many FieldTripTypes
+     * const fieldTripType = await prisma.fieldTripType.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FieldTripTypes and only return the `id`
+     * const fieldTripTypeWithIdOnly = await prisma.fieldTripType.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FieldTripTypeCreateManyAndReturnArgs>(args?: SelectSubset<T, FieldTripTypeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FieldTripType.
+     * @param {FieldTripTypeDeleteArgs} args - Arguments to delete one FieldTripType.
+     * @example
+     * // Delete one FieldTripType
+     * const FieldTripType = await prisma.fieldTripType.delete({
+     *   where: {
+     *     // ... filter to delete one FieldTripType
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FieldTripTypeDeleteArgs>(args: SelectSubset<T, FieldTripTypeDeleteArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FieldTripType.
+     * @param {FieldTripTypeUpdateArgs} args - Arguments to update one FieldTripType.
+     * @example
+     * // Update one FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FieldTripTypeUpdateArgs>(args: SelectSubset<T, FieldTripTypeUpdateArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FieldTripTypes.
+     * @param {FieldTripTypeDeleteManyArgs} args - Arguments to filter FieldTripTypes to delete.
+     * @example
+     * // Delete a few FieldTripTypes
+     * const { count } = await prisma.fieldTripType.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FieldTripTypeDeleteManyArgs>(args?: SelectSubset<T, FieldTripTypeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FieldTripTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FieldTripTypes
+     * const fieldTripType = await prisma.fieldTripType.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FieldTripTypeUpdateManyArgs>(args: SelectSubset<T, FieldTripTypeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FieldTripTypes and returns the data updated in the database.
+     * @param {FieldTripTypeUpdateManyAndReturnArgs} args - Arguments to update many FieldTripTypes.
+     * @example
+     * // Update many FieldTripTypes
+     * const fieldTripType = await prisma.fieldTripType.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FieldTripTypes and only return the `id`
+     * const fieldTripTypeWithIdOnly = await prisma.fieldTripType.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FieldTripTypeUpdateManyAndReturnArgs>(args: SelectSubset<T, FieldTripTypeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FieldTripType.
+     * @param {FieldTripTypeUpsertArgs} args - Arguments to update or create a FieldTripType.
+     * @example
+     * // Update or create a FieldTripType
+     * const fieldTripType = await prisma.fieldTripType.upsert({
+     *   create: {
+     *     // ... data to create a FieldTripType
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FieldTripType we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FieldTripTypeUpsertArgs>(args: SelectSubset<T, FieldTripTypeUpsertArgs<ExtArgs>>): Prisma__FieldTripTypeClient<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FieldTripTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeCountArgs} args - Arguments to filter FieldTripTypes to count.
+     * @example
+     * // Count the number of FieldTripTypes
+     * const count = await prisma.fieldTripType.count({
+     *   where: {
+     *     // ... the filter for the FieldTripTypes we want to count
+     *   }
+     * })
+    **/
+    count<T extends FieldTripTypeCountArgs>(
+      args?: Subset<T, FieldTripTypeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FieldTripTypeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FieldTripType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FieldTripTypeAggregateArgs>(args: Subset<T, FieldTripTypeAggregateArgs>): Prisma.PrismaPromise<GetFieldTripTypeAggregateType<T>>
+
+    /**
+     * Group by FieldTripType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripTypeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FieldTripTypeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FieldTripTypeGroupByArgs['orderBy'] }
+        : { orderBy?: FieldTripTypeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FieldTripTypeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFieldTripTypeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FieldTripType model
+   */
+  readonly fields: FieldTripTypeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FieldTripType.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FieldTripTypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FieldTripType model
+   */
+  interface FieldTripTypeFieldRefs {
+    readonly id: FieldRef<"FieldTripType", 'String'>
+    readonly schoolId: FieldRef<"FieldTripType", 'String'>
+    readonly name: FieldRef<"FieldTripType", 'String'>
+    readonly minAdultStudentRatio: FieldRef<"FieldTripType", 'Float'>
+    readonly minLeaderStudentRatio: FieldRef<"FieldTripType", 'Float'>
+    readonly policyCitationId: FieldRef<"FieldTripType", 'String'>
+    readonly notes: FieldRef<"FieldTripType", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FieldTripType findUnique
+   */
+  export type FieldTripTypeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripType to fetch.
+     */
+    where: FieldTripTypeWhereUniqueInput
+  }
+
+  /**
+   * FieldTripType findUniqueOrThrow
+   */
+  export type FieldTripTypeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripType to fetch.
+     */
+    where: FieldTripTypeWhereUniqueInput
+  }
+
+  /**
+   * FieldTripType findFirst
+   */
+  export type FieldTripTypeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripType to fetch.
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripTypes to fetch.
+     */
+    orderBy?: FieldTripTypeOrderByWithRelationInput | FieldTripTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FieldTripTypes.
+     */
+    cursor?: FieldTripTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FieldTripTypes.
+     */
+    distinct?: FieldTripTypeScalarFieldEnum | FieldTripTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripType findFirstOrThrow
+   */
+  export type FieldTripTypeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripType to fetch.
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripTypes to fetch.
+     */
+    orderBy?: FieldTripTypeOrderByWithRelationInput | FieldTripTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FieldTripTypes.
+     */
+    cursor?: FieldTripTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FieldTripTypes.
+     */
+    distinct?: FieldTripTypeScalarFieldEnum | FieldTripTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripType findMany
+   */
+  export type FieldTripTypeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripTypes to fetch.
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripTypes to fetch.
+     */
+    orderBy?: FieldTripTypeOrderByWithRelationInput | FieldTripTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FieldTripTypes.
+     */
+    cursor?: FieldTripTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripTypes.
+     */
+    skip?: number
+    distinct?: FieldTripTypeScalarFieldEnum | FieldTripTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripType create
+   */
+  export type FieldTripTypeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FieldTripType.
+     */
+    data: XOR<FieldTripTypeCreateInput, FieldTripTypeUncheckedCreateInput>
+  }
+
+  /**
+   * FieldTripType createMany
+   */
+  export type FieldTripTypeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FieldTripTypes.
+     */
+    data: FieldTripTypeCreateManyInput | FieldTripTypeCreateManyInput[]
+  }
+
+  /**
+   * FieldTripType createManyAndReturn
+   */
+  export type FieldTripTypeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * The data used to create many FieldTripTypes.
+     */
+    data: FieldTripTypeCreateManyInput | FieldTripTypeCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FieldTripType update
+   */
+  export type FieldTripTypeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FieldTripType.
+     */
+    data: XOR<FieldTripTypeUpdateInput, FieldTripTypeUncheckedUpdateInput>
+    /**
+     * Choose, which FieldTripType to update.
+     */
+    where: FieldTripTypeWhereUniqueInput
+  }
+
+  /**
+   * FieldTripType updateMany
+   */
+  export type FieldTripTypeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FieldTripTypes.
+     */
+    data: XOR<FieldTripTypeUpdateManyMutationInput, FieldTripTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which FieldTripTypes to update
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * Limit how many FieldTripTypes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FieldTripType updateManyAndReturn
+   */
+  export type FieldTripTypeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * The data used to update FieldTripTypes.
+     */
+    data: XOR<FieldTripTypeUpdateManyMutationInput, FieldTripTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which FieldTripTypes to update
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * Limit how many FieldTripTypes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FieldTripType upsert
+   */
+  export type FieldTripTypeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FieldTripType to update in case it exists.
+     */
+    where: FieldTripTypeWhereUniqueInput
+    /**
+     * In case the FieldTripType found by the `where` argument doesn't exist, create a new FieldTripType with this data.
+     */
+    create: XOR<FieldTripTypeCreateInput, FieldTripTypeUncheckedCreateInput>
+    /**
+     * In case the FieldTripType was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FieldTripTypeUpdateInput, FieldTripTypeUncheckedUpdateInput>
+  }
+
+  /**
+   * FieldTripType delete
+   */
+  export type FieldTripTypeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+    /**
+     * Filter which FieldTripType to delete.
+     */
+    where: FieldTripTypeWhereUniqueInput
+  }
+
+  /**
+   * FieldTripType deleteMany
+   */
+  export type FieldTripTypeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FieldTripTypes to delete
+     */
+    where?: FieldTripTypeWhereInput
+    /**
+     * Limit how many FieldTripTypes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FieldTripType without action
+   */
+  export type FieldTripTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripType
+     */
+    select?: FieldTripTypeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripType
+     */
+    omit?: FieldTripTypeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripTypeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ScheduleWeek
+   */
+
+  export type AggregateScheduleWeek = {
+    _count: ScheduleWeekCountAggregateOutputType | null
+    _min: ScheduleWeekMinAggregateOutputType | null
+    _max: ScheduleWeekMaxAggregateOutputType | null
+  }
+
+  export type ScheduleWeekMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    label: string | null
+    status: string | null
+    startDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ScheduleWeekMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    label: string | null
+    status: string | null
+    startDate: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ScheduleWeekCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    label: number
+    status: number
+    startDate: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ScheduleWeekMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    label?: true
+    status?: true
+    startDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ScheduleWeekMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    label?: true
+    status?: true
+    startDate?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ScheduleWeekCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    label?: true
+    status?: true
+    startDate?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ScheduleWeekAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleWeek to aggregate.
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleWeeks to fetch.
+     */
+    orderBy?: ScheduleWeekOrderByWithRelationInput | ScheduleWeekOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ScheduleWeekWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleWeeks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleWeeks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ScheduleWeeks
+    **/
+    _count?: true | ScheduleWeekCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ScheduleWeekMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ScheduleWeekMaxAggregateInputType
+  }
+
+  export type GetScheduleWeekAggregateType<T extends ScheduleWeekAggregateArgs> = {
+        [P in keyof T & keyof AggregateScheduleWeek]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateScheduleWeek[P]>
+      : GetScalarType<T[P], AggregateScheduleWeek[P]>
+  }
+
+
+
+
+  export type ScheduleWeekGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleWeekWhereInput
+    orderBy?: ScheduleWeekOrderByWithAggregationInput | ScheduleWeekOrderByWithAggregationInput[]
+    by: ScheduleWeekScalarFieldEnum[] | ScheduleWeekScalarFieldEnum
+    having?: ScheduleWeekScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ScheduleWeekCountAggregateInputType | true
+    _min?: ScheduleWeekMinAggregateInputType
+    _max?: ScheduleWeekMaxAggregateInputType
+  }
+
+  export type ScheduleWeekGroupByOutputType = {
+    id: string
+    schoolId: string
+    label: string | null
+    status: string
+    startDate: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ScheduleWeekCountAggregateOutputType | null
+    _min: ScheduleWeekMinAggregateOutputType | null
+    _max: ScheduleWeekMaxAggregateOutputType | null
+  }
+
+  type GetScheduleWeekGroupByPayload<T extends ScheduleWeekGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ScheduleWeekGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ScheduleWeekGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ScheduleWeekGroupByOutputType[P]>
+            : GetScalarType<T[P], ScheduleWeekGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ScheduleWeekSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    label?: boolean
+    status?: boolean
+    startDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+    scheduleDays?: boolean | ScheduleWeek$scheduleDaysArgs<ExtArgs>
+    segmentBlocks?: boolean | ScheduleWeek$segmentBlocksArgs<ExtArgs>
+    staffAssignments?: boolean | ScheduleWeek$staffAssignmentsArgs<ExtArgs>
+    fieldTripEvents?: boolean | ScheduleWeek$fieldTripEventsArgs<ExtArgs>
+    _count?: boolean | ScheduleWeekCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleWeek"]>
+
+  export type ScheduleWeekSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    label?: boolean
+    status?: boolean
+    startDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleWeek"]>
+
+  export type ScheduleWeekSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    label?: boolean
+    status?: boolean
+    startDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleWeek"]>
+
+  export type ScheduleWeekSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    label?: boolean
+    status?: boolean
+    startDate?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ScheduleWeekOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "label" | "status" | "startDate" | "createdAt" | "updatedAt", ExtArgs["result"]["scheduleWeek"]>
+  export type ScheduleWeekInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+    scheduleDays?: boolean | ScheduleWeek$scheduleDaysArgs<ExtArgs>
+    segmentBlocks?: boolean | ScheduleWeek$segmentBlocksArgs<ExtArgs>
+    staffAssignments?: boolean | ScheduleWeek$staffAssignmentsArgs<ExtArgs>
+    fieldTripEvents?: boolean | ScheduleWeek$fieldTripEventsArgs<ExtArgs>
+    _count?: boolean | ScheduleWeekCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type ScheduleWeekIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type ScheduleWeekIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $ScheduleWeekPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ScheduleWeek"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+      scheduleDays: Prisma.$ScheduleDayPayload<ExtArgs>[]
+      segmentBlocks: Prisma.$SegmentBlockPayload<ExtArgs>[]
+      staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
+      fieldTripEvents: Prisma.$FieldTripEventPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      label: string | null
+      status: string
+      startDate: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["scheduleWeek"]>
+    composites: {}
+  }
+
+  type ScheduleWeekGetPayload<S extends boolean | null | undefined | ScheduleWeekDefaultArgs> = $Result.GetResult<Prisma.$ScheduleWeekPayload, S>
+
+  type ScheduleWeekCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ScheduleWeekFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ScheduleWeekCountAggregateInputType | true
+    }
+
+  export interface ScheduleWeekDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ScheduleWeek'], meta: { name: 'ScheduleWeek' } }
+    /**
+     * Find zero or one ScheduleWeek that matches the filter.
+     * @param {ScheduleWeekFindUniqueArgs} args - Arguments to find a ScheduleWeek
+     * @example
+     * // Get one ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ScheduleWeekFindUniqueArgs>(args: SelectSubset<T, ScheduleWeekFindUniqueArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ScheduleWeek that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ScheduleWeekFindUniqueOrThrowArgs} args - Arguments to find a ScheduleWeek
+     * @example
+     * // Get one ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ScheduleWeekFindUniqueOrThrowArgs>(args: SelectSubset<T, ScheduleWeekFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleWeek that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekFindFirstArgs} args - Arguments to find a ScheduleWeek
+     * @example
+     * // Get one ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ScheduleWeekFindFirstArgs>(args?: SelectSubset<T, ScheduleWeekFindFirstArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleWeek that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekFindFirstOrThrowArgs} args - Arguments to find a ScheduleWeek
+     * @example
+     * // Get one ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ScheduleWeekFindFirstOrThrowArgs>(args?: SelectSubset<T, ScheduleWeekFindFirstOrThrowArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ScheduleWeeks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ScheduleWeeks
+     * const scheduleWeeks = await prisma.scheduleWeek.findMany()
+     * 
+     * // Get first 10 ScheduleWeeks
+     * const scheduleWeeks = await prisma.scheduleWeek.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const scheduleWeekWithIdOnly = await prisma.scheduleWeek.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ScheduleWeekFindManyArgs>(args?: SelectSubset<T, ScheduleWeekFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ScheduleWeek.
+     * @param {ScheduleWeekCreateArgs} args - Arguments to create a ScheduleWeek.
+     * @example
+     * // Create one ScheduleWeek
+     * const ScheduleWeek = await prisma.scheduleWeek.create({
+     *   data: {
+     *     // ... data to create a ScheduleWeek
+     *   }
+     * })
+     * 
+     */
+    create<T extends ScheduleWeekCreateArgs>(args: SelectSubset<T, ScheduleWeekCreateArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ScheduleWeeks.
+     * @param {ScheduleWeekCreateManyArgs} args - Arguments to create many ScheduleWeeks.
+     * @example
+     * // Create many ScheduleWeeks
+     * const scheduleWeek = await prisma.scheduleWeek.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ScheduleWeekCreateManyArgs>(args?: SelectSubset<T, ScheduleWeekCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ScheduleWeeks and returns the data saved in the database.
+     * @param {ScheduleWeekCreateManyAndReturnArgs} args - Arguments to create many ScheduleWeeks.
+     * @example
+     * // Create many ScheduleWeeks
+     * const scheduleWeek = await prisma.scheduleWeek.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ScheduleWeeks and only return the `id`
+     * const scheduleWeekWithIdOnly = await prisma.scheduleWeek.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ScheduleWeekCreateManyAndReturnArgs>(args?: SelectSubset<T, ScheduleWeekCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ScheduleWeek.
+     * @param {ScheduleWeekDeleteArgs} args - Arguments to delete one ScheduleWeek.
+     * @example
+     * // Delete one ScheduleWeek
+     * const ScheduleWeek = await prisma.scheduleWeek.delete({
+     *   where: {
+     *     // ... filter to delete one ScheduleWeek
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ScheduleWeekDeleteArgs>(args: SelectSubset<T, ScheduleWeekDeleteArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ScheduleWeek.
+     * @param {ScheduleWeekUpdateArgs} args - Arguments to update one ScheduleWeek.
+     * @example
+     * // Update one ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ScheduleWeekUpdateArgs>(args: SelectSubset<T, ScheduleWeekUpdateArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ScheduleWeeks.
+     * @param {ScheduleWeekDeleteManyArgs} args - Arguments to filter ScheduleWeeks to delete.
+     * @example
+     * // Delete a few ScheduleWeeks
+     * const { count } = await prisma.scheduleWeek.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ScheduleWeekDeleteManyArgs>(args?: SelectSubset<T, ScheduleWeekDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleWeeks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ScheduleWeeks
+     * const scheduleWeek = await prisma.scheduleWeek.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ScheduleWeekUpdateManyArgs>(args: SelectSubset<T, ScheduleWeekUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleWeeks and returns the data updated in the database.
+     * @param {ScheduleWeekUpdateManyAndReturnArgs} args - Arguments to update many ScheduleWeeks.
+     * @example
+     * // Update many ScheduleWeeks
+     * const scheduleWeek = await prisma.scheduleWeek.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ScheduleWeeks and only return the `id`
+     * const scheduleWeekWithIdOnly = await prisma.scheduleWeek.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ScheduleWeekUpdateManyAndReturnArgs>(args: SelectSubset<T, ScheduleWeekUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ScheduleWeek.
+     * @param {ScheduleWeekUpsertArgs} args - Arguments to update or create a ScheduleWeek.
+     * @example
+     * // Update or create a ScheduleWeek
+     * const scheduleWeek = await prisma.scheduleWeek.upsert({
+     *   create: {
+     *     // ... data to create a ScheduleWeek
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ScheduleWeek we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ScheduleWeekUpsertArgs>(args: SelectSubset<T, ScheduleWeekUpsertArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ScheduleWeeks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekCountArgs} args - Arguments to filter ScheduleWeeks to count.
+     * @example
+     * // Count the number of ScheduleWeeks
+     * const count = await prisma.scheduleWeek.count({
+     *   where: {
+     *     // ... the filter for the ScheduleWeeks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ScheduleWeekCountArgs>(
+      args?: Subset<T, ScheduleWeekCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ScheduleWeekCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ScheduleWeek.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ScheduleWeekAggregateArgs>(args: Subset<T, ScheduleWeekAggregateArgs>): Prisma.PrismaPromise<GetScheduleWeekAggregateType<T>>
+
+    /**
+     * Group by ScheduleWeek.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleWeekGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ScheduleWeekGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ScheduleWeekGroupByArgs['orderBy'] }
+        : { orderBy?: ScheduleWeekGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ScheduleWeekGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetScheduleWeekGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ScheduleWeek model
+   */
+  readonly fields: ScheduleWeekFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ScheduleWeek.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ScheduleWeekClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    scheduleDays<T extends ScheduleWeek$scheduleDaysArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$scheduleDaysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    segmentBlocks<T extends ScheduleWeek$segmentBlocksArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$segmentBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    staffAssignments<T extends ScheduleWeek$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fieldTripEvents<T extends ScheduleWeek$fieldTripEventsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$fieldTripEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ScheduleWeek model
+   */
+  interface ScheduleWeekFieldRefs {
+    readonly id: FieldRef<"ScheduleWeek", 'String'>
+    readonly schoolId: FieldRef<"ScheduleWeek", 'String'>
+    readonly label: FieldRef<"ScheduleWeek", 'String'>
+    readonly status: FieldRef<"ScheduleWeek", 'String'>
+    readonly startDate: FieldRef<"ScheduleWeek", 'DateTime'>
+    readonly createdAt: FieldRef<"ScheduleWeek", 'DateTime'>
+    readonly updatedAt: FieldRef<"ScheduleWeek", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ScheduleWeek findUnique
+   */
+  export type ScheduleWeekFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleWeek to fetch.
+     */
+    where: ScheduleWeekWhereUniqueInput
+  }
+
+  /**
+   * ScheduleWeek findUniqueOrThrow
+   */
+  export type ScheduleWeekFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleWeek to fetch.
+     */
+    where: ScheduleWeekWhereUniqueInput
+  }
+
+  /**
+   * ScheduleWeek findFirst
+   */
+  export type ScheduleWeekFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleWeek to fetch.
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleWeeks to fetch.
+     */
+    orderBy?: ScheduleWeekOrderByWithRelationInput | ScheduleWeekOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleWeeks.
+     */
+    cursor?: ScheduleWeekWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleWeeks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleWeeks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleWeeks.
+     */
+    distinct?: ScheduleWeekScalarFieldEnum | ScheduleWeekScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek findFirstOrThrow
+   */
+  export type ScheduleWeekFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleWeek to fetch.
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleWeeks to fetch.
+     */
+    orderBy?: ScheduleWeekOrderByWithRelationInput | ScheduleWeekOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleWeeks.
+     */
+    cursor?: ScheduleWeekWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleWeeks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleWeeks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleWeeks.
+     */
+    distinct?: ScheduleWeekScalarFieldEnum | ScheduleWeekScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek findMany
+   */
+  export type ScheduleWeekFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleWeeks to fetch.
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleWeeks to fetch.
+     */
+    orderBy?: ScheduleWeekOrderByWithRelationInput | ScheduleWeekOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ScheduleWeeks.
+     */
+    cursor?: ScheduleWeekWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleWeeks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleWeeks.
+     */
+    skip?: number
+    distinct?: ScheduleWeekScalarFieldEnum | ScheduleWeekScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek create
+   */
+  export type ScheduleWeekCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ScheduleWeek.
+     */
+    data: XOR<ScheduleWeekCreateInput, ScheduleWeekUncheckedCreateInput>
+  }
+
+  /**
+   * ScheduleWeek createMany
+   */
+  export type ScheduleWeekCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ScheduleWeeks.
+     */
+    data: ScheduleWeekCreateManyInput | ScheduleWeekCreateManyInput[]
+  }
+
+  /**
+   * ScheduleWeek createManyAndReturn
+   */
+  export type ScheduleWeekCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * The data used to create many ScheduleWeeks.
+     */
+    data: ScheduleWeekCreateManyInput | ScheduleWeekCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleWeek update
+   */
+  export type ScheduleWeekUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ScheduleWeek.
+     */
+    data: XOR<ScheduleWeekUpdateInput, ScheduleWeekUncheckedUpdateInput>
+    /**
+     * Choose, which ScheduleWeek to update.
+     */
+    where: ScheduleWeekWhereUniqueInput
+  }
+
+  /**
+   * ScheduleWeek updateMany
+   */
+  export type ScheduleWeekUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ScheduleWeeks.
+     */
+    data: XOR<ScheduleWeekUpdateManyMutationInput, ScheduleWeekUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleWeeks to update
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * Limit how many ScheduleWeeks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleWeek updateManyAndReturn
+   */
+  export type ScheduleWeekUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * The data used to update ScheduleWeeks.
+     */
+    data: XOR<ScheduleWeekUpdateManyMutationInput, ScheduleWeekUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleWeeks to update
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * Limit how many ScheduleWeeks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleWeek upsert
+   */
+  export type ScheduleWeekUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ScheduleWeek to update in case it exists.
+     */
+    where: ScheduleWeekWhereUniqueInput
+    /**
+     * In case the ScheduleWeek found by the `where` argument doesn't exist, create a new ScheduleWeek with this data.
+     */
+    create: XOR<ScheduleWeekCreateInput, ScheduleWeekUncheckedCreateInput>
+    /**
+     * In case the ScheduleWeek was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ScheduleWeekUpdateInput, ScheduleWeekUncheckedUpdateInput>
+  }
+
+  /**
+   * ScheduleWeek delete
+   */
+  export type ScheduleWeekDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+    /**
+     * Filter which ScheduleWeek to delete.
+     */
+    where: ScheduleWeekWhereUniqueInput
+  }
+
+  /**
+   * ScheduleWeek deleteMany
+   */
+  export type ScheduleWeekDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleWeeks to delete
+     */
+    where?: ScheduleWeekWhereInput
+    /**
+     * Limit how many ScheduleWeeks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleWeek.scheduleDays
+   */
+  export type ScheduleWeek$scheduleDaysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    where?: ScheduleDayWhereInput
+    orderBy?: ScheduleDayOrderByWithRelationInput | ScheduleDayOrderByWithRelationInput[]
+    cursor?: ScheduleDayWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ScheduleDayScalarFieldEnum | ScheduleDayScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek.segmentBlocks
+   */
+  export type ScheduleWeek$segmentBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    where?: SegmentBlockWhereInput
+    orderBy?: SegmentBlockOrderByWithRelationInput | SegmentBlockOrderByWithRelationInput[]
+    cursor?: SegmentBlockWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SegmentBlockScalarFieldEnum | SegmentBlockScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek.staffAssignments
+   */
+  export type ScheduleWeek$staffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    where?: StaffAssignmentWhereInput
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    cursor?: StaffAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek.fieldTripEvents
+   */
+  export type ScheduleWeek$fieldTripEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    where?: FieldTripEventWhereInput
+    orderBy?: FieldTripEventOrderByWithRelationInput | FieldTripEventOrderByWithRelationInput[]
+    cursor?: FieldTripEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FieldTripEventScalarFieldEnum | FieldTripEventScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek without action
+   */
+  export type ScheduleWeekDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleWeek
+     */
+    select?: ScheduleWeekSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleWeek
+     */
+    omit?: ScheduleWeekOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleWeekInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ScheduleDay
+   */
+
+  export type AggregateScheduleDay = {
+    _count: ScheduleDayCountAggregateOutputType | null
+    _avg: ScheduleDayAvgAggregateOutputType | null
+    _sum: ScheduleDaySumAggregateOutputType | null
+    _min: ScheduleDayMinAggregateOutputType | null
+    _max: ScheduleDayMaxAggregateOutputType | null
+  }
+
+  export type ScheduleDayAvgAggregateOutputType = {
+    enrollmentCount: number | null
+    operatingCapacityOverride: number | null
+  }
+
+  export type ScheduleDaySumAggregateOutputType = {
+    enrollmentCount: number | null
+    operatingCapacityOverride: number | null
+  }
+
+  export type ScheduleDayMinAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    date: Date | null
+    dayOfWeek: string | null
+    scheduleType: string | null
+    enrollmentCount: number | null
+    enrollmentSource: string | null
+    fieldTripEventId: string | null
+    operatingCapacityOverride: number | null
+    notes: string | null
+    dayScheduleType: string | null
+  }
+
+  export type ScheduleDayMaxAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    date: Date | null
+    dayOfWeek: string | null
+    scheduleType: string | null
+    enrollmentCount: number | null
+    enrollmentSource: string | null
+    fieldTripEventId: string | null
+    operatingCapacityOverride: number | null
+    notes: string | null
+    dayScheduleType: string | null
+  }
+
+  export type ScheduleDayCountAggregateOutputType = {
+    id: number
+    scheduleWeekId: number
+    date: number
+    dayOfWeek: number
+    scheduleType: number
+    enrollmentCount: number
+    enrollmentSource: number
+    fieldTripEventId: number
+    operatingCapacityOverride: number
+    notes: number
+    dayScheduleType: number
+    _all: number
+  }
+
+
+  export type ScheduleDayAvgAggregateInputType = {
+    enrollmentCount?: true
+    operatingCapacityOverride?: true
+  }
+
+  export type ScheduleDaySumAggregateInputType = {
+    enrollmentCount?: true
+    operatingCapacityOverride?: true
+  }
+
+  export type ScheduleDayMinAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    date?: true
+    dayOfWeek?: true
+    scheduleType?: true
+    enrollmentCount?: true
+    enrollmentSource?: true
+    fieldTripEventId?: true
+    operatingCapacityOverride?: true
+    notes?: true
+    dayScheduleType?: true
+  }
+
+  export type ScheduleDayMaxAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    date?: true
+    dayOfWeek?: true
+    scheduleType?: true
+    enrollmentCount?: true
+    enrollmentSource?: true
+    fieldTripEventId?: true
+    operatingCapacityOverride?: true
+    notes?: true
+    dayScheduleType?: true
+  }
+
+  export type ScheduleDayCountAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    date?: true
+    dayOfWeek?: true
+    scheduleType?: true
+    enrollmentCount?: true
+    enrollmentSource?: true
+    fieldTripEventId?: true
+    operatingCapacityOverride?: true
+    notes?: true
+    dayScheduleType?: true
+    _all?: true
+  }
+
+  export type ScheduleDayAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleDay to aggregate.
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleDays to fetch.
+     */
+    orderBy?: ScheduleDayOrderByWithRelationInput | ScheduleDayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ScheduleDayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleDays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleDays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ScheduleDays
+    **/
+    _count?: true | ScheduleDayCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ScheduleDayAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ScheduleDaySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ScheduleDayMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ScheduleDayMaxAggregateInputType
+  }
+
+  export type GetScheduleDayAggregateType<T extends ScheduleDayAggregateArgs> = {
+        [P in keyof T & keyof AggregateScheduleDay]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateScheduleDay[P]>
+      : GetScalarType<T[P], AggregateScheduleDay[P]>
+  }
+
+
+
+
+  export type ScheduleDayGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleDayWhereInput
+    orderBy?: ScheduleDayOrderByWithAggregationInput | ScheduleDayOrderByWithAggregationInput[]
+    by: ScheduleDayScalarFieldEnum[] | ScheduleDayScalarFieldEnum
+    having?: ScheduleDayScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ScheduleDayCountAggregateInputType | true
+    _avg?: ScheduleDayAvgAggregateInputType
+    _sum?: ScheduleDaySumAggregateInputType
+    _min?: ScheduleDayMinAggregateInputType
+    _max?: ScheduleDayMaxAggregateInputType
+  }
+
+  export type ScheduleDayGroupByOutputType = {
+    id: string
+    scheduleWeekId: string
+    date: Date | null
+    dayOfWeek: string
+    scheduleType: string | null
+    enrollmentCount: number | null
+    enrollmentSource: string | null
+    fieldTripEventId: string | null
+    operatingCapacityOverride: number | null
+    notes: string | null
+    dayScheduleType: string | null
+    _count: ScheduleDayCountAggregateOutputType | null
+    _avg: ScheduleDayAvgAggregateOutputType | null
+    _sum: ScheduleDaySumAggregateOutputType | null
+    _min: ScheduleDayMinAggregateOutputType | null
+    _max: ScheduleDayMaxAggregateOutputType | null
+  }
+
+  type GetScheduleDayGroupByPayload<T extends ScheduleDayGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ScheduleDayGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ScheduleDayGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ScheduleDayGroupByOutputType[P]>
+            : GetScalarType<T[P], ScheduleDayGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ScheduleDaySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    date?: boolean
+    dayOfWeek?: boolean
+    scheduleType?: boolean
+    enrollmentCount?: boolean
+    enrollmentSource?: boolean
+    fieldTripEventId?: boolean
+    operatingCapacityOverride?: boolean
+    notes?: boolean
+    dayScheduleType?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleDay"]>
+
+  export type ScheduleDaySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    date?: boolean
+    dayOfWeek?: boolean
+    scheduleType?: boolean
+    enrollmentCount?: boolean
+    enrollmentSource?: boolean
+    fieldTripEventId?: boolean
+    operatingCapacityOverride?: boolean
+    notes?: boolean
+    dayScheduleType?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleDay"]>
+
+  export type ScheduleDaySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    date?: boolean
+    dayOfWeek?: boolean
+    scheduleType?: boolean
+    enrollmentCount?: boolean
+    enrollmentSource?: boolean
+    fieldTripEventId?: boolean
+    operatingCapacityOverride?: boolean
+    notes?: boolean
+    dayScheduleType?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleDay"]>
+
+  export type ScheduleDaySelectScalar = {
+    id?: boolean
+    scheduleWeekId?: boolean
+    date?: boolean
+    dayOfWeek?: boolean
+    scheduleType?: boolean
+    enrollmentCount?: boolean
+    enrollmentSource?: boolean
+    fieldTripEventId?: boolean
+    operatingCapacityOverride?: boolean
+    notes?: boolean
+    dayScheduleType?: boolean
+  }
+
+  export type ScheduleDayOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "date" | "dayOfWeek" | "scheduleType" | "enrollmentCount" | "enrollmentSource" | "fieldTripEventId" | "operatingCapacityOverride" | "notes" | "dayScheduleType", ExtArgs["result"]["scheduleDay"]>
+  export type ScheduleDayInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type ScheduleDayIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type ScheduleDayIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+
+  export type $ScheduleDayPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ScheduleDay"
+    objects: {
+      scheduleWeek: Prisma.$ScheduleWeekPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleWeekId: string
+      date: Date | null
+      dayOfWeek: string
+      scheduleType: string | null
+      enrollmentCount: number | null
+      enrollmentSource: string | null
+      fieldTripEventId: string | null
+      operatingCapacityOverride: number | null
+      notes: string | null
+      dayScheduleType: string | null
+    }, ExtArgs["result"]["scheduleDay"]>
+    composites: {}
+  }
+
+  type ScheduleDayGetPayload<S extends boolean | null | undefined | ScheduleDayDefaultArgs> = $Result.GetResult<Prisma.$ScheduleDayPayload, S>
+
+  type ScheduleDayCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ScheduleDayFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ScheduleDayCountAggregateInputType | true
+    }
+
+  export interface ScheduleDayDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ScheduleDay'], meta: { name: 'ScheduleDay' } }
+    /**
+     * Find zero or one ScheduleDay that matches the filter.
+     * @param {ScheduleDayFindUniqueArgs} args - Arguments to find a ScheduleDay
+     * @example
+     * // Get one ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ScheduleDayFindUniqueArgs>(args: SelectSubset<T, ScheduleDayFindUniqueArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ScheduleDay that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ScheduleDayFindUniqueOrThrowArgs} args - Arguments to find a ScheduleDay
+     * @example
+     * // Get one ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ScheduleDayFindUniqueOrThrowArgs>(args: SelectSubset<T, ScheduleDayFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleDay that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayFindFirstArgs} args - Arguments to find a ScheduleDay
+     * @example
+     * // Get one ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ScheduleDayFindFirstArgs>(args?: SelectSubset<T, ScheduleDayFindFirstArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleDay that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayFindFirstOrThrowArgs} args - Arguments to find a ScheduleDay
+     * @example
+     * // Get one ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ScheduleDayFindFirstOrThrowArgs>(args?: SelectSubset<T, ScheduleDayFindFirstOrThrowArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ScheduleDays that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ScheduleDays
+     * const scheduleDays = await prisma.scheduleDay.findMany()
+     * 
+     * // Get first 10 ScheduleDays
+     * const scheduleDays = await prisma.scheduleDay.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const scheduleDayWithIdOnly = await prisma.scheduleDay.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ScheduleDayFindManyArgs>(args?: SelectSubset<T, ScheduleDayFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ScheduleDay.
+     * @param {ScheduleDayCreateArgs} args - Arguments to create a ScheduleDay.
+     * @example
+     * // Create one ScheduleDay
+     * const ScheduleDay = await prisma.scheduleDay.create({
+     *   data: {
+     *     // ... data to create a ScheduleDay
+     *   }
+     * })
+     * 
+     */
+    create<T extends ScheduleDayCreateArgs>(args: SelectSubset<T, ScheduleDayCreateArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ScheduleDays.
+     * @param {ScheduleDayCreateManyArgs} args - Arguments to create many ScheduleDays.
+     * @example
+     * // Create many ScheduleDays
+     * const scheduleDay = await prisma.scheduleDay.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ScheduleDayCreateManyArgs>(args?: SelectSubset<T, ScheduleDayCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ScheduleDays and returns the data saved in the database.
+     * @param {ScheduleDayCreateManyAndReturnArgs} args - Arguments to create many ScheduleDays.
+     * @example
+     * // Create many ScheduleDays
+     * const scheduleDay = await prisma.scheduleDay.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ScheduleDays and only return the `id`
+     * const scheduleDayWithIdOnly = await prisma.scheduleDay.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ScheduleDayCreateManyAndReturnArgs>(args?: SelectSubset<T, ScheduleDayCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ScheduleDay.
+     * @param {ScheduleDayDeleteArgs} args - Arguments to delete one ScheduleDay.
+     * @example
+     * // Delete one ScheduleDay
+     * const ScheduleDay = await prisma.scheduleDay.delete({
+     *   where: {
+     *     // ... filter to delete one ScheduleDay
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ScheduleDayDeleteArgs>(args: SelectSubset<T, ScheduleDayDeleteArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ScheduleDay.
+     * @param {ScheduleDayUpdateArgs} args - Arguments to update one ScheduleDay.
+     * @example
+     * // Update one ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ScheduleDayUpdateArgs>(args: SelectSubset<T, ScheduleDayUpdateArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ScheduleDays.
+     * @param {ScheduleDayDeleteManyArgs} args - Arguments to filter ScheduleDays to delete.
+     * @example
+     * // Delete a few ScheduleDays
+     * const { count } = await prisma.scheduleDay.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ScheduleDayDeleteManyArgs>(args?: SelectSubset<T, ScheduleDayDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleDays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ScheduleDays
+     * const scheduleDay = await prisma.scheduleDay.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ScheduleDayUpdateManyArgs>(args: SelectSubset<T, ScheduleDayUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleDays and returns the data updated in the database.
+     * @param {ScheduleDayUpdateManyAndReturnArgs} args - Arguments to update many ScheduleDays.
+     * @example
+     * // Update many ScheduleDays
+     * const scheduleDay = await prisma.scheduleDay.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ScheduleDays and only return the `id`
+     * const scheduleDayWithIdOnly = await prisma.scheduleDay.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ScheduleDayUpdateManyAndReturnArgs>(args: SelectSubset<T, ScheduleDayUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ScheduleDay.
+     * @param {ScheduleDayUpsertArgs} args - Arguments to update or create a ScheduleDay.
+     * @example
+     * // Update or create a ScheduleDay
+     * const scheduleDay = await prisma.scheduleDay.upsert({
+     *   create: {
+     *     // ... data to create a ScheduleDay
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ScheduleDay we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ScheduleDayUpsertArgs>(args: SelectSubset<T, ScheduleDayUpsertArgs<ExtArgs>>): Prisma__ScheduleDayClient<$Result.GetResult<Prisma.$ScheduleDayPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ScheduleDays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayCountArgs} args - Arguments to filter ScheduleDays to count.
+     * @example
+     * // Count the number of ScheduleDays
+     * const count = await prisma.scheduleDay.count({
+     *   where: {
+     *     // ... the filter for the ScheduleDays we want to count
+     *   }
+     * })
+    **/
+    count<T extends ScheduleDayCountArgs>(
+      args?: Subset<T, ScheduleDayCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ScheduleDayCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ScheduleDay.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ScheduleDayAggregateArgs>(args: Subset<T, ScheduleDayAggregateArgs>): Prisma.PrismaPromise<GetScheduleDayAggregateType<T>>
+
+    /**
+     * Group by ScheduleDay.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleDayGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ScheduleDayGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ScheduleDayGroupByArgs['orderBy'] }
+        : { orderBy?: ScheduleDayGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ScheduleDayGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetScheduleDayGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ScheduleDay model
+   */
+  readonly fields: ScheduleDayFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ScheduleDay.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ScheduleDayClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleWeek<T extends ScheduleWeekDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeekDefaultArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ScheduleDay model
+   */
+  interface ScheduleDayFieldRefs {
+    readonly id: FieldRef<"ScheduleDay", 'String'>
+    readonly scheduleWeekId: FieldRef<"ScheduleDay", 'String'>
+    readonly date: FieldRef<"ScheduleDay", 'DateTime'>
+    readonly dayOfWeek: FieldRef<"ScheduleDay", 'String'>
+    readonly scheduleType: FieldRef<"ScheduleDay", 'String'>
+    readonly enrollmentCount: FieldRef<"ScheduleDay", 'Int'>
+    readonly enrollmentSource: FieldRef<"ScheduleDay", 'String'>
+    readonly fieldTripEventId: FieldRef<"ScheduleDay", 'String'>
+    readonly operatingCapacityOverride: FieldRef<"ScheduleDay", 'Int'>
+    readonly notes: FieldRef<"ScheduleDay", 'String'>
+    readonly dayScheduleType: FieldRef<"ScheduleDay", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ScheduleDay findUnique
+   */
+  export type ScheduleDayFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleDay to fetch.
+     */
+    where: ScheduleDayWhereUniqueInput
+  }
+
+  /**
+   * ScheduleDay findUniqueOrThrow
+   */
+  export type ScheduleDayFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleDay to fetch.
+     */
+    where: ScheduleDayWhereUniqueInput
+  }
+
+  /**
+   * ScheduleDay findFirst
+   */
+  export type ScheduleDayFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleDay to fetch.
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleDays to fetch.
+     */
+    orderBy?: ScheduleDayOrderByWithRelationInput | ScheduleDayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleDays.
+     */
+    cursor?: ScheduleDayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleDays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleDays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleDays.
+     */
+    distinct?: ScheduleDayScalarFieldEnum | ScheduleDayScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleDay findFirstOrThrow
+   */
+  export type ScheduleDayFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleDay to fetch.
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleDays to fetch.
+     */
+    orderBy?: ScheduleDayOrderByWithRelationInput | ScheduleDayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleDays.
+     */
+    cursor?: ScheduleDayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleDays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleDays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleDays.
+     */
+    distinct?: ScheduleDayScalarFieldEnum | ScheduleDayScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleDay findMany
+   */
+  export type ScheduleDayFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleDays to fetch.
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleDays to fetch.
+     */
+    orderBy?: ScheduleDayOrderByWithRelationInput | ScheduleDayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ScheduleDays.
+     */
+    cursor?: ScheduleDayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleDays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleDays.
+     */
+    skip?: number
+    distinct?: ScheduleDayScalarFieldEnum | ScheduleDayScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleDay create
+   */
+  export type ScheduleDayCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ScheduleDay.
+     */
+    data: XOR<ScheduleDayCreateInput, ScheduleDayUncheckedCreateInput>
+  }
+
+  /**
+   * ScheduleDay createMany
+   */
+  export type ScheduleDayCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ScheduleDays.
+     */
+    data: ScheduleDayCreateManyInput | ScheduleDayCreateManyInput[]
+  }
+
+  /**
+   * ScheduleDay createManyAndReturn
+   */
+  export type ScheduleDayCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * The data used to create many ScheduleDays.
+     */
+    data: ScheduleDayCreateManyInput | ScheduleDayCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleDay update
+   */
+  export type ScheduleDayUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ScheduleDay.
+     */
+    data: XOR<ScheduleDayUpdateInput, ScheduleDayUncheckedUpdateInput>
+    /**
+     * Choose, which ScheduleDay to update.
+     */
+    where: ScheduleDayWhereUniqueInput
+  }
+
+  /**
+   * ScheduleDay updateMany
+   */
+  export type ScheduleDayUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ScheduleDays.
+     */
+    data: XOR<ScheduleDayUpdateManyMutationInput, ScheduleDayUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleDays to update
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * Limit how many ScheduleDays to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleDay updateManyAndReturn
+   */
+  export type ScheduleDayUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * The data used to update ScheduleDays.
+     */
+    data: XOR<ScheduleDayUpdateManyMutationInput, ScheduleDayUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleDays to update
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * Limit how many ScheduleDays to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleDay upsert
+   */
+  export type ScheduleDayUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ScheduleDay to update in case it exists.
+     */
+    where: ScheduleDayWhereUniqueInput
+    /**
+     * In case the ScheduleDay found by the `where` argument doesn't exist, create a new ScheduleDay with this data.
+     */
+    create: XOR<ScheduleDayCreateInput, ScheduleDayUncheckedCreateInput>
+    /**
+     * In case the ScheduleDay was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ScheduleDayUpdateInput, ScheduleDayUncheckedUpdateInput>
+  }
+
+  /**
+   * ScheduleDay delete
+   */
+  export type ScheduleDayDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+    /**
+     * Filter which ScheduleDay to delete.
+     */
+    where: ScheduleDayWhereUniqueInput
+  }
+
+  /**
+   * ScheduleDay deleteMany
+   */
+  export type ScheduleDayDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleDays to delete
+     */
+    where?: ScheduleDayWhereInput
+    /**
+     * Limit how many ScheduleDays to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleDay without action
+   */
+  export type ScheduleDayDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleDay
+     */
+    select?: ScheduleDaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleDay
+     */
+    omit?: ScheduleDayOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleDayInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FieldTripEvent
+   */
+
+  export type AggregateFieldTripEvent = {
+    _count: FieldTripEventCountAggregateOutputType | null
+    _min: FieldTripEventMinAggregateOutputType | null
+    _max: FieldTripEventMaxAggregateOutputType | null
+  }
+
+  export type FieldTripEventMinAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    dayOfWeek: string | null
+    segment: string | null
+    scheduleDayId: string | null
+    fieldTripTypeId: string | null
+    isNoFieldTrip: boolean | null
+    approverId: string | null
+    signedOffAt: Date | null
+    notes: string | null
+  }
+
+  export type FieldTripEventMaxAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    dayOfWeek: string | null
+    segment: string | null
+    scheduleDayId: string | null
+    fieldTripTypeId: string | null
+    isNoFieldTrip: boolean | null
+    approverId: string | null
+    signedOffAt: Date | null
+    notes: string | null
+  }
+
+  export type FieldTripEventCountAggregateOutputType = {
+    id: number
+    scheduleWeekId: number
+    dayOfWeek: number
+    segment: number
+    scheduleDayId: number
+    fieldTripTypeId: number
+    isNoFieldTrip: number
+    approverId: number
+    signedOffAt: number
+    notes: number
+    _all: number
+  }
+
+
+  export type FieldTripEventMinAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    dayOfWeek?: true
+    segment?: true
+    scheduleDayId?: true
+    fieldTripTypeId?: true
+    isNoFieldTrip?: true
+    approverId?: true
+    signedOffAt?: true
+    notes?: true
+  }
+
+  export type FieldTripEventMaxAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    dayOfWeek?: true
+    segment?: true
+    scheduleDayId?: true
+    fieldTripTypeId?: true
+    isNoFieldTrip?: true
+    approverId?: true
+    signedOffAt?: true
+    notes?: true
+  }
+
+  export type FieldTripEventCountAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    dayOfWeek?: true
+    segment?: true
+    scheduleDayId?: true
+    fieldTripTypeId?: true
+    isNoFieldTrip?: true
+    approverId?: true
+    signedOffAt?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type FieldTripEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FieldTripEvent to aggregate.
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripEvents to fetch.
+     */
+    orderBy?: FieldTripEventOrderByWithRelationInput | FieldTripEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FieldTripEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FieldTripEvents
+    **/
+    _count?: true | FieldTripEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FieldTripEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FieldTripEventMaxAggregateInputType
+  }
+
+  export type GetFieldTripEventAggregateType<T extends FieldTripEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateFieldTripEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFieldTripEvent[P]>
+      : GetScalarType<T[P], AggregateFieldTripEvent[P]>
+  }
+
+
+
+
+  export type FieldTripEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FieldTripEventWhereInput
+    orderBy?: FieldTripEventOrderByWithAggregationInput | FieldTripEventOrderByWithAggregationInput[]
+    by: FieldTripEventScalarFieldEnum[] | FieldTripEventScalarFieldEnum
+    having?: FieldTripEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FieldTripEventCountAggregateInputType | true
+    _min?: FieldTripEventMinAggregateInputType
+    _max?: FieldTripEventMaxAggregateInputType
+  }
+
+  export type FieldTripEventGroupByOutputType = {
+    id: string
+    scheduleWeekId: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId: string | null
+    fieldTripTypeId: string | null
+    isNoFieldTrip: boolean
+    approverId: string | null
+    signedOffAt: Date | null
+    notes: string | null
+    _count: FieldTripEventCountAggregateOutputType | null
+    _min: FieldTripEventMinAggregateOutputType | null
+    _max: FieldTripEventMaxAggregateOutputType | null
+  }
+
+  type GetFieldTripEventGroupByPayload<T extends FieldTripEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FieldTripEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FieldTripEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FieldTripEventGroupByOutputType[P]>
+            : GetScalarType<T[P], FieldTripEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FieldTripEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    scheduleDayId?: boolean
+    fieldTripTypeId?: boolean
+    isNoFieldTrip?: boolean
+    approverId?: boolean
+    signedOffAt?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripEvent"]>
+
+  export type FieldTripEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    scheduleDayId?: boolean
+    fieldTripTypeId?: boolean
+    isNoFieldTrip?: boolean
+    approverId?: boolean
+    signedOffAt?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripEvent"]>
+
+  export type FieldTripEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    scheduleDayId?: boolean
+    fieldTripTypeId?: boolean
+    isNoFieldTrip?: boolean
+    approverId?: boolean
+    signedOffAt?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fieldTripEvent"]>
+
+  export type FieldTripEventSelectScalar = {
+    id?: boolean
+    scheduleWeekId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    scheduleDayId?: boolean
+    fieldTripTypeId?: boolean
+    isNoFieldTrip?: boolean
+    approverId?: boolean
+    signedOffAt?: boolean
+    notes?: boolean
+  }
+
+  export type FieldTripEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "dayOfWeek" | "segment" | "scheduleDayId" | "fieldTripTypeId" | "isNoFieldTrip" | "approverId" | "signedOffAt" | "notes", ExtArgs["result"]["fieldTripEvent"]>
+  export type FieldTripEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type FieldTripEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type FieldTripEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+
+  export type $FieldTripEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FieldTripEvent"
+    objects: {
+      scheduleWeek: Prisma.$ScheduleWeekPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleWeekId: string
+      dayOfWeek: string
+      segment: string
+      scheduleDayId: string | null
+      fieldTripTypeId: string | null
+      isNoFieldTrip: boolean
+      approverId: string | null
+      signedOffAt: Date | null
+      notes: string | null
+    }, ExtArgs["result"]["fieldTripEvent"]>
+    composites: {}
+  }
+
+  type FieldTripEventGetPayload<S extends boolean | null | undefined | FieldTripEventDefaultArgs> = $Result.GetResult<Prisma.$FieldTripEventPayload, S>
+
+  type FieldTripEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FieldTripEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FieldTripEventCountAggregateInputType | true
+    }
+
+  export interface FieldTripEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FieldTripEvent'], meta: { name: 'FieldTripEvent' } }
+    /**
+     * Find zero or one FieldTripEvent that matches the filter.
+     * @param {FieldTripEventFindUniqueArgs} args - Arguments to find a FieldTripEvent
+     * @example
+     * // Get one FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FieldTripEventFindUniqueArgs>(args: SelectSubset<T, FieldTripEventFindUniqueArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FieldTripEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FieldTripEventFindUniqueOrThrowArgs} args - Arguments to find a FieldTripEvent
+     * @example
+     * // Get one FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FieldTripEventFindUniqueOrThrowArgs>(args: SelectSubset<T, FieldTripEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FieldTripEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventFindFirstArgs} args - Arguments to find a FieldTripEvent
+     * @example
+     * // Get one FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FieldTripEventFindFirstArgs>(args?: SelectSubset<T, FieldTripEventFindFirstArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FieldTripEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventFindFirstOrThrowArgs} args - Arguments to find a FieldTripEvent
+     * @example
+     * // Get one FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FieldTripEventFindFirstOrThrowArgs>(args?: SelectSubset<T, FieldTripEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FieldTripEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FieldTripEvents
+     * const fieldTripEvents = await prisma.fieldTripEvent.findMany()
+     * 
+     * // Get first 10 FieldTripEvents
+     * const fieldTripEvents = await prisma.fieldTripEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fieldTripEventWithIdOnly = await prisma.fieldTripEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FieldTripEventFindManyArgs>(args?: SelectSubset<T, FieldTripEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FieldTripEvent.
+     * @param {FieldTripEventCreateArgs} args - Arguments to create a FieldTripEvent.
+     * @example
+     * // Create one FieldTripEvent
+     * const FieldTripEvent = await prisma.fieldTripEvent.create({
+     *   data: {
+     *     // ... data to create a FieldTripEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends FieldTripEventCreateArgs>(args: SelectSubset<T, FieldTripEventCreateArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FieldTripEvents.
+     * @param {FieldTripEventCreateManyArgs} args - Arguments to create many FieldTripEvents.
+     * @example
+     * // Create many FieldTripEvents
+     * const fieldTripEvent = await prisma.fieldTripEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FieldTripEventCreateManyArgs>(args?: SelectSubset<T, FieldTripEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FieldTripEvents and returns the data saved in the database.
+     * @param {FieldTripEventCreateManyAndReturnArgs} args - Arguments to create many FieldTripEvents.
+     * @example
+     * // Create many FieldTripEvents
+     * const fieldTripEvent = await prisma.fieldTripEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FieldTripEvents and only return the `id`
+     * const fieldTripEventWithIdOnly = await prisma.fieldTripEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FieldTripEventCreateManyAndReturnArgs>(args?: SelectSubset<T, FieldTripEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FieldTripEvent.
+     * @param {FieldTripEventDeleteArgs} args - Arguments to delete one FieldTripEvent.
+     * @example
+     * // Delete one FieldTripEvent
+     * const FieldTripEvent = await prisma.fieldTripEvent.delete({
+     *   where: {
+     *     // ... filter to delete one FieldTripEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FieldTripEventDeleteArgs>(args: SelectSubset<T, FieldTripEventDeleteArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FieldTripEvent.
+     * @param {FieldTripEventUpdateArgs} args - Arguments to update one FieldTripEvent.
+     * @example
+     * // Update one FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FieldTripEventUpdateArgs>(args: SelectSubset<T, FieldTripEventUpdateArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FieldTripEvents.
+     * @param {FieldTripEventDeleteManyArgs} args - Arguments to filter FieldTripEvents to delete.
+     * @example
+     * // Delete a few FieldTripEvents
+     * const { count } = await prisma.fieldTripEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FieldTripEventDeleteManyArgs>(args?: SelectSubset<T, FieldTripEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FieldTripEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FieldTripEvents
+     * const fieldTripEvent = await prisma.fieldTripEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FieldTripEventUpdateManyArgs>(args: SelectSubset<T, FieldTripEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FieldTripEvents and returns the data updated in the database.
+     * @param {FieldTripEventUpdateManyAndReturnArgs} args - Arguments to update many FieldTripEvents.
+     * @example
+     * // Update many FieldTripEvents
+     * const fieldTripEvent = await prisma.fieldTripEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FieldTripEvents and only return the `id`
+     * const fieldTripEventWithIdOnly = await prisma.fieldTripEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FieldTripEventUpdateManyAndReturnArgs>(args: SelectSubset<T, FieldTripEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FieldTripEvent.
+     * @param {FieldTripEventUpsertArgs} args - Arguments to update or create a FieldTripEvent.
+     * @example
+     * // Update or create a FieldTripEvent
+     * const fieldTripEvent = await prisma.fieldTripEvent.upsert({
+     *   create: {
+     *     // ... data to create a FieldTripEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FieldTripEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FieldTripEventUpsertArgs>(args: SelectSubset<T, FieldTripEventUpsertArgs<ExtArgs>>): Prisma__FieldTripEventClient<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FieldTripEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventCountArgs} args - Arguments to filter FieldTripEvents to count.
+     * @example
+     * // Count the number of FieldTripEvents
+     * const count = await prisma.fieldTripEvent.count({
+     *   where: {
+     *     // ... the filter for the FieldTripEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends FieldTripEventCountArgs>(
+      args?: Subset<T, FieldTripEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FieldTripEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FieldTripEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FieldTripEventAggregateArgs>(args: Subset<T, FieldTripEventAggregateArgs>): Prisma.PrismaPromise<GetFieldTripEventAggregateType<T>>
+
+    /**
+     * Group by FieldTripEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FieldTripEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FieldTripEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FieldTripEventGroupByArgs['orderBy'] }
+        : { orderBy?: FieldTripEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FieldTripEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFieldTripEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FieldTripEvent model
+   */
+  readonly fields: FieldTripEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FieldTripEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FieldTripEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleWeek<T extends ScheduleWeekDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeekDefaultArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FieldTripEvent model
+   */
+  interface FieldTripEventFieldRefs {
+    readonly id: FieldRef<"FieldTripEvent", 'String'>
+    readonly scheduleWeekId: FieldRef<"FieldTripEvent", 'String'>
+    readonly dayOfWeek: FieldRef<"FieldTripEvent", 'String'>
+    readonly segment: FieldRef<"FieldTripEvent", 'String'>
+    readonly scheduleDayId: FieldRef<"FieldTripEvent", 'String'>
+    readonly fieldTripTypeId: FieldRef<"FieldTripEvent", 'String'>
+    readonly isNoFieldTrip: FieldRef<"FieldTripEvent", 'Boolean'>
+    readonly approverId: FieldRef<"FieldTripEvent", 'String'>
+    readonly signedOffAt: FieldRef<"FieldTripEvent", 'DateTime'>
+    readonly notes: FieldRef<"FieldTripEvent", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FieldTripEvent findUnique
+   */
+  export type FieldTripEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripEvent to fetch.
+     */
+    where: FieldTripEventWhereUniqueInput
+  }
+
+  /**
+   * FieldTripEvent findUniqueOrThrow
+   */
+  export type FieldTripEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripEvent to fetch.
+     */
+    where: FieldTripEventWhereUniqueInput
+  }
+
+  /**
+   * FieldTripEvent findFirst
+   */
+  export type FieldTripEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripEvent to fetch.
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripEvents to fetch.
+     */
+    orderBy?: FieldTripEventOrderByWithRelationInput | FieldTripEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FieldTripEvents.
+     */
+    cursor?: FieldTripEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FieldTripEvents.
+     */
+    distinct?: FieldTripEventScalarFieldEnum | FieldTripEventScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripEvent findFirstOrThrow
+   */
+  export type FieldTripEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripEvent to fetch.
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripEvents to fetch.
+     */
+    orderBy?: FieldTripEventOrderByWithRelationInput | FieldTripEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FieldTripEvents.
+     */
+    cursor?: FieldTripEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FieldTripEvents.
+     */
+    distinct?: FieldTripEventScalarFieldEnum | FieldTripEventScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripEvent findMany
+   */
+  export type FieldTripEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter, which FieldTripEvents to fetch.
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FieldTripEvents to fetch.
+     */
+    orderBy?: FieldTripEventOrderByWithRelationInput | FieldTripEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FieldTripEvents.
+     */
+    cursor?: FieldTripEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FieldTripEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FieldTripEvents.
+     */
+    skip?: number
+    distinct?: FieldTripEventScalarFieldEnum | FieldTripEventScalarFieldEnum[]
+  }
+
+  /**
+   * FieldTripEvent create
+   */
+  export type FieldTripEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FieldTripEvent.
+     */
+    data: XOR<FieldTripEventCreateInput, FieldTripEventUncheckedCreateInput>
+  }
+
+  /**
+   * FieldTripEvent createMany
+   */
+  export type FieldTripEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FieldTripEvents.
+     */
+    data: FieldTripEventCreateManyInput | FieldTripEventCreateManyInput[]
+  }
+
+  /**
+   * FieldTripEvent createManyAndReturn
+   */
+  export type FieldTripEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many FieldTripEvents.
+     */
+    data: FieldTripEventCreateManyInput | FieldTripEventCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FieldTripEvent update
+   */
+  export type FieldTripEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FieldTripEvent.
+     */
+    data: XOR<FieldTripEventUpdateInput, FieldTripEventUncheckedUpdateInput>
+    /**
+     * Choose, which FieldTripEvent to update.
+     */
+    where: FieldTripEventWhereUniqueInput
+  }
+
+  /**
+   * FieldTripEvent updateMany
+   */
+  export type FieldTripEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FieldTripEvents.
+     */
+    data: XOR<FieldTripEventUpdateManyMutationInput, FieldTripEventUncheckedUpdateManyInput>
+    /**
+     * Filter which FieldTripEvents to update
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * Limit how many FieldTripEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FieldTripEvent updateManyAndReturn
+   */
+  export type FieldTripEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * The data used to update FieldTripEvents.
+     */
+    data: XOR<FieldTripEventUpdateManyMutationInput, FieldTripEventUncheckedUpdateManyInput>
+    /**
+     * Filter which FieldTripEvents to update
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * Limit how many FieldTripEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FieldTripEvent upsert
+   */
+  export type FieldTripEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FieldTripEvent to update in case it exists.
+     */
+    where: FieldTripEventWhereUniqueInput
+    /**
+     * In case the FieldTripEvent found by the `where` argument doesn't exist, create a new FieldTripEvent with this data.
+     */
+    create: XOR<FieldTripEventCreateInput, FieldTripEventUncheckedCreateInput>
+    /**
+     * In case the FieldTripEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FieldTripEventUpdateInput, FieldTripEventUncheckedUpdateInput>
+  }
+
+  /**
+   * FieldTripEvent delete
+   */
+  export type FieldTripEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+    /**
+     * Filter which FieldTripEvent to delete.
+     */
+    where: FieldTripEventWhereUniqueInput
+  }
+
+  /**
+   * FieldTripEvent deleteMany
+   */
+  export type FieldTripEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FieldTripEvents to delete
+     */
+    where?: FieldTripEventWhereInput
+    /**
+     * Limit how many FieldTripEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FieldTripEvent without action
+   */
+  export type FieldTripEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FieldTripEvent
+     */
+    select?: FieldTripEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FieldTripEvent
+     */
+    omit?: FieldTripEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FieldTripEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SegmentBlock
+   */
+
+  export type AggregateSegmentBlock = {
+    _count: SegmentBlockCountAggregateOutputType | null
+    _avg: SegmentBlockAvgAggregateOutputType | null
+    _sum: SegmentBlockSumAggregateOutputType | null
+    _min: SegmentBlockMinAggregateOutputType | null
+    _max: SegmentBlockMaxAggregateOutputType | null
+  }
+
+  export type SegmentBlockAvgAggregateOutputType = {
+    childCount: number | null
+  }
+
+  export type SegmentBlockSumAggregateOutputType = {
+    childCount: number | null
+  }
+
+  export type SegmentBlockMinAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    scheduleDayId: string | null
+    dayOfWeek: string | null
+    segment: string | null
+    startTime: string | null
+    endTime: string | null
+    childCount: number | null
+    status: string | null
+  }
+
+  export type SegmentBlockMaxAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    scheduleDayId: string | null
+    dayOfWeek: string | null
+    segment: string | null
+    startTime: string | null
+    endTime: string | null
+    childCount: number | null
+    status: string | null
+  }
+
+  export type SegmentBlockCountAggregateOutputType = {
+    id: number
+    scheduleWeekId: number
+    scheduleDayId: number
+    dayOfWeek: number
+    segment: number
+    startTime: number
+    endTime: number
+    childCount: number
+    requirementTemplate: number
+    status: number
+    _all: number
+  }
+
+
+  export type SegmentBlockAvgAggregateInputType = {
+    childCount?: true
+  }
+
+  export type SegmentBlockSumAggregateInputType = {
+    childCount?: true
+  }
+
+  export type SegmentBlockMinAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    scheduleDayId?: true
+    dayOfWeek?: true
+    segment?: true
+    startTime?: true
+    endTime?: true
+    childCount?: true
+    status?: true
+  }
+
+  export type SegmentBlockMaxAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    scheduleDayId?: true
+    dayOfWeek?: true
+    segment?: true
+    startTime?: true
+    endTime?: true
+    childCount?: true
+    status?: true
+  }
+
+  export type SegmentBlockCountAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    scheduleDayId?: true
+    dayOfWeek?: true
+    segment?: true
+    startTime?: true
+    endTime?: true
+    childCount?: true
+    requirementTemplate?: true
+    status?: true
+    _all?: true
+  }
+
+  export type SegmentBlockAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SegmentBlock to aggregate.
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SegmentBlocks to fetch.
+     */
+    orderBy?: SegmentBlockOrderByWithRelationInput | SegmentBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SegmentBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SegmentBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SegmentBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SegmentBlocks
+    **/
+    _count?: true | SegmentBlockCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SegmentBlockAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SegmentBlockSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SegmentBlockMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SegmentBlockMaxAggregateInputType
+  }
+
+  export type GetSegmentBlockAggregateType<T extends SegmentBlockAggregateArgs> = {
+        [P in keyof T & keyof AggregateSegmentBlock]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSegmentBlock[P]>
+      : GetScalarType<T[P], AggregateSegmentBlock[P]>
+  }
+
+
+
+
+  export type SegmentBlockGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SegmentBlockWhereInput
+    orderBy?: SegmentBlockOrderByWithAggregationInput | SegmentBlockOrderByWithAggregationInput[]
+    by: SegmentBlockScalarFieldEnum[] | SegmentBlockScalarFieldEnum
+    having?: SegmentBlockScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SegmentBlockCountAggregateInputType | true
+    _avg?: SegmentBlockAvgAggregateInputType
+    _sum?: SegmentBlockSumAggregateInputType
+    _min?: SegmentBlockMinAggregateInputType
+    _max?: SegmentBlockMaxAggregateInputType
+  }
+
+  export type SegmentBlockGroupByOutputType = {
+    id: string
+    scheduleWeekId: string
+    scheduleDayId: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonValue
+    status: string
+    _count: SegmentBlockCountAggregateOutputType | null
+    _avg: SegmentBlockAvgAggregateOutputType | null
+    _sum: SegmentBlockSumAggregateOutputType | null
+    _min: SegmentBlockMinAggregateOutputType | null
+    _max: SegmentBlockMaxAggregateOutputType | null
+  }
+
+  type GetSegmentBlockGroupByPayload<T extends SegmentBlockGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SegmentBlockGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SegmentBlockGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SegmentBlockGroupByOutputType[P]>
+            : GetScalarType<T[P], SegmentBlockGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SegmentBlockSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    scheduleDayId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    childCount?: boolean
+    requirementTemplate?: boolean
+    status?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    staffAssignments?: boolean | SegmentBlock$staffAssignmentsArgs<ExtArgs>
+    _count?: boolean | SegmentBlockCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["segmentBlock"]>
+
+  export type SegmentBlockSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    scheduleDayId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    childCount?: boolean
+    requirementTemplate?: boolean
+    status?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["segmentBlock"]>
+
+  export type SegmentBlockSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    scheduleDayId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    childCount?: boolean
+    requirementTemplate?: boolean
+    status?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["segmentBlock"]>
+
+  export type SegmentBlockSelectScalar = {
+    id?: boolean
+    scheduleWeekId?: boolean
+    scheduleDayId?: boolean
+    dayOfWeek?: boolean
+    segment?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    childCount?: boolean
+    requirementTemplate?: boolean
+    status?: boolean
+  }
+
+  export type SegmentBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "scheduleDayId" | "dayOfWeek" | "segment" | "startTime" | "endTime" | "childCount" | "requirementTemplate" | "status", ExtArgs["result"]["segmentBlock"]>
+  export type SegmentBlockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    staffAssignments?: boolean | SegmentBlock$staffAssignmentsArgs<ExtArgs>
+    _count?: boolean | SegmentBlockCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SegmentBlockIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type SegmentBlockIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+
+  export type $SegmentBlockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SegmentBlock"
+    objects: {
+      scheduleWeek: Prisma.$ScheduleWeekPayload<ExtArgs>
+      staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleWeekId: string
+      scheduleDayId: string | null
+      dayOfWeek: string
+      segment: string
+      startTime: string
+      endTime: string
+      childCount: number
+      requirementTemplate: Prisma.JsonValue
+      status: string
+    }, ExtArgs["result"]["segmentBlock"]>
+    composites: {}
+  }
+
+  type SegmentBlockGetPayload<S extends boolean | null | undefined | SegmentBlockDefaultArgs> = $Result.GetResult<Prisma.$SegmentBlockPayload, S>
+
+  type SegmentBlockCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SegmentBlockFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SegmentBlockCountAggregateInputType | true
+    }
+
+  export interface SegmentBlockDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SegmentBlock'], meta: { name: 'SegmentBlock' } }
+    /**
+     * Find zero or one SegmentBlock that matches the filter.
+     * @param {SegmentBlockFindUniqueArgs} args - Arguments to find a SegmentBlock
+     * @example
+     * // Get one SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SegmentBlockFindUniqueArgs>(args: SelectSubset<T, SegmentBlockFindUniqueArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SegmentBlock that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SegmentBlockFindUniqueOrThrowArgs} args - Arguments to find a SegmentBlock
+     * @example
+     * // Get one SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SegmentBlockFindUniqueOrThrowArgs>(args: SelectSubset<T, SegmentBlockFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SegmentBlock that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockFindFirstArgs} args - Arguments to find a SegmentBlock
+     * @example
+     * // Get one SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SegmentBlockFindFirstArgs>(args?: SelectSubset<T, SegmentBlockFindFirstArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SegmentBlock that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockFindFirstOrThrowArgs} args - Arguments to find a SegmentBlock
+     * @example
+     * // Get one SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SegmentBlockFindFirstOrThrowArgs>(args?: SelectSubset<T, SegmentBlockFindFirstOrThrowArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SegmentBlocks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SegmentBlocks
+     * const segmentBlocks = await prisma.segmentBlock.findMany()
+     * 
+     * // Get first 10 SegmentBlocks
+     * const segmentBlocks = await prisma.segmentBlock.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const segmentBlockWithIdOnly = await prisma.segmentBlock.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SegmentBlockFindManyArgs>(args?: SelectSubset<T, SegmentBlockFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SegmentBlock.
+     * @param {SegmentBlockCreateArgs} args - Arguments to create a SegmentBlock.
+     * @example
+     * // Create one SegmentBlock
+     * const SegmentBlock = await prisma.segmentBlock.create({
+     *   data: {
+     *     // ... data to create a SegmentBlock
+     *   }
+     * })
+     * 
+     */
+    create<T extends SegmentBlockCreateArgs>(args: SelectSubset<T, SegmentBlockCreateArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SegmentBlocks.
+     * @param {SegmentBlockCreateManyArgs} args - Arguments to create many SegmentBlocks.
+     * @example
+     * // Create many SegmentBlocks
+     * const segmentBlock = await prisma.segmentBlock.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SegmentBlockCreateManyArgs>(args?: SelectSubset<T, SegmentBlockCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SegmentBlocks and returns the data saved in the database.
+     * @param {SegmentBlockCreateManyAndReturnArgs} args - Arguments to create many SegmentBlocks.
+     * @example
+     * // Create many SegmentBlocks
+     * const segmentBlock = await prisma.segmentBlock.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SegmentBlocks and only return the `id`
+     * const segmentBlockWithIdOnly = await prisma.segmentBlock.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SegmentBlockCreateManyAndReturnArgs>(args?: SelectSubset<T, SegmentBlockCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SegmentBlock.
+     * @param {SegmentBlockDeleteArgs} args - Arguments to delete one SegmentBlock.
+     * @example
+     * // Delete one SegmentBlock
+     * const SegmentBlock = await prisma.segmentBlock.delete({
+     *   where: {
+     *     // ... filter to delete one SegmentBlock
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SegmentBlockDeleteArgs>(args: SelectSubset<T, SegmentBlockDeleteArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SegmentBlock.
+     * @param {SegmentBlockUpdateArgs} args - Arguments to update one SegmentBlock.
+     * @example
+     * // Update one SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SegmentBlockUpdateArgs>(args: SelectSubset<T, SegmentBlockUpdateArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SegmentBlocks.
+     * @param {SegmentBlockDeleteManyArgs} args - Arguments to filter SegmentBlocks to delete.
+     * @example
+     * // Delete a few SegmentBlocks
+     * const { count } = await prisma.segmentBlock.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SegmentBlockDeleteManyArgs>(args?: SelectSubset<T, SegmentBlockDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SegmentBlocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SegmentBlocks
+     * const segmentBlock = await prisma.segmentBlock.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SegmentBlockUpdateManyArgs>(args: SelectSubset<T, SegmentBlockUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SegmentBlocks and returns the data updated in the database.
+     * @param {SegmentBlockUpdateManyAndReturnArgs} args - Arguments to update many SegmentBlocks.
+     * @example
+     * // Update many SegmentBlocks
+     * const segmentBlock = await prisma.segmentBlock.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SegmentBlocks and only return the `id`
+     * const segmentBlockWithIdOnly = await prisma.segmentBlock.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SegmentBlockUpdateManyAndReturnArgs>(args: SelectSubset<T, SegmentBlockUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SegmentBlock.
+     * @param {SegmentBlockUpsertArgs} args - Arguments to update or create a SegmentBlock.
+     * @example
+     * // Update or create a SegmentBlock
+     * const segmentBlock = await prisma.segmentBlock.upsert({
+     *   create: {
+     *     // ... data to create a SegmentBlock
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SegmentBlock we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SegmentBlockUpsertArgs>(args: SelectSubset<T, SegmentBlockUpsertArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SegmentBlocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockCountArgs} args - Arguments to filter SegmentBlocks to count.
+     * @example
+     * // Count the number of SegmentBlocks
+     * const count = await prisma.segmentBlock.count({
+     *   where: {
+     *     // ... the filter for the SegmentBlocks we want to count
+     *   }
+     * })
+    **/
+    count<T extends SegmentBlockCountArgs>(
+      args?: Subset<T, SegmentBlockCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SegmentBlockCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SegmentBlock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SegmentBlockAggregateArgs>(args: Subset<T, SegmentBlockAggregateArgs>): Prisma.PrismaPromise<GetSegmentBlockAggregateType<T>>
+
+    /**
+     * Group by SegmentBlock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SegmentBlockGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SegmentBlockGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SegmentBlockGroupByArgs['orderBy'] }
+        : { orderBy?: SegmentBlockGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SegmentBlockGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSegmentBlockGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SegmentBlock model
+   */
+  readonly fields: SegmentBlockFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SegmentBlock.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SegmentBlockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleWeek<T extends ScheduleWeekDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeekDefaultArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    staffAssignments<T extends SegmentBlock$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, SegmentBlock$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SegmentBlock model
+   */
+  interface SegmentBlockFieldRefs {
+    readonly id: FieldRef<"SegmentBlock", 'String'>
+    readonly scheduleWeekId: FieldRef<"SegmentBlock", 'String'>
+    readonly scheduleDayId: FieldRef<"SegmentBlock", 'String'>
+    readonly dayOfWeek: FieldRef<"SegmentBlock", 'String'>
+    readonly segment: FieldRef<"SegmentBlock", 'String'>
+    readonly startTime: FieldRef<"SegmentBlock", 'String'>
+    readonly endTime: FieldRef<"SegmentBlock", 'String'>
+    readonly childCount: FieldRef<"SegmentBlock", 'Int'>
+    readonly requirementTemplate: FieldRef<"SegmentBlock", 'Json'>
+    readonly status: FieldRef<"SegmentBlock", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SegmentBlock findUnique
+   */
+  export type SegmentBlockFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which SegmentBlock to fetch.
+     */
+    where: SegmentBlockWhereUniqueInput
+  }
+
+  /**
+   * SegmentBlock findUniqueOrThrow
+   */
+  export type SegmentBlockFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which SegmentBlock to fetch.
+     */
+    where: SegmentBlockWhereUniqueInput
+  }
+
+  /**
+   * SegmentBlock findFirst
+   */
+  export type SegmentBlockFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which SegmentBlock to fetch.
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SegmentBlocks to fetch.
+     */
+    orderBy?: SegmentBlockOrderByWithRelationInput | SegmentBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SegmentBlocks.
+     */
+    cursor?: SegmentBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SegmentBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SegmentBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SegmentBlocks.
+     */
+    distinct?: SegmentBlockScalarFieldEnum | SegmentBlockScalarFieldEnum[]
+  }
+
+  /**
+   * SegmentBlock findFirstOrThrow
+   */
+  export type SegmentBlockFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which SegmentBlock to fetch.
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SegmentBlocks to fetch.
+     */
+    orderBy?: SegmentBlockOrderByWithRelationInput | SegmentBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SegmentBlocks.
+     */
+    cursor?: SegmentBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SegmentBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SegmentBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SegmentBlocks.
+     */
+    distinct?: SegmentBlockScalarFieldEnum | SegmentBlockScalarFieldEnum[]
+  }
+
+  /**
+   * SegmentBlock findMany
+   */
+  export type SegmentBlockFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which SegmentBlocks to fetch.
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SegmentBlocks to fetch.
+     */
+    orderBy?: SegmentBlockOrderByWithRelationInput | SegmentBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SegmentBlocks.
+     */
+    cursor?: SegmentBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SegmentBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SegmentBlocks.
+     */
+    skip?: number
+    distinct?: SegmentBlockScalarFieldEnum | SegmentBlockScalarFieldEnum[]
+  }
+
+  /**
+   * SegmentBlock create
+   */
+  export type SegmentBlockCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SegmentBlock.
+     */
+    data: XOR<SegmentBlockCreateInput, SegmentBlockUncheckedCreateInput>
+  }
+
+  /**
+   * SegmentBlock createMany
+   */
+  export type SegmentBlockCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SegmentBlocks.
+     */
+    data: SegmentBlockCreateManyInput | SegmentBlockCreateManyInput[]
+  }
+
+  /**
+   * SegmentBlock createManyAndReturn
+   */
+  export type SegmentBlockCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * The data used to create many SegmentBlocks.
+     */
+    data: SegmentBlockCreateManyInput | SegmentBlockCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SegmentBlock update
+   */
+  export type SegmentBlockUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SegmentBlock.
+     */
+    data: XOR<SegmentBlockUpdateInput, SegmentBlockUncheckedUpdateInput>
+    /**
+     * Choose, which SegmentBlock to update.
+     */
+    where: SegmentBlockWhereUniqueInput
+  }
+
+  /**
+   * SegmentBlock updateMany
+   */
+  export type SegmentBlockUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SegmentBlocks.
+     */
+    data: XOR<SegmentBlockUpdateManyMutationInput, SegmentBlockUncheckedUpdateManyInput>
+    /**
+     * Filter which SegmentBlocks to update
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * Limit how many SegmentBlocks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SegmentBlock updateManyAndReturn
+   */
+  export type SegmentBlockUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * The data used to update SegmentBlocks.
+     */
+    data: XOR<SegmentBlockUpdateManyMutationInput, SegmentBlockUncheckedUpdateManyInput>
+    /**
+     * Filter which SegmentBlocks to update
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * Limit how many SegmentBlocks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SegmentBlock upsert
+   */
+  export type SegmentBlockUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SegmentBlock to update in case it exists.
+     */
+    where: SegmentBlockWhereUniqueInput
+    /**
+     * In case the SegmentBlock found by the `where` argument doesn't exist, create a new SegmentBlock with this data.
+     */
+    create: XOR<SegmentBlockCreateInput, SegmentBlockUncheckedCreateInput>
+    /**
+     * In case the SegmentBlock was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SegmentBlockUpdateInput, SegmentBlockUncheckedUpdateInput>
+  }
+
+  /**
+   * SegmentBlock delete
+   */
+  export type SegmentBlockDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+    /**
+     * Filter which SegmentBlock to delete.
+     */
+    where: SegmentBlockWhereUniqueInput
+  }
+
+  /**
+   * SegmentBlock deleteMany
+   */
+  export type SegmentBlockDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SegmentBlocks to delete
+     */
+    where?: SegmentBlockWhereInput
+    /**
+     * Limit how many SegmentBlocks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SegmentBlock.staffAssignments
+   */
+  export type SegmentBlock$staffAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    where?: StaffAssignmentWhereInput
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    cursor?: StaffAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * SegmentBlock without action
+   */
+  export type SegmentBlockDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SegmentBlock
+     */
+    select?: SegmentBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SegmentBlock
+     */
+    omit?: SegmentBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SegmentBlockInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StaffAssignment
+   */
+
+  export type AggregateStaffAssignment = {
+    _count: StaffAssignmentCountAggregateOutputType | null
+    _min: StaffAssignmentMinAggregateOutputType | null
+    _max: StaffAssignmentMaxAggregateOutputType | null
+  }
+
+  export type StaffAssignmentMinAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    segmentBlockId: string | null
+    employeeId: string | null
+    assignmentSource: string | null
+    startTime: string | null
+    endTime: string | null
+    status: string | null
+    notes: string | null
+  }
+
+  export type StaffAssignmentMaxAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    segmentBlockId: string | null
+    employeeId: string | null
+    assignmentSource: string | null
+    startTime: string | null
+    endTime: string | null
+    status: string | null
+    notes: string | null
+  }
+
+  export type StaffAssignmentCountAggregateOutputType = {
+    id: number
+    scheduleWeekId: number
+    segmentBlockId: number
+    employeeId: number
+    assignmentSource: number
+    startTime: number
+    endTime: number
+    status: number
+    notes: number
+    _all: number
+  }
+
+
+  export type StaffAssignmentMinAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    segmentBlockId?: true
+    employeeId?: true
+    assignmentSource?: true
+    startTime?: true
+    endTime?: true
+    status?: true
+    notes?: true
+  }
+
+  export type StaffAssignmentMaxAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    segmentBlockId?: true
+    employeeId?: true
+    assignmentSource?: true
+    startTime?: true
+    endTime?: true
+    status?: true
+    notes?: true
+  }
+
+  export type StaffAssignmentCountAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    segmentBlockId?: true
+    employeeId?: true
+    assignmentSource?: true
+    startTime?: true
+    endTime?: true
+    status?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type StaffAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StaffAssignment to aggregate.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StaffAssignments
+    **/
+    _count?: true | StaffAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StaffAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StaffAssignmentMaxAggregateInputType
+  }
+
+  export type GetStaffAssignmentAggregateType<T extends StaffAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateStaffAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStaffAssignment[P]>
+      : GetScalarType<T[P], AggregateStaffAssignment[P]>
+  }
+
+
+
+
+  export type StaffAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StaffAssignmentWhereInput
+    orderBy?: StaffAssignmentOrderByWithAggregationInput | StaffAssignmentOrderByWithAggregationInput[]
+    by: StaffAssignmentScalarFieldEnum[] | StaffAssignmentScalarFieldEnum
+    having?: StaffAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StaffAssignmentCountAggregateInputType | true
+    _min?: StaffAssignmentMinAggregateInputType
+    _max?: StaffAssignmentMaxAggregateInputType
+  }
+
+  export type StaffAssignmentGroupByOutputType = {
+    id: string
+    scheduleWeekId: string
+    segmentBlockId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes: string | null
+    _count: StaffAssignmentCountAggregateOutputType | null
+    _min: StaffAssignmentMinAggregateOutputType | null
+    _max: StaffAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetStaffAssignmentGroupByPayload<T extends StaffAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StaffAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StaffAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], StaffAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StaffAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    segmentBlockId?: boolean
+    employeeId?: boolean
+    assignmentSource?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    status?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    segmentBlockId?: boolean
+    employeeId?: boolean
+    assignmentSource?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    status?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    segmentBlockId?: boolean
+    employeeId?: boolean
+    assignmentSource?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    status?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["staffAssignment"]>
+
+  export type StaffAssignmentSelectScalar = {
+    id?: boolean
+    scheduleWeekId?: boolean
+    segmentBlockId?: boolean
+    employeeId?: boolean
+    assignmentSource?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    status?: boolean
+    notes?: boolean
+  }
+
+  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes", ExtArgs["result"]["staffAssignment"]>
+  export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }
+  export type StaffAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }
+  export type StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+    segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
+  }
+
+  export type $StaffAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StaffAssignment"
+    objects: {
+      scheduleWeek: Prisma.$ScheduleWeekPayload<ExtArgs>
+      segmentBlock: Prisma.$SegmentBlockPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleWeekId: string
+      segmentBlockId: string
+      employeeId: string
+      assignmentSource: string
+      startTime: string
+      endTime: string
+      status: string
+      notes: string | null
+    }, ExtArgs["result"]["staffAssignment"]>
+    composites: {}
+  }
+
+  type StaffAssignmentGetPayload<S extends boolean | null | undefined | StaffAssignmentDefaultArgs> = $Result.GetResult<Prisma.$StaffAssignmentPayload, S>
+
+  type StaffAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StaffAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StaffAssignmentCountAggregateInputType | true
+    }
+
+  export interface StaffAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StaffAssignment'], meta: { name: 'StaffAssignment' } }
+    /**
+     * Find zero or one StaffAssignment that matches the filter.
+     * @param {StaffAssignmentFindUniqueArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StaffAssignmentFindUniqueArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StaffAssignment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StaffAssignmentFindUniqueOrThrowArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StaffAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, StaffAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StaffAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindFirstArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StaffAssignmentFindFirstArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StaffAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindFirstOrThrowArgs} args - Arguments to find a StaffAssignment
+     * @example
+     * // Get one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StaffAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, StaffAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StaffAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StaffAssignments
+     * const staffAssignments = await prisma.staffAssignment.findMany()
+     * 
+     * // Get first 10 StaffAssignments
+     * const staffAssignments = await prisma.staffAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StaffAssignmentFindManyArgs>(args?: SelectSubset<T, StaffAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StaffAssignment.
+     * @param {StaffAssignmentCreateArgs} args - Arguments to create a StaffAssignment.
+     * @example
+     * // Create one StaffAssignment
+     * const StaffAssignment = await prisma.staffAssignment.create({
+     *   data: {
+     *     // ... data to create a StaffAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends StaffAssignmentCreateArgs>(args: SelectSubset<T, StaffAssignmentCreateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StaffAssignments.
+     * @param {StaffAssignmentCreateManyArgs} args - Arguments to create many StaffAssignments.
+     * @example
+     * // Create many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StaffAssignmentCreateManyArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StaffAssignments and returns the data saved in the database.
+     * @param {StaffAssignmentCreateManyAndReturnArgs} args - Arguments to create many StaffAssignments.
+     * @example
+     * // Create many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StaffAssignments and only return the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StaffAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, StaffAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StaffAssignment.
+     * @param {StaffAssignmentDeleteArgs} args - Arguments to delete one StaffAssignment.
+     * @example
+     * // Delete one StaffAssignment
+     * const StaffAssignment = await prisma.staffAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one StaffAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StaffAssignmentDeleteArgs>(args: SelectSubset<T, StaffAssignmentDeleteArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StaffAssignment.
+     * @param {StaffAssignmentUpdateArgs} args - Arguments to update one StaffAssignment.
+     * @example
+     * // Update one StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StaffAssignmentUpdateArgs>(args: SelectSubset<T, StaffAssignmentUpdateArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StaffAssignments.
+     * @param {StaffAssignmentDeleteManyArgs} args - Arguments to filter StaffAssignments to delete.
+     * @example
+     * // Delete a few StaffAssignments
+     * const { count } = await prisma.staffAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StaffAssignmentDeleteManyArgs>(args?: SelectSubset<T, StaffAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StaffAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StaffAssignmentUpdateManyArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StaffAssignments and returns the data updated in the database.
+     * @param {StaffAssignmentUpdateManyAndReturnArgs} args - Arguments to update many StaffAssignments.
+     * @example
+     * // Update many StaffAssignments
+     * const staffAssignment = await prisma.staffAssignment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StaffAssignments and only return the `id`
+     * const staffAssignmentWithIdOnly = await prisma.staffAssignment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StaffAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, StaffAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StaffAssignment.
+     * @param {StaffAssignmentUpsertArgs} args - Arguments to update or create a StaffAssignment.
+     * @example
+     * // Update or create a StaffAssignment
+     * const staffAssignment = await prisma.staffAssignment.upsert({
+     *   create: {
+     *     // ... data to create a StaffAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StaffAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StaffAssignmentUpsertArgs>(args: SelectSubset<T, StaffAssignmentUpsertArgs<ExtArgs>>): Prisma__StaffAssignmentClient<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StaffAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentCountArgs} args - Arguments to filter StaffAssignments to count.
+     * @example
+     * // Count the number of StaffAssignments
+     * const count = await prisma.staffAssignment.count({
+     *   where: {
+     *     // ... the filter for the StaffAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends StaffAssignmentCountArgs>(
+      args?: Subset<T, StaffAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StaffAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StaffAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StaffAssignmentAggregateArgs>(args: Subset<T, StaffAssignmentAggregateArgs>): Prisma.PrismaPromise<GetStaffAssignmentAggregateType<T>>
+
+    /**
+     * Group by StaffAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StaffAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StaffAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StaffAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: StaffAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StaffAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStaffAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StaffAssignment model
+   */
+  readonly fields: StaffAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StaffAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StaffAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleWeek<T extends ScheduleWeekDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeekDefaultArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    segmentBlock<T extends SegmentBlockDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SegmentBlockDefaultArgs<ExtArgs>>): Prisma__SegmentBlockClient<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StaffAssignment model
+   */
+  interface StaffAssignmentFieldRefs {
+    readonly id: FieldRef<"StaffAssignment", 'String'>
+    readonly scheduleWeekId: FieldRef<"StaffAssignment", 'String'>
+    readonly segmentBlockId: FieldRef<"StaffAssignment", 'String'>
+    readonly employeeId: FieldRef<"StaffAssignment", 'String'>
+    readonly assignmentSource: FieldRef<"StaffAssignment", 'String'>
+    readonly startTime: FieldRef<"StaffAssignment", 'String'>
+    readonly endTime: FieldRef<"StaffAssignment", 'String'>
+    readonly status: FieldRef<"StaffAssignment", 'String'>
+    readonly notes: FieldRef<"StaffAssignment", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StaffAssignment findUnique
+   */
+  export type StaffAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment findUniqueOrThrow
+   */
+  export type StaffAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment findFirst
+   */
+  export type StaffAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StaffAssignments.
+     */
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment findFirstOrThrow
+   */
+  export type StaffAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignment to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StaffAssignments.
+     */
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment findMany
+   */
+  export type StaffAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which StaffAssignments to fetch.
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StaffAssignments to fetch.
+     */
+    orderBy?: StaffAssignmentOrderByWithRelationInput | StaffAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StaffAssignments.
+     */
+    cursor?: StaffAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StaffAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StaffAssignments.
+     */
+    skip?: number
+    distinct?: StaffAssignmentScalarFieldEnum | StaffAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * StaffAssignment create
+   */
+  export type StaffAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StaffAssignment.
+     */
+    data: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * StaffAssignment createMany
+   */
+  export type StaffAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StaffAssignments.
+     */
+    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
+  }
+
+  /**
+   * StaffAssignment createManyAndReturn
+   */
+  export type StaffAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many StaffAssignments.
+     */
+    data: StaffAssignmentCreateManyInput | StaffAssignmentCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StaffAssignment update
+   */
+  export type StaffAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StaffAssignment.
+     */
+    data: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which StaffAssignment to update.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment updateMany
+   */
+  export type StaffAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StaffAssignments.
+     */
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which StaffAssignments to update
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StaffAssignment updateManyAndReturn
+   */
+  export type StaffAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to update StaffAssignments.
+     */
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which StaffAssignments to update
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StaffAssignment upsert
+   */
+  export type StaffAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StaffAssignment to update in case it exists.
+     */
+    where: StaffAssignmentWhereUniqueInput
+    /**
+     * In case the StaffAssignment found by the `where` argument doesn't exist, create a new StaffAssignment with this data.
+     */
+    create: XOR<StaffAssignmentCreateInput, StaffAssignmentUncheckedCreateInput>
+    /**
+     * In case the StaffAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StaffAssignmentUpdateInput, StaffAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * StaffAssignment delete
+   */
+  export type StaffAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which StaffAssignment to delete.
+     */
+    where: StaffAssignmentWhereUniqueInput
+  }
+
+  /**
+   * StaffAssignment deleteMany
+   */
+  export type StaffAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StaffAssignments to delete
+     */
+    where?: StaffAssignmentWhereInput
+    /**
+     * Limit how many StaffAssignments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StaffAssignment without action
+   */
+  export type StaffAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StaffAssignment
+     */
+    select?: StaffAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StaffAssignment
+     */
+    omit?: StaffAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StaffAssignmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Enums
+   */
+
+  export const TransactionIsolationLevel: {
+    Serializable: 'Serializable'
+  };
+
+  export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+  export const SchoolScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    closedDays: 'closedDays',
+    openerCount: 'openerCount',
+    closerCount: 'closerCount',
+    minimumMedicalDelegated: 'minimumMedicalDelegated',
+    requireCurrentCpr: 'requireCurrentCpr',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
+
+
+  export const ScheduleTypeScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    value: 'value',
+    label: 'label',
+    ratioAdults: 'ratioAdults',
+    ratioStudents: 'ratioStudents',
+    description: 'description'
+  };
+
+  export type ScheduleTypeScalarFieldEnum = (typeof ScheduleTypeScalarFieldEnum)[keyof typeof ScheduleTypeScalarFieldEnum]
+
+
+  export const JobTitleScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    title: 'title',
+    leaderQualified: 'leaderQualified',
+    requiresLeaderForOpenClose: 'requiresLeaderForOpenClose'
+  };
+
+  export type JobTitleScalarFieldEnum = (typeof JobTitleScalarFieldEnum)[keyof typeof JobTitleScalarFieldEnum]
+
+
+  export const EmployeeScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    name: 'name',
+    jobTitle: 'jobTitle',
+    maxHoursPerDay: 'maxHoursPerDay',
+    maxHoursPerWeek: 'maxHoursPerWeek',
+    employmentStatus: 'employmentStatus',
+    medicallyDelegated: 'medicallyDelegated',
+    cprCurrent: 'cprCurrent',
+    notes: 'notes'
+  };
+
+  export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
+
+
+  export const OperatingHoursScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    scheduleType: 'scheduleType',
+    daysOfWeek: 'daysOfWeek',
+    open: 'open',
+    close: 'close'
+  };
+
+  export type OperatingHoursScalarFieldEnum = (typeof OperatingHoursScalarFieldEnum)[keyof typeof OperatingHoursScalarFieldEnum]
+
+
+  export const FieldTripTypeScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    name: 'name',
+    minAdultStudentRatio: 'minAdultStudentRatio',
+    minLeaderStudentRatio: 'minLeaderStudentRatio',
+    policyCitationId: 'policyCitationId',
+    notes: 'notes'
+  };
+
+  export type FieldTripTypeScalarFieldEnum = (typeof FieldTripTypeScalarFieldEnum)[keyof typeof FieldTripTypeScalarFieldEnum]
+
+
+  export const ScheduleWeekScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    label: 'label',
+    status: 'status',
+    startDate: 'startDate',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ScheduleWeekScalarFieldEnum = (typeof ScheduleWeekScalarFieldEnum)[keyof typeof ScheduleWeekScalarFieldEnum]
+
+
+  export const ScheduleDayScalarFieldEnum: {
+    id: 'id',
+    scheduleWeekId: 'scheduleWeekId',
+    date: 'date',
+    dayOfWeek: 'dayOfWeek',
+    scheduleType: 'scheduleType',
+    enrollmentCount: 'enrollmentCount',
+    enrollmentSource: 'enrollmentSource',
+    fieldTripEventId: 'fieldTripEventId',
+    operatingCapacityOverride: 'operatingCapacityOverride',
+    notes: 'notes',
+    dayScheduleType: 'dayScheduleType'
+  };
+
+  export type ScheduleDayScalarFieldEnum = (typeof ScheduleDayScalarFieldEnum)[keyof typeof ScheduleDayScalarFieldEnum]
+
+
+  export const FieldTripEventScalarFieldEnum: {
+    id: 'id',
+    scheduleWeekId: 'scheduleWeekId',
+    dayOfWeek: 'dayOfWeek',
+    segment: 'segment',
+    scheduleDayId: 'scheduleDayId',
+    fieldTripTypeId: 'fieldTripTypeId',
+    isNoFieldTrip: 'isNoFieldTrip',
+    approverId: 'approverId',
+    signedOffAt: 'signedOffAt',
+    notes: 'notes'
+  };
+
+  export type FieldTripEventScalarFieldEnum = (typeof FieldTripEventScalarFieldEnum)[keyof typeof FieldTripEventScalarFieldEnum]
+
+
+  export const SegmentBlockScalarFieldEnum: {
+    id: 'id',
+    scheduleWeekId: 'scheduleWeekId',
+    scheduleDayId: 'scheduleDayId',
+    dayOfWeek: 'dayOfWeek',
+    segment: 'segment',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    childCount: 'childCount',
+    requirementTemplate: 'requirementTemplate',
+    status: 'status'
+  };
+
+  export type SegmentBlockScalarFieldEnum = (typeof SegmentBlockScalarFieldEnum)[keyof typeof SegmentBlockScalarFieldEnum]
+
+
+  export const StaffAssignmentScalarFieldEnum: {
+    id: 'id',
+    scheduleWeekId: 'scheduleWeekId',
+    segmentBlockId: 'segmentBlockId',
+    employeeId: 'employeeId',
+    assignmentSource: 'assignmentSource',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    status: 'status',
+    notes: 'notes'
+  };
+
+  export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
+
+
+  export const SortOrder: {
+    asc: 'asc',
+    desc: 'desc'
+  };
+
+  export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  /**
+   * Field references
+   */
+
+
+  /**
+   * Reference to a field of type 'String'
+   */
+  export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+  /**
+   * Deep Input Types
+   */
+
+
+  export type SchoolWhereInput = {
+    AND?: SchoolWhereInput | SchoolWhereInput[]
+    OR?: SchoolWhereInput[]
+    NOT?: SchoolWhereInput | SchoolWhereInput[]
+    id?: StringFilter<"School"> | string
+    name?: StringFilter<"School"> | string
+    closedDays?: JsonFilter<"School">
+    openerCount?: IntFilter<"School"> | number
+    closerCount?: IntFilter<"School"> | number
+    minimumMedicalDelegated?: IntFilter<"School"> | number
+    requireCurrentCpr?: BoolFilter<"School"> | boolean
+    createdAt?: DateTimeFilter<"School"> | Date | string
+    updatedAt?: DateTimeFilter<"School"> | Date | string
+    scheduleTypes?: ScheduleTypeListRelationFilter
+    jobTitles?: JobTitleListRelationFilter
+    employees?: EmployeeListRelationFilter
+    operatingHours?: OperatingHoursListRelationFilter
+    fieldTripTypes?: FieldTripTypeListRelationFilter
+    scheduleWeeks?: ScheduleWeekListRelationFilter
+  }
+
+  export type SchoolOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    closedDays?: SortOrder
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+    requireCurrentCpr?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    scheduleTypes?: ScheduleTypeOrderByRelationAggregateInput
+    jobTitles?: JobTitleOrderByRelationAggregateInput
+    employees?: EmployeeOrderByRelationAggregateInput
+    operatingHours?: OperatingHoursOrderByRelationAggregateInput
+    fieldTripTypes?: FieldTripTypeOrderByRelationAggregateInput
+    scheduleWeeks?: ScheduleWeekOrderByRelationAggregateInput
+  }
+
+  export type SchoolWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SchoolWhereInput | SchoolWhereInput[]
+    OR?: SchoolWhereInput[]
+    NOT?: SchoolWhereInput | SchoolWhereInput[]
+    name?: StringFilter<"School"> | string
+    closedDays?: JsonFilter<"School">
+    openerCount?: IntFilter<"School"> | number
+    closerCount?: IntFilter<"School"> | number
+    minimumMedicalDelegated?: IntFilter<"School"> | number
+    requireCurrentCpr?: BoolFilter<"School"> | boolean
+    createdAt?: DateTimeFilter<"School"> | Date | string
+    updatedAt?: DateTimeFilter<"School"> | Date | string
+    scheduleTypes?: ScheduleTypeListRelationFilter
+    jobTitles?: JobTitleListRelationFilter
+    employees?: EmployeeListRelationFilter
+    operatingHours?: OperatingHoursListRelationFilter
+    fieldTripTypes?: FieldTripTypeListRelationFilter
+    scheduleWeeks?: ScheduleWeekListRelationFilter
+  }, "id">
+
+  export type SchoolOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    closedDays?: SortOrder
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+    requireCurrentCpr?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SchoolCountOrderByAggregateInput
+    _avg?: SchoolAvgOrderByAggregateInput
+    _max?: SchoolMaxOrderByAggregateInput
+    _min?: SchoolMinOrderByAggregateInput
+    _sum?: SchoolSumOrderByAggregateInput
+  }
+
+  export type SchoolScalarWhereWithAggregatesInput = {
+    AND?: SchoolScalarWhereWithAggregatesInput | SchoolScalarWhereWithAggregatesInput[]
+    OR?: SchoolScalarWhereWithAggregatesInput[]
+    NOT?: SchoolScalarWhereWithAggregatesInput | SchoolScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"School"> | string
+    name?: StringWithAggregatesFilter<"School"> | string
+    closedDays?: JsonWithAggregatesFilter<"School">
+    openerCount?: IntWithAggregatesFilter<"School"> | number
+    closerCount?: IntWithAggregatesFilter<"School"> | number
+    minimumMedicalDelegated?: IntWithAggregatesFilter<"School"> | number
+    requireCurrentCpr?: BoolWithAggregatesFilter<"School"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"School"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"School"> | Date | string
+  }
+
+  export type ScheduleTypeWhereInput = {
+    AND?: ScheduleTypeWhereInput | ScheduleTypeWhereInput[]
+    OR?: ScheduleTypeWhereInput[]
+    NOT?: ScheduleTypeWhereInput | ScheduleTypeWhereInput[]
+    id?: StringFilter<"ScheduleType"> | string
+    schoolId?: StringFilter<"ScheduleType"> | string
+    value?: StringFilter<"ScheduleType"> | string
+    label?: StringFilter<"ScheduleType"> | string
+    ratioAdults?: IntFilter<"ScheduleType"> | number
+    ratioStudents?: IntFilter<"ScheduleType"> | number
+    description?: StringNullableFilter<"ScheduleType"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type ScheduleTypeOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    value?: SortOrder
+    label?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    description?: SortOrderInput | SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type ScheduleTypeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    schoolId_value?: ScheduleTypeSchoolIdValueCompoundUniqueInput
+    AND?: ScheduleTypeWhereInput | ScheduleTypeWhereInput[]
+    OR?: ScheduleTypeWhereInput[]
+    NOT?: ScheduleTypeWhereInput | ScheduleTypeWhereInput[]
+    schoolId?: StringFilter<"ScheduleType"> | string
+    value?: StringFilter<"ScheduleType"> | string
+    label?: StringFilter<"ScheduleType"> | string
+    ratioAdults?: IntFilter<"ScheduleType"> | number
+    ratioStudents?: IntFilter<"ScheduleType"> | number
+    description?: StringNullableFilter<"ScheduleType"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id" | "schoolId_value">
+
+  export type ScheduleTypeOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    value?: SortOrder
+    label?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    description?: SortOrderInput | SortOrder
+    _count?: ScheduleTypeCountOrderByAggregateInput
+    _avg?: ScheduleTypeAvgOrderByAggregateInput
+    _max?: ScheduleTypeMaxOrderByAggregateInput
+    _min?: ScheduleTypeMinOrderByAggregateInput
+    _sum?: ScheduleTypeSumOrderByAggregateInput
+  }
+
+  export type ScheduleTypeScalarWhereWithAggregatesInput = {
+    AND?: ScheduleTypeScalarWhereWithAggregatesInput | ScheduleTypeScalarWhereWithAggregatesInput[]
+    OR?: ScheduleTypeScalarWhereWithAggregatesInput[]
+    NOT?: ScheduleTypeScalarWhereWithAggregatesInput | ScheduleTypeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ScheduleType"> | string
+    schoolId?: StringWithAggregatesFilter<"ScheduleType"> | string
+    value?: StringWithAggregatesFilter<"ScheduleType"> | string
+    label?: StringWithAggregatesFilter<"ScheduleType"> | string
+    ratioAdults?: IntWithAggregatesFilter<"ScheduleType"> | number
+    ratioStudents?: IntWithAggregatesFilter<"ScheduleType"> | number
+    description?: StringNullableWithAggregatesFilter<"ScheduleType"> | string | null
+  }
+
+  export type JobTitleWhereInput = {
+    AND?: JobTitleWhereInput | JobTitleWhereInput[]
+    OR?: JobTitleWhereInput[]
+    NOT?: JobTitleWhereInput | JobTitleWhereInput[]
+    id?: StringFilter<"JobTitle"> | string
+    schoolId?: StringFilter<"JobTitle"> | string
+    title?: StringFilter<"JobTitle"> | string
+    leaderQualified?: BoolFilter<"JobTitle"> | boolean
+    requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type JobTitleOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    title?: SortOrder
+    leaderQualified?: SortOrder
+    requiresLeaderForOpenClose?: SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type JobTitleWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: JobTitleWhereInput | JobTitleWhereInput[]
+    OR?: JobTitleWhereInput[]
+    NOT?: JobTitleWhereInput | JobTitleWhereInput[]
+    schoolId?: StringFilter<"JobTitle"> | string
+    title?: StringFilter<"JobTitle"> | string
+    leaderQualified?: BoolFilter<"JobTitle"> | boolean
+    requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id">
+
+  export type JobTitleOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    title?: SortOrder
+    leaderQualified?: SortOrder
+    requiresLeaderForOpenClose?: SortOrder
+    _count?: JobTitleCountOrderByAggregateInput
+    _max?: JobTitleMaxOrderByAggregateInput
+    _min?: JobTitleMinOrderByAggregateInput
+  }
+
+  export type JobTitleScalarWhereWithAggregatesInput = {
+    AND?: JobTitleScalarWhereWithAggregatesInput | JobTitleScalarWhereWithAggregatesInput[]
+    OR?: JobTitleScalarWhereWithAggregatesInput[]
+    NOT?: JobTitleScalarWhereWithAggregatesInput | JobTitleScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"JobTitle"> | string
+    schoolId?: StringWithAggregatesFilter<"JobTitle"> | string
+    title?: StringWithAggregatesFilter<"JobTitle"> | string
+    leaderQualified?: BoolWithAggregatesFilter<"JobTitle"> | boolean
+    requiresLeaderForOpenClose?: BoolWithAggregatesFilter<"JobTitle"> | boolean
+  }
+
+  export type EmployeeWhereInput = {
+    AND?: EmployeeWhereInput | EmployeeWhereInput[]
+    OR?: EmployeeWhereInput[]
+    NOT?: EmployeeWhereInput | EmployeeWhereInput[]
+    id?: StringFilter<"Employee"> | string
+    schoolId?: StringFilter<"Employee"> | string
+    name?: StringFilter<"Employee"> | string
+    jobTitle?: StringFilter<"Employee"> | string
+    maxHoursPerDay?: IntFilter<"Employee"> | number
+    maxHoursPerWeek?: IntFilter<"Employee"> | number
+    employmentStatus?: StringFilter<"Employee"> | string
+    medicallyDelegated?: BoolFilter<"Employee"> | boolean
+    cprCurrent?: BoolFilter<"Employee"> | boolean
+    notes?: StringNullableFilter<"Employee"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type EmployeeOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    jobTitle?: SortOrder
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+    employmentStatus?: SortOrder
+    medicallyDelegated?: SortOrder
+    cprCurrent?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EmployeeWhereInput | EmployeeWhereInput[]
+    OR?: EmployeeWhereInput[]
+    NOT?: EmployeeWhereInput | EmployeeWhereInput[]
+    schoolId?: StringFilter<"Employee"> | string
+    name?: StringFilter<"Employee"> | string
+    jobTitle?: StringFilter<"Employee"> | string
+    maxHoursPerDay?: IntFilter<"Employee"> | number
+    maxHoursPerWeek?: IntFilter<"Employee"> | number
+    employmentStatus?: StringFilter<"Employee"> | string
+    medicallyDelegated?: BoolFilter<"Employee"> | boolean
+    cprCurrent?: BoolFilter<"Employee"> | boolean
+    notes?: StringNullableFilter<"Employee"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id">
+
+  export type EmployeeOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    jobTitle?: SortOrder
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+    employmentStatus?: SortOrder
+    medicallyDelegated?: SortOrder
+    cprCurrent?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: EmployeeCountOrderByAggregateInput
+    _avg?: EmployeeAvgOrderByAggregateInput
+    _max?: EmployeeMaxOrderByAggregateInput
+    _min?: EmployeeMinOrderByAggregateInput
+    _sum?: EmployeeSumOrderByAggregateInput
+  }
+
+  export type EmployeeScalarWhereWithAggregatesInput = {
+    AND?: EmployeeScalarWhereWithAggregatesInput | EmployeeScalarWhereWithAggregatesInput[]
+    OR?: EmployeeScalarWhereWithAggregatesInput[]
+    NOT?: EmployeeScalarWhereWithAggregatesInput | EmployeeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Employee"> | string
+    schoolId?: StringWithAggregatesFilter<"Employee"> | string
+    name?: StringWithAggregatesFilter<"Employee"> | string
+    jobTitle?: StringWithAggregatesFilter<"Employee"> | string
+    maxHoursPerDay?: IntWithAggregatesFilter<"Employee"> | number
+    maxHoursPerWeek?: IntWithAggregatesFilter<"Employee"> | number
+    employmentStatus?: StringWithAggregatesFilter<"Employee"> | string
+    medicallyDelegated?: BoolWithAggregatesFilter<"Employee"> | boolean
+    cprCurrent?: BoolWithAggregatesFilter<"Employee"> | boolean
+    notes?: StringNullableWithAggregatesFilter<"Employee"> | string | null
+  }
+
+  export type OperatingHoursWhereInput = {
+    AND?: OperatingHoursWhereInput | OperatingHoursWhereInput[]
+    OR?: OperatingHoursWhereInput[]
+    NOT?: OperatingHoursWhereInput | OperatingHoursWhereInput[]
+    id?: StringFilter<"OperatingHours"> | string
+    schoolId?: StringFilter<"OperatingHours"> | string
+    scheduleType?: StringFilter<"OperatingHours"> | string
+    daysOfWeek?: JsonFilter<"OperatingHours">
+    open?: StringFilter<"OperatingHours"> | string
+    close?: StringFilter<"OperatingHours"> | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type OperatingHoursOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    scheduleType?: SortOrder
+    daysOfWeek?: SortOrder
+    open?: SortOrder
+    close?: SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type OperatingHoursWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: OperatingHoursWhereInput | OperatingHoursWhereInput[]
+    OR?: OperatingHoursWhereInput[]
+    NOT?: OperatingHoursWhereInput | OperatingHoursWhereInput[]
+    schoolId?: StringFilter<"OperatingHours"> | string
+    scheduleType?: StringFilter<"OperatingHours"> | string
+    daysOfWeek?: JsonFilter<"OperatingHours">
+    open?: StringFilter<"OperatingHours"> | string
+    close?: StringFilter<"OperatingHours"> | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id">
+
+  export type OperatingHoursOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    scheduleType?: SortOrder
+    daysOfWeek?: SortOrder
+    open?: SortOrder
+    close?: SortOrder
+    _count?: OperatingHoursCountOrderByAggregateInput
+    _max?: OperatingHoursMaxOrderByAggregateInput
+    _min?: OperatingHoursMinOrderByAggregateInput
+  }
+
+  export type OperatingHoursScalarWhereWithAggregatesInput = {
+    AND?: OperatingHoursScalarWhereWithAggregatesInput | OperatingHoursScalarWhereWithAggregatesInput[]
+    OR?: OperatingHoursScalarWhereWithAggregatesInput[]
+    NOT?: OperatingHoursScalarWhereWithAggregatesInput | OperatingHoursScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OperatingHours"> | string
+    schoolId?: StringWithAggregatesFilter<"OperatingHours"> | string
+    scheduleType?: StringWithAggregatesFilter<"OperatingHours"> | string
+    daysOfWeek?: JsonWithAggregatesFilter<"OperatingHours">
+    open?: StringWithAggregatesFilter<"OperatingHours"> | string
+    close?: StringWithAggregatesFilter<"OperatingHours"> | string
+  }
+
+  export type FieldTripTypeWhereInput = {
+    AND?: FieldTripTypeWhereInput | FieldTripTypeWhereInput[]
+    OR?: FieldTripTypeWhereInput[]
+    NOT?: FieldTripTypeWhereInput | FieldTripTypeWhereInput[]
+    id?: StringFilter<"FieldTripType"> | string
+    schoolId?: StringFilter<"FieldTripType"> | string
+    name?: StringFilter<"FieldTripType"> | string
+    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
+    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
+    notes?: StringNullableFilter<"FieldTripType"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type FieldTripTypeOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+    policyCitationId?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type FieldTripTypeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FieldTripTypeWhereInput | FieldTripTypeWhereInput[]
+    OR?: FieldTripTypeWhereInput[]
+    NOT?: FieldTripTypeWhereInput | FieldTripTypeWhereInput[]
+    schoolId?: StringFilter<"FieldTripType"> | string
+    name?: StringFilter<"FieldTripType"> | string
+    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
+    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
+    notes?: StringNullableFilter<"FieldTripType"> | string | null
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id">
+
+  export type FieldTripTypeOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+    policyCitationId?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: FieldTripTypeCountOrderByAggregateInput
+    _avg?: FieldTripTypeAvgOrderByAggregateInput
+    _max?: FieldTripTypeMaxOrderByAggregateInput
+    _min?: FieldTripTypeMinOrderByAggregateInput
+    _sum?: FieldTripTypeSumOrderByAggregateInput
+  }
+
+  export type FieldTripTypeScalarWhereWithAggregatesInput = {
+    AND?: FieldTripTypeScalarWhereWithAggregatesInput | FieldTripTypeScalarWhereWithAggregatesInput[]
+    OR?: FieldTripTypeScalarWhereWithAggregatesInput[]
+    NOT?: FieldTripTypeScalarWhereWithAggregatesInput | FieldTripTypeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FieldTripType"> | string
+    schoolId?: StringWithAggregatesFilter<"FieldTripType"> | string
+    name?: StringWithAggregatesFilter<"FieldTripType"> | string
+    minAdultStudentRatio?: FloatWithAggregatesFilter<"FieldTripType"> | number
+    minLeaderStudentRatio?: FloatWithAggregatesFilter<"FieldTripType"> | number
+    policyCitationId?: StringNullableWithAggregatesFilter<"FieldTripType"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"FieldTripType"> | string | null
+  }
+
+  export type ScheduleWeekWhereInput = {
+    AND?: ScheduleWeekWhereInput | ScheduleWeekWhereInput[]
+    OR?: ScheduleWeekWhereInput[]
+    NOT?: ScheduleWeekWhereInput | ScheduleWeekWhereInput[]
+    id?: StringFilter<"ScheduleWeek"> | string
+    schoolId?: StringFilter<"ScheduleWeek"> | string
+    label?: StringNullableFilter<"ScheduleWeek"> | string | null
+    status?: StringFilter<"ScheduleWeek"> | string
+    startDate?: DateTimeNullableFilter<"ScheduleWeek"> | Date | string | null
+    createdAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+    updatedAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    scheduleDays?: ScheduleDayListRelationFilter
+    segmentBlocks?: SegmentBlockListRelationFilter
+    staffAssignments?: StaffAssignmentListRelationFilter
+    fieldTripEvents?: FieldTripEventListRelationFilter
+  }
+
+  export type ScheduleWeekOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    label?: SortOrderInput | SortOrder
+    status?: SortOrder
+    startDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    school?: SchoolOrderByWithRelationInput
+    scheduleDays?: ScheduleDayOrderByRelationAggregateInput
+    segmentBlocks?: SegmentBlockOrderByRelationAggregateInput
+    staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
+    fieldTripEvents?: FieldTripEventOrderByRelationAggregateInput
+  }
+
+  export type ScheduleWeekWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ScheduleWeekWhereInput | ScheduleWeekWhereInput[]
+    OR?: ScheduleWeekWhereInput[]
+    NOT?: ScheduleWeekWhereInput | ScheduleWeekWhereInput[]
+    schoolId?: StringFilter<"ScheduleWeek"> | string
+    label?: StringNullableFilter<"ScheduleWeek"> | string | null
+    status?: StringFilter<"ScheduleWeek"> | string
+    startDate?: DateTimeNullableFilter<"ScheduleWeek"> | Date | string | null
+    createdAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+    updatedAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    scheduleDays?: ScheduleDayListRelationFilter
+    segmentBlocks?: SegmentBlockListRelationFilter
+    staffAssignments?: StaffAssignmentListRelationFilter
+    fieldTripEvents?: FieldTripEventListRelationFilter
+  }, "id">
+
+  export type ScheduleWeekOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    label?: SortOrderInput | SortOrder
+    status?: SortOrder
+    startDate?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ScheduleWeekCountOrderByAggregateInput
+    _max?: ScheduleWeekMaxOrderByAggregateInput
+    _min?: ScheduleWeekMinOrderByAggregateInput
+  }
+
+  export type ScheduleWeekScalarWhereWithAggregatesInput = {
+    AND?: ScheduleWeekScalarWhereWithAggregatesInput | ScheduleWeekScalarWhereWithAggregatesInput[]
+    OR?: ScheduleWeekScalarWhereWithAggregatesInput[]
+    NOT?: ScheduleWeekScalarWhereWithAggregatesInput | ScheduleWeekScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ScheduleWeek"> | string
+    schoolId?: StringWithAggregatesFilter<"ScheduleWeek"> | string
+    label?: StringNullableWithAggregatesFilter<"ScheduleWeek"> | string | null
+    status?: StringWithAggregatesFilter<"ScheduleWeek"> | string
+    startDate?: DateTimeNullableWithAggregatesFilter<"ScheduleWeek"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ScheduleWeek"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ScheduleWeek"> | Date | string
+  }
+
+  export type ScheduleDayWhereInput = {
+    AND?: ScheduleDayWhereInput | ScheduleDayWhereInput[]
+    OR?: ScheduleDayWhereInput[]
+    NOT?: ScheduleDayWhereInput | ScheduleDayWhereInput[]
+    id?: StringFilter<"ScheduleDay"> | string
+    scheduleWeekId?: StringFilter<"ScheduleDay"> | string
+    date?: DateTimeNullableFilter<"ScheduleDay"> | Date | string | null
+    dayOfWeek?: StringFilter<"ScheduleDay"> | string
+    scheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+    enrollmentCount?: IntNullableFilter<"ScheduleDay"> | number | null
+    enrollmentSource?: StringNullableFilter<"ScheduleDay"> | string | null
+    fieldTripEventId?: StringNullableFilter<"ScheduleDay"> | string | null
+    operatingCapacityOverride?: IntNullableFilter<"ScheduleDay"> | number | null
+    notes?: StringNullableFilter<"ScheduleDay"> | string | null
+    dayScheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }
+
+  export type ScheduleDayOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    date?: SortOrderInput | SortOrder
+    dayOfWeek?: SortOrder
+    scheduleType?: SortOrderInput | SortOrder
+    enrollmentCount?: SortOrderInput | SortOrder
+    enrollmentSource?: SortOrderInput | SortOrder
+    fieldTripEventId?: SortOrderInput | SortOrder
+    operatingCapacityOverride?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    dayScheduleType?: SortOrderInput | SortOrder
+    scheduleWeek?: ScheduleWeekOrderByWithRelationInput
+  }
+
+  export type ScheduleDayWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ScheduleDayWhereInput | ScheduleDayWhereInput[]
+    OR?: ScheduleDayWhereInput[]
+    NOT?: ScheduleDayWhereInput | ScheduleDayWhereInput[]
+    scheduleWeekId?: StringFilter<"ScheduleDay"> | string
+    date?: DateTimeNullableFilter<"ScheduleDay"> | Date | string | null
+    dayOfWeek?: StringFilter<"ScheduleDay"> | string
+    scheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+    enrollmentCount?: IntNullableFilter<"ScheduleDay"> | number | null
+    enrollmentSource?: StringNullableFilter<"ScheduleDay"> | string | null
+    fieldTripEventId?: StringNullableFilter<"ScheduleDay"> | string | null
+    operatingCapacityOverride?: IntNullableFilter<"ScheduleDay"> | number | null
+    notes?: StringNullableFilter<"ScheduleDay"> | string | null
+    dayScheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }, "id">
+
+  export type ScheduleDayOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    date?: SortOrderInput | SortOrder
+    dayOfWeek?: SortOrder
+    scheduleType?: SortOrderInput | SortOrder
+    enrollmentCount?: SortOrderInput | SortOrder
+    enrollmentSource?: SortOrderInput | SortOrder
+    fieldTripEventId?: SortOrderInput | SortOrder
+    operatingCapacityOverride?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    dayScheduleType?: SortOrderInput | SortOrder
+    _count?: ScheduleDayCountOrderByAggregateInput
+    _avg?: ScheduleDayAvgOrderByAggregateInput
+    _max?: ScheduleDayMaxOrderByAggregateInput
+    _min?: ScheduleDayMinOrderByAggregateInput
+    _sum?: ScheduleDaySumOrderByAggregateInput
+  }
+
+  export type ScheduleDayScalarWhereWithAggregatesInput = {
+    AND?: ScheduleDayScalarWhereWithAggregatesInput | ScheduleDayScalarWhereWithAggregatesInput[]
+    OR?: ScheduleDayScalarWhereWithAggregatesInput[]
+    NOT?: ScheduleDayScalarWhereWithAggregatesInput | ScheduleDayScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ScheduleDay"> | string
+    scheduleWeekId?: StringWithAggregatesFilter<"ScheduleDay"> | string
+    date?: DateTimeNullableWithAggregatesFilter<"ScheduleDay"> | Date | string | null
+    dayOfWeek?: StringWithAggregatesFilter<"ScheduleDay"> | string
+    scheduleType?: StringNullableWithAggregatesFilter<"ScheduleDay"> | string | null
+    enrollmentCount?: IntNullableWithAggregatesFilter<"ScheduleDay"> | number | null
+    enrollmentSource?: StringNullableWithAggregatesFilter<"ScheduleDay"> | string | null
+    fieldTripEventId?: StringNullableWithAggregatesFilter<"ScheduleDay"> | string | null
+    operatingCapacityOverride?: IntNullableWithAggregatesFilter<"ScheduleDay"> | number | null
+    notes?: StringNullableWithAggregatesFilter<"ScheduleDay"> | string | null
+    dayScheduleType?: StringNullableWithAggregatesFilter<"ScheduleDay"> | string | null
+  }
+
+  export type FieldTripEventWhereInput = {
+    AND?: FieldTripEventWhereInput | FieldTripEventWhereInput[]
+    OR?: FieldTripEventWhereInput[]
+    NOT?: FieldTripEventWhereInput | FieldTripEventWhereInput[]
+    id?: StringFilter<"FieldTripEvent"> | string
+    scheduleWeekId?: StringFilter<"FieldTripEvent"> | string
+    dayOfWeek?: StringFilter<"FieldTripEvent"> | string
+    segment?: StringFilter<"FieldTripEvent"> | string
+    scheduleDayId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    fieldTripTypeId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    isNoFieldTrip?: BoolFilter<"FieldTripEvent"> | boolean
+    approverId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    signedOffAt?: DateTimeNullableFilter<"FieldTripEvent"> | Date | string | null
+    notes?: StringNullableFilter<"FieldTripEvent"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }
+
+  export type FieldTripEventOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    scheduleDayId?: SortOrderInput | SortOrder
+    fieldTripTypeId?: SortOrderInput | SortOrder
+    isNoFieldTrip?: SortOrder
+    approverId?: SortOrderInput | SortOrder
+    signedOffAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    scheduleWeek?: ScheduleWeekOrderByWithRelationInput
+  }
+
+  export type FieldTripEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FieldTripEventWhereInput | FieldTripEventWhereInput[]
+    OR?: FieldTripEventWhereInput[]
+    NOT?: FieldTripEventWhereInput | FieldTripEventWhereInput[]
+    scheduleWeekId?: StringFilter<"FieldTripEvent"> | string
+    dayOfWeek?: StringFilter<"FieldTripEvent"> | string
+    segment?: StringFilter<"FieldTripEvent"> | string
+    scheduleDayId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    fieldTripTypeId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    isNoFieldTrip?: BoolFilter<"FieldTripEvent"> | boolean
+    approverId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    signedOffAt?: DateTimeNullableFilter<"FieldTripEvent"> | Date | string | null
+    notes?: StringNullableFilter<"FieldTripEvent"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }, "id">
+
+  export type FieldTripEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    scheduleDayId?: SortOrderInput | SortOrder
+    fieldTripTypeId?: SortOrderInput | SortOrder
+    isNoFieldTrip?: SortOrder
+    approverId?: SortOrderInput | SortOrder
+    signedOffAt?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: FieldTripEventCountOrderByAggregateInput
+    _max?: FieldTripEventMaxOrderByAggregateInput
+    _min?: FieldTripEventMinOrderByAggregateInput
+  }
+
+  export type FieldTripEventScalarWhereWithAggregatesInput = {
+    AND?: FieldTripEventScalarWhereWithAggregatesInput | FieldTripEventScalarWhereWithAggregatesInput[]
+    OR?: FieldTripEventScalarWhereWithAggregatesInput[]
+    NOT?: FieldTripEventScalarWhereWithAggregatesInput | FieldTripEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FieldTripEvent"> | string
+    scheduleWeekId?: StringWithAggregatesFilter<"FieldTripEvent"> | string
+    dayOfWeek?: StringWithAggregatesFilter<"FieldTripEvent"> | string
+    segment?: StringWithAggregatesFilter<"FieldTripEvent"> | string
+    scheduleDayId?: StringNullableWithAggregatesFilter<"FieldTripEvent"> | string | null
+    fieldTripTypeId?: StringNullableWithAggregatesFilter<"FieldTripEvent"> | string | null
+    isNoFieldTrip?: BoolWithAggregatesFilter<"FieldTripEvent"> | boolean
+    approverId?: StringNullableWithAggregatesFilter<"FieldTripEvent"> | string | null
+    signedOffAt?: DateTimeNullableWithAggregatesFilter<"FieldTripEvent"> | Date | string | null
+    notes?: StringNullableWithAggregatesFilter<"FieldTripEvent"> | string | null
+  }
+
+  export type SegmentBlockWhereInput = {
+    AND?: SegmentBlockWhereInput | SegmentBlockWhereInput[]
+    OR?: SegmentBlockWhereInput[]
+    NOT?: SegmentBlockWhereInput | SegmentBlockWhereInput[]
+    id?: StringFilter<"SegmentBlock"> | string
+    scheduleWeekId?: StringFilter<"SegmentBlock"> | string
+    scheduleDayId?: StringNullableFilter<"SegmentBlock"> | string | null
+    dayOfWeek?: StringFilter<"SegmentBlock"> | string
+    segment?: StringFilter<"SegmentBlock"> | string
+    startTime?: StringFilter<"SegmentBlock"> | string
+    endTime?: StringFilter<"SegmentBlock"> | string
+    childCount?: IntFilter<"SegmentBlock"> | number
+    requirementTemplate?: JsonFilter<"SegmentBlock">
+    status?: StringFilter<"SegmentBlock"> | string
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+    staffAssignments?: StaffAssignmentListRelationFilter
+  }
+
+  export type SegmentBlockOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    scheduleDayId?: SortOrderInput | SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    childCount?: SortOrder
+    requirementTemplate?: SortOrder
+    status?: SortOrder
+    scheduleWeek?: ScheduleWeekOrderByWithRelationInput
+    staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
+  }
+
+  export type SegmentBlockWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SegmentBlockWhereInput | SegmentBlockWhereInput[]
+    OR?: SegmentBlockWhereInput[]
+    NOT?: SegmentBlockWhereInput | SegmentBlockWhereInput[]
+    scheduleWeekId?: StringFilter<"SegmentBlock"> | string
+    scheduleDayId?: StringNullableFilter<"SegmentBlock"> | string | null
+    dayOfWeek?: StringFilter<"SegmentBlock"> | string
+    segment?: StringFilter<"SegmentBlock"> | string
+    startTime?: StringFilter<"SegmentBlock"> | string
+    endTime?: StringFilter<"SegmentBlock"> | string
+    childCount?: IntFilter<"SegmentBlock"> | number
+    requirementTemplate?: JsonFilter<"SegmentBlock">
+    status?: StringFilter<"SegmentBlock"> | string
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+    staffAssignments?: StaffAssignmentListRelationFilter
+  }, "id">
+
+  export type SegmentBlockOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    scheduleDayId?: SortOrderInput | SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    childCount?: SortOrder
+    requirementTemplate?: SortOrder
+    status?: SortOrder
+    _count?: SegmentBlockCountOrderByAggregateInput
+    _avg?: SegmentBlockAvgOrderByAggregateInput
+    _max?: SegmentBlockMaxOrderByAggregateInput
+    _min?: SegmentBlockMinOrderByAggregateInput
+    _sum?: SegmentBlockSumOrderByAggregateInput
+  }
+
+  export type SegmentBlockScalarWhereWithAggregatesInput = {
+    AND?: SegmentBlockScalarWhereWithAggregatesInput | SegmentBlockScalarWhereWithAggregatesInput[]
+    OR?: SegmentBlockScalarWhereWithAggregatesInput[]
+    NOT?: SegmentBlockScalarWhereWithAggregatesInput | SegmentBlockScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    scheduleWeekId?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    scheduleDayId?: StringNullableWithAggregatesFilter<"SegmentBlock"> | string | null
+    dayOfWeek?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    segment?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    startTime?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    endTime?: StringWithAggregatesFilter<"SegmentBlock"> | string
+    childCount?: IntWithAggregatesFilter<"SegmentBlock"> | number
+    requirementTemplate?: JsonWithAggregatesFilter<"SegmentBlock">
+    status?: StringWithAggregatesFilter<"SegmentBlock"> | string
+  }
+
+  export type StaffAssignmentWhereInput = {
+    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    OR?: StaffAssignmentWhereInput[]
+    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    id?: StringFilter<"StaffAssignment"> | string
+    scheduleWeekId?: StringFilter<"StaffAssignment"> | string
+    segmentBlockId?: StringFilter<"StaffAssignment"> | string
+    employeeId?: StringFilter<"StaffAssignment"> | string
+    assignmentSource?: StringFilter<"StaffAssignment"> | string
+    startTime?: StringFilter<"StaffAssignment"> | string
+    endTime?: StringFilter<"StaffAssignment"> | string
+    status?: StringFilter<"StaffAssignment"> | string
+    notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+    segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
+  }
+
+  export type StaffAssignmentOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    segmentBlockId?: SortOrder
+    employeeId?: SortOrder
+    assignmentSource?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    scheduleWeek?: ScheduleWeekOrderByWithRelationInput
+    segmentBlock?: SegmentBlockOrderByWithRelationInput
+  }
+
+  export type StaffAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    OR?: StaffAssignmentWhereInput[]
+    NOT?: StaffAssignmentWhereInput | StaffAssignmentWhereInput[]
+    scheduleWeekId?: StringFilter<"StaffAssignment"> | string
+    segmentBlockId?: StringFilter<"StaffAssignment"> | string
+    employeeId?: StringFilter<"StaffAssignment"> | string
+    assignmentSource?: StringFilter<"StaffAssignment"> | string
+    startTime?: StringFilter<"StaffAssignment"> | string
+    endTime?: StringFilter<"StaffAssignment"> | string
+    status?: StringFilter<"StaffAssignment"> | string
+    notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+    segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
+  }, "id">
+
+  export type StaffAssignmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    segmentBlockId?: SortOrder
+    employeeId?: SortOrder
+    assignmentSource?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: StaffAssignmentCountOrderByAggregateInput
+    _max?: StaffAssignmentMaxOrderByAggregateInput
+    _min?: StaffAssignmentMinOrderByAggregateInput
+  }
+
+  export type StaffAssignmentScalarWhereWithAggregatesInput = {
+    AND?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
+    OR?: StaffAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: StaffAssignmentScalarWhereWithAggregatesInput | StaffAssignmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    scheduleWeekId?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    segmentBlockId?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    employeeId?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    assignmentSource?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    startTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    endTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    status?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    notes?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
+  }
+
+  export type SchoolCreateInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateManyInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SchoolUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SchoolUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ScheduleTypeCreateInput = {
+    id?: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+    school: SchoolCreateNestedOneWithoutScheduleTypesInput
+  }
+
+  export type ScheduleTypeUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type ScheduleTypeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    school?: SchoolUpdateOneRequiredWithoutScheduleTypesNestedInput
+  }
+
+  export type ScheduleTypeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleTypeCreateManyInput = {
+    id?: string
+    schoolId: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type ScheduleTypeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleTypeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JobTitleCreateInput = {
+    id?: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+    school: SchoolCreateNestedOneWithoutJobTitlesInput
+  }
+
+  export type JobTitleUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type JobTitleUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+    school?: SchoolUpdateOneRequiredWithoutJobTitlesNestedInput
+  }
+
+  export type JobTitleUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type JobTitleCreateManyInput = {
+    id?: string
+    schoolId: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type JobTitleUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type JobTitleUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type EmployeeCreateInput = {
+    id?: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+    school: SchoolCreateNestedOneWithoutEmployeesInput
+  }
+
+  export type EmployeeUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+  }
+
+  export type EmployeeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EmployeeCreateManyInput = {
+    id?: string
+    schoolId: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+  }
+
+  export type EmployeeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EmployeeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type OperatingHoursCreateInput = {
+    id?: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+    school: SchoolCreateNestedOneWithoutOperatingHoursInput
+  }
+
+  export type OperatingHoursUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+  }
+
+  export type OperatingHoursUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+    school?: SchoolUpdateOneRequiredWithoutOperatingHoursNestedInput
+  }
+
+  export type OperatingHoursUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OperatingHoursCreateManyInput = {
+    id?: string
+    schoolId: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+  }
+
+  export type OperatingHoursUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OperatingHoursUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FieldTripTypeCreateInput = {
+    id?: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+    school: SchoolCreateNestedOneWithoutFieldTripTypesInput
+  }
+
+  export type FieldTripTypeUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+  }
+
+  export type FieldTripTypeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    school?: SchoolUpdateOneRequiredWithoutFieldTripTypesNestedInput
+  }
+
+  export type FieldTripTypeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripTypeCreateManyInput = {
+    id?: string
+    schoolId: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+  }
+
+  export type FieldTripTypeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripTypeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleWeekCreateInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekCreateManyInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ScheduleWeekUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ScheduleWeekUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ScheduleDayCreateInput = {
+    id?: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutScheduleDaysInput
+  }
+
+  export type ScheduleDayUncheckedCreateInput = {
+    id?: string
+    scheduleWeekId: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+  }
+
+  export type ScheduleDayUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutScheduleDaysNestedInput
+  }
+
+  export type ScheduleDayUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleDayCreateManyInput = {
+    id?: string
+    scheduleWeekId: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+  }
+
+  export type ScheduleDayUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleDayUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventCreateInput = {
+    id?: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutFieldTripEventsInput
+  }
+
+  export type FieldTripEventUncheckedCreateInput = {
+    id?: string
+    scheduleWeekId: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type FieldTripEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutFieldTripEventsNestedInput
+  }
+
+  export type FieldTripEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventCreateManyInput = {
+    id?: string
+    scheduleWeekId: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type FieldTripEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SegmentBlockCreateInput = {
+    id?: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutSegmentBlocksInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutSegmentBlockInput
+  }
+
+  export type SegmentBlockUncheckedCreateInput = {
+    id?: string
+    scheduleWeekId: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutSegmentBlockInput
+  }
+
+  export type SegmentBlockUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutSegmentBlocksNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutSegmentBlockNestedInput
+  }
+
+  export type SegmentBlockUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockNestedInput
+  }
+
+  export type SegmentBlockCreateManyInput = {
+    id?: string
+    scheduleWeekId: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+  }
+
+  export type SegmentBlockUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SegmentBlockUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StaffAssignmentCreateInput = {
+    id?: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
+    segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
+  }
+
+  export type StaffAssignmentUncheckedCreateInput = {
+    id?: string
+    scheduleWeekId: string
+    segmentBlockId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type StaffAssignmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+    segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+  }
+
+  export type StaffAssignmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    segmentBlockId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StaffAssignmentCreateManyInput = {
+    id?: string
+    scheduleWeekId: string
+    segmentBlockId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type StaffAssignmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    segmentBlockId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringFilter<$PrismaModel> | string
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type ScheduleTypeListRelationFilter = {
+    every?: ScheduleTypeWhereInput
+    some?: ScheduleTypeWhereInput
+    none?: ScheduleTypeWhereInput
+  }
+
+  export type JobTitleListRelationFilter = {
+    every?: JobTitleWhereInput
+    some?: JobTitleWhereInput
+    none?: JobTitleWhereInput
+  }
+
+  export type EmployeeListRelationFilter = {
+    every?: EmployeeWhereInput
+    some?: EmployeeWhereInput
+    none?: EmployeeWhereInput
+  }
+
+  export type OperatingHoursListRelationFilter = {
+    every?: OperatingHoursWhereInput
+    some?: OperatingHoursWhereInput
+    none?: OperatingHoursWhereInput
+  }
+
+  export type FieldTripTypeListRelationFilter = {
+    every?: FieldTripTypeWhereInput
+    some?: FieldTripTypeWhereInput
+    none?: FieldTripTypeWhereInput
+  }
+
+  export type ScheduleWeekListRelationFilter = {
+    every?: ScheduleWeekWhereInput
+    some?: ScheduleWeekWhereInput
+    none?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleTypeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobTitleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EmployeeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OperatingHoursOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FieldTripTypeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ScheduleWeekOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SchoolCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    closedDays?: SortOrder
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+    requireCurrentCpr?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SchoolAvgOrderByAggregateInput = {
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+  }
+
+  export type SchoolMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+    requireCurrentCpr?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SchoolMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+    requireCurrentCpr?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SchoolSumOrderByAggregateInput = {
+    openerCount?: SortOrder
+    closerCount?: SortOrder
+    minimumMedicalDelegated?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type SchoolScalarRelationFilter = {
+    is?: SchoolWhereInput
+    isNot?: SchoolWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type ScheduleTypeSchoolIdValueCompoundUniqueInput = {
+    schoolId: string
+    value: string
+  }
+
+  export type ScheduleTypeCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    value?: SortOrder
+    label?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    description?: SortOrder
+  }
+
+  export type ScheduleTypeAvgOrderByAggregateInput = {
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type ScheduleTypeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    value?: SortOrder
+    label?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    description?: SortOrder
+  }
+
+  export type ScheduleTypeMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    value?: SortOrder
+    label?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    description?: SortOrder
+  }
+
+  export type ScheduleTypeSumOrderByAggregateInput = {
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type JobTitleCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    title?: SortOrder
+    leaderQualified?: SortOrder
+    requiresLeaderForOpenClose?: SortOrder
+  }
+
+  export type JobTitleMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    title?: SortOrder
+    leaderQualified?: SortOrder
+    requiresLeaderForOpenClose?: SortOrder
+  }
+
+  export type JobTitleMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    title?: SortOrder
+    leaderQualified?: SortOrder
+    requiresLeaderForOpenClose?: SortOrder
+  }
+
+  export type EmployeeCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    jobTitle?: SortOrder
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+    employmentStatus?: SortOrder
+    medicallyDelegated?: SortOrder
+    cprCurrent?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type EmployeeAvgOrderByAggregateInput = {
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+  }
+
+  export type EmployeeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    jobTitle?: SortOrder
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+    employmentStatus?: SortOrder
+    medicallyDelegated?: SortOrder
+    cprCurrent?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type EmployeeMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    jobTitle?: SortOrder
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+    employmentStatus?: SortOrder
+    medicallyDelegated?: SortOrder
+    cprCurrent?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type EmployeeSumOrderByAggregateInput = {
+    maxHoursPerDay?: SortOrder
+    maxHoursPerWeek?: SortOrder
+  }
+
+  export type OperatingHoursCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    scheduleType?: SortOrder
+    daysOfWeek?: SortOrder
+    open?: SortOrder
+    close?: SortOrder
+  }
+
+  export type OperatingHoursMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    scheduleType?: SortOrder
+    open?: SortOrder
+    close?: SortOrder
+  }
+
+  export type OperatingHoursMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    scheduleType?: SortOrder
+    open?: SortOrder
+    close?: SortOrder
+  }
+
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type FieldTripTypeCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+    policyCitationId?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type FieldTripTypeAvgOrderByAggregateInput = {
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+  }
+
+  export type FieldTripTypeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+    policyCitationId?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type FieldTripTypeMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+    policyCitationId?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type FieldTripTypeSumOrderByAggregateInput = {
+    minAdultStudentRatio?: SortOrder
+    minLeaderStudentRatio?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type ScheduleDayListRelationFilter = {
+    every?: ScheduleDayWhereInput
+    some?: ScheduleDayWhereInput
+    none?: ScheduleDayWhereInput
+  }
+
+  export type SegmentBlockListRelationFilter = {
+    every?: SegmentBlockWhereInput
+    some?: SegmentBlockWhereInput
+    none?: SegmentBlockWhereInput
+  }
+
+  export type StaffAssignmentListRelationFilter = {
+    every?: StaffAssignmentWhereInput
+    some?: StaffAssignmentWhereInput
+    none?: StaffAssignmentWhereInput
+  }
+
+  export type FieldTripEventListRelationFilter = {
+    every?: FieldTripEventWhereInput
+    some?: FieldTripEventWhereInput
+    none?: FieldTripEventWhereInput
+  }
+
+  export type ScheduleDayOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SegmentBlockOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StaffAssignmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FieldTripEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ScheduleWeekCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    label?: SortOrder
+    status?: SortOrder
+    startDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ScheduleWeekMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    label?: SortOrder
+    status?: SortOrder
+    startDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ScheduleWeekMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    label?: SortOrder
+    status?: SortOrder
+    startDate?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type ScheduleWeekScalarRelationFilter = {
+    is?: ScheduleWeekWhereInput
+    isNot?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleDayCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    date?: SortOrder
+    dayOfWeek?: SortOrder
+    scheduleType?: SortOrder
+    enrollmentCount?: SortOrder
+    enrollmentSource?: SortOrder
+    fieldTripEventId?: SortOrder
+    operatingCapacityOverride?: SortOrder
+    notes?: SortOrder
+    dayScheduleType?: SortOrder
+  }
+
+  export type ScheduleDayAvgOrderByAggregateInput = {
+    enrollmentCount?: SortOrder
+    operatingCapacityOverride?: SortOrder
+  }
+
+  export type ScheduleDayMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    date?: SortOrder
+    dayOfWeek?: SortOrder
+    scheduleType?: SortOrder
+    enrollmentCount?: SortOrder
+    enrollmentSource?: SortOrder
+    fieldTripEventId?: SortOrder
+    operatingCapacityOverride?: SortOrder
+    notes?: SortOrder
+    dayScheduleType?: SortOrder
+  }
+
+  export type ScheduleDayMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    date?: SortOrder
+    dayOfWeek?: SortOrder
+    scheduleType?: SortOrder
+    enrollmentCount?: SortOrder
+    enrollmentSource?: SortOrder
+    fieldTripEventId?: SortOrder
+    operatingCapacityOverride?: SortOrder
+    notes?: SortOrder
+    dayScheduleType?: SortOrder
+  }
+
+  export type ScheduleDaySumOrderByAggregateInput = {
+    enrollmentCount?: SortOrder
+    operatingCapacityOverride?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type FieldTripEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    scheduleDayId?: SortOrder
+    fieldTripTypeId?: SortOrder
+    isNoFieldTrip?: SortOrder
+    approverId?: SortOrder
+    signedOffAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type FieldTripEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    scheduleDayId?: SortOrder
+    fieldTripTypeId?: SortOrder
+    isNoFieldTrip?: SortOrder
+    approverId?: SortOrder
+    signedOffAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type FieldTripEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    scheduleDayId?: SortOrder
+    fieldTripTypeId?: SortOrder
+    isNoFieldTrip?: SortOrder
+    approverId?: SortOrder
+    signedOffAt?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type SegmentBlockCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    scheduleDayId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    childCount?: SortOrder
+    requirementTemplate?: SortOrder
+    status?: SortOrder
+  }
+
+  export type SegmentBlockAvgOrderByAggregateInput = {
+    childCount?: SortOrder
+  }
+
+  export type SegmentBlockMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    scheduleDayId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    childCount?: SortOrder
+    status?: SortOrder
+  }
+
+  export type SegmentBlockMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    scheduleDayId?: SortOrder
+    dayOfWeek?: SortOrder
+    segment?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    childCount?: SortOrder
+    status?: SortOrder
+  }
+
+  export type SegmentBlockSumOrderByAggregateInput = {
+    childCount?: SortOrder
+  }
+
+  export type SegmentBlockScalarRelationFilter = {
+    is?: SegmentBlockWhereInput
+    isNot?: SegmentBlockWhereInput
+  }
+
+  export type StaffAssignmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    segmentBlockId?: SortOrder
+    employeeId?: SortOrder
+    assignmentSource?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type StaffAssignmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    segmentBlockId?: SortOrder
+    employeeId?: SortOrder
+    assignmentSource?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type StaffAssignmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    segmentBlockId?: SortOrder
+    employeeId?: SortOrder
+    assignmentSource?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type ScheduleTypeCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput> | ScheduleTypeCreateWithoutSchoolInput[] | ScheduleTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutSchoolInput | ScheduleTypeCreateOrConnectWithoutSchoolInput[]
+    createMany?: ScheduleTypeCreateManySchoolInputEnvelope
+    connect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+  }
+
+  export type JobTitleCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput> | JobTitleCreateWithoutSchoolInput[] | JobTitleUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: JobTitleCreateOrConnectWithoutSchoolInput | JobTitleCreateOrConnectWithoutSchoolInput[]
+    createMany?: JobTitleCreateManySchoolInputEnvelope
+    connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+  }
+
+  export type EmployeeCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
+    createMany?: EmployeeCreateManySchoolInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+  }
+
+  export type OperatingHoursCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput> | OperatingHoursCreateWithoutSchoolInput[] | OperatingHoursUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: OperatingHoursCreateOrConnectWithoutSchoolInput | OperatingHoursCreateOrConnectWithoutSchoolInput[]
+    createMany?: OperatingHoursCreateManySchoolInputEnvelope
+    connect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+  }
+
+  export type FieldTripTypeCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput> | FieldTripTypeCreateWithoutSchoolInput[] | FieldTripTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: FieldTripTypeCreateOrConnectWithoutSchoolInput | FieldTripTypeCreateOrConnectWithoutSchoolInput[]
+    createMany?: FieldTripTypeCreateManySchoolInputEnvelope
+    connect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+  }
+
+  export type ScheduleWeekCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput> | ScheduleWeekCreateWithoutSchoolInput[] | ScheduleWeekUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSchoolInput | ScheduleWeekCreateOrConnectWithoutSchoolInput[]
+    createMany?: ScheduleWeekCreateManySchoolInputEnvelope
+    connect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+  }
+
+  export type ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput> | ScheduleTypeCreateWithoutSchoolInput[] | ScheduleTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutSchoolInput | ScheduleTypeCreateOrConnectWithoutSchoolInput[]
+    createMany?: ScheduleTypeCreateManySchoolInputEnvelope
+    connect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+  }
+
+  export type JobTitleUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput> | JobTitleCreateWithoutSchoolInput[] | JobTitleUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: JobTitleCreateOrConnectWithoutSchoolInput | JobTitleCreateOrConnectWithoutSchoolInput[]
+    createMany?: JobTitleCreateManySchoolInputEnvelope
+    connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+  }
+
+  export type EmployeeUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
+    createMany?: EmployeeCreateManySchoolInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+  }
+
+  export type OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput> | OperatingHoursCreateWithoutSchoolInput[] | OperatingHoursUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: OperatingHoursCreateOrConnectWithoutSchoolInput | OperatingHoursCreateOrConnectWithoutSchoolInput[]
+    createMany?: OperatingHoursCreateManySchoolInputEnvelope
+    connect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+  }
+
+  export type FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput> | FieldTripTypeCreateWithoutSchoolInput[] | FieldTripTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: FieldTripTypeCreateOrConnectWithoutSchoolInput | FieldTripTypeCreateOrConnectWithoutSchoolInput[]
+    createMany?: FieldTripTypeCreateManySchoolInputEnvelope
+    connect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+  }
+
+  export type ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput> | ScheduleWeekCreateWithoutSchoolInput[] | ScheduleWeekUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSchoolInput | ScheduleWeekCreateOrConnectWithoutSchoolInput[]
+    createMany?: ScheduleWeekCreateManySchoolInputEnvelope
+    connect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type ScheduleTypeUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput> | ScheduleTypeCreateWithoutSchoolInput[] | ScheduleTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutSchoolInput | ScheduleTypeCreateOrConnectWithoutSchoolInput[]
+    upsert?: ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput | ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: ScheduleTypeCreateManySchoolInputEnvelope
+    set?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    disconnect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    delete?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    connect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    update?: ScheduleTypeUpdateWithWhereUniqueWithoutSchoolInput | ScheduleTypeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: ScheduleTypeUpdateManyWithWhereWithoutSchoolInput | ScheduleTypeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: ScheduleTypeScalarWhereInput | ScheduleTypeScalarWhereInput[]
+  }
+
+  export type JobTitleUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput> | JobTitleCreateWithoutSchoolInput[] | JobTitleUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: JobTitleCreateOrConnectWithoutSchoolInput | JobTitleCreateOrConnectWithoutSchoolInput[]
+    upsert?: JobTitleUpsertWithWhereUniqueWithoutSchoolInput | JobTitleUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: JobTitleCreateManySchoolInputEnvelope
+    set?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    disconnect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    delete?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    update?: JobTitleUpdateWithWhereUniqueWithoutSchoolInput | JobTitleUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: JobTitleUpdateManyWithWhereWithoutSchoolInput | JobTitleUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
+  }
+
+  export type EmployeeUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutSchoolInput | EmployeeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: EmployeeCreateManySchoolInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutSchoolInput | EmployeeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutSchoolInput | EmployeeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+  }
+
+  export type OperatingHoursUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput> | OperatingHoursCreateWithoutSchoolInput[] | OperatingHoursUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: OperatingHoursCreateOrConnectWithoutSchoolInput | OperatingHoursCreateOrConnectWithoutSchoolInput[]
+    upsert?: OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput | OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: OperatingHoursCreateManySchoolInputEnvelope
+    set?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    disconnect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    delete?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    connect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    update?: OperatingHoursUpdateWithWhereUniqueWithoutSchoolInput | OperatingHoursUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: OperatingHoursUpdateManyWithWhereWithoutSchoolInput | OperatingHoursUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: OperatingHoursScalarWhereInput | OperatingHoursScalarWhereInput[]
+  }
+
+  export type FieldTripTypeUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput> | FieldTripTypeCreateWithoutSchoolInput[] | FieldTripTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: FieldTripTypeCreateOrConnectWithoutSchoolInput | FieldTripTypeCreateOrConnectWithoutSchoolInput[]
+    upsert?: FieldTripTypeUpsertWithWhereUniqueWithoutSchoolInput | FieldTripTypeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: FieldTripTypeCreateManySchoolInputEnvelope
+    set?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    disconnect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    delete?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    connect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    update?: FieldTripTypeUpdateWithWhereUniqueWithoutSchoolInput | FieldTripTypeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: FieldTripTypeUpdateManyWithWhereWithoutSchoolInput | FieldTripTypeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: FieldTripTypeScalarWhereInput | FieldTripTypeScalarWhereInput[]
+  }
+
+  export type ScheduleWeekUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput> | ScheduleWeekCreateWithoutSchoolInput[] | ScheduleWeekUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSchoolInput | ScheduleWeekCreateOrConnectWithoutSchoolInput[]
+    upsert?: ScheduleWeekUpsertWithWhereUniqueWithoutSchoolInput | ScheduleWeekUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: ScheduleWeekCreateManySchoolInputEnvelope
+    set?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    disconnect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    delete?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    connect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    update?: ScheduleWeekUpdateWithWhereUniqueWithoutSchoolInput | ScheduleWeekUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: ScheduleWeekUpdateManyWithWhereWithoutSchoolInput | ScheduleWeekUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: ScheduleWeekScalarWhereInput | ScheduleWeekScalarWhereInput[]
+  }
+
+  export type ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput> | ScheduleTypeCreateWithoutSchoolInput[] | ScheduleTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutSchoolInput | ScheduleTypeCreateOrConnectWithoutSchoolInput[]
+    upsert?: ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput | ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: ScheduleTypeCreateManySchoolInputEnvelope
+    set?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    disconnect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    delete?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    connect?: ScheduleTypeWhereUniqueInput | ScheduleTypeWhereUniqueInput[]
+    update?: ScheduleTypeUpdateWithWhereUniqueWithoutSchoolInput | ScheduleTypeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: ScheduleTypeUpdateManyWithWhereWithoutSchoolInput | ScheduleTypeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: ScheduleTypeScalarWhereInput | ScheduleTypeScalarWhereInput[]
+  }
+
+  export type JobTitleUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput> | JobTitleCreateWithoutSchoolInput[] | JobTitleUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: JobTitleCreateOrConnectWithoutSchoolInput | JobTitleCreateOrConnectWithoutSchoolInput[]
+    upsert?: JobTitleUpsertWithWhereUniqueWithoutSchoolInput | JobTitleUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: JobTitleCreateManySchoolInputEnvelope
+    set?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    disconnect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    delete?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+    update?: JobTitleUpdateWithWhereUniqueWithoutSchoolInput | JobTitleUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: JobTitleUpdateManyWithWhereWithoutSchoolInput | JobTitleUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutSchoolInput | EmployeeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: EmployeeCreateManySchoolInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutSchoolInput | EmployeeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutSchoolInput | EmployeeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+  }
+
+  export type OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput> | OperatingHoursCreateWithoutSchoolInput[] | OperatingHoursUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: OperatingHoursCreateOrConnectWithoutSchoolInput | OperatingHoursCreateOrConnectWithoutSchoolInput[]
+    upsert?: OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput | OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: OperatingHoursCreateManySchoolInputEnvelope
+    set?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    disconnect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    delete?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    connect?: OperatingHoursWhereUniqueInput | OperatingHoursWhereUniqueInput[]
+    update?: OperatingHoursUpdateWithWhereUniqueWithoutSchoolInput | OperatingHoursUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: OperatingHoursUpdateManyWithWhereWithoutSchoolInput | OperatingHoursUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: OperatingHoursScalarWhereInput | OperatingHoursScalarWhereInput[]
+  }
+
+  export type FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput> | FieldTripTypeCreateWithoutSchoolInput[] | FieldTripTypeUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: FieldTripTypeCreateOrConnectWithoutSchoolInput | FieldTripTypeCreateOrConnectWithoutSchoolInput[]
+    upsert?: FieldTripTypeUpsertWithWhereUniqueWithoutSchoolInput | FieldTripTypeUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: FieldTripTypeCreateManySchoolInputEnvelope
+    set?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    disconnect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    delete?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    connect?: FieldTripTypeWhereUniqueInput | FieldTripTypeWhereUniqueInput[]
+    update?: FieldTripTypeUpdateWithWhereUniqueWithoutSchoolInput | FieldTripTypeUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: FieldTripTypeUpdateManyWithWhereWithoutSchoolInput | FieldTripTypeUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: FieldTripTypeScalarWhereInput | FieldTripTypeScalarWhereInput[]
+  }
+
+  export type ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput> | ScheduleWeekCreateWithoutSchoolInput[] | ScheduleWeekUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSchoolInput | ScheduleWeekCreateOrConnectWithoutSchoolInput[]
+    upsert?: ScheduleWeekUpsertWithWhereUniqueWithoutSchoolInput | ScheduleWeekUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: ScheduleWeekCreateManySchoolInputEnvelope
+    set?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    disconnect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    delete?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    connect?: ScheduleWeekWhereUniqueInput | ScheduleWeekWhereUniqueInput[]
+    update?: ScheduleWeekUpdateWithWhereUniqueWithoutSchoolInput | ScheduleWeekUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: ScheduleWeekUpdateManyWithWhereWithoutSchoolInput | ScheduleWeekUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: ScheduleWeekScalarWhereInput | ScheduleWeekScalarWhereInput[]
+  }
+
+  export type SchoolCreateNestedOneWithoutScheduleTypesInput = {
+    create?: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutScheduleTypesInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type SchoolUpdateOneRequiredWithoutScheduleTypesNestedInput = {
+    create?: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutScheduleTypesInput
+    upsert?: SchoolUpsertWithoutScheduleTypesInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutScheduleTypesInput, SchoolUpdateWithoutScheduleTypesInput>, SchoolUncheckedUpdateWithoutScheduleTypesInput>
+  }
+
+  export type SchoolCreateNestedOneWithoutJobTitlesInput = {
+    create?: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutJobTitlesInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type SchoolUpdateOneRequiredWithoutJobTitlesNestedInput = {
+    create?: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutJobTitlesInput
+    upsert?: SchoolUpsertWithoutJobTitlesInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutJobTitlesInput, SchoolUpdateWithoutJobTitlesInput>, SchoolUncheckedUpdateWithoutJobTitlesInput>
+  }
+
+  export type SchoolCreateNestedOneWithoutEmployeesInput = {
+    create?: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutEmployeesInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type SchoolUpdateOneRequiredWithoutEmployeesNestedInput = {
+    create?: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutEmployeesInput
+    upsert?: SchoolUpsertWithoutEmployeesInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutEmployeesInput, SchoolUpdateWithoutEmployeesInput>, SchoolUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type SchoolCreateNestedOneWithoutOperatingHoursInput = {
+    create?: XOR<SchoolCreateWithoutOperatingHoursInput, SchoolUncheckedCreateWithoutOperatingHoursInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutOperatingHoursInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type SchoolUpdateOneRequiredWithoutOperatingHoursNestedInput = {
+    create?: XOR<SchoolCreateWithoutOperatingHoursInput, SchoolUncheckedCreateWithoutOperatingHoursInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutOperatingHoursInput
+    upsert?: SchoolUpsertWithoutOperatingHoursInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutOperatingHoursInput, SchoolUpdateWithoutOperatingHoursInput>, SchoolUncheckedUpdateWithoutOperatingHoursInput>
+  }
+
+  export type SchoolCreateNestedOneWithoutFieldTripTypesInput = {
+    create?: XOR<SchoolCreateWithoutFieldTripTypesInput, SchoolUncheckedCreateWithoutFieldTripTypesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutFieldTripTypesInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type SchoolUpdateOneRequiredWithoutFieldTripTypesNestedInput = {
+    create?: XOR<SchoolCreateWithoutFieldTripTypesInput, SchoolUncheckedCreateWithoutFieldTripTypesInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutFieldTripTypesInput
+    upsert?: SchoolUpsertWithoutFieldTripTypesInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutFieldTripTypesInput, SchoolUpdateWithoutFieldTripTypesInput>, SchoolUncheckedUpdateWithoutFieldTripTypesInput>
+  }
+
+  export type SchoolCreateNestedOneWithoutScheduleWeeksInput = {
+    create?: XOR<SchoolCreateWithoutScheduleWeeksInput, SchoolUncheckedCreateWithoutScheduleWeeksInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutScheduleWeeksInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type ScheduleDayCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: ScheduleDayCreateManyScheduleWeekInputEnvelope
+    connect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+  }
+
+  export type SegmentBlockCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput> | SegmentBlockCreateWithoutScheduleWeekInput[] | SegmentBlockUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutScheduleWeekInput | SegmentBlockCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: SegmentBlockCreateManyScheduleWeekInputEnvelope
+    connect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+  }
+
+  export type StaffAssignmentCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput> | StaffAssignmentCreateWithoutScheduleWeekInput[] | StaffAssignmentUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutScheduleWeekInput | StaffAssignmentCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: StaffAssignmentCreateManyScheduleWeekInputEnvelope
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
+  export type FieldTripEventCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput> | FieldTripEventCreateWithoutScheduleWeekInput[] | FieldTripEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: FieldTripEventCreateOrConnectWithoutScheduleWeekInput | FieldTripEventCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: FieldTripEventCreateManyScheduleWeekInputEnvelope
+    connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+  }
+
+  export type ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: ScheduleDayCreateManyScheduleWeekInputEnvelope
+    connect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+  }
+
+  export type SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput> | SegmentBlockCreateWithoutScheduleWeekInput[] | SegmentBlockUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutScheduleWeekInput | SegmentBlockCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: SegmentBlockCreateManyScheduleWeekInputEnvelope
+    connect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+  }
+
+  export type StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput> | StaffAssignmentCreateWithoutScheduleWeekInput[] | StaffAssignmentUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutScheduleWeekInput | StaffAssignmentCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: StaffAssignmentCreateManyScheduleWeekInputEnvelope
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
+  export type FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput> | FieldTripEventCreateWithoutScheduleWeekInput[] | FieldTripEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: FieldTripEventCreateOrConnectWithoutScheduleWeekInput | FieldTripEventCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: FieldTripEventCreateManyScheduleWeekInputEnvelope
+    connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput = {
+    create?: XOR<SchoolCreateWithoutScheduleWeeksInput, SchoolUncheckedCreateWithoutScheduleWeeksInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutScheduleWeeksInput
+    upsert?: SchoolUpsertWithoutScheduleWeeksInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutScheduleWeeksInput, SchoolUpdateWithoutScheduleWeeksInput>, SchoolUncheckedUpdateWithoutScheduleWeeksInput>
+  }
+
+  export type ScheduleDayUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: ScheduleDayUpsertWithWhereUniqueWithoutScheduleWeekInput | ScheduleDayUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: ScheduleDayCreateManyScheduleWeekInputEnvelope
+    set?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    disconnect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    delete?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    connect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    update?: ScheduleDayUpdateWithWhereUniqueWithoutScheduleWeekInput | ScheduleDayUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: ScheduleDayUpdateManyWithWhereWithoutScheduleWeekInput | ScheduleDayUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: ScheduleDayScalarWhereInput | ScheduleDayScalarWhereInput[]
+  }
+
+  export type SegmentBlockUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput> | SegmentBlockCreateWithoutScheduleWeekInput[] | SegmentBlockUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutScheduleWeekInput | SegmentBlockCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: SegmentBlockUpsertWithWhereUniqueWithoutScheduleWeekInput | SegmentBlockUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: SegmentBlockCreateManyScheduleWeekInputEnvelope
+    set?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    disconnect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    delete?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    connect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    update?: SegmentBlockUpdateWithWhereUniqueWithoutScheduleWeekInput | SegmentBlockUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: SegmentBlockUpdateManyWithWhereWithoutScheduleWeekInput | SegmentBlockUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: SegmentBlockScalarWhereInput | SegmentBlockScalarWhereInput[]
+  }
+
+  export type StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput> | StaffAssignmentCreateWithoutScheduleWeekInput[] | StaffAssignmentUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutScheduleWeekInput | StaffAssignmentCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutScheduleWeekInput | StaffAssignmentUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: StaffAssignmentCreateManyScheduleWeekInputEnvelope
+    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    update?: StaffAssignmentUpdateWithWhereUniqueWithoutScheduleWeekInput | StaffAssignmentUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutScheduleWeekInput | StaffAssignmentUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+  }
+
+  export type FieldTripEventUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput> | FieldTripEventCreateWithoutScheduleWeekInput[] | FieldTripEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: FieldTripEventCreateOrConnectWithoutScheduleWeekInput | FieldTripEventCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput | FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: FieldTripEventCreateManyScheduleWeekInputEnvelope
+    set?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    disconnect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    delete?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    update?: FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput | FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput | FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
+  }
+
+  export type ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: ScheduleDayUpsertWithWhereUniqueWithoutScheduleWeekInput | ScheduleDayUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: ScheduleDayCreateManyScheduleWeekInputEnvelope
+    set?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    disconnect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    delete?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    connect?: ScheduleDayWhereUniqueInput | ScheduleDayWhereUniqueInput[]
+    update?: ScheduleDayUpdateWithWhereUniqueWithoutScheduleWeekInput | ScheduleDayUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: ScheduleDayUpdateManyWithWhereWithoutScheduleWeekInput | ScheduleDayUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: ScheduleDayScalarWhereInput | ScheduleDayScalarWhereInput[]
+  }
+
+  export type SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput> | SegmentBlockCreateWithoutScheduleWeekInput[] | SegmentBlockUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutScheduleWeekInput | SegmentBlockCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: SegmentBlockUpsertWithWhereUniqueWithoutScheduleWeekInput | SegmentBlockUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: SegmentBlockCreateManyScheduleWeekInputEnvelope
+    set?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    disconnect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    delete?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    connect?: SegmentBlockWhereUniqueInput | SegmentBlockWhereUniqueInput[]
+    update?: SegmentBlockUpdateWithWhereUniqueWithoutScheduleWeekInput | SegmentBlockUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: SegmentBlockUpdateManyWithWhereWithoutScheduleWeekInput | SegmentBlockUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: SegmentBlockScalarWhereInput | SegmentBlockScalarWhereInput[]
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput> | StaffAssignmentCreateWithoutScheduleWeekInput[] | StaffAssignmentUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutScheduleWeekInput | StaffAssignmentCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutScheduleWeekInput | StaffAssignmentUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: StaffAssignmentCreateManyScheduleWeekInputEnvelope
+    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    update?: StaffAssignmentUpdateWithWhereUniqueWithoutScheduleWeekInput | StaffAssignmentUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutScheduleWeekInput | StaffAssignmentUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+  }
+
+  export type FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput> | FieldTripEventCreateWithoutScheduleWeekInput[] | FieldTripEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: FieldTripEventCreateOrConnectWithoutScheduleWeekInput | FieldTripEventCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput | FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: FieldTripEventCreateManyScheduleWeekInputEnvelope
+    set?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    disconnect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    delete?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+    update?: FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput | FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput | FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
+  }
+
+  export type ScheduleWeekCreateNestedOneWithoutScheduleDaysInput = {
+    create?: XOR<ScheduleWeekCreateWithoutScheduleDaysInput, ScheduleWeekUncheckedCreateWithoutScheduleDaysInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutScheduleDaysInput
+    connect?: ScheduleWeekWhereUniqueInput
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type ScheduleWeekUpdateOneRequiredWithoutScheduleDaysNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutScheduleDaysInput, ScheduleWeekUncheckedCreateWithoutScheduleDaysInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutScheduleDaysInput
+    upsert?: ScheduleWeekUpsertWithoutScheduleDaysInput
+    connect?: ScheduleWeekWhereUniqueInput
+    update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutScheduleDaysInput, ScheduleWeekUpdateWithoutScheduleDaysInput>, ScheduleWeekUncheckedUpdateWithoutScheduleDaysInput>
+  }
+
+  export type ScheduleWeekCreateNestedOneWithoutFieldTripEventsInput = {
+    create?: XOR<ScheduleWeekCreateWithoutFieldTripEventsInput, ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutFieldTripEventsInput
+    connect?: ScheduleWeekWhereUniqueInput
+  }
+
+  export type ScheduleWeekUpdateOneRequiredWithoutFieldTripEventsNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutFieldTripEventsInput, ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutFieldTripEventsInput
+    upsert?: ScheduleWeekUpsertWithoutFieldTripEventsInput
+    connect?: ScheduleWeekWhereUniqueInput
+    update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutFieldTripEventsInput, ScheduleWeekUpdateWithoutFieldTripEventsInput>, ScheduleWeekUncheckedUpdateWithoutFieldTripEventsInput>
+  }
+
+  export type ScheduleWeekCreateNestedOneWithoutSegmentBlocksInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSegmentBlocksInput, ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSegmentBlocksInput
+    connect?: ScheduleWeekWhereUniqueInput
+  }
+
+  export type StaffAssignmentCreateNestedManyWithoutSegmentBlockInput = {
+    create?: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput> | StaffAssignmentCreateWithoutSegmentBlockInput[] | StaffAssignmentUncheckedCreateWithoutSegmentBlockInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutSegmentBlockInput | StaffAssignmentCreateOrConnectWithoutSegmentBlockInput[]
+    createMany?: StaffAssignmentCreateManySegmentBlockInputEnvelope
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
+  export type StaffAssignmentUncheckedCreateNestedManyWithoutSegmentBlockInput = {
+    create?: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput> | StaffAssignmentCreateWithoutSegmentBlockInput[] | StaffAssignmentUncheckedCreateWithoutSegmentBlockInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutSegmentBlockInput | StaffAssignmentCreateOrConnectWithoutSegmentBlockInput[]
+    createMany?: StaffAssignmentCreateManySegmentBlockInputEnvelope
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+  }
+
+  export type ScheduleWeekUpdateOneRequiredWithoutSegmentBlocksNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutSegmentBlocksInput, ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutSegmentBlocksInput
+    upsert?: ScheduleWeekUpsertWithoutSegmentBlocksInput
+    connect?: ScheduleWeekWhereUniqueInput
+    update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutSegmentBlocksInput, ScheduleWeekUpdateWithoutSegmentBlocksInput>, ScheduleWeekUncheckedUpdateWithoutSegmentBlocksInput>
+  }
+
+  export type StaffAssignmentUpdateManyWithoutSegmentBlockNestedInput = {
+    create?: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput> | StaffAssignmentCreateWithoutSegmentBlockInput[] | StaffAssignmentUncheckedCreateWithoutSegmentBlockInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutSegmentBlockInput | StaffAssignmentCreateOrConnectWithoutSegmentBlockInput[]
+    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput | StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput[]
+    createMany?: StaffAssignmentCreateManySegmentBlockInputEnvelope
+    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    update?: StaffAssignmentUpdateWithWhereUniqueWithoutSegmentBlockInput | StaffAssignmentUpdateWithWhereUniqueWithoutSegmentBlockInput[]
+    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutSegmentBlockInput | StaffAssignmentUpdateManyWithWhereWithoutSegmentBlockInput[]
+    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockNestedInput = {
+    create?: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput> | StaffAssignmentCreateWithoutSegmentBlockInput[] | StaffAssignmentUncheckedCreateWithoutSegmentBlockInput[]
+    connectOrCreate?: StaffAssignmentCreateOrConnectWithoutSegmentBlockInput | StaffAssignmentCreateOrConnectWithoutSegmentBlockInput[]
+    upsert?: StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput | StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput[]
+    createMany?: StaffAssignmentCreateManySegmentBlockInputEnvelope
+    set?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    disconnect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    delete?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    connect?: StaffAssignmentWhereUniqueInput | StaffAssignmentWhereUniqueInput[]
+    update?: StaffAssignmentUpdateWithWhereUniqueWithoutSegmentBlockInput | StaffAssignmentUpdateWithWhereUniqueWithoutSegmentBlockInput[]
+    updateMany?: StaffAssignmentUpdateManyWithWhereWithoutSegmentBlockInput | StaffAssignmentUpdateManyWithWhereWithoutSegmentBlockInput[]
+    deleteMany?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+  }
+
+  export type ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput = {
+    create?: XOR<ScheduleWeekCreateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutStaffAssignmentsInput
+    connect?: ScheduleWeekWhereUniqueInput
+  }
+
+  export type SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput = {
+    create?: XOR<SegmentBlockCreateWithoutStaffAssignmentsInput, SegmentBlockUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutStaffAssignmentsInput
+    connect?: SegmentBlockWhereUniqueInput
+  }
+
+  export type ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutStaffAssignmentsInput
+    upsert?: ScheduleWeekUpsertWithoutStaffAssignmentsInput
+    connect?: ScheduleWeekWhereUniqueInput
+    update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutStaffAssignmentsInput, ScheduleWeekUpdateWithoutStaffAssignmentsInput>, ScheduleWeekUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput = {
+    create?: XOR<SegmentBlockCreateWithoutStaffAssignmentsInput, SegmentBlockUncheckedCreateWithoutStaffAssignmentsInput>
+    connectOrCreate?: SegmentBlockCreateOrConnectWithoutStaffAssignmentsInput
+    upsert?: SegmentBlockUpsertWithoutStaffAssignmentsInput
+    connect?: SegmentBlockWhereUniqueInput
+    update?: XOR<XOR<SegmentBlockUpdateToOneWithWhereWithoutStaffAssignmentsInput, SegmentBlockUpdateWithoutStaffAssignmentsInput>, SegmentBlockUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type NestedStringFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type ScheduleTypeCreateWithoutSchoolInput = {
+    id?: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type ScheduleTypeUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type ScheduleTypeCreateOrConnectWithoutSchoolInput = {
+    where: ScheduleTypeWhereUniqueInput
+    create: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type ScheduleTypeCreateManySchoolInputEnvelope = {
+    data: ScheduleTypeCreateManySchoolInput | ScheduleTypeCreateManySchoolInput[]
+  }
+
+  export type JobTitleCreateWithoutSchoolInput = {
+    id?: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type JobTitleUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type JobTitleCreateOrConnectWithoutSchoolInput = {
+    where: JobTitleWhereUniqueInput
+    create: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type JobTitleCreateManySchoolInputEnvelope = {
+    data: JobTitleCreateManySchoolInput | JobTitleCreateManySchoolInput[]
+  }
+
+  export type EmployeeCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+  }
+
+  export type EmployeeUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+  }
+
+  export type EmployeeCreateOrConnectWithoutSchoolInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type EmployeeCreateManySchoolInputEnvelope = {
+    data: EmployeeCreateManySchoolInput | EmployeeCreateManySchoolInput[]
+  }
+
+  export type OperatingHoursCreateWithoutSchoolInput = {
+    id?: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+  }
+
+  export type OperatingHoursUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+  }
+
+  export type OperatingHoursCreateOrConnectWithoutSchoolInput = {
+    where: OperatingHoursWhereUniqueInput
+    create: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type OperatingHoursCreateManySchoolInputEnvelope = {
+    data: OperatingHoursCreateManySchoolInput | OperatingHoursCreateManySchoolInput[]
+  }
+
+  export type FieldTripTypeCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+  }
+
+  export type FieldTripTypeUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+  }
+
+  export type FieldTripTypeCreateOrConnectWithoutSchoolInput = {
+    where: FieldTripTypeWhereUniqueInput
+    create: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type FieldTripTypeCreateManySchoolInputEnvelope = {
+    data: FieldTripTypeCreateManySchoolInput | FieldTripTypeCreateManySchoolInput[]
+  }
+
+  export type ScheduleWeekCreateWithoutSchoolInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutSchoolInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type ScheduleWeekCreateManySchoolInputEnvelope = {
+    data: ScheduleWeekCreateManySchoolInput | ScheduleWeekCreateManySchoolInput[]
+  }
+
+  export type ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: ScheduleTypeWhereUniqueInput
+    update: XOR<ScheduleTypeUpdateWithoutSchoolInput, ScheduleTypeUncheckedUpdateWithoutSchoolInput>
+    create: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type ScheduleTypeUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: ScheduleTypeWhereUniqueInput
+    data: XOR<ScheduleTypeUpdateWithoutSchoolInput, ScheduleTypeUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type ScheduleTypeUpdateManyWithWhereWithoutSchoolInput = {
+    where: ScheduleTypeScalarWhereInput
+    data: XOR<ScheduleTypeUpdateManyMutationInput, ScheduleTypeUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type ScheduleTypeScalarWhereInput = {
+    AND?: ScheduleTypeScalarWhereInput | ScheduleTypeScalarWhereInput[]
+    OR?: ScheduleTypeScalarWhereInput[]
+    NOT?: ScheduleTypeScalarWhereInput | ScheduleTypeScalarWhereInput[]
+    id?: StringFilter<"ScheduleType"> | string
+    schoolId?: StringFilter<"ScheduleType"> | string
+    value?: StringFilter<"ScheduleType"> | string
+    label?: StringFilter<"ScheduleType"> | string
+    ratioAdults?: IntFilter<"ScheduleType"> | number
+    ratioStudents?: IntFilter<"ScheduleType"> | number
+    description?: StringNullableFilter<"ScheduleType"> | string | null
+  }
+
+  export type JobTitleUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: JobTitleWhereUniqueInput
+    update: XOR<JobTitleUpdateWithoutSchoolInput, JobTitleUncheckedUpdateWithoutSchoolInput>
+    create: XOR<JobTitleCreateWithoutSchoolInput, JobTitleUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type JobTitleUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: JobTitleWhereUniqueInput
+    data: XOR<JobTitleUpdateWithoutSchoolInput, JobTitleUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type JobTitleUpdateManyWithWhereWithoutSchoolInput = {
+    where: JobTitleScalarWhereInput
+    data: XOR<JobTitleUpdateManyMutationInput, JobTitleUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type JobTitleScalarWhereInput = {
+    AND?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
+    OR?: JobTitleScalarWhereInput[]
+    NOT?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
+    id?: StringFilter<"JobTitle"> | string
+    schoolId?: StringFilter<"JobTitle"> | string
+    title?: StringFilter<"JobTitle"> | string
+    leaderQualified?: BoolFilter<"JobTitle"> | boolean
+    requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
+  }
+
+  export type EmployeeUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: EmployeeWhereUniqueInput
+    update: XOR<EmployeeUpdateWithoutSchoolInput, EmployeeUncheckedUpdateWithoutSchoolInput>
+    create: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type EmployeeUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: EmployeeWhereUniqueInput
+    data: XOR<EmployeeUpdateWithoutSchoolInput, EmployeeUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type EmployeeUpdateManyWithWhereWithoutSchoolInput = {
+    where: EmployeeScalarWhereInput
+    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type EmployeeScalarWhereInput = {
+    AND?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+    OR?: EmployeeScalarWhereInput[]
+    NOT?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+    id?: StringFilter<"Employee"> | string
+    schoolId?: StringFilter<"Employee"> | string
+    name?: StringFilter<"Employee"> | string
+    jobTitle?: StringFilter<"Employee"> | string
+    maxHoursPerDay?: IntFilter<"Employee"> | number
+    maxHoursPerWeek?: IntFilter<"Employee"> | number
+    employmentStatus?: StringFilter<"Employee"> | string
+    medicallyDelegated?: BoolFilter<"Employee"> | boolean
+    cprCurrent?: BoolFilter<"Employee"> | boolean
+    notes?: StringNullableFilter<"Employee"> | string | null
+  }
+
+  export type OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: OperatingHoursWhereUniqueInput
+    update: XOR<OperatingHoursUpdateWithoutSchoolInput, OperatingHoursUncheckedUpdateWithoutSchoolInput>
+    create: XOR<OperatingHoursCreateWithoutSchoolInput, OperatingHoursUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type OperatingHoursUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: OperatingHoursWhereUniqueInput
+    data: XOR<OperatingHoursUpdateWithoutSchoolInput, OperatingHoursUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type OperatingHoursUpdateManyWithWhereWithoutSchoolInput = {
+    where: OperatingHoursScalarWhereInput
+    data: XOR<OperatingHoursUpdateManyMutationInput, OperatingHoursUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type OperatingHoursScalarWhereInput = {
+    AND?: OperatingHoursScalarWhereInput | OperatingHoursScalarWhereInput[]
+    OR?: OperatingHoursScalarWhereInput[]
+    NOT?: OperatingHoursScalarWhereInput | OperatingHoursScalarWhereInput[]
+    id?: StringFilter<"OperatingHours"> | string
+    schoolId?: StringFilter<"OperatingHours"> | string
+    scheduleType?: StringFilter<"OperatingHours"> | string
+    daysOfWeek?: JsonFilter<"OperatingHours">
+    open?: StringFilter<"OperatingHours"> | string
+    close?: StringFilter<"OperatingHours"> | string
+  }
+
+  export type FieldTripTypeUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: FieldTripTypeWhereUniqueInput
+    update: XOR<FieldTripTypeUpdateWithoutSchoolInput, FieldTripTypeUncheckedUpdateWithoutSchoolInput>
+    create: XOR<FieldTripTypeCreateWithoutSchoolInput, FieldTripTypeUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type FieldTripTypeUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: FieldTripTypeWhereUniqueInput
+    data: XOR<FieldTripTypeUpdateWithoutSchoolInput, FieldTripTypeUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type FieldTripTypeUpdateManyWithWhereWithoutSchoolInput = {
+    where: FieldTripTypeScalarWhereInput
+    data: XOR<FieldTripTypeUpdateManyMutationInput, FieldTripTypeUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type FieldTripTypeScalarWhereInput = {
+    AND?: FieldTripTypeScalarWhereInput | FieldTripTypeScalarWhereInput[]
+    OR?: FieldTripTypeScalarWhereInput[]
+    NOT?: FieldTripTypeScalarWhereInput | FieldTripTypeScalarWhereInput[]
+    id?: StringFilter<"FieldTripType"> | string
+    schoolId?: StringFilter<"FieldTripType"> | string
+    name?: StringFilter<"FieldTripType"> | string
+    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
+    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
+    notes?: StringNullableFilter<"FieldTripType"> | string | null
+  }
+
+  export type ScheduleWeekUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: ScheduleWeekWhereUniqueInput
+    update: XOR<ScheduleWeekUpdateWithoutSchoolInput, ScheduleWeekUncheckedUpdateWithoutSchoolInput>
+    create: XOR<ScheduleWeekCreateWithoutSchoolInput, ScheduleWeekUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type ScheduleWeekUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: ScheduleWeekWhereUniqueInput
+    data: XOR<ScheduleWeekUpdateWithoutSchoolInput, ScheduleWeekUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type ScheduleWeekUpdateManyWithWhereWithoutSchoolInput = {
+    where: ScheduleWeekScalarWhereInput
+    data: XOR<ScheduleWeekUpdateManyMutationInput, ScheduleWeekUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type ScheduleWeekScalarWhereInput = {
+    AND?: ScheduleWeekScalarWhereInput | ScheduleWeekScalarWhereInput[]
+    OR?: ScheduleWeekScalarWhereInput[]
+    NOT?: ScheduleWeekScalarWhereInput | ScheduleWeekScalarWhereInput[]
+    id?: StringFilter<"ScheduleWeek"> | string
+    schoolId?: StringFilter<"ScheduleWeek"> | string
+    label?: StringNullableFilter<"ScheduleWeek"> | string | null
+    status?: StringFilter<"ScheduleWeek"> | string
+    startDate?: DateTimeNullableFilter<"ScheduleWeek"> | Date | string | null
+    createdAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+    updatedAt?: DateTimeFilter<"ScheduleWeek"> | Date | string
+  }
+
+  export type SchoolCreateWithoutScheduleTypesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutScheduleTypesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutScheduleTypesInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
+  }
+
+  export type SchoolUpsertWithoutScheduleTypesInput = {
+    update: XOR<SchoolUpdateWithoutScheduleTypesInput, SchoolUncheckedUpdateWithoutScheduleTypesInput>
+    create: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutScheduleTypesInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutScheduleTypesInput, SchoolUncheckedUpdateWithoutScheduleTypesInput>
+  }
+
+  export type SchoolUpdateWithoutScheduleTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutScheduleTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateWithoutJobTitlesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutJobTitlesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutJobTitlesInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
+  }
+
+  export type SchoolUpsertWithoutJobTitlesInput = {
+    update: XOR<SchoolUpdateWithoutJobTitlesInput, SchoolUncheckedUpdateWithoutJobTitlesInput>
+    create: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutJobTitlesInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutJobTitlesInput, SchoolUncheckedUpdateWithoutJobTitlesInput>
+  }
+
+  export type SchoolUpdateWithoutJobTitlesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutJobTitlesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateWithoutEmployeesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutEmployeesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutEmployeesInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
+  }
+
+  export type SchoolUpsertWithoutEmployeesInput = {
+    update: XOR<SchoolUpdateWithoutEmployeesInput, SchoolUncheckedUpdateWithoutEmployeesInput>
+    create: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutEmployeesInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutEmployeesInput, SchoolUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type SchoolUpdateWithoutEmployeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutEmployeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateWithoutOperatingHoursInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutOperatingHoursInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutOperatingHoursInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutOperatingHoursInput, SchoolUncheckedCreateWithoutOperatingHoursInput>
+  }
+
+  export type SchoolUpsertWithoutOperatingHoursInput = {
+    update: XOR<SchoolUpdateWithoutOperatingHoursInput, SchoolUncheckedUpdateWithoutOperatingHoursInput>
+    create: XOR<SchoolCreateWithoutOperatingHoursInput, SchoolUncheckedCreateWithoutOperatingHoursInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutOperatingHoursInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutOperatingHoursInput, SchoolUncheckedUpdateWithoutOperatingHoursInput>
+  }
+
+  export type SchoolUpdateWithoutOperatingHoursInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutOperatingHoursInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateWithoutFieldTripTypesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutFieldTripTypesInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutFieldTripTypesInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutFieldTripTypesInput, SchoolUncheckedCreateWithoutFieldTripTypesInput>
+  }
+
+  export type SchoolUpsertWithoutFieldTripTypesInput = {
+    update: XOR<SchoolUpdateWithoutFieldTripTypesInput, SchoolUncheckedUpdateWithoutFieldTripTypesInput>
+    create: XOR<SchoolCreateWithoutFieldTripTypesInput, SchoolUncheckedCreateWithoutFieldTripTypesInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutFieldTripTypesInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutFieldTripTypesInput, SchoolUncheckedUpdateWithoutFieldTripTypesInput>
+  }
+
+  export type SchoolUpdateWithoutFieldTripTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutFieldTripTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolCreateWithoutScheduleWeeksInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutScheduleWeeksInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutScheduleWeeksInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutScheduleWeeksInput, SchoolUncheckedCreateWithoutScheduleWeeksInput>
+  }
+
+  export type ScheduleDayCreateWithoutScheduleWeekInput = {
+    id?: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+  }
+
+  export type ScheduleDayUncheckedCreateWithoutScheduleWeekInput = {
+    id?: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+  }
+
+  export type ScheduleDayCreateOrConnectWithoutScheduleWeekInput = {
+    where: ScheduleDayWhereUniqueInput
+    create: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type ScheduleDayCreateManyScheduleWeekInputEnvelope = {
+    data: ScheduleDayCreateManyScheduleWeekInput | ScheduleDayCreateManyScheduleWeekInput[]
+  }
+
+  export type SegmentBlockCreateWithoutScheduleWeekInput = {
+    id?: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutSegmentBlockInput
+  }
+
+  export type SegmentBlockUncheckedCreateWithoutScheduleWeekInput = {
+    id?: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutSegmentBlockInput
+  }
+
+  export type SegmentBlockCreateOrConnectWithoutScheduleWeekInput = {
+    where: SegmentBlockWhereUniqueInput
+    create: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type SegmentBlockCreateManyScheduleWeekInputEnvelope = {
+    data: SegmentBlockCreateManyScheduleWeekInput | SegmentBlockCreateManyScheduleWeekInput[]
+  }
+
+  export type StaffAssignmentCreateWithoutScheduleWeekInput = {
+    id?: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+    segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
+  }
+
+  export type StaffAssignmentUncheckedCreateWithoutScheduleWeekInput = {
+    id?: string
+    segmentBlockId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type StaffAssignmentCreateOrConnectWithoutScheduleWeekInput = {
+    where: StaffAssignmentWhereUniqueInput
+    create: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type StaffAssignmentCreateManyScheduleWeekInputEnvelope = {
+    data: StaffAssignmentCreateManyScheduleWeekInput | StaffAssignmentCreateManyScheduleWeekInput[]
+  }
+
+  export type FieldTripEventCreateWithoutScheduleWeekInput = {
+    id?: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type FieldTripEventUncheckedCreateWithoutScheduleWeekInput = {
+    id?: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type FieldTripEventCreateOrConnectWithoutScheduleWeekInput = {
+    where: FieldTripEventWhereUniqueInput
+    create: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type FieldTripEventCreateManyScheduleWeekInputEnvelope = {
+    data: FieldTripEventCreateManyScheduleWeekInput | FieldTripEventCreateManyScheduleWeekInput[]
+  }
+
+  export type SchoolUpsertWithoutScheduleWeeksInput = {
+    update: XOR<SchoolUpdateWithoutScheduleWeeksInput, SchoolUncheckedUpdateWithoutScheduleWeeksInput>
+    create: XOR<SchoolCreateWithoutScheduleWeeksInput, SchoolUncheckedCreateWithoutScheduleWeeksInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutScheduleWeeksInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutScheduleWeeksInput, SchoolUncheckedUpdateWithoutScheduleWeeksInput>
+  }
+
+  export type SchoolUpdateWithoutScheduleWeeksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutScheduleWeeksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type ScheduleDayUpsertWithWhereUniqueWithoutScheduleWeekInput = {
+    where: ScheduleDayWhereUniqueInput
+    update: XOR<ScheduleDayUpdateWithoutScheduleWeekInput, ScheduleDayUncheckedUpdateWithoutScheduleWeekInput>
+    create: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type ScheduleDayUpdateWithWhereUniqueWithoutScheduleWeekInput = {
+    where: ScheduleDayWhereUniqueInput
+    data: XOR<ScheduleDayUpdateWithoutScheduleWeekInput, ScheduleDayUncheckedUpdateWithoutScheduleWeekInput>
+  }
+
+  export type ScheduleDayUpdateManyWithWhereWithoutScheduleWeekInput = {
+    where: ScheduleDayScalarWhereInput
+    data: XOR<ScheduleDayUpdateManyMutationInput, ScheduleDayUncheckedUpdateManyWithoutScheduleWeekInput>
+  }
+
+  export type ScheduleDayScalarWhereInput = {
+    AND?: ScheduleDayScalarWhereInput | ScheduleDayScalarWhereInput[]
+    OR?: ScheduleDayScalarWhereInput[]
+    NOT?: ScheduleDayScalarWhereInput | ScheduleDayScalarWhereInput[]
+    id?: StringFilter<"ScheduleDay"> | string
+    scheduleWeekId?: StringFilter<"ScheduleDay"> | string
+    date?: DateTimeNullableFilter<"ScheduleDay"> | Date | string | null
+    dayOfWeek?: StringFilter<"ScheduleDay"> | string
+    scheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+    enrollmentCount?: IntNullableFilter<"ScheduleDay"> | number | null
+    enrollmentSource?: StringNullableFilter<"ScheduleDay"> | string | null
+    fieldTripEventId?: StringNullableFilter<"ScheduleDay"> | string | null
+    operatingCapacityOverride?: IntNullableFilter<"ScheduleDay"> | number | null
+    notes?: StringNullableFilter<"ScheduleDay"> | string | null
+    dayScheduleType?: StringNullableFilter<"ScheduleDay"> | string | null
+  }
+
+  export type SegmentBlockUpsertWithWhereUniqueWithoutScheduleWeekInput = {
+    where: SegmentBlockWhereUniqueInput
+    update: XOR<SegmentBlockUpdateWithoutScheduleWeekInput, SegmentBlockUncheckedUpdateWithoutScheduleWeekInput>
+    create: XOR<SegmentBlockCreateWithoutScheduleWeekInput, SegmentBlockUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type SegmentBlockUpdateWithWhereUniqueWithoutScheduleWeekInput = {
+    where: SegmentBlockWhereUniqueInput
+    data: XOR<SegmentBlockUpdateWithoutScheduleWeekInput, SegmentBlockUncheckedUpdateWithoutScheduleWeekInput>
+  }
+
+  export type SegmentBlockUpdateManyWithWhereWithoutScheduleWeekInput = {
+    where: SegmentBlockScalarWhereInput
+    data: XOR<SegmentBlockUpdateManyMutationInput, SegmentBlockUncheckedUpdateManyWithoutScheduleWeekInput>
+  }
+
+  export type SegmentBlockScalarWhereInput = {
+    AND?: SegmentBlockScalarWhereInput | SegmentBlockScalarWhereInput[]
+    OR?: SegmentBlockScalarWhereInput[]
+    NOT?: SegmentBlockScalarWhereInput | SegmentBlockScalarWhereInput[]
+    id?: StringFilter<"SegmentBlock"> | string
+    scheduleWeekId?: StringFilter<"SegmentBlock"> | string
+    scheduleDayId?: StringNullableFilter<"SegmentBlock"> | string | null
+    dayOfWeek?: StringFilter<"SegmentBlock"> | string
+    segment?: StringFilter<"SegmentBlock"> | string
+    startTime?: StringFilter<"SegmentBlock"> | string
+    endTime?: StringFilter<"SegmentBlock"> | string
+    childCount?: IntFilter<"SegmentBlock"> | number
+    requirementTemplate?: JsonFilter<"SegmentBlock">
+    status?: StringFilter<"SegmentBlock"> | string
+  }
+
+  export type StaffAssignmentUpsertWithWhereUniqueWithoutScheduleWeekInput = {
+    where: StaffAssignmentWhereUniqueInput
+    update: XOR<StaffAssignmentUpdateWithoutScheduleWeekInput, StaffAssignmentUncheckedUpdateWithoutScheduleWeekInput>
+    create: XOR<StaffAssignmentCreateWithoutScheduleWeekInput, StaffAssignmentUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type StaffAssignmentUpdateWithWhereUniqueWithoutScheduleWeekInput = {
+    where: StaffAssignmentWhereUniqueInput
+    data: XOR<StaffAssignmentUpdateWithoutScheduleWeekInput, StaffAssignmentUncheckedUpdateWithoutScheduleWeekInput>
+  }
+
+  export type StaffAssignmentUpdateManyWithWhereWithoutScheduleWeekInput = {
+    where: StaffAssignmentScalarWhereInput
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekInput>
+  }
+
+  export type StaffAssignmentScalarWhereInput = {
+    AND?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+    OR?: StaffAssignmentScalarWhereInput[]
+    NOT?: StaffAssignmentScalarWhereInput | StaffAssignmentScalarWhereInput[]
+    id?: StringFilter<"StaffAssignment"> | string
+    scheduleWeekId?: StringFilter<"StaffAssignment"> | string
+    segmentBlockId?: StringFilter<"StaffAssignment"> | string
+    employeeId?: StringFilter<"StaffAssignment"> | string
+    assignmentSource?: StringFilter<"StaffAssignment"> | string
+    startTime?: StringFilter<"StaffAssignment"> | string
+    endTime?: StringFilter<"StaffAssignment"> | string
+    status?: StringFilter<"StaffAssignment"> | string
+    notes?: StringNullableFilter<"StaffAssignment"> | string | null
+  }
+
+  export type FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput = {
+    where: FieldTripEventWhereUniqueInput
+    update: XOR<FieldTripEventUpdateWithoutScheduleWeekInput, FieldTripEventUncheckedUpdateWithoutScheduleWeekInput>
+    create: XOR<FieldTripEventCreateWithoutScheduleWeekInput, FieldTripEventUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput = {
+    where: FieldTripEventWhereUniqueInput
+    data: XOR<FieldTripEventUpdateWithoutScheduleWeekInput, FieldTripEventUncheckedUpdateWithoutScheduleWeekInput>
+  }
+
+  export type FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput = {
+    where: FieldTripEventScalarWhereInput
+    data: XOR<FieldTripEventUpdateManyMutationInput, FieldTripEventUncheckedUpdateManyWithoutScheduleWeekInput>
+  }
+
+  export type FieldTripEventScalarWhereInput = {
+    AND?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
+    OR?: FieldTripEventScalarWhereInput[]
+    NOT?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
+    id?: StringFilter<"FieldTripEvent"> | string
+    scheduleWeekId?: StringFilter<"FieldTripEvent"> | string
+    dayOfWeek?: StringFilter<"FieldTripEvent"> | string
+    segment?: StringFilter<"FieldTripEvent"> | string
+    scheduleDayId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    fieldTripTypeId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    isNoFieldTrip?: BoolFilter<"FieldTripEvent"> | boolean
+    approverId?: StringNullableFilter<"FieldTripEvent"> | string | null
+    signedOffAt?: DateTimeNullableFilter<"FieldTripEvent"> | Date | string | null
+    notes?: StringNullableFilter<"FieldTripEvent"> | string | null
+  }
+
+  export type ScheduleWeekCreateWithoutScheduleDaysInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutScheduleDaysInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutScheduleDaysInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutScheduleDaysInput, ScheduleWeekUncheckedCreateWithoutScheduleDaysInput>
+  }
+
+  export type ScheduleWeekUpsertWithoutScheduleDaysInput = {
+    update: XOR<ScheduleWeekUpdateWithoutScheduleDaysInput, ScheduleWeekUncheckedUpdateWithoutScheduleDaysInput>
+    create: XOR<ScheduleWeekCreateWithoutScheduleDaysInput, ScheduleWeekUncheckedCreateWithoutScheduleDaysInput>
+    where?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleWeekUpdateToOneWithWhereWithoutScheduleDaysInput = {
+    where?: ScheduleWeekWhereInput
+    data: XOR<ScheduleWeekUpdateWithoutScheduleDaysInput, ScheduleWeekUncheckedUpdateWithoutScheduleDaysInput>
+  }
+
+  export type ScheduleWeekUpdateWithoutScheduleDaysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutScheduleDaysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekCreateWithoutFieldTripEventsInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutFieldTripEventsInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutFieldTripEventsInput, ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput>
+  }
+
+  export type ScheduleWeekUpsertWithoutFieldTripEventsInput = {
+    update: XOR<ScheduleWeekUpdateWithoutFieldTripEventsInput, ScheduleWeekUncheckedUpdateWithoutFieldTripEventsInput>
+    create: XOR<ScheduleWeekCreateWithoutFieldTripEventsInput, ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput>
+    where?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleWeekUpdateToOneWithWhereWithoutFieldTripEventsInput = {
+    where?: ScheduleWeekWhereInput
+    data: XOR<ScheduleWeekUpdateWithoutFieldTripEventsInput, ScheduleWeekUncheckedUpdateWithoutFieldTripEventsInput>
+  }
+
+  export type ScheduleWeekUpdateWithoutFieldTripEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutFieldTripEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekCreateWithoutSegmentBlocksInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutSegmentBlocksInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutSegmentBlocksInput, ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput>
+  }
+
+  export type StaffAssignmentCreateWithoutSegmentBlockInput = {
+    id?: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
+  }
+
+  export type StaffAssignmentUncheckedCreateWithoutSegmentBlockInput = {
+    id?: string
+    scheduleWeekId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type StaffAssignmentCreateOrConnectWithoutSegmentBlockInput = {
+    where: StaffAssignmentWhereUniqueInput
+    create: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput>
+  }
+
+  export type StaffAssignmentCreateManySegmentBlockInputEnvelope = {
+    data: StaffAssignmentCreateManySegmentBlockInput | StaffAssignmentCreateManySegmentBlockInput[]
+  }
+
+  export type ScheduleWeekUpsertWithoutSegmentBlocksInput = {
+    update: XOR<ScheduleWeekUpdateWithoutSegmentBlocksInput, ScheduleWeekUncheckedUpdateWithoutSegmentBlocksInput>
+    create: XOR<ScheduleWeekCreateWithoutSegmentBlocksInput, ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput>
+    where?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleWeekUpdateToOneWithWhereWithoutSegmentBlocksInput = {
+    where?: ScheduleWeekWhereInput
+    data: XOR<ScheduleWeekUpdateWithoutSegmentBlocksInput, ScheduleWeekUncheckedUpdateWithoutSegmentBlocksInput>
+  }
+
+  export type ScheduleWeekUpdateWithoutSegmentBlocksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutSegmentBlocksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput = {
+    where: StaffAssignmentWhereUniqueInput
+    update: XOR<StaffAssignmentUpdateWithoutSegmentBlockInput, StaffAssignmentUncheckedUpdateWithoutSegmentBlockInput>
+    create: XOR<StaffAssignmentCreateWithoutSegmentBlockInput, StaffAssignmentUncheckedCreateWithoutSegmentBlockInput>
+  }
+
+  export type StaffAssignmentUpdateWithWhereUniqueWithoutSegmentBlockInput = {
+    where: StaffAssignmentWhereUniqueInput
+    data: XOR<StaffAssignmentUpdateWithoutSegmentBlockInput, StaffAssignmentUncheckedUpdateWithoutSegmentBlockInput>
+  }
+
+  export type StaffAssignmentUpdateManyWithWhereWithoutSegmentBlockInput = {
+    where: StaffAssignmentScalarWhereInput
+    data: XOR<StaffAssignmentUpdateManyMutationInput, StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockInput>
+  }
+
+  export type ScheduleWeekCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutStaffAssignmentsInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput>
+  }
+
+  export type SegmentBlockCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutSegmentBlocksInput
+  }
+
+  export type SegmentBlockUncheckedCreateWithoutStaffAssignmentsInput = {
+    id?: string
+    scheduleWeekId: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+  }
+
+  export type SegmentBlockCreateOrConnectWithoutStaffAssignmentsInput = {
+    where: SegmentBlockWhereUniqueInput
+    create: XOR<SegmentBlockCreateWithoutStaffAssignmentsInput, SegmentBlockUncheckedCreateWithoutStaffAssignmentsInput>
+  }
+
+  export type ScheduleWeekUpsertWithoutStaffAssignmentsInput = {
+    update: XOR<ScheduleWeekUpdateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedUpdateWithoutStaffAssignmentsInput>
+    create: XOR<ScheduleWeekCreateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput>
+    where?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleWeekUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
+    where?: ScheduleWeekWhereInput
+    data: XOR<ScheduleWeekUpdateWithoutStaffAssignmentsInput, ScheduleWeekUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type ScheduleWeekUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type SegmentBlockUpsertWithoutStaffAssignmentsInput = {
+    update: XOR<SegmentBlockUpdateWithoutStaffAssignmentsInput, SegmentBlockUncheckedUpdateWithoutStaffAssignmentsInput>
+    create: XOR<SegmentBlockCreateWithoutStaffAssignmentsInput, SegmentBlockUncheckedCreateWithoutStaffAssignmentsInput>
+    where?: SegmentBlockWhereInput
+  }
+
+  export type SegmentBlockUpdateToOneWithWhereWithoutStaffAssignmentsInput = {
+    where?: SegmentBlockWhereInput
+    data: XOR<SegmentBlockUpdateWithoutStaffAssignmentsInput, SegmentBlockUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type SegmentBlockUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutSegmentBlocksNestedInput
+  }
+
+  export type SegmentBlockUncheckedUpdateWithoutStaffAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ScheduleTypeCreateManySchoolInput = {
+    id?: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type JobTitleCreateManySchoolInput = {
+    id?: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type EmployeeCreateManySchoolInput = {
+    id?: string
+    name: string
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+  }
+
+  export type OperatingHoursCreateManySchoolInput = {
+    id?: string
+    scheduleType: string
+    daysOfWeek: JsonNullValueInput | InputJsonValue
+    open: string
+    close: string
+  }
+
+  export type FieldTripTypeCreateManySchoolInput = {
+    id?: string
+    name: string
+    minAdultStudentRatio: number
+    minLeaderStudentRatio: number
+    policyCitationId?: string | null
+    notes?: string | null
+  }
+
+  export type ScheduleWeekCreateManySchoolInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ScheduleTypeUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleTypeUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleTypeUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JobTitleUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type JobTitleUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type JobTitleUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type EmployeeUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EmployeeUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type OperatingHoursUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OperatingHoursUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OperatingHoursUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleType?: StringFieldUpdateOperationsInput | string
+    daysOfWeek?: JsonNullValueInput | InputJsonValue
+    open?: StringFieldUpdateOperationsInput | string
+    close?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FieldTripTypeUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripTypeUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripTypeUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
+    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleWeekUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ScheduleDayCreateManyScheduleWeekInput = {
+    id?: string
+    date?: Date | string | null
+    dayOfWeek: string
+    scheduleType?: string | null
+    enrollmentCount?: number | null
+    enrollmentSource?: string | null
+    fieldTripEventId?: string | null
+    operatingCapacityOverride?: number | null
+    notes?: string | null
+    dayScheduleType?: string | null
+  }
+
+  export type SegmentBlockCreateManyScheduleWeekInput = {
+    id?: string
+    scheduleDayId?: string | null
+    dayOfWeek: string
+    segment: string
+    startTime: string
+    endTime: string
+    childCount: number
+    requirementTemplate: JsonNullValueInput | InputJsonValue
+    status: string
+  }
+
+  export type StaffAssignmentCreateManyScheduleWeekInput = {
+    id?: string
+    segmentBlockId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type FieldTripEventCreateManyScheduleWeekInput = {
+    id?: string
+    dayOfWeek: string
+    segment: string
+    scheduleDayId?: string | null
+    fieldTripTypeId?: string | null
+    isNoFieldTrip: boolean
+    approverId?: string | null
+    signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type ScheduleDayUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleDayUncheckedUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleDayUncheckedUpdateManyWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    scheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+    enrollmentCount?: NullableIntFieldUpdateOperationsInput | number | null
+    enrollmentSource?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    operatingCapacityOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    dayScheduleType?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SegmentBlockUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    staffAssignments?: StaffAssignmentUpdateManyWithoutSegmentBlockNestedInput
+  }
+
+  export type SegmentBlockUncheckedUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockNestedInput
+  }
+
+  export type SegmentBlockUncheckedUpdateManyWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    childCount?: IntFieldUpdateOperationsInput | number
+    requirementTemplate?: JsonNullValueInput | InputJsonValue
+    status?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StaffAssignmentUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+  }
+
+  export type StaffAssignmentUncheckedUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    segmentBlockId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    segmentBlockId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventUncheckedUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type FieldTripEventUncheckedUpdateManyWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dayOfWeek?: StringFieldUpdateOperationsInput | string
+    segment?: StringFieldUpdateOperationsInput | string
+    scheduleDayId?: NullableStringFieldUpdateOperationsInput | string | null
+    fieldTripTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
+    approverId?: NullableStringFieldUpdateOperationsInput | string | null
+    signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StaffAssignmentCreateManySegmentBlockInput = {
+    id?: string
+    scheduleWeekId: string
+    employeeId: string
+    assignmentSource: string
+    startTime: string
+    endTime: string
+    status: string
+    notes?: string | null
+  }
+
+  export type StaffAssignmentUpdateWithoutSegmentBlockInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
+  }
+
+  export type StaffAssignmentUncheckedUpdateWithoutSegmentBlockInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    employeeId?: StringFieldUpdateOperationsInput | string
+    assignmentSource?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+
+
+  /**
+   * Batch Payload for updateMany & deleteMany & createMany
+   */
+
+  export type BatchPayload = {
+    count: number
+  }
+
+  /**
+   * DMMF
+   */
+  export const dmmf: runtime.BaseDMMF
+}

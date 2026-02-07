@@ -1,30 +1,30 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../apps/api/generated/prisma-postgres"
+  output   = "../apps/api/generated/prisma-client"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model School {
-  id                      String             @id @default(cuid())
+  id                      String   @id @default(cuid())
   name                    String
   closedDays              Json
   openerCount             Int
   closerCount             Int
   minimumMedicalDelegated Int
   requireCurrentCpr       Boolean
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
-  scheduleTypes           ScheduleType[]
-  jobTitles               JobTitle[]
-  employees               Employee[]
-  operatingHours          OperatingHours[]
-  fieldTripTypes          FieldTripType[]
-  scheduleWeeks           ScheduleWeek[]
+  scheduleTypes  ScheduleType[]
+  jobTitles      JobTitle[]
+  employees      Employee[]
+  operatingHours OperatingHours[]
+  fieldTripTypes FieldTripType[]
+  scheduleWeeks  ScheduleWeek[]
 }
 
 model ScheduleType {
@@ -36,19 +36,19 @@ model ScheduleType {
   ratioStudents Int
   description   String?
 
-  school        School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@unique([schoolId, value])
 }
 
 model JobTitle {
-  id                        String @id @default(cuid())
-  schoolId                  String
-  title                     String
-  leaderQualified           Boolean
+  id                         String  @id @default(cuid())
+  schoolId                   String
+  title                      String
+  leaderQualified            Boolean
   requiresLeaderForOpenClose Boolean
 
-  school                    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model Employee {
@@ -63,7 +63,7 @@ model Employee {
   cprCurrent         Boolean
   notes              String?
 
-  school             School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model OperatingHours {
@@ -74,7 +74,7 @@ model OperatingHours {
   open         String
   close        String
 
-  school       School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model FieldTripType {
@@ -86,27 +86,27 @@ model FieldTripType {
   policyCitationId      String?
   notes                 String?
 
-  school                School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model ScheduleWeek {
-  id                String   @id @default(cuid())
-  schoolId          String
-  label             String?
-  status            String
-  startDate         DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id        String    @id @default(cuid())
+  schoolId  String
+  label     String?
+  status    String
+  startDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  school            School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  scheduleDays      ScheduleDay[]
-  segmentBlocks     SegmentBlock[]
-  staffAssignments  StaffAssignment[]
-  fieldTripEvents   FieldTripEvent[]
+  school           School            @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  scheduleDays     ScheduleDay[]
+  segmentBlocks    SegmentBlock[]
+  staffAssignments StaffAssignment[]
+  fieldTripEvents  FieldTripEvent[]
 }
 
 model ScheduleDay {
-  id                        String  @id @default(cuid())
+  id                        String    @id @default(cuid())
   scheduleWeekId            String
   date                      DateTime?
   dayOfWeek                 String
@@ -118,11 +118,11 @@ model ScheduleDay {
   notes                     String?
   dayScheduleType           String?
 
-  scheduleWeek              ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
 }
 
 model FieldTripEvent {
-  id              String  @id @default(cuid())
+  id              String    @id @default(cuid())
   scheduleWeekId  String
   dayOfWeek       String
   segment         String
@@ -133,11 +133,11 @@ model FieldTripEvent {
   signedOffAt     DateTime?
   notes           String?
 
-  scheduleWeek    ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
 }
 
 model SegmentBlock {
-  id                  String @id @default(cuid())
+  id                  String  @id @default(cuid())
   scheduleWeekId      String
   scheduleDayId       String?
   dayOfWeek           String
@@ -148,12 +148,12 @@ model SegmentBlock {
   requirementTemplate Json
   status              String
 
-  scheduleWeek        ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
-  staffAssignments    StaffAssignment[]
+  scheduleWeek     ScheduleWeek      @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+  staffAssignments StaffAssignment[]
 }
 
 model StaffAssignment {
-  id               String @id @default(cuid())
+  id               String  @id @default(cuid())
   scheduleWeekId   String
   segmentBlockId   String
   employeeId       String
@@ -163,6 +163,6 @@ model StaffAssignment {
   status           String
   notes            String?
 
-  scheduleWeek     ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
-  segmentBlock     SegmentBlock @relation(fields: [segmentBlockId], references: [id], onDelete: Cascade)
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
+  segmentBlock SegmentBlock @relation(fields: [segmentBlockId], references: [id], onDelete: Cascade)
 }
