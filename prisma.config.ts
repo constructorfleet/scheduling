@@ -3,6 +3,6 @@ import { defineConfig } from "prisma/config";
 export default defineConfig({
   engine: "classic",
   datasource: {
-    url: process.env.DATABASE_URL ?? "file:./data.db"
+    url: process.env.DATABASE_URL ?? "file:./scheduling.db"
   }
 });

@@ -19,7 +19,7 @@ export const resolveDbConfig = (): DbConfig => {
     return { url: resolvedUrl };
   }
 
-  const file = getArgValue("db-file") ?? process.env.DB_FILE ?? process.env.DB_NAME ?? "data.db";
+  const file = getArgValue("db-file") ?? process.env.DB_FILE ?? process.env.DB_NAME ?? "scheduling.db";
   return { url: `file:${file.startsWith("./") ? file : `./${file}`}` };
 };
 
