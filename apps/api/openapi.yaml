@@ -372,15 +372,19 @@ components:
       properties:
         name:
           type: string
-        minAdultStudentRatio:
-          type: number
-        minLeaderStudentRatio:
-          type: number
+        adultRatioAdults:
+          type: integer
+        adultRatioStudents:
+          type: integer
+        leaderRatioAdults:
+          type: integer
+        leaderRatioStudents:
+          type: integer
         policyCitationId:
           type: string
         notes:
           type: string
-      required: [name, minAdultStudentRatio, minLeaderStudentRatio]
+      required: [name, adultRatioAdults, adultRatioStudents, leaderRatioAdults, leaderRatioStudents]
     FieldTripTypeResponse:
       type: object
       properties:
@@ -390,15 +394,19 @@ components:
           type: string
         name:
           type: string
-        minAdultStudentRatio:
-          type: number
-        minLeaderStudentRatio:
-          type: number
+        adultRatioAdults:
+          type: integer
+        adultRatioStudents:
+          type: integer
+        leaderRatioAdults:
+          type: integer
+        leaderRatioStudents:
+          type: integer
         policyCitationId:
           type: string
         notes:
           type: string
-      required: [id, schoolId, name, minAdultStudentRatio, minLeaderStudentRatio]
+      required: [id, schoolId, name, adultRatioAdults, adultRatioStudents, leaderRatioAdults, leaderRatioStudents]
     ScheduleWeek:
       type: object
       properties:

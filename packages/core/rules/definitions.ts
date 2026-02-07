@@ -141,10 +141,10 @@ export const ratioSegmentRule: RuleDefinition = {
       });
       const activeFieldTripType = getFieldTripTypeById(context, activeFieldTripEvent?.fieldTripTypeId);
       // Field trip ratios use same format as schedule type ratios: children per adult
-      // e.g., 10 means 1 adult per 10 children (1:10 ratio)
+      // e.g., 1:10 ratio means adultRatioAdults=1, adultRatioStudents=10
       const fieldTripChildrenPerStaff =
-        activeFieldTripType && activeFieldTripType.minAdultStudentRatio > 0
-          ? activeFieldTripType.minAdultStudentRatio
+        activeFieldTripType && activeFieldTripType.adultRatioStudents > 0
+          ? activeFieldTripType.adultRatioStudents / activeFieldTripType.adultRatioAdults
           : undefined;
       const childrenPerStaff =
         fieldTripChildrenPerStaff ??
@@ -1128,14 +1128,14 @@ export const fieldTripRatiosRule: RuleDefinition = {
         return Boolean(candidate.fieldTripTypeId) && !candidate.isNoFieldTrip;
       });
       const type = event && getFieldTripTypeById(context, event.fieldTripTypeId);
-      if (!event || !type || type.minLeaderStudentRatio <= 0) {
+      if (!event || !type || type.leaderRatioStudents <= 0) {
         return;
       }
       const effectiveChildCount =
         typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
-      // Field trip ratios use same format as schedule type ratios: children per leader
-      // e.g., 30 means 1 leader per 30 children (1:30 ratio)
-      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / type.minLeaderStudentRatio));
+      // Field trip ratios: leaderRatioAdults:leaderRatioStudents (e.g., 1:30 ratio)
+      const childrenPerLeader = type.leaderRatioStudents / type.leaderRatioAdults;
+      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / childrenPerLeader));
       const blockStart = parseTimeToMinutes(block.startTime);
       const blockEnd = parseTimeToMinutes(block.endTime);
       const assignedLeaderIds = new Set(

@@ -79,13 +79,15 @@ model OperatingHours {
 }
 
 model FieldTripType {
-  id                    String  @id @default(cuid())
-  schoolId              String
-  name                  String
-  minAdultStudentRatio  Float
-  minLeaderStudentRatio Float
-  policyCitationId      String?
-  notes                 String?
+  id                  String  @id @default(cuid())
+  schoolId            String
+  name                String
+  adultRatioAdults    Int
+  adultRatioStudents  Int
+  leaderRatioAdults   Int
+  leaderRatioStudents Int
+  policyCitationId    String?
+  notes               String?
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }

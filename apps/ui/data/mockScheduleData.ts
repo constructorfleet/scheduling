@@ -343,16 +343,20 @@ export const fieldTripTypes: FieldTripType[] = [
   {
     id: "ft-zoo",
     name: "Museum Explorers",
-    minAdultStudentRatio: 8,
-    minLeaderStudentRatio: 12,
+    adultRatioAdults: 1,
+    adultRatioStudents: 8,
+    leaderRatioAdults: 1,
+    leaderRatioStudents: 12,
     policyCitationId: policyCitations.fieldTrip.id,
     notes: "Requires two leaders for any outdoor trips"
   },
   {
     id: "ft-forest",
     name: "Forest STEAM outing",
-    minAdultStudentRatio: 10,
-    minLeaderStudentRatio: 14,
+    adultRatioAdults: 1,
+    adultRatioStudents: 10,
+    leaderRatioAdults: 1,
+    leaderRatioStudents: 14,
     policyCitationId: policyCitations.fieldTrip.id,
     notes: "Leader-led nature explorations with small pods"
   }

@@ -693,8 +693,10 @@ export default function App() {
     if ("fieldTripTypes" in overrides) {
       payload.fieldTripTypes = (overrides.fieldTripTypes ?? fieldTripTypesState).map((trip) => ({
         name: trip.name,
-        minAdultStudentRatio: trip.minAdultStudentRatio,
-        minLeaderStudentRatio: trip.minLeaderStudentRatio,
+        adultRatioAdults: trip.adultRatioAdults,
+        adultRatioStudents: trip.adultRatioStudents,
+        leaderRatioAdults: trip.leaderRatioAdults,
+        leaderRatioStudents: trip.leaderRatioStudents,
         policyCitationId: trip.policyCitationId,
         notes: trip.notes
       })) as FieldTripTypePayload[];

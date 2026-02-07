@@ -82,8 +82,10 @@ model FieldTripType {
   id                    String  @id @default(cuid())
   schoolId              String
   name                  String
-  minAdultStudentRatio  Float
-  minLeaderStudentRatio Float
+  adultRatioAdults      Int
+  adultRatioStudents    Int
+  leaderRatioAdults     Int
+  leaderRatioStudents   Int
   policyCitationId      String?
   notes                 String?
 

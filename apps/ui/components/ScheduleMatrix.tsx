@@ -75,21 +75,7 @@ const FIELD_TRIP_OPTIONS = (fieldTripTypes: FieldTripType[]) => [
   }))
 ];
 
-const ratioToPair = (ratio: number) => {
-  if (!Number.isFinite(ratio)) {
-    return { adults: 1, students: 1 };
-  }
-  if (ratio === 0) {
-    return { adults: 0, students: 0 };
-  }
-  if (ratio < 0) {
-    return { adults: 1, students: 1 };
-  }
-  if (ratio >= 1) {
-    return { adults: Math.max(1, Math.round(ratio)), students: 1 };
-  }
-  return { adults: 1, students: Math.max(1, Math.round(1 / ratio)) };
-};
+
 
 export default function ScheduleMatrix({
   staff,
@@ -335,10 +321,10 @@ export default function ScheduleMatrix({
                 ? `${scheduleTypeOption.ratio.adults}:${scheduleTypeOption.ratio.students}`
                 : "not set";
               const fieldTripAdultRatioLabel = fieldTripType
-                ? `${ratioToPair(fieldTripType.minAdultStudentRatio).adults}:${ratioToPair(fieldTripType.minAdultStudentRatio).students}`
+                ? `${fieldTripType.adultRatioAdults}:${fieldTripType.adultRatioStudents}`
                 : undefined;
-              const fieldTripLeaderRatioLabel = fieldTripType && fieldTripType.minLeaderStudentRatio > 0
-                ? `${ratioToPair(fieldTripType.minLeaderStudentRatio).adults}:${ratioToPair(fieldTripType.minLeaderStudentRatio).students}`
+              const fieldTripLeaderRatioLabel = fieldTripType && fieldTripType.leaderRatioStudents > 0
+                ? `${fieldTripType.leaderRatioAdults}:${fieldTripType.leaderRatioStudents}`
                 : undefined;
               return (
                 <th

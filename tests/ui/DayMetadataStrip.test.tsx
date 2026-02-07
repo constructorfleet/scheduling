@@ -40,8 +40,10 @@ const fieldTripTypes: FieldTripType[] = [
   {
     id: "ft-zoo",
     name: "Zoo visit",
-    minAdultStudentRatio: 0.2,
-    minLeaderStudentRatio: 0.1,
+    adultRatioAdults: 1,
+    adultRatioStudents: 5,
+    leaderRatioAdults: 1,
+    leaderRatioStudents: 10,
     policyCitationId: "policy-field-trip"
   }
 ];

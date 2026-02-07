@@ -256,8 +256,10 @@ const buildServer = async () => {
       }>;
       fieldTripTypes?: Array<{
         name: string;
-        minAdultStudentRatio: number;
-        minLeaderStudentRatio: number;
+        adultRatioAdults: number;
+        adultRatioStudents: number;
+        leaderRatioAdults: number;
+        leaderRatioStudents: number;
         policyCitationId?: string;
         notes?: string;
       }>;
@@ -466,8 +468,10 @@ const buildServer = async () => {
             await tx.fieldTripType.update({
               where: { id: existing.id },
               data: {
-                minAdultStudentRatio: trip.minAdultStudentRatio,
-                minLeaderStudentRatio: trip.minLeaderStudentRatio,
+                adultRatioAdults: trip.adultRatioAdults,
+                adultRatioStudents: trip.adultRatioStudents,
+                leaderRatioAdults: trip.leaderRatioAdults,
+                leaderRatioStudents: trip.leaderRatioStudents,
                 policyCitationId: trip.policyCitationId ?? null,
                 notes: trip.notes ?? null
               }
@@ -478,8 +482,10 @@ const buildServer = async () => {
             data: {
               schoolId,
               name: trip.name,
-              minAdultStudentRatio: trip.minAdultStudentRatio,
-              minLeaderStudentRatio: trip.minLeaderStudentRatio,
+              adultRatioAdults: trip.adultRatioAdults,
+              adultRatioStudents: trip.adultRatioStudents,
+              leaderRatioAdults: trip.leaderRatioAdults,
+              leaderRatioStudents: trip.leaderRatioStudents,
               policyCitationId: trip.policyCitationId ?? null,
               notes: trip.notes ?? null
             }

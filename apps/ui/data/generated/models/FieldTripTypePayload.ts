@@ -4,8 +4,10 @@
 /* eslint-disable */
 export type FieldTripTypePayload = {
     name: string;
-    minAdultStudentRatio: number;
-    minLeaderStudentRatio: number;
+    adultRatioAdults: number;
+    adultRatioStudents: number;
+    leaderRatioAdults: number;
+    leaderRatioStudents: number;
     policyCitationId?: string;
     notes?: string;
 };

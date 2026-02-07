@@ -68,8 +68,10 @@ const emptyScheduleType = (): ScheduleTypeOption => ({
 const emptyFieldTrip = (): FieldTripType => ({
   id: `ft-${Date.now()}`,
   name: "New field trip",
-  minAdultStudentRatio: 10,
-  minLeaderStudentRatio: 12,
+  adultRatioAdults: 1,
+  adultRatioStudents: 10,
+  leaderRatioAdults: 1,
+  leaderRatioStudents: 12,
   policyCitationId: "policy-field-trip",
   notes: ""
 });
@@ -128,21 +130,6 @@ export default function SettingsPanel({
 }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("school");
   const jobTitleOptions = useMemo(() => jobTitles.map((title) => title.title), [jobTitles]);
-  const ratioToPair = (ratio: number) => {
-    if (!Number.isFinite(ratio)) {
-      return { adults: 1, students: 1 };
-    }
-    if (ratio === 0) {
-      return { adults: 0, students: 0 };
-    }
-    if (ratio < 0) {
-      return { adults: 1, students: 1 };
-    }
-    if (ratio >= 1) {
-      return { adults: Math.max(1, Math.round(ratio)), students: 1 };
-    }
-    return { adults: 1, students: Math.max(1, Math.round(1 / ratio)) };
-  };
   const allDays: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
   const [draftSchoolName, setDraftSchoolName] = useState(schoolName);
@@ -489,7 +476,6 @@ export default function SettingsPanel({
           {activeTab === "fieldTrips" && (
             <FieldTripsSection
               draftFieldTrips={draftFieldTrips}
-              ratioToPair={ratioToPair}
               onChange={(next) => {
                 setDraftFieldTrips(next);
                 markDirty("fieldTrips");

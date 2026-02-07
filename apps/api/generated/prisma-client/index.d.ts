@@ -7765,21 +7765,27 @@ export namespace Prisma {
   }
 
   export type FieldTripTypeAvgAggregateOutputType = {
-    minAdultStudentRatio: number | null
-    minLeaderStudentRatio: number | null
+    adultRatioAdults: number | null
+    adultRatioStudents: number | null
+    leaderRatioAdults: number | null
+    leaderRatioStudents: number | null
   }
 
   export type FieldTripTypeSumAggregateOutputType = {
-    minAdultStudentRatio: number | null
-    minLeaderStudentRatio: number | null
+    adultRatioAdults: number | null
+    adultRatioStudents: number | null
+    leaderRatioAdults: number | null
+    leaderRatioStudents: number | null
   }
 
   export type FieldTripTypeMinAggregateOutputType = {
     id: string | null
     schoolId: string | null
     name: string | null
-    minAdultStudentRatio: number | null
-    minLeaderStudentRatio: number | null
+    adultRatioAdults: number | null
+    adultRatioStudents: number | null
+    leaderRatioAdults: number | null
+    leaderRatioStudents: number | null
     policyCitationId: string | null
     notes: string | null
   }
@@ -7788,8 +7794,10 @@ export namespace Prisma {
     id: string | null
     schoolId: string | null
     name: string | null
-    minAdultStudentRatio: number | null
-    minLeaderStudentRatio: number | null
+    adultRatioAdults: number | null
+    adultRatioStudents: number | null
+    leaderRatioAdults: number | null
+    leaderRatioStudents: number | null
     policyCitationId: string | null
     notes: string | null
   }
@@ -7798,8 +7806,10 @@ export namespace Prisma {
     id: number
     schoolId: number
     name: number
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId: number
     notes: number
     _all: number
@@ -7807,21 +7817,27 @@ export namespace Prisma {
 
 
   export type FieldTripTypeAvgAggregateInputType = {
-    minAdultStudentRatio?: true
-    minLeaderStudentRatio?: true
+    adultRatioAdults?: true
+    adultRatioStudents?: true
+    leaderRatioAdults?: true
+    leaderRatioStudents?: true
   }
 
   export type FieldTripTypeSumAggregateInputType = {
-    minAdultStudentRatio?: true
-    minLeaderStudentRatio?: true
+    adultRatioAdults?: true
+    adultRatioStudents?: true
+    leaderRatioAdults?: true
+    leaderRatioStudents?: true
   }
 
   export type FieldTripTypeMinAggregateInputType = {
     id?: true
     schoolId?: true
     name?: true
-    minAdultStudentRatio?: true
-    minLeaderStudentRatio?: true
+    adultRatioAdults?: true
+    adultRatioStudents?: true
+    leaderRatioAdults?: true
+    leaderRatioStudents?: true
     policyCitationId?: true
     notes?: true
   }
@@ -7830,8 +7846,10 @@ export namespace Prisma {
     id?: true
     schoolId?: true
     name?: true
-    minAdultStudentRatio?: true
-    minLeaderStudentRatio?: true
+    adultRatioAdults?: true
+    adultRatioStudents?: true
+    leaderRatioAdults?: true
+    leaderRatioStudents?: true
     policyCitationId?: true
     notes?: true
   }
@@ -7840,8 +7858,10 @@ export namespace Prisma {
     id?: true
     schoolId?: true
     name?: true
-    minAdultStudentRatio?: true
-    minLeaderStudentRatio?: true
+    adultRatioAdults?: true
+    adultRatioStudents?: true
+    leaderRatioAdults?: true
+    leaderRatioStudents?: true
     policyCitationId?: true
     notes?: true
     _all?: true
@@ -7937,8 +7957,10 @@ export namespace Prisma {
     id: string
     schoolId: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId: string | null
     notes: string | null
     _count: FieldTripTypeCountAggregateOutputType | null
@@ -7966,8 +7988,10 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
-    minAdultStudentRatio?: boolean
-    minLeaderStudentRatio?: boolean
+    adultRatioAdults?: boolean
+    adultRatioStudents?: boolean
+    leaderRatioAdults?: boolean
+    leaderRatioStudents?: boolean
     policyCitationId?: boolean
     notes?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
@@ -7977,8 +8001,10 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
-    minAdultStudentRatio?: boolean
-    minLeaderStudentRatio?: boolean
+    adultRatioAdults?: boolean
+    adultRatioStudents?: boolean
+    leaderRatioAdults?: boolean
+    leaderRatioStudents?: boolean
     policyCitationId?: boolean
     notes?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
@@ -7988,8 +8014,10 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
-    minAdultStudentRatio?: boolean
-    minLeaderStudentRatio?: boolean
+    adultRatioAdults?: boolean
+    adultRatioStudents?: boolean
+    leaderRatioAdults?: boolean
+    leaderRatioStudents?: boolean
     policyCitationId?: boolean
     notes?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
@@ -7999,13 +8027,15 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
-    minAdultStudentRatio?: boolean
-    minLeaderStudentRatio?: boolean
+    adultRatioAdults?: boolean
+    adultRatioStudents?: boolean
+    leaderRatioAdults?: boolean
+    leaderRatioStudents?: boolean
     policyCitationId?: boolean
     notes?: boolean
   }
 
-  export type FieldTripTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "minAdultStudentRatio" | "minLeaderStudentRatio" | "policyCitationId" | "notes", ExtArgs["result"]["fieldTripType"]>
+  export type FieldTripTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "adultRatioAdults" | "adultRatioStudents" | "leaderRatioAdults" | "leaderRatioStudents" | "policyCitationId" | "notes", ExtArgs["result"]["fieldTripType"]>
   export type FieldTripTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }
@@ -8025,8 +8055,10 @@ export namespace Prisma {
       id: string
       schoolId: string
       name: string
-      minAdultStudentRatio: number
-      minLeaderStudentRatio: number
+      adultRatioAdults: number
+      adultRatioStudents: number
+      leaderRatioAdults: number
+      leaderRatioStudents: number
       policyCitationId: string | null
       notes: string | null
     }, ExtArgs["result"]["fieldTripType"]>
@@ -8456,8 +8488,10 @@ export namespace Prisma {
     readonly id: FieldRef<"FieldTripType", 'String'>
     readonly schoolId: FieldRef<"FieldTripType", 'String'>
     readonly name: FieldRef<"FieldTripType", 'String'>
-    readonly minAdultStudentRatio: FieldRef<"FieldTripType", 'Float'>
-    readonly minLeaderStudentRatio: FieldRef<"FieldTripType", 'Float'>
+    readonly adultRatioAdults: FieldRef<"FieldTripType", 'Int'>
+    readonly adultRatioStudents: FieldRef<"FieldTripType", 'Int'>
+    readonly leaderRatioAdults: FieldRef<"FieldTripType", 'Int'>
+    readonly leaderRatioStudents: FieldRef<"FieldTripType", 'Int'>
     readonly policyCitationId: FieldRef<"FieldTripType", 'String'>
     readonly notes: FieldRef<"FieldTripType", 'String'>
   }
@@ -15882,8 +15916,10 @@ export namespace Prisma {
     id: 'id',
     schoolId: 'schoolId',
     name: 'name',
-    minAdultStudentRatio: 'minAdultStudentRatio',
-    minLeaderStudentRatio: 'minLeaderStudentRatio',
+    adultRatioAdults: 'adultRatioAdults',
+    adultRatioStudents: 'adultRatioStudents',
+    leaderRatioAdults: 'leaderRatioAdults',
+    leaderRatioStudents: 'leaderRatioStudents',
     policyCitationId: 'policyCitationId',
     notes: 'notes'
   };
@@ -16462,8 +16498,10 @@ export namespace Prisma {
     id?: StringFilter<"FieldTripType"> | string
     schoolId?: StringFilter<"FieldTripType"> | string
     name?: StringFilter<"FieldTripType"> | string
-    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
-    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    adultRatioAdults?: IntFilter<"FieldTripType"> | number
+    adultRatioStudents?: IntFilter<"FieldTripType"> | number
+    leaderRatioAdults?: IntFilter<"FieldTripType"> | number
+    leaderRatioStudents?: IntFilter<"FieldTripType"> | number
     policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
     notes?: StringNullableFilter<"FieldTripType"> | string | null
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
@@ -16473,8 +16511,10 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
     policyCitationId?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     school?: SchoolOrderByWithRelationInput
@@ -16487,8 +16527,10 @@ export namespace Prisma {
     NOT?: FieldTripTypeWhereInput | FieldTripTypeWhereInput[]
     schoolId?: StringFilter<"FieldTripType"> | string
     name?: StringFilter<"FieldTripType"> | string
-    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
-    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    adultRatioAdults?: IntFilter<"FieldTripType"> | number
+    adultRatioStudents?: IntFilter<"FieldTripType"> | number
+    leaderRatioAdults?: IntFilter<"FieldTripType"> | number
+    leaderRatioStudents?: IntFilter<"FieldTripType"> | number
     policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
     notes?: StringNullableFilter<"FieldTripType"> | string | null
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
@@ -16498,8 +16540,10 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
     policyCitationId?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     _count?: FieldTripTypeCountOrderByAggregateInput
@@ -16516,8 +16560,10 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"FieldTripType"> | string
     schoolId?: StringWithAggregatesFilter<"FieldTripType"> | string
     name?: StringWithAggregatesFilter<"FieldTripType"> | string
-    minAdultStudentRatio?: FloatWithAggregatesFilter<"FieldTripType"> | number
-    minLeaderStudentRatio?: FloatWithAggregatesFilter<"FieldTripType"> | number
+    adultRatioAdults?: IntWithAggregatesFilter<"FieldTripType"> | number
+    adultRatioStudents?: IntWithAggregatesFilter<"FieldTripType"> | number
+    leaderRatioAdults?: IntWithAggregatesFilter<"FieldTripType"> | number
+    leaderRatioStudents?: IntWithAggregatesFilter<"FieldTripType"> | number
     policyCitationId?: StringNullableWithAggregatesFilter<"FieldTripType"> | string | null
     notes?: StringNullableWithAggregatesFilter<"FieldTripType"> | string | null
   }
@@ -17408,8 +17454,10 @@ export namespace Prisma {
   export type FieldTripTypeCreateInput = {
     id?: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
     school: SchoolCreateNestedOneWithoutFieldTripTypesInput
@@ -17419,8 +17467,10 @@ export namespace Prisma {
     id?: string
     schoolId: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
   }
@@ -17428,8 +17478,10 @@ export namespace Prisma {
   export type FieldTripTypeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     school?: SchoolUpdateOneRequiredWithoutFieldTripTypesNestedInput
@@ -17439,8 +17491,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     schoolId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -17449,8 +17503,10 @@ export namespace Prisma {
     id?: string
     schoolId: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
   }
@@ -17458,8 +17514,10 @@ export namespace Prisma {
   export type FieldTripTypeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -17468,8 +17526,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     schoolId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -18475,38 +18535,33 @@ export namespace Prisma {
     close?: SortOrder
   }
 
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
   export type FieldTripTypeCountOrderByAggregateInput = {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
     policyCitationId?: SortOrder
     notes?: SortOrder
   }
 
   export type FieldTripTypeAvgOrderByAggregateInput = {
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
   }
 
   export type FieldTripTypeMaxOrderByAggregateInput = {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
     policyCitationId?: SortOrder
     notes?: SortOrder
   }
@@ -18515,31 +18570,19 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
     policyCitationId?: SortOrder
     notes?: SortOrder
   }
 
   export type FieldTripTypeSumOrderByAggregateInput = {
-    minAdultStudentRatio?: SortOrder
-    minLeaderStudentRatio?: SortOrder
-  }
-
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
+    adultRatioAdults?: SortOrder
+    adultRatioStudents?: SortOrder
+    leaderRatioAdults?: SortOrder
+    leaderRatioStudents?: SortOrder
   }
 
   export type DateTimeNullableFilter<$PrismaModel = never> = {
@@ -19232,14 +19275,6 @@ export namespace Prisma {
     connect?: SchoolWhereUniqueInput
   }
 
-  export type FloatFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type SchoolUpdateOneRequiredWithoutFieldTripTypesNestedInput = {
     create?: XOR<SchoolCreateWithoutFieldTripTypesInput, SchoolUncheckedCreateWithoutFieldTripTypesInput>
     connectOrCreate?: SchoolCreateOrConnectWithoutFieldTripTypesInput
@@ -19795,22 +19830,6 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | null
@@ -19978,8 +19997,10 @@ export namespace Prisma {
   export type FieldTripTypeCreateWithoutSchoolInput = {
     id?: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
   }
@@ -19987,8 +20008,10 @@ export namespace Prisma {
   export type FieldTripTypeUncheckedCreateWithoutSchoolInput = {
     id?: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
   }
@@ -20180,8 +20203,10 @@ export namespace Prisma {
     id?: StringFilter<"FieldTripType"> | string
     schoolId?: StringFilter<"FieldTripType"> | string
     name?: StringFilter<"FieldTripType"> | string
-    minAdultStudentRatio?: FloatFilter<"FieldTripType"> | number
-    minLeaderStudentRatio?: FloatFilter<"FieldTripType"> | number
+    adultRatioAdults?: IntFilter<"FieldTripType"> | number
+    adultRatioStudents?: IntFilter<"FieldTripType"> | number
+    leaderRatioAdults?: IntFilter<"FieldTripType"> | number
+    leaderRatioStudents?: IntFilter<"FieldTripType"> | number
     policyCitationId?: StringNullableFilter<"FieldTripType"> | string | null
     notes?: StringNullableFilter<"FieldTripType"> | string | null
   }
@@ -21555,8 +21580,10 @@ export namespace Prisma {
   export type FieldTripTypeCreateManySchoolInput = {
     id?: string
     name: string
-    minAdultStudentRatio: number
-    minLeaderStudentRatio: number
+    adultRatioAdults: number
+    adultRatioStudents: number
+    leaderRatioAdults: number
+    leaderRatioStudents: number
     policyCitationId?: string | null
     notes?: string | null
   }
@@ -21687,8 +21714,10 @@ export namespace Prisma {
   export type FieldTripTypeUpdateWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -21696,8 +21725,10 @@ export namespace Prisma {
   export type FieldTripTypeUncheckedUpdateWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -21705,8 +21736,10 @@ export namespace Prisma {
   export type FieldTripTypeUncheckedUpdateManyWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    minAdultStudentRatio?: FloatFieldUpdateOperationsInput | number
-    minLeaderStudentRatio?: FloatFieldUpdateOperationsInput | number
+    adultRatioAdults?: IntFieldUpdateOperationsInput | number
+    adultRatioStudents?: IntFieldUpdateOperationsInput | number
+    leaderRatioAdults?: IntFieldUpdateOperationsInput | number
+    leaderRatioStudents?: IntFieldUpdateOperationsInput | number
     policyCitationId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }

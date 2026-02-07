@@ -175,8 +175,10 @@ exports.Prisma.FieldTripTypeScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
   name: 'name',
-  minAdultStudentRatio: 'minAdultStudentRatio',
-  minLeaderStudentRatio: 'minLeaderStudentRatio',
+  adultRatioAdults: 'adultRatioAdults',
+  adultRatioStudents: 'adultRatioStudents',
+  leaderRatioAdults: 'leaderRatioAdults',
+  leaderRatioStudents: 'leaderRatioStudents',
   policyCitationId: 'policyCitationId',
   notes: 'notes'
 };
