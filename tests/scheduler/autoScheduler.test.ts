@@ -416,6 +416,156 @@ describe("autoSchedule", () => {
       expect(fullTimeHours).toBeLessThanOrEqual(10);
     });
 
+    it("should extend a first assignment to the employee max daily shift when possible", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 12
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Eight Hour Erin", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 6 },
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 0,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const erinAssignment = result.staffAssignments.find(a => a.employeeId === "emp-1");
+
+      expect(erinAssignment).toBeDefined();
+      expect(erinAssignment?.startTime).toBe("06:30");
+      expect(erinAssignment?.endTime).toBe("14:30");
+    });
+
+    it("should seed opener and closer staffing with longest shifts first", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 8
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Opener One", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-2", "Opener Two", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-3", "Closer One", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 }),
+          createEmployee("emp-4", "Closer Two", { leaderQualified: true, medicallyDelegated: true, maxHoursPerDay: 8 })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 20 },
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 2,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const mondayAssignments = result.staffAssignments.filter(a => {
+        const block = result.segmentBlocks.find(b => b.id === a.segmentBlockId);
+        return block?.dayOfWeek === "mon";
+      });
+      const openers = mondayAssignments.filter(a => a.startTime === "06:30");
+      const closers = mondayAssignments.filter(a => a.endTime === "18:00");
+
+      expect(openers.length).toBeGreaterThanOrEqual(2);
+      expect(closers.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("should prefer open-only constrained staff after satisfying med delegated opener minimum", () => {
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 8
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-med-open", "Medical Opener", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8
+          }),
+          createEmployee("emp-open-only", "Open Only Non-Med", {
+            leaderQualified: true,
+            medicallyDelegated: false,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "06:30", endTime: "12:00" }] }
+            ]
+          }),
+          createEmployee("emp-flex", "Flexible Non-Med", {
+            leaderQualified: true,
+            medicallyDelegated: false,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "06:30", endTime: "18:00" }] }
+            ]
+          }),
+          createEmployee("emp-close-med", "Medical Closer", {
+            leaderQualified: true,
+            medicallyDelegated: true,
+            cprCurrent: true,
+            maxHoursPerDay: 8,
+            availability: [
+              { dayOfWeek: "mon", blocks: [{ startTime: "10:00", endTime: "18:00" }] }
+            ]
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:30", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 20 },
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+      const mondayOpeners = result.staffAssignments.filter(a => a.startTime === "06:30");
+
+      const hasMedicalOpener = mondayOpeners.some(a => a.employeeId === "emp-med-open");
+      const hasOpenOnlyOpener = mondayOpeners.some(a => a.employeeId === "emp-open-only");
+      const hasFlexOpener = mondayOpeners.some(a => a.employeeId === "emp-flex");
+
+      expect(hasMedicalOpener).toBe(true);
+      expect(hasOpenOnlyOpener).toBe(true);
+      expect(hasFlexOpener).toBe(false);
+    });
+
     it("should prioritize leader-qualified employees", () => {
       // Realistic scenario: Mix of leaders and assistants
       const context: AutoSchedulerContext = {
