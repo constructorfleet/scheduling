@@ -29,6 +29,7 @@ interface ScheduleMatrixProps {
   onScheduleTypeChange: (dayId: string, scheduleType: ScheduleType | undefined) => void;
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
+  onDeleteAssignment: (assignmentId: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
   focusedSegmentIds?: string[] | null;
 }
@@ -95,6 +96,7 @@ export default function ScheduleMatrix({
   onScheduleTypeChange,
   onFieldTripSelection,
   onUpdateAssignmentTime,
+  onDeleteAssignment,
   onCreateAssignment,
   focusedSegmentIds
 }: ScheduleMatrixProps) {
@@ -578,12 +580,15 @@ export default function ScheduleMatrix({
                                 gap: "0.25rem",
                                 padding: "0.25rem 0.4rem",
                                 borderRadius: 8,
-                                background: blockBackground,
-                                border: blockBorder,
+                                background: isFocused ? "#fef3c7" : blockBackground,
+                                border: isFocused ? "2px solid #f59e0b" : blockBorder,
                                 fontSize: "0.75rem",
                                 fontWeight: 600,
                                 cursor: "pointer",
-                                boxShadow: isFocused ? "0 0 0 2px rgba(37, 99, 235, 0.6)" : "none"
+                                boxShadow: isFocused
+                                  ? "0 0 0 4px rgba(245, 158, 11, 0.35), 0 6px 20px rgba(245, 158, 11, 0.2)"
+                                  : "none",
+                                transition: "box-shadow 180ms linear, background-color 180ms linear, border-color 180ms linear"
                               }}
                               data-segment-id={block.segmentBlockId}
                               onClick={() => {
@@ -610,23 +615,6 @@ export default function ScheduleMatrix({
                                         prev ? { ...prev, startTime: event.target.value } : prev
                                       )
                                     }
-                                    onBlur={(event) => {
-                                      const nextStart = event.target.value;
-                                      const nextEnd = editing.endTime;
-                                      if (nextStart && nextEnd) {
-                                        const overlap = getOverlapMessage({
-                                          assignmentId: block.id,
-                                          employeeId: editing.employeeId,
-                                          dayOfWeek: editing.dayOfWeek,
-                                          startTime: nextStart,
-                                          endTime: nextEnd
-                                        });
-                                        if (overlap) {
-                                          return;
-                                        }
-                                        onUpdateAssignmentTime(block.id, nextStart, nextEnd);
-                                      }
-                                    }}
                                     style={{
                                       borderRadius: 6,
                                       border: "1px solid #cbd5f5",
@@ -642,23 +630,6 @@ export default function ScheduleMatrix({
                                         prev ? { ...prev, endTime: event.target.value } : prev
                                       )
                                     }
-                                    onBlur={(event) => {
-                                      const nextEnd = event.target.value;
-                                      const nextStart = editing.startTime;
-                                      if (nextStart && nextEnd) {
-                                        const overlap = getOverlapMessage({
-                                          assignmentId: block.id,
-                                          employeeId: editing.employeeId,
-                                          dayOfWeek: editing.dayOfWeek,
-                                          startTime: nextStart,
-                                          endTime: nextEnd
-                                        });
-                                        if (overlap) {
-                                          return;
-                                        }
-                                        onUpdateAssignmentTime(block.id, nextStart, nextEnd);
-                                      }
-                                    }}
                                     style={{
                                       borderRadius: 6,
                                       border: "1px solid #cbd5f5",
@@ -692,6 +663,27 @@ export default function ScheduleMatrix({
                                     }}
                                   >
                                     Save
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      onDeleteAssignment(block.id);
+                                      setEditing(null);
+                                    }}
+                                    onPointerDown={(event) => event.stopPropagation()}
+                                    style={{
+                                      borderRadius: 999,
+                                      border: "1px solid #fecaca",
+                                      background: "#fee2e2",
+                                      color: "#b91c1c",
+                                      padding: "0.15rem 0.6rem",
+                                      fontSize: "0.7rem",
+                                      alignSelf: "flex-start",
+                                      cursor: "pointer"
+                                    }}
+                                  >
+                                    Delete
                                   </button>
                                   {overlapMessage && (
                                     <span style={{ fontSize: "0.7rem", color: "#b91c1c" }}>{overlapMessage}</span>

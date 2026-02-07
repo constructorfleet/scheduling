@@ -234,7 +234,7 @@ export default function ViolationNavigator({
             }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h4 style={{ margin: 0, fontSize: "1rem" }}>{violation.title}</h4>
+                <h4 style={{ margin: 0, fontSize: "1rem" }}>Rule: {violation.title}</h4>
                 <span
                   style={{
                     fontSize: "0.75rem",
@@ -248,16 +248,25 @@ export default function ViolationNavigator({
                   {severity.label}
                 </span>
               </div>
-              <p style={{ margin: 0, color: "#4b5563" }}>{violation.description}</p>
               {violation.dayLabel && (
                 <p style={{ margin: 0, fontSize: "0.8rem", color: "#1d4ed8", fontWeight: 600 }}>
-                  Day: {violation.dayLabel}
+                  {violation.dayLabel}
+                </p>
+              )}
+              <p style={{ margin: 0, color: "#4b5563" }}>
+                Issue: {violation.issue ?? violation.description}
+              </p>
+              {violation.context && (
+                <p style={{ margin: 0, color: "#4b5563" }}>
+                  Context: {violation.context}
                 </p>
               )}
               <p style={{ margin: 0, fontSize: "0.85rem", color: "#6b7280" }}>
-                Citation: {violation.policyCitation.name} ({violation.policyCitation.section})
+                Citation: {violation.policyCitation.name}{violation.policyCitation.section ? ' (' + violation.policyCitation.section + ')' : ''}
               </p>
-              <p style={{ margin: 0, fontWeight: 600, color: "#166534" }}>{violation.recommendedAction}</p>
+              <p style={{ margin: 0, fontWeight: 600, color: "#166534" }}>
+                Fix: {violation.recommendedAction}
+              </p>
               {Boolean(violation.metadata?.operatingHoursId) && (
                 <span
                   style={{

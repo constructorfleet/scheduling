@@ -127,6 +127,7 @@ const renderMatrix = (overrides?: Partial<{
       onScheduleTypeChange={jest.fn()}
       onFieldTripSelection={jest.fn()}
       onUpdateAssignmentTime={onUpdateAssignmentTime}
+      onDeleteAssignment={jest.fn()}
       onCreateAssignment={onCreateAssignment}
     />
   );
@@ -155,6 +156,7 @@ describe("ScheduleMatrix", () => {
         onScheduleTypeChange={jest.fn()}
         onFieldTripSelection={jest.fn()}
         onUpdateAssignmentTime={jest.fn()}
+        onDeleteAssignment={jest.fn()}
         onCreateAssignment={jest.fn()}
         focusedSegmentIds={["segment-mon-open"]}
       />
@@ -162,7 +164,7 @@ describe("ScheduleMatrix", () => {
 
     const focusedBlock = container.querySelector<HTMLElement>('[data-segment-id="segment-mon-open"]');
     expect(focusedBlock).not.toBeNull();
-    expect(focusedBlock?.style.boxShadow).toContain("rgba(37, 99, 235, 0.6)");
+    expect(focusedBlock?.style.boxShadow).toContain("rgba(245, 158, 11");
     expect(scrollIntoView).toHaveBeenCalled();
 
     HTMLElement.prototype.scrollIntoView = original;
@@ -233,6 +235,40 @@ describe("ScheduleMatrix", () => {
       fireEvent.change(endInputs[0], { target: { value: "11:00" } });
     });
     expect(within(row as HTMLElement).getByText("Overlaps another block")).toBeInTheDocument();
+  });
+
+  it("deletes an assignment from edit mode", async () => {
+    const user = userEvent.setup();
+    const onDeleteAssignment = jest.fn();
+    render(
+      <ScheduleMatrix
+        staff={baseStaff}
+        assignments={assignments}
+        segmentBlocks={segmentBlocks}
+        days={baseDays}
+        daySequence={daySequence}
+        dayDisplayNames={dayDisplayNames}
+        scheduleTypeOptions={scheduleTypeOptions}
+        fieldTripTypes={[]}
+        fieldTripEventsByDay={baseFieldTripEventsByDay}
+        operatingHoursByDay={baseOperatingHoursByDay}
+        onEnrollmentChange={jest.fn()}
+        onScheduleTypeChange={jest.fn()}
+        onFieldTripSelection={jest.fn()}
+        onUpdateAssignmentTime={jest.fn()}
+        onDeleteAssignment={onDeleteAssignment}
+        onCreateAssignment={jest.fn()}
+      />
+    );
+    const block = screen.getByText("7:00 AM");
+    await act(async () => {
+      await user.click(block);
+    });
+    const deleteButton = screen.getByRole("button", { name: "Delete" });
+    await act(async () => {
+      await user.click(deleteButton);
+    });
+    expect(onDeleteAssignment).toHaveBeenCalledWith("assign-1");
   });
 
   it("highlights opener and closer blocks based on operating hours", () => {

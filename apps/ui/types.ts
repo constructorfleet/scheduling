@@ -18,6 +18,8 @@ export interface RuleViolation {
   severity: "critical" | "warning" | "info";
   description: string;
   dayLabel?: string;
+  issue?: string;
+  context?: string;
   segmentBlockId: string;
   relatedSegmentBlockIds?: string[];
   policyCitation: PolicyCitation;

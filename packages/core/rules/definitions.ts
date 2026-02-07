@@ -250,6 +250,10 @@ export const ratioSegmentRule: RuleDefinition = {
               dayOfWeek: day.dayOfWeek,
               childCount: effectiveChildCount,
               ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType",
+              required: interval.required,
+              actual: interval.assigned,
+              minStaff: interval.minStaff,
+              ratioChildrenPerStaff: normalizedChildrenPerStaff,
               startTime: formatMinutesAsTime(interval.start),
               endTime: formatMinutesAsTime(interval.end),
               relatedSegmentBlockIds: relatedBlocks.map((block) => block.id)

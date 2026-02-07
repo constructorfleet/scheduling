@@ -754,7 +754,10 @@ export default function App() {
         dayOfWeek = block?.dayOfWeek;
       }
       if (!dayOfWeek && engineViolation.target.entity === "ScheduleDay") {
-        const day = scheduleDaysState.find((item) => item.id === engineViolation.target.id);
+        const scheduleDayId = engineViolation.target.id.includes(":")
+          ? engineViolation.target.id.split(":")[0]
+          : engineViolation.target.id;
+        const day = scheduleDaysState.find((item) => item.id === scheduleDayId);
         dayOfWeek = day?.dayOfWeek;
       }
       if (!dayOfWeek && engineViolation.target.entity === "FieldTripEvent") {
@@ -777,6 +780,30 @@ export default function App() {
       const dayLabel = dayOfWeek
         ? `${dayDisplayNames[dayOfWeek]}${formattedDate ? ` ${formattedDate}` : ""}`
         : undefined;
+      const metadata = engineViolation.target.metadata as Record<string, unknown> | undefined;
+      let issue = engineViolation.message;
+      let contextDetail: string | undefined;
+      if (engineViolation.ruleId === "ratio-segment") {
+        const required = Number(metadata?.required ?? Number.NaN);
+        const actual = Number(metadata?.actual ?? Number.NaN);
+        const minStaff = Number(metadata?.minStaff ?? Number.NaN);
+        const ratio = Number(metadata?.ratioChildrenPerStaff ?? Number.NaN);
+        const headcount = Number(metadata?.childCount ?? Number.NaN);
+        const ratioSource = String(metadata?.ratioSource ?? "");
+        if (Number.isFinite(required) && Number.isFinite(actual)) {
+          issue = `Requires ${required} staff but only ${actual} are scheduled`;
+        }
+        if (Number.isFinite(minStaff) || Number.isFinite(ratio) || Number.isFinite(headcount)) {
+          const sourceLabel =
+            ratioSource === "fieldTrip" ? "Field Trip" : ratioSource === "scheduleType" ? "Schedule Type" : "Rule";
+          const pieces = [
+            Number.isFinite(minStaff) ? `Minimum Staff Scheduled: ${minStaff}` : undefined,
+            Number.isFinite(ratio) ? `Ratio From "${sourceLabel}": 1:${ratio}` : undefined,
+            Number.isFinite(headcount) ? `Headcount: ${headcount}` : undefined
+          ].filter(Boolean);
+          contextDetail = pieces.join(", ");
+        }
+      }
 
       return {
         id: engineViolation.id,
@@ -784,6 +811,8 @@ export default function App() {
         severity: SEVERITY_MAP[engineViolation.severity] ?? "warning",
         description,
         dayLabel,
+        issue,
+        context: contextDetail,
         segmentBlockId,
         relatedSegmentBlockIds,
         policyCitation: citation,
@@ -910,7 +939,7 @@ export default function App() {
     }
     focusResetRef.current = window.setTimeout(() => {
       setFocusedSegmentIds((prev) => (prev.length ? [] : prev));
-    }, 2500);
+    }, 6000);
   };
 
   const handlePublish = () => {
@@ -934,6 +963,10 @@ export default function App() {
         assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
       )
     );
+  };
+
+  const handleDeleteAssignment = (assignmentId: string) => {
+    setStaffAssignmentsState((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
   };
 
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
@@ -1057,6 +1090,7 @@ export default function App() {
           onScheduleTypeChange={handleScheduleTypeUpdate}
           onFieldTripSelection={handleFieldTripSelection}
           onUpdateAssignmentTime={handleUpdateAssignmentTime}
+          onDeleteAssignment={handleDeleteAssignment}
           onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
             const scheduleDay = scheduleDaysState.find((day) => day.dayOfWeek === dayOfWeek);
             const existingBlock = segmentBlocksState.find((block) => {
