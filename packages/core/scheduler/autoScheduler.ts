@@ -93,20 +93,19 @@ function generateInitialAssignments(
       continue;
     }
 
-    // Find operating hours for this day
+    // Find operating hours for this day (prefer exact match, fallback to any hours for this day)
     const opHours = context.operatingHours.find(
       oh => oh.dayOfWeek === day.dayOfWeek && oh.dayScheduleType === day.dayScheduleType
     );
     
-    // Fallback: try to find any operating hours for this day
-    const fallbackOpHours = opHours || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
+    const effectiveOpHours = opHours || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
     
-    if (!fallbackOpHours) {
+    if (!effectiveOpHours) {
       continue; // Skip days without operating hours
     }
 
-    const openTime = fallbackOpHours.open;
-    const closeTime = fallbackOpHours.close;
+    const openTime = effectiveOpHours.open;
+    const closeTime = effectiveOpHours.close;
 
     if (!openTime || !closeTime) {
       continue; // Skip if we can't determine operating hours
@@ -185,8 +184,8 @@ function generateInitialAssignments(
       }
 
       // Employee has specific availability windows for this day
-      // dayAvailability is guaranteed to exist here due to checks above
-      if (!dayAvailability || !dayAvailability.blocks || dayAvailability.blocks.length === 0) {
+      // TypeScript needs explicit null check even though dayAvailability is guaranteed above
+      if (!dayAvailability?.blocks || dayAvailability.blocks.length === 0) {
         continue; // No availability blocks for this day
       }
 
