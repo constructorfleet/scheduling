@@ -34,6 +34,29 @@ const violations: RuleViolation[] = [
 ] as const;
 
 describe("ViolationNavigator", () => {
+  it("returns null when closed", () => {
+    const { container } = render(
+      <ViolationNavigator
+        violations={violations}
+        onFocusSegments={jest.fn()}
+        isOpen={false}
+        onClose={jest.fn()}
+      />
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it("shows empty state for zero violations", () => {
+    render(
+      <ViolationNavigator
+        violations={[]}
+        onFocusSegments={jest.fn()}
+        isOpen={true}
+        onClose={jest.fn()}
+      />
+    );
+    expect(screen.getByText("No active violations.")).toBeInTheDocument();
+  });
   it("renders violation cards with severity badges and action buttons", () => {
     render(<ViolationNavigator violations={violations} onFocusSegments={jest.fn()} isOpen={true} onClose={() => {}} />);
 

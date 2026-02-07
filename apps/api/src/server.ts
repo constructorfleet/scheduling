@@ -151,7 +151,8 @@ const buildServer = async () => {
   const uiDistRoot = path.resolve(__dirname, "../../../dist/ui");
   await fastify.register(fastifyStatic, {
     root: uiDistRoot,
-    prefix: "/"
+    prefix: "/",
+    serve: false
   });
 
   fastify.get("/api/health", async () => ({ status: "ok" }));

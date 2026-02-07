@@ -6,3 +6,4 @@ dist/
 dist-static/
 dist-static-*.tar.gz
 dist-api/
+scheduling.db
