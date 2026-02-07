@@ -1,6 +1,7 @@
 **/node_modules/
 node_modules
 node_modules/
+.github/agents/node_modules/
 dist/
 **/dist/
 dist-static/
