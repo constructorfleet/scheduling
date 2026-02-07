@@ -1,5 +1,6 @@
 import type {
   DayOfWeek,
+  DaySegment,
   Employee,
   FieldTripEvent,
   OperatingHours,
@@ -112,10 +113,6 @@ function generateInitialAssignments(
       continue; // Skip if we can't determine operating hours
     }
 
-    // Calculate needed staff based on ratio
-    const ratio = context.scheduleTypeRatios?.[day.scheduleType] ?? 0.2; // Default 1:5 ratio
-    const neededStaff = Math.max(2, Math.ceil(day.enrollmentCount * ratio));
-
     // Track hours assigned per employee for this day
     const employeeHoursToday = new Map<string, number>();
 
@@ -131,8 +128,13 @@ function generateInitialAssignments(
       // Check if employee is available on this day
       const dayAvailability = employee.availability?.find(a => a.dayOfWeek === day.dayOfWeek);
       
-      // If no availability specified, assume available during all operating hours
-      if (!employee.availability || employee.availability.length === 0 || !dayAvailability) {
+      // If employee has defined availability but none for this day, skip
+      if (employee.availability && employee.availability.length > 0 && !dayAvailability) {
+        continue; // Employee explicitly not available on this day
+      }
+      
+      // If no availability restrictions at all, assume available during all operating hours
+      if (!employee.availability || employee.availability.length === 0) {
         const remainingHours = employee.maxHoursPerDay - currentHours;
         if (remainingHours > 0) {
           // Schedule for remaining hours or until close, whichever is less
@@ -183,9 +185,10 @@ function generateInitialAssignments(
         continue;
       }
 
-      // Employee has specific availability windows
-      if (!dayAvailability.blocks || dayAvailability.blocks.length === 0) {
-        continue; // Not available on this day
+      // Employee has specific availability windows for this day
+      // dayAvailability is guaranteed to exist here due to checks above
+      if (!dayAvailability || !dayAvailability.blocks || dayAvailability.blocks.length === 0) {
+        continue; // No availability blocks for this day
       }
 
       // Sort availability blocks chronologically
@@ -311,33 +314,6 @@ function isEmployeeAvailable(
   }
 
   return false;
-}
-
-/**
- * Calculate total hours already assigned to an employee
- */
-function calculateEmployeeHours(
-  assignments: StaffAssignment[],
-  employeeId: string
-): number {
-  let totalHours = 0;
-  
-  for (const assignment of assignments) {
-    if (assignment.employeeId === employeeId) {
-      totalHours += calculateHoursBetween(assignment.startTime, assignment.endTime);
-    }
-  }
-
-  return totalHours;
-}
-
-/**
- * Calculate hours between two time strings (HH:MM format)
- */
-function calculateHoursBetween(startTime: string, endTime: string): number {
-  const start = timeToMinutes(startTime);
-  const end = timeToMinutes(endTime);
-  return Math.max(0, (end - start) / 60);
 }
 
 /**
