@@ -1,7 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
   engineType    = "binary"
-  binaryTargets = ["native", "rhel-openssl-1.1.x"]
+  binaryTargets = ["native", "rhel-openssl-1.1.x", "linux-musl-openssl-3.0.x", "linux-musl", "linux-static-x64"]
   output        = "../apps/api/generated/prisma-client"
 }
 
