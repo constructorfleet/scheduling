@@ -74,7 +74,7 @@ export function validateDayMetadata(scheduleDays: ScheduleDay[]): MissingMetadat
  */
 function generateInitialAssignments(
   context: AutoSchedulerContext
-): StaffAssignment[] {
+): { assignments: StaffAssignment[]; segmentBlocks: SegmentBlock[] } {
   const assignments: StaffAssignment[] = [];
   const createdSegmentBlocks: SegmentBlock[] = [];
   const availableEmployees = context.employees.filter(emp => emp.employmentStatus === 'active');
@@ -98,16 +98,15 @@ function generateInitialAssignments(
       oh => oh.dayOfWeek === day.dayOfWeek && oh.dayScheduleType === day.dayScheduleType
     );
     
-    if (!opHours) {
-      // Fallback: try to find any operating hours for this day
-      const fallbackOpHours = context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
-      if (!fallbackOpHours) {
-        continue; // Skip days without operating hours
-      }
+    // Fallback: try to find any operating hours for this day
+    const fallbackOpHours = opHours || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
+    
+    if (!fallbackOpHours) {
+      continue; // Skip days without operating hours
     }
 
-    const openTime = opHours?.open || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek)?.open;
-    const closeTime = opHours?.close || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek)?.close;
+    const openTime = fallbackOpHours.open;
+    const closeTime = fallbackOpHours.close;
 
     if (!openTime || !closeTime) {
       continue; // Skip if we can't determine operating hours
@@ -247,10 +246,7 @@ function generateInitialAssignments(
     }
   }
 
-  // Merge created segment blocks with existing ones
-  context.segmentBlocks.push(...createdSegmentBlocks);
-
-  return assignments;
+  return { assignments, segmentBlocks: createdSegmentBlocks };
 }
 
 /**
@@ -456,8 +452,10 @@ function attemptViolationFixes(
 export function autoSchedule(context: AutoSchedulerContext, _weekId: string): AutoSchedulerResult {
   const engine = createRulesEngine();
 
-  // Generate initial assignments
-  let currentAssignments = generateInitialAssignments(context);
+  // Generate initial assignments and segment blocks
+  const initialResult = generateInitialAssignments(context);
+  let currentAssignments = initialResult.assignments;
+  const allSegmentBlocks = [...context.segmentBlocks, ...initialResult.segmentBlocks];
   let iterations = 0;
   let violations: RuleViolation[] = [];
 
@@ -468,7 +466,7 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
     // Evaluate current state
     const rulesContext: RulesContext = {
       scheduleDays: context.scheduleDays,
-      segmentBlocks: context.segmentBlocks,
+      segmentBlocks: allSegmentBlocks,
       staffAssignments: currentAssignments,
       employees: context.employees,
       fieldTripEvents: context.fieldTripEvents,
@@ -488,7 +486,7 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
       return {
         success: true,
         staffAssignments: currentAssignments,
-        segmentBlocks: context.segmentBlocks,
+        segmentBlocks: allSegmentBlocks,
         violations: [],
         iterations,
         message: `Successfully auto-scheduled staff with no violations in ${iterations} iteration(s).`
@@ -497,7 +495,11 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
 
     // Try to fix violations
     const previousAssignmentCount = currentAssignments.length;
-    currentAssignments = attemptViolationFixes(context, currentAssignments, violations);
+    currentAssignments = attemptViolationFixes(
+      { ...context, segmentBlocks: allSegmentBlocks },
+      currentAssignments,
+      violations
+    );
 
     // If no changes were made, we can't fix any more violations
     if (currentAssignments.length === previousAssignmentCount) {
@@ -509,7 +511,7 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
   return {
     success: false,
     staffAssignments: currentAssignments,
-    segmentBlocks: context.segmentBlocks,
+    segmentBlocks: allSegmentBlocks,
     violations,
     iterations,
     message: violations.length > 0
