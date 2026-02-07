@@ -469,24 +469,9 @@ export const segmentBlockTimelineRule: RuleDefinition = {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
-      const start = parseTimeToMinutes(block.startTime);
-      const end = parseTimeToMinutes(block.endTime);
-
-      if (start >= end) {
-        violations.push(
-          buildViolation(
-            "segment-block-timeline",
-            `Clock block ${block.dayOfWeek.toUpperCase()} ${block.startTime}-${block.endTime} has an invalid window`,
-            "SegmentBlock",
-            block.id,
-            citationId,
-            "error",
-            { startTime: block.startTime, endTime: block.endTime, dayOfWeek: block.dayOfWeek }
-          )
-        );
-        return;
-      }
-
+      const blockAssignments = getAssignmentsForBlock(context, block.id).filter(
+        (assignment) => assignment.status !== "completed"
+      );
       const scheduleDay =
         getScheduleDayById(context, block.scheduleDayId) ??
         context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
@@ -495,8 +480,50 @@ export const segmentBlockTimelineRule: RuleDefinition = {
         block.dayOfWeek,
         scheduleDay?.dayScheduleType
       );
+      const windows =
+        blockAssignments.length > 0
+          ? blockAssignments.map((assignment) => ({
+              entity: "StaffAssignment" as const,
+              id: assignment.id,
+              startTime: assignment.startTime,
+              endTime: assignment.endTime,
+              metadata: { relatedSegmentBlockIds: [block.id] as string[] }
+            }))
+          : [
+              {
+                entity: "SegmentBlock" as const,
+                id: block.id,
+                startTime: block.startTime,
+                endTime: block.endTime,
+                metadata: {}
+              }
+            ];
 
-      if (operatingHours) {
+      windows.forEach((window) => {
+        const start = parseTimeToMinutes(window.startTime);
+        const end = parseTimeToMinutes(window.endTime);
+        if (start >= end) {
+          violations.push(
+            buildViolation(
+              "segment-block-timeline",
+              `Clock block ${block.dayOfWeek.toUpperCase()} ${window.startTime}-${window.endTime} has an invalid window`,
+              window.entity,
+              window.id,
+              citationId,
+              "error",
+              {
+                startTime: window.startTime,
+                endTime: window.endTime,
+                dayOfWeek: block.dayOfWeek,
+                ...window.metadata
+              }
+            )
+          );
+          return;
+        }
+        if (!operatingHours) {
+          return;
+        }
         const openMinutes = parseTimeToMinutes(operatingHours.open);
         const closeMinutes = parseTimeToMinutes(operatingHours.close);
         if (start < openMinutes) {
@@ -504,15 +531,16 @@ export const segmentBlockTimelineRule: RuleDefinition = {
             buildViolation(
               "segment-block-timeline",
               `Clock block on ${block.dayOfWeek.toUpperCase()} starts before operating hours (${operatingHours.open})`,
-              "SegmentBlock",
-              block.id,
+              window.entity,
+              window.id,
               citationId,
               "error",
               {
                 operatingHoursId: operatingHours.id,
-                startTime: block.startTime,
+                startTime: window.startTime,
                 boundary: operatingHours.open,
-                dayOfWeek: block.dayOfWeek
+                dayOfWeek: block.dayOfWeek,
+                ...window.metadata
               }
             )
           );
@@ -522,20 +550,21 @@ export const segmentBlockTimelineRule: RuleDefinition = {
             buildViolation(
               "segment-block-timeline",
               `Clock block on ${block.dayOfWeek.toUpperCase()} ends after operating hours (${operatingHours.close})`,
-              "SegmentBlock",
-              block.id,
+              window.entity,
+              window.id,
               citationId,
               "error",
               {
                 operatingHoursId: operatingHours.id,
-                endTime: block.endTime,
+                endTime: window.endTime,
                 boundary: operatingHours.close,
-                dayOfWeek: block.dayOfWeek
+                dayOfWeek: block.dayOfWeek,
+                ...window.metadata
               }
             )
           );
         }
-      }
+      });
     });
 
     const assignmentsByEmployeeDay: Record<string, StaffAssignment[]> = {};
