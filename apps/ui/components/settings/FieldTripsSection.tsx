@@ -23,6 +23,18 @@ export default function FieldTripsSection({
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
       <div
         style={{
+          fontSize: "0.875rem",
+          color: "#4b5563",
+          padding: "0.75rem",
+          background: "#f9fafb",
+          borderRadius: 10,
+          border: "1px solid #e5e7eb"
+        }}
+      >
+        <strong>Note:</strong> If the leader ratio is set to 0:0, it will be ignored and only the adult ratio will be enforced for that field trip.
+      </div>
+      <div
+        style={{
           display: "grid",
           gridTemplateColumns: "1.2fr 200px 200px 88px",
           gap: "0.75rem",

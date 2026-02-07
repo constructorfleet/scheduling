@@ -93,6 +93,33 @@ describe("Settings section components", () => {
     expect(onRemove).toHaveBeenCalledWith(0);
   });
 
+  it("displays explanation text for 0:0 leader ratio behavior", () => {
+    const fieldTrips: FieldTripType[] = [
+      {
+        id: "trip-1",
+        name: "Zoo Visit",
+        minAdultStudentRatio: 1 / 8,
+        minLeaderStudentRatio: 1 / 25,
+        policyCitationId: "policy"
+      }
+    ];
+
+    render(
+      <FieldTripsSection
+        draftFieldTrips={fieldTrips}
+        onChange={jest.fn()}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+        onSave={jest.fn()}
+        canSave={true}
+        ratioToPair={ratioToPair}
+      />
+    );
+
+    expect(screen.getByText(/If the leader ratio is set to 0:0/i)).toBeInTheDocument();
+    expect(screen.getByText(/it will be ignored and only the adult ratio will be enforced/i)).toBeInTheDocument();
+  });
+
   it("edits job titles and toggles flags", async () => {
     const user = userEvent.setup();
     const onChange = jest.fn();
