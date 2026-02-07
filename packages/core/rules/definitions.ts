@@ -6,6 +6,7 @@ import {
   getDayOfWeekForAssignment,
   getEmployeeById,
   getFieldTripEventById,
+  getFieldTripEventForBlock,
   getFieldTripTypeById,
   parseTimeToMinutes,
   getOperatingHoursForDay,
@@ -82,21 +83,37 @@ export const ratioSegmentRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
-      if (block.fieldTripEventId) {
+      const fieldTripEvent = getFieldTripEventForBlock(context, block);
+      if (fieldTripEvent && !fieldTripEvent.isNoFieldTrip) {
         return;
       }
-      const ratioProfile = block.requirementTemplate.ratioProfile;
-      const childrenPerStaff = ratioProfile.childrenPerStaff || 1;
+      const scheduleDay =
+        getScheduleDayById(context, block.scheduleDayId) ??
+        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
+      const scheduleType = scheduleDay?.scheduleType;
+      const childrenPerStaff =
+        (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ?? 1;
       const requiredFromRatio = Math.ceil(block.childCount / childrenPerStaff);
-      const requiredStaff = Math.max(block.requirementTemplate.minStaff, requiredFromRatio);
-      const assigned = getAssignmentsForBlock(context, block.id).length;
+      const schoolRules = getSchoolRules(context);
+      let minStaff = 0;
+      if (block.segment === "open" && schoolRules.openerCount > 0) {
+        minStaff = schoolRules.openerCount;
+      } else if (block.segment === "close" && schoolRules.closerCount > 0) {
+        minStaff = schoolRules.closerCount;
+      }
+      const requiredStaff = Math.max(minStaff, requiredFromRatio);
+      // Only count real scheduled staff (ignore orphan/completed assignments).
+      const assigned = getAssignmentsForBlock(context, block.id).filter((assignment) => {
+        const employee = getEmployeeById(context, assignment.employeeId);
+        return Boolean(employee) && assignment.status !== "completed";
+      }).length;
       if (assigned < requiredStaff) {
         const citationId = getCitationId(
           context,
           "ratio-segment",
-          ratioProfile.policyCitationId ?? block.requirementTemplate.policyCitationId
+          DEFAULT_POLICY_CITATIONS["ratio-segment"]
         );
-        const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${block.requirementTemplate.minStaff}, ratio ${childrenPerStaff}) but only ${assigned} assigned`;
+        const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${minStaff}, ratio ${childrenPerStaff}) but only ${assigned} assigned`;
         violations.push(
           buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId)
         );
@@ -761,8 +778,6 @@ export const fieldTripRatiosRule: RuleDefinition = {
 export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
   scheduleDayMetadataRule,
   ratioSegmentRule,
-  certificationPerSegmentRule,
-  segmentCoverageRule,
   segmentBlockTimelineRule,
   shiftBreakLimitsRule,
   openCloseCoverageRule,

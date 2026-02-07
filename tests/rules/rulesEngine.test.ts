@@ -146,6 +146,7 @@ const withDefaultScheduleInfo = (context: Partial<RulesContext>): RulesContext =
     fieldTripTypes: context.fieldTripTypes ?? [],
     scheduleDays: context.scheduleDays ?? [defaultScheduleDay],
     operatingHours,
+    scheduleTypeRatios: context.scheduleTypeRatios ?? { regular: 8 },
     schoolRules: context.schoolRules,
     jobTitleRules: context.jobTitleRules,
     policyCitations: context.policyCitations,
@@ -174,6 +175,25 @@ describe("RulesEngine", () => {
     const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
     expect(ratioViolations).toHaveLength(1);
     expect(ratioViolations[0].target.id).toBe(block.id);
+  });
+
+  test("does not count orphan assignments toward ratio coverage", () => {
+    const block = createSegmentBlock("block-ratio-orphan", {
+      childCount: 18
+    });
+    const orphanAssignment = createAssignment("assign-ratio-orphan", block.id, "emp-missing");
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [block],
+      staffAssignments: [orphanAssignment],
+      employees: [],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
+    expect(ratioViolations).toHaveLength(1);
+    expect(ratioViolations[0].message).toContain("but only 0 assigned");
   });
 
   test("allows ratio compliance when ratio and minimums are met", () => {
@@ -241,107 +261,6 @@ describe("RulesEngine", () => {
     expect(tripViolations.every((v) => v.target.id === block.id)).toBe(true);
   });
 
-  test("detects missing certifications when multiple flags are required", () => {
-    const block = createSegmentBlock("block-cert", {
-      requirementTemplate: createRequirementTemplate({
-        requiresCpr: true,
-        requiresMedicalDelegation: true,
-        requiresLeader: true
-      })
-    });
-    const assignment = createAssignment("assign-cert", block.id, "emp-cert");
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [createEmployee("emp-cert", { cprCurrent: false })],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const certViolations = violations.filter((violation) => violation.ruleId === "certification-per-segment");
-    expect(certViolations).toHaveLength(3);
-    expect(certViolations.some((v) => v.message.includes("CPR"))).toBe(true);
-    expect(certViolations.some((v) => v.message.includes("medically delegated"))).toBe(true);
-    expect(certViolations.some((v) => v.message.includes("leader-qualified"))).toBe(true);
-  });
-
-  test("clears certification requirements when qualified staff are assigned", () => {
-    const block = createSegmentBlock("block-cert-clean", {
-      requirementTemplate: createRequirementTemplate({
-        requiresCpr: true,
-        requiresMedicalDelegation: true,
-        requiresLeader: true
-      })
-    });
-    const assignment = createAssignment("assign-cert-clean", block.id, "emp-cert-clean");
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [
-        createEmployee("emp-cert-clean", {
-          cprCurrent: true,
-          medicallyDelegated: true,
-          leaderQualified: true
-        })
-      ],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const certViolations = violations.filter((violation) => violation.ruleId === "certification-per-segment");
-    expect(certViolations).toHaveLength(0);
-  });
-
-  test("flags segment coverage violations when required roles are absent", () => {
-    const block = createSegmentBlock("block-coverage", {
-      requirementTemplate: createRequirementTemplate({
-        requiresLeader: true,
-        requiresMedicalDelegation: true
-      })
-    });
-    const assignment = createAssignment("assign-coverage", block.id, "emp-coverage");
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [createEmployee("emp-coverage")],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const coverageViolations = violations.filter((violation) => violation.ruleId === "segment-coverage");
-    expect(coverageViolations).toHaveLength(2);
-    expect(coverageViolations.some((v) => v.message.includes("leader-qualified"))).toBe(true);
-    expect(coverageViolations.some((v) => v.message.includes("medically delegated"))).toBe(true);
-  });
-
-  test("passes segment coverage when leader and medical staff are assigned", () => {
-    const block = createSegmentBlock("block-coverage-clean", {
-      requirementTemplate: createRequirementTemplate({
-        requiresLeader: true,
-        requiresMedicalDelegation: true
-      })
-    });
-    const assignment = createAssignment("assign-coverage-clean", block.id, "emp-coverage-clean");
-    const context: RulesContext = withDefaultScheduleInfo({
-      segmentBlocks: [block],
-      staffAssignments: [assignment],
-      employees: [
-        createEmployee("emp-coverage-clean", {
-          leaderQualified: true,
-          medicallyDelegated: true
-        })
-      ],
-      fieldTripEvents: [],
-      fieldTripTypes: []
-    });
-
-    const violations = engine.evaluate(context);
-    const coverageViolations = violations.filter((violation) => violation.ruleId === "segment-coverage");
-    expect(coverageViolations).toHaveLength(0);
-  });
 
   test("reports daily and weekly limit violations", () => {
     const block = createSegmentBlock("block-shift", { dayOfWeek: "tue" });
