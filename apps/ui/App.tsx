@@ -138,14 +138,15 @@ export default function App() {
   const [showViolationNavigator, setShowViolationNavigator] = useState(false);
   const [showAuditTimeline, setShowAuditTimeline] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [settingsCloseAttempt, setSettingsCloseAttempt] = useState(0);
-  const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>(["sat", "sun"]);
+  const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>([]);
   const [schoolRulesState, setSchoolRulesState] = useState<SchoolRules>({
-    openerCount: 2,
-    closerCount: 2,
-    minimumMedicalDelegated: 1,
-    requireCurrentCpr: true
+    openerCount: 0,
+    closerCount: 0,
+    minimumMedicalDelegated: 0,
+    requireCurrentCpr: false
   });
   const [scheduleStatusOverride, setScheduleStatusOverride] = useState<ScheduleStatus | null>(null);
   const [hasLoadedRemote, setHasLoadedRemote] = useState(false);
@@ -395,10 +396,10 @@ export default function App() {
   };
 
   const persistSettings = async (overrides: Parameters<typeof buildSettingsPayload>[0] = {}) => {
-    if (!hasLoadedRemote) return;
     beginApiAction("saving", "Saving settings...");
     try {
       await saveSettings(selectedSchoolId, buildSettingsPayload(overrides));
+      setIsConfigured(true);
       completeApiAction("Settings saved");
     } catch (error) {
       failApiAction("Settings save failed");
@@ -416,6 +417,7 @@ export default function App() {
         completeApiAction("Settings loaded");
         if (!isActive) return;
         if (settings?.school) {
+          setIsConfigured(true);
           setSchoolName(settings.school.name ?? schoolName);
           setClosedDaysState(
             (settings.school.closedDays ?? closedDaysState).filter((day): day is DayOfWeek =>
@@ -487,6 +489,9 @@ export default function App() {
               }))
             );
           }
+        } else {
+          setIsConfigured(false);
+          setShowSettings(true);
         }
       } catch (error) {
         failApiAction("Settings load failed");
@@ -545,7 +550,7 @@ export default function App() {
   }, [selectedSchoolId]);
 
   useEffect(() => {
-    if (!hasLoadedRemote) return;
+    if (!hasLoadedRemote || !isConfigured) return;
     const payload: ScheduleSavePayload = {
       scheduleWeek: {
         id: weekMeta.id,
@@ -591,6 +596,7 @@ export default function App() {
     };
   }, [
     hasLoadedRemote,
+    isConfigured,
     selectedSchoolId,
     scheduleDaysState,
     segmentBlocksState,
@@ -600,7 +606,7 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    if (!hasLoadedRemote) {
+    if (!hasLoadedRemote || !isConfigured) {
       return;
     }
     const handleBeforeUnload = () => {
@@ -619,7 +625,7 @@ export default function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [hasLoadedRemote]);
+  }, [hasLoadedRemote, isConfigured]);
 
   useEffect(() => {
     return () => {

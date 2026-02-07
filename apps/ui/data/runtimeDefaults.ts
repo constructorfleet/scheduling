@@ -9,8 +9,7 @@ import type {
   SegmentBlock,
   SegmentRequirementTemplate,
   StaffAssignment,
-  Employee,
-  ScheduleType
+  Employee
 } from "@core/domain/types";
 import type { AuditEvent } from "../types";
 import type { ScheduleTypeOption } from "../components/DayMetadataStrip";
@@ -56,52 +55,24 @@ export const dayDisplayNames: Record<DayOfWeek, string> = {
 
 export const weekMeta = {
   id: "week-2026-02-16",
-  label: "Week schedule",
+  label: "Unconfigured week",
   startDate: "2026-02-16",
   endDate: "2026-02-22",
   status: "draft" as ScheduleStatus
 };
 
-export const schools = [{ id: "school-evergreen", name: "Evergreen Daycare" }];
+export const schools = [{ id: "school-evergreen", name: "School" }];
 
-export const scheduleTypeOptions: ScheduleTypeOption[] = [
-  {
-    value: "regular",
-    label: "Regular day",
-    ratio: { adults: 1, students: 15 },
-    description: "Default staffing coverage."
-  },
-  {
-    value: "extended",
-    label: "Extended care",
-    ratio: { adults: 1, students: 20 },
-    description: "Early arrival and late pickup."
-  },
-  {
-    value: "enrichment",
-    label: "Enrichment focus",
-    ratio: { adults: 1, students: 4 },
-    description: "Smaller cohort programming."
-  },
-  {
-    value: "closed",
-    label: "Closed",
-    ratio: { adults: 1, students: 1 },
-    description: "School closed for the day."
-  }
-];
-
-const defaultScheduleTypeForDay = (day: DayOfWeek): ScheduleType =>
-  day === "wed" ? "enrichment" : day === "thu" ? "extended" : "regular";
+export const scheduleTypeOptions: ScheduleTypeOption[] = [];
 
 export const scheduleDays: ScheduleDay[] = daySequence.map((day, index) => ({
   id: `schedule-day-${day}`,
   scheduleWeekId: weekMeta.id,
   date: `2026-02-${(16 + index).toString().padStart(2, "0")}`,
   dayOfWeek: day,
-  scheduleType: defaultScheduleTypeForDay(day),
-  dayScheduleType: "full_day",
-  enrollmentCount: 0,
+  scheduleType: undefined,
+  dayScheduleType: undefined,
+  enrollmentCount: undefined,
   fieldTripEventId: `field-trip-${day}`
 }));
 
@@ -111,8 +82,8 @@ export const fieldTripEvents: FieldTripEvent[] = daySequence.map((day) => ({
   dayOfWeek: day,
   segment: "mid",
   scheduleDayId: `schedule-day-${day}`,
-  isNoFieldTrip: true,
-  notes: "No field trip selected"
+  isNoFieldTrip: undefined,
+  notes: undefined
 }));
 
 export const defaultRequirementTemplate: SegmentRequirementTemplate = {
