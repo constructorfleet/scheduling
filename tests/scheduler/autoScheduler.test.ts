@@ -160,7 +160,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }, // 1:5 ratio
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio
         schoolRules: {
           openerCount: 1,
           closerCount: 1,
@@ -237,7 +237,7 @@ describe("autoSchedule", () => {
         ],
         fieldTripEvents,
         operatingHours,
-        scheduleTypeRatios: { full_day: 0.2 }, // 1:5 ratio = 5 staff needed for 25 kids
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 5 staff needed for 25 kids
         schoolRules: {
           openerCount: 1,
           closerCount: 1,
@@ -323,7 +323,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -378,7 +378,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "07:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.25 } // 1:4 ratio
+        scheduleTypeRatios: { full_day: 4 } // 1:4 ratio
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -446,7 +446,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -476,7 +476,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -508,7 +508,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 } // Needs 5 staff for 25 kids
+        scheduleTypeRatios: { full_day: 5 } // Needs 5 staff for 25 kids
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -558,7 +558,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -594,7 +594,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -605,12 +605,12 @@ describe("autoSchedule", () => {
     });
 
     it("should handle scenario with high child-to-staff ratio requirements", () => {
-      // Realistic scenario: Infant room with 1:3 ratio but not enough staff
+      // Realistic scenario: Small ratio (1:3) with not enough staff
       const context: AutoSchedulerContext = {
         scheduleDays: [
           createScheduleDay("day-mon", "mon", "2026-02-16", {
-            scheduleType: "infant",
-            enrollmentCount: 12 // Need 4 staff members
+            scheduleType: "full_day",
+            enrollmentCount: 12 // Need 4 staff members with 1:3 ratio
           })
         ],
         segmentBlocks: [],
@@ -626,7 +626,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { infant: 0.33 } // 1:3 ratio
+        scheduleTypeRatios: { full_day: 3 } // 1:3 ratio
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -692,7 +692,7 @@ describe("autoSchedule", () => {
         ],
         fieldTripEvents,
         operatingHours,
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -751,7 +751,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -791,7 +791,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "09:00", "12:00")
         ],
-        scheduleTypeRatios: { half_day: 0.25 }
+        scheduleTypeRatios: { half_day: 4 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -827,12 +827,12 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "08:00", "16:00")
         ],
-        scheduleTypeRatios: { pd_day: 1.0 } // Different ratio for PD days
+        scheduleTypeRatios: { pd_day: 1 } // Different ratio for PD days
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
 
-      // With 0 enrollment and 1.0 ratio, we'd calculate neededStaff = max(2, ceil(0 * 1.0)) = 2
+      // With 0 enrollment and 1:1 ratio, we'd calculate neededStaff = max(2, ceil(0 / 1)) = 2
       // So there might still be assignments, but the logic should handle it gracefully
       expect(result).toBeDefined();
       expect(result.iterations).toBeGreaterThan(0);
