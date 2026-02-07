@@ -170,7 +170,7 @@ describe("ClockBlockTimeline", () => {
     const autoBalanceButton = screen.getByRole("button", { name: /Auto-balance suggestions/ });
     await userEvent.click(autoBalanceButton);
     expect(autoBalance).toHaveBeenCalledTimes(1);
-    expect(screen.getByText("Add clock block")).toBeVisible();
+    expect(screen.getByText("Add schdule block")).toBeVisible();
     expect(screen.getByText("6:30a – 6:30p operating window")).toBeVisible();
     expect(screen.getByText("Operating hours guardrail")).toBeVisible();
   });
@@ -213,7 +213,7 @@ describe("ClockBlockTimeline", () => {
       await user.type(childCountInput, "22");
 
       await user.selectOptions(screen.getByLabelText("Staff member (optional)"), "emp-assistant");
-      await user.click(screen.getByRole("button", { name: "Save clock block" }));
+      await user.click(screen.getByRole("button", { name: "Save schdule block" }));
     });
 
     expect(addClockBlock).toHaveBeenCalledWith({
