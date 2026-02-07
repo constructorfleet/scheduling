@@ -41,6 +41,40 @@ export interface AutoSchedulerResult {
 
 const MAX_ITERATIONS = 10;
 
+function normalizeChildrenPerStaff(value: number | undefined): number {
+    if (!Number.isFinite(value) || !value || value <= 0) {
+        return 1;
+    }
+    return Math.max(1, Math.ceil(value));
+}
+
+function getRatioRequiredStaffForDay(
+    context: AutoSchedulerContext,
+    day: ScheduleDay
+): number {
+    const enrollmentCount = typeof day.enrollmentCount === "number" ? day.enrollmentCount : 0;
+    if (enrollmentCount <= 0) {
+        return 0;
+    }
+
+    const dayFieldTripEvent = context.fieldTripEvents.find(event => {
+        if (event.dayOfWeek !== day.dayOfWeek) return false;
+        if (event.scheduleDayId && event.scheduleDayId !== day.id) return false;
+        return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
+    });
+    const fieldTripType = dayFieldTripEvent
+        ? context.fieldTripTypes?.find(type => type.id === dayFieldTripEvent.fieldTripTypeId)
+        : undefined;
+    const fieldTripChildrenPerStaff = fieldTripType && fieldTripType.adultRatioStudents > 0
+        ? fieldTripType.adultRatioStudents / fieldTripType.adultRatioAdults
+        : undefined;
+    const childrenPerStaff = fieldTripChildrenPerStaff
+        ?? (day.scheduleType ? context.scheduleTypeRatios?.[ day.scheduleType ] : undefined)
+        ?? 1;
+    const normalizedChildrenPerStaff = normalizeChildrenPerStaff(childrenPerStaff);
+    return Math.max(1, Math.ceil(enrollmentCount / normalizedChildrenPerStaff));
+}
+
 /**
  * Validates that all days have required metadata (scheduleType and enrollmentCount)
  */
@@ -146,13 +180,6 @@ function generateInitialAssignments(
         openedDays.push(day);
     }
 
-    const openerCount = Math.max(0, context.schoolRules?.openerCount ?? 0);
-    const closerCount = Math.max(0, context.schoolRules?.closerCount ?? 0);
-
-    if (openerCount <= 0 && closerCount <= 0) {
-        return { assignments: seededAssignments, segmentBlocks: createdSegmentBlocks };
-    }
-
     const seedingContext: AutoSchedulerContext = {
         ...context,
         segmentBlocks: createdSegmentBlocks
@@ -168,6 +195,16 @@ function generateInitialAssignments(
         if (!openBlock || !closeBlock) {
             continue;
         }
+
+        const ratioRequired = getRatioRequiredStaffForDay(context, day);
+        const openerCount = Math.max(
+            Math.max(0, context.schoolRules?.openerCount ?? 0),
+            ratioRequired
+        );
+        const closerCount = Math.max(
+            Math.max(0, context.schoolRules?.closerCount ?? 0),
+            ratioRequired
+        );
 
         for (let i = 0; i < openerCount; i++) {
             const bestOpener = findBestOpeningSeedCandidate(seedingContext, seededAssignments, day, openBlock);
@@ -473,7 +510,7 @@ function findBestOpeningSeedCandidate(
             }
             return getCandidateScore(b.employee) - getCandidateScore(a.employee);
         });
-    return candidates[0] ?? null;
+    return candidates[ 0 ] ?? null;
 }
 
 function findBestClosingSeedCandidate(
@@ -501,7 +538,7 @@ function findBestClosingSeedCandidate(
             }
             return getCandidateScore(b.employee) - getCandidateScore(a.employee);
         });
-    return candidates[0] ?? null;
+    return candidates[ 0 ] ?? null;
 }
 
 /**
@@ -765,24 +802,24 @@ function attemptViolationFixes(
             let staffAdded = 0;
             const maxStaffPerBlock = Math.max(2, needed); // Add at least what's needed
 
-                for (const employee of availableEmployees) {
-                    if (staffAdded >= maxStaffPerBlock) break;
+            for (const employee of availableEmployees) {
+                if (staffAdded >= maxStaffPerBlock) break;
 
-                    const window = getPreferredAssignmentWindow(context, updatedAssignments, employee, block);
-                    if (!window) continue;
+                const window = getPreferredAssignmentWindow(context, updatedAssignments, employee, block);
+                if (!window) continue;
 
-                    const assignmentId = `auto-assign-${ block.id }-${ employee.id }-${ Date.now() }-${ staffAdded }`;
-                    updatedAssignments.push({
-                        id: assignmentId,
-                        segmentBlockId: block.id,
-                        employeeId: employee.id,
-                        assignmentSource: 'template',
-                        startTime: window.startTime,
-                        endTime: window.endTime,
-                        status: 'scheduled'
-                    });
-                    staffAdded++;
-                }
+                const assignmentId = `auto-assign-${ block.id }-${ employee.id }-${ Date.now() }-${ staffAdded }`;
+                updatedAssignments.push({
+                    id: assignmentId,
+                    segmentBlockId: block.id,
+                    employeeId: employee.id,
+                    assignmentSource: 'template',
+                    startTime: window.startTime,
+                    endTime: window.endTime,
+                    status: 'scheduled'
+                });
+                staffAdded++;
+            }
         }
     }
 
@@ -889,23 +926,23 @@ function attemptViolationFixes(
                 ));
 
             let added = 0;
-                for (const emp of availableMedical) {
-                    if (added >= needed) break;
-                    const window = getPreferredAssignmentWindow(context, updatedAssignments, emp, block);
-                    if (!window) continue;
+            for (const emp of availableMedical) {
+                if (added >= needed) break;
+                const window = getPreferredAssignmentWindow(context, updatedAssignments, emp, block);
+                if (!window) continue;
 
-                    const assignmentId = `auto-medical-${ block.id }-${ emp.id }`;
-                    updatedAssignments.push({
-                        id: assignmentId,
-                        segmentBlockId: block.id,
-                        employeeId: emp.id,
-                        assignmentSource: 'template',
-                        startTime: window.startTime,
-                        endTime: window.endTime,
-                        status: 'scheduled'
-                    });
-                    added++;
-                }
+                const assignmentId = `auto-medical-${ block.id }-${ emp.id }`;
+                updatedAssignments.push({
+                    id: assignmentId,
+                    segmentBlockId: block.id,
+                    employeeId: emp.id,
+                    assignmentSource: 'template',
+                    startTime: window.startTime,
+                    endTime: window.endTime,
+                    status: 'scheduled'
+                });
+                added++;
+            }
         }
     }
 
