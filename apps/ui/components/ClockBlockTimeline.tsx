@@ -19,7 +19,12 @@ interface ClockBlockTimelineProps {
   violations: RuleViolation[];
   focusedSegmentIds?: string[];
   schoolRules?: Pick<SchoolRules, "openerCount" | "closerCount">;
-  scheduleDays: Array<{ id: string; dayOfWeek: DayOfWeek; scheduleType?: string }>;
+  scheduleDays: Array<{
+    id: string;
+    dayOfWeek: DayOfWeek;
+    scheduleType?: string;
+    enrollmentCount?: number;
+  }>;
   scheduleTypeRatios: Record<string, number>;
   onFocusSegment: (segmentId: string) => void;
   daySequence: DayOfWeek[];
@@ -447,6 +452,10 @@ export default function ClockBlockTimeline({
                     const scheduleDay =
                       (segment.scheduleDayId ? scheduleDaysById[segment.scheduleDayId] : undefined) ??
                       scheduleDaysByDow[segment.dayOfWeek];
+                    const effectiveChildCount =
+                      typeof scheduleDay?.enrollmentCount === "number"
+                        ? scheduleDay.enrollmentCount
+                        : segment.childCount;
                     const ratioChildren =
                       (scheduleDay?.scheduleType ? scheduleTypeRatios[scheduleDay.scheduleType] : undefined) ?? 0;
                     let minStaff = 0;
@@ -457,7 +466,7 @@ export default function ClockBlockTimeline({
                     }
                     const requiredStaff = Math.max(
                       minStaff,
-                      Math.ceil(segment.childCount / Math.max(ratioChildren, 1))
+                      Math.ceil(effectiveChildCount / Math.max(ratioChildren, 1))
                     );
                     const hasLeader = assignedStaff.some((employee) => employee.leaderQualified);
                     const violationsForBlock = violationsByBlock[segment.id] ?? [];
@@ -512,7 +521,7 @@ export default function ClockBlockTimeline({
                           </span>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem" }}>
-                          <span>Children: {segment.childCount}</span>
+                          <span>Children: {effectiveChildCount}</span>
                           <span>Req staff: {requiredStaff}</span>
                           <span>Ratio 1:{ratioChildren || "?"}</span>
                         </div>

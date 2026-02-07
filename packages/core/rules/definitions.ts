@@ -104,9 +104,11 @@ export const ratioSegmentRule: RuleDefinition = {
         getScheduleDayById(context, block.scheduleDayId) ??
         context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
       const scheduleType = scheduleDay?.scheduleType;
+      const effectiveChildCount =
+        typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
       const childrenPerStaff =
         (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ?? 1;
-      const requiredFromRatio = Math.ceil(block.childCount / childrenPerStaff);
+      const requiredFromRatio = Math.ceil(effectiveChildCount / childrenPerStaff);
       const schoolRules = getSchoolRules(context);
       let minStaff = 0;
       if (block.segment === "open" && schoolRules.openerCount > 0) {
@@ -126,9 +128,12 @@ export const ratioSegmentRule: RuleDefinition = {
           "ratio-segment",
           DEFAULT_POLICY_CITATIONS["ratio-segment"]
         );
-        const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${minStaff}, ratio ${childrenPerStaff}) but only ${assigned} assigned`;
+        const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${minStaff}, ratio ${childrenPerStaff}, children ${effectiveChildCount}) but only ${assigned} assigned`;
         violations.push(
-          buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId)
+          buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId, "error", {
+            dayOfWeek: block.dayOfWeek,
+            childCount: effectiveChildCount
+          })
         );
       }
     });

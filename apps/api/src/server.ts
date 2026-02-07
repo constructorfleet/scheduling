@@ -135,6 +135,7 @@ const buildServer = async () => {
         requiresLeaderForOpenClose: boolean;
       }>;
       employees: Array<{
+        id?: string;
         name: string;
         jobTitle: string;
         maxHoursPerDay: number;
@@ -185,7 +186,6 @@ const buildServer = async () => {
 
       await tx.scheduleType.deleteMany({ where: { schoolId } });
       await tx.jobTitle.deleteMany({ where: { schoolId } });
-      await tx.employee.deleteMany({ where: { schoolId } });
       await tx.operatingHours.deleteMany({ where: { schoolId } });
       await tx.fieldTripType.deleteMany({ where: { schoolId } });
 
@@ -214,19 +214,73 @@ const buildServer = async () => {
       }
 
       if (payload.employees?.length) {
-        await tx.employee.createMany({
-          data: payload.employees.map((employee) => ({
-            schoolId,
-            name: employee.name,
-            jobTitle: employee.jobTitle,
-            maxHoursPerDay: employee.maxHoursPerDay,
-            maxHoursPerWeek: employee.maxHoursPerWeek,
-            employmentStatus: employee.employmentStatus,
-            medicallyDelegated: employee.medicallyDelegated,
-            cprCurrent: employee.cprCurrent,
-            notes: employee.notes ?? null
-          }))
+        const existingEmployees = await tx.employee.findMany({ where: { schoolId } });
+        const keptEmployeeIds = new Set<string>();
+        const existingById = new Map(existingEmployees.map((employee) => [employee.id, employee]));
+        const existingByStableKey = new Map<string, string[]>();
+
+        existingEmployees.forEach((employee) => {
+          const key = `${employee.name.trim().toLowerCase()}::${employee.jobTitle.trim().toLowerCase()}`;
+          const ids = existingByStableKey.get(key) ?? [];
+          ids.push(employee.id);
+          existingByStableKey.set(key, ids);
         });
+
+        for (const employee of payload.employees) {
+          const stableKey = `${employee.name.trim().toLowerCase()}::${employee.jobTitle.trim().toLowerCase()}`;
+          const fromId = employee.id && existingById.has(employee.id) ? employee.id : null;
+          const fromStableKey = (existingByStableKey.get(stableKey) ?? []).find(
+            (candidateId) => !keptEmployeeIds.has(candidateId)
+          );
+          const targetId = fromId ?? fromStableKey;
+
+          if (targetId) {
+            keptEmployeeIds.add(targetId);
+            await tx.employee.update({
+              where: { id: targetId },
+              data: {
+                name: employee.name,
+                jobTitle: employee.jobTitle,
+                maxHoursPerDay: employee.maxHoursPerDay,
+                maxHoursPerWeek: employee.maxHoursPerWeek,
+                employmentStatus: employee.employmentStatus,
+                medicallyDelegated: employee.medicallyDelegated,
+                cprCurrent: employee.cprCurrent,
+                notes: employee.notes ?? null
+              }
+            });
+            continue;
+          }
+
+          const created = await tx.employee.create({
+            data: {
+              id: employee.id,
+              schoolId,
+              name: employee.name,
+              jobTitle: employee.jobTitle,
+              maxHoursPerDay: employee.maxHoursPerDay,
+              maxHoursPerWeek: employee.maxHoursPerWeek,
+              employmentStatus: employee.employmentStatus,
+              medicallyDelegated: employee.medicallyDelegated,
+              cprCurrent: employee.cprCurrent,
+              notes: employee.notes ?? null
+            }
+          });
+          keptEmployeeIds.add(created.id);
+        }
+
+        if (keptEmployeeIds.size > 0) {
+          await tx.employee.deleteMany({
+            where: {
+              schoolId,
+              id: {
+                notIn: Array.from(keptEmployeeIds)
+              }
+            }
+          });
+        }
+      } else {
+        await tx.employee.deleteMany({ where: { schoolId } });
       }
 
       if (payload.operatingHours?.length) {
@@ -377,8 +431,16 @@ const buildServer = async () => {
       }
 
       if (payload.staffAssignments?.length) {
+        const segmentBlockIds = new Set((payload.segmentBlocks ?? []).map((block) => block.id));
+        const uniqueAssignments = new Map<string, StaffAssignmentPayload>();
+        payload.staffAssignments.forEach((assignment) => {
+          if (!segmentBlockIds.has(assignment.segmentBlockId)) {
+            return;
+          }
+          uniqueAssignments.set(assignment.id, assignment);
+        });
         await tx.staffAssignment.createMany({
-          data: payload.staffAssignments.map((assignment) => ({
+          data: Array.from(uniqueAssignments.values()).map((assignment) => ({
             id: assignment.id,
             scheduleWeekId: weekId,
             segmentBlockId: assignment.segmentBlockId,

@@ -379,6 +379,7 @@ export default function App() {
       })) as ScheduleTypePayloadModel[],
       jobTitles: overrides.jobTitles ?? jobTitlesState,
       employees: (overrides.employees ?? employeesState).map((employee) => ({
+        id: employee.id,
         name: employee.name,
         jobTitle: employee.jobTitle,
         maxHoursPerDay: employee.maxHoursPerDay,
@@ -512,28 +513,20 @@ export default function App() {
           if (schedule.status) {
             setScheduleStatusOverride(schedule.status);
           }
-          if (schedule.scheduleDays?.length) {
-            setScheduleDaysState(
-              schedule.scheduleDays.map((day: ScheduleDay) => ({
-                ...day,
-                date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
-              }))
-            );
-          }
-          if (schedule.segmentBlocks?.length) {
-            setSegmentBlocksState(schedule.segmentBlocks);
-          }
-          if (schedule.staffAssignments?.length) {
-            setStaffAssignmentsState(schedule.staffAssignments);
-          }
-          if (schedule.fieldTripEvents?.length) {
-            setFieldTripEventsState(
-              schedule.fieldTripEvents.map((event: FieldTripEvent) => ({
-                ...event,
-                signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
-              }))
-            );
-          }
+          setScheduleDaysState(
+            (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
+              ...day,
+              date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
+            }))
+          );
+          setSegmentBlocksState(schedule.segmentBlocks ?? []);
+          setStaffAssignmentsState(schedule.staffAssignments ?? []);
+          setFieldTripEventsState(
+            (schedule.fieldTripEvents ?? []).map((event: FieldTripEvent) => ({
+              ...event,
+              signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
+            }))
+          );
         }
       } catch (error) {
         failApiAction("Schedule load failed");
