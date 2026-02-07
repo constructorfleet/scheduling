@@ -126,6 +126,13 @@ const formatWeekRange = (startDate: Date) => {
   const endLabel = endDate.toLocaleDateString(undefined, options);
   return `${startLabel} – ${endLabel}, ${endDate.getFullYear()}`;
 };
+const formatShortDate = (value?: string) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 type ScheduleSnapshot = {
   scheduleDays: ScheduleDay[];
@@ -375,6 +382,25 @@ export default function App() {
     });
     return Array.from(byId.values());
   }, [employeesDerived, staffAssignmentsState]);
+  const employeeNameById = useMemo(() => {
+    return new Map(scheduleStaff.map((employee) => [employee.id, employee.name]));
+  }, [scheduleStaff]);
+  const scheduleDayById = useMemo(() => {
+    return new Map(scheduleDaysState.map((day) => [day.id, day]));
+  }, [scheduleDaysState]);
+  const scheduleTypeLabelByValue = useMemo(() => {
+    return new Map(scheduleTypeOptionsState.map((type) => [type.value, type.label]));
+  }, [scheduleTypeOptionsState]);
+  const fieldTripNameById = useMemo(() => {
+    return new Map(fieldTripTypesState.map((trip) => [trip.id, trip.name]));
+  }, [fieldTripTypesState]);
+  const formatDayLabel = (dayId: string) => {
+    const day = scheduleDayById.get(dayId);
+    if (!day) return dayId;
+    const dayName = dayDisplayNames[day.dayOfWeek] ?? day.dayOfWeek.toUpperCase();
+    const dateLabel = formatShortDate(day.date);
+    return `${dayName}${dateLabel ? ` ${dateLabel}` : ""}`;
+  };
 
   const fieldTripEventsByDay = useMemo<Record<DayOfWeek, FieldTripEvent | undefined>>(() => {
     return fieldTripEventsState.reduce((map, event) => {
@@ -977,17 +1003,20 @@ export default function App() {
   };
 
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
+    const dayLabel = formatDayLabel(dayId);
     applyScheduleChange(
       (current) => ({
         scheduleDays: current.scheduleDays.map((day) =>
           day.id === dayId ? { ...day, enrollmentCount: enrollment } : day
         )
       }),
-      { action: "Updated enrollment", notes: `Set ${dayId} enrollment to ${enrollment ?? "unset"}` }
+      { action: "Updated enrollment", notes: `${dayLabel}: ${enrollment ?? "unset"} students` }
     );
   };
 
   const handleScheduleTypeUpdate = (dayId: string, scheduleType: ScheduleType | undefined) => {
+    const dayLabel = formatDayLabel(dayId);
+    const typeLabel = scheduleType ? (scheduleTypeLabelByValue.get(scheduleType) ?? scheduleType) : "unset";
     applyScheduleChange(
       (current) => ({
         scheduleDays: current.scheduleDays.map((day) => {
@@ -1011,7 +1040,7 @@ export default function App() {
       }),
       {
         action: "Updated schedule type",
-        notes: `Set ${dayId} schedule type to ${scheduleType ?? "unset"}`
+        notes: `${dayLabel}: ${typeLabel}`
       }
     );
   };
@@ -1019,6 +1048,7 @@ export default function App() {
   const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
     const day = scheduleDaysState.find((item) => item.id === dayId);
     const dayOfWeek = day?.dayOfWeek;
+    const dayLabel = formatDayLabel(dayId);
     applyScheduleChange(
       (current) => ({
         fieldTripEvents: current.fieldTripEvents.map((event) => {
@@ -1050,8 +1080,8 @@ export default function App() {
         action: "Updated field trip selection",
         notes:
           selection.type === "none"
-            ? `${dayId} set to No Field Trip`
-            : `${dayId} set to field trip ${selection.fieldTripTypeId}`
+            ? `${dayLabel}: No Field Trip`
+            : `${dayLabel}: ${fieldTripNameById.get(selection.fieldTripTypeId) ?? selection.fieldTripTypeId}`
       }
     );
   };
@@ -1145,22 +1175,30 @@ export default function App() {
   }, [handleRedo, handleUndo]);
 
   const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
+    const assignment = staffAssignmentsState.find((item) => item.id === assignmentId);
+    const segment = assignment
+      ? segmentBlocksState.find((block) => block.id === assignment.segmentBlockId)
+      : undefined;
+    const employeeName = assignment ? (employeeNameById.get(assignment.employeeId) ?? assignment.employeeId) : assignmentId;
+    const dayName = segment ? (dayDisplayNames[segment.dayOfWeek] ?? segment.dayOfWeek.toUpperCase()) : "";
     applyScheduleChange(
       (current) => ({
         staffAssignments: current.staffAssignments.map((assignment) =>
           assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
         )
       }),
-      { action: "Updated assignment time", notes: `${assignmentId}: ${startTime}-${endTime}` }
+      { action: "Updated assignment time", notes: `${employeeName}${dayName ? ` (${dayName})` : ""}: ${startTime}-${endTime}` }
     );
   };
 
   const handleDeleteAssignment = (assignmentId: string) => {
+    const assignment = staffAssignmentsState.find((item) => item.id === assignmentId);
+    const employeeName = assignment ? (employeeNameById.get(assignment.employeeId) ?? assignment.employeeId) : assignmentId;
     applyScheduleChange(
       (current) => ({
         staffAssignments: current.staffAssignments.filter((assignment) => assignment.id !== assignmentId)
       }),
-      { action: "Deleted assignment", notes: assignmentId }
+      { action: "Deleted assignment", notes: employeeName }
     );
   };
 
@@ -1193,10 +1231,27 @@ export default function App() {
       },
       {
         action: "Reassigned unlinked staff",
-        notes: `${fromEmployeeId} -> ${toEmployeeId}`
+        notes: `${employeeNameById.get(fromEmployeeId) ?? fromEmployeeId} -> ${
+          employeeNameById.get(toEmployeeId) ?? toEmployeeId
+        }`
       }
     );
   };
+
+  const displayAuditEvents = useMemo(() => {
+    const replacements = new Map<string, string>();
+    employeeNameById.forEach((name, id) => replacements.set(id, name));
+    scheduleDayById.forEach((_, id) => replacements.set(id, formatDayLabel(id)));
+    fieldTripNameById.forEach((name, id) => replacements.set(id, name));
+    return auditEvents.map((event) => {
+      if (!event.notes) return event;
+      let notes = event.notes;
+      replacements.forEach((value, key) => {
+        notes = notes.replace(new RegExp(`\\b${escapeRegex(key)}\\b`, "g"), value);
+      });
+      return { ...event, notes };
+    });
+  }, [auditEvents, employeeNameById, fieldTripNameById, scheduleDayById]);
 
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
     const nextWithClosed = ensureClosedScheduleType(next);
@@ -1374,7 +1429,7 @@ export default function App() {
               },
               {
                 action: "Created assignment",
-                notes: `${employeeId} ${dayOfWeek} ${startTime}-${endTime}`
+                notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]}): ${startTime}-${endTime}`
               }
             );
           }}
@@ -1395,7 +1450,7 @@ export default function App() {
       <AnimatePresence>
         {showAuditTimeline && (
           <AuditTimeline
-            events={auditEvents}
+            events={displayAuditEvents}
             onUndo={handleUndo}
             onRedo={handleRedo}
             canUndo={historyPast.length > 0}
