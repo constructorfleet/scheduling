@@ -71,8 +71,7 @@ export function validateDayMetadata(scheduleDays: ScheduleDay[]): MissingMetadat
  * Generates initial staff assignments based on availability and operating hours
  */
 function generateInitialAssignments(
-  context: AutoSchedulerContext,
-  weekId: string
+  context: AutoSchedulerContext
 ): StaffAssignment[] {
   const assignments: StaffAssignment[] = [];
   const availableEmployees = context.employees.filter(emp => emp.employmentStatus === 'active');
@@ -119,7 +118,7 @@ function generateInitialAssignments(
         }
 
         // Check if employee would exceed max hours
-        const currentHours = calculateEmployeeHours(assignments, employee.id, dayOfWeek as DayOfWeek);
+        const currentHours = calculateEmployeeHours(assignments, employee.id);
         const blockHours = calculateHoursBetween(block.startTime, block.endTime);
         
         if (currentHours + blockHours > employee.maxHoursPerDay) {
@@ -131,7 +130,7 @@ function generateInitialAssignments(
           id: `auto-${block.id}-${employee.id}`,
           segmentBlockId: block.id,
           employeeId: employee.id,
-          assignmentSource: 'manual_adjustment',
+          assignmentSource: 'template',
           startTime: block.startTime,
           endTime: block.endTime,
           status: 'scheduled'
@@ -181,12 +180,11 @@ function isEmployeeAvailable(
 }
 
 /**
- * Calculate total hours already assigned to an employee for a specific day
+ * Calculate total hours already assigned to an employee
  */
 function calculateEmployeeHours(
   assignments: StaffAssignment[],
-  employeeId: string,
-  dayOfWeek: DayOfWeek
+  employeeId: string
 ): number {
   let totalHours = 0;
   
@@ -249,7 +247,7 @@ function attemptViolationFixes(
             id: `auto-fix-${block.id}-${employee.id}`,
             segmentBlockId: block.id,
             employeeId: employee.id,
-            assignmentSource: 'manual_adjustment',
+            assignmentSource: 'template',
             startTime: block.startTime,
             endTime: block.endTime,
             status: 'scheduled'
@@ -293,7 +291,7 @@ function attemptViolationFixes(
               id: `auto-fix-leader-${block.id}-${leaders[0].id}`,
               segmentBlockId: block.id,
               employeeId: leaders[0].id,
-              assignmentSource: 'manual_adjustment',
+              assignmentSource: 'template',
               startTime: block.startTime,
               endTime: block.endTime,
               status: 'scheduled'
@@ -330,7 +328,7 @@ function attemptViolationFixes(
           id: `auto-fix-cpr-${block.id}-${cprStaff[0].id}`,
           segmentBlockId: block.id,
           employeeId: cprStaff[0].id,
-          assignmentSource: 'manual_adjustment',
+          assignmentSource: 'template',
           startTime: block.startTime,
           endTime: block.endTime,
           status: 'scheduled'
@@ -345,11 +343,11 @@ function attemptViolationFixes(
 /**
  * Main auto-scheduler function
  */
-export function autoSchedule(context: AutoSchedulerContext, weekId: string): AutoSchedulerResult {
+export function autoSchedule(context: AutoSchedulerContext, _weekId: string): AutoSchedulerResult {
   const engine = createRulesEngine();
 
   // Generate initial assignments
-  let currentAssignments = generateInitialAssignments(context, weekId);
+  let currentAssignments = generateInitialAssignments(context);
   let iterations = 0;
   let violations: RuleViolation[] = [];
 
