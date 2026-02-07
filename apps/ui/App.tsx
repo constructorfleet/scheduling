@@ -1683,14 +1683,22 @@ export default function App() {
           currentWeekId
         );
 
-        // Apply the new assignments
+        // Apply the new assignments and segment blocks
         const finalAssignments = keepExisting
           ? [...staffAssignmentsState, ...result.staffAssignments]
           : result.staffAssignments;
 
+        // Merge segment blocks (avoid duplicates)
+        const existingBlockIds = new Set(segmentBlocksState.map(b => b.id));
+        const newBlocks = result.segmentBlocks.filter(b => !existingBlockIds.has(b.id));
+        const finalSegmentBlocks = keepExisting
+          ? [...segmentBlocksState, ...newBlocks]
+          : result.segmentBlocks;
+
         applyScheduleChange(
           () => ({
-            staffAssignments: finalAssignments
+            staffAssignments: finalAssignments,
+            segmentBlocks: finalSegmentBlocks
           }),
           {
             action: "Auto-scheduled staff assignments",
