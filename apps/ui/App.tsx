@@ -206,6 +206,7 @@ export default function App() {
   const [scheduleStatusOverride, setScheduleStatusOverride] = useState<ScheduleStatus | null>(null);
   const [hasLoadedRemote, setHasLoadedRemote] = useState(false);
   const [isWeekInitialized, setIsWeekInitialized] = useState(false);
+  const [loadedWeekId, setLoadedWeekId] = useState<string | null>(null);
   const [pendingWeekInitialization, setPendingWeekInitialization] = useState<WeekInitializationState | null>(null);
   const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<{
@@ -814,6 +815,7 @@ export default function App() {
     const loadScheduleWeek = async () => {
       setHasLoadedRemote(false);
       setIsWeekInitialized(false);
+      setLoadedWeekId(null);
       setPendingWeekInitialization(null);
       beginApiAction("loading", "Loading schedule...");
       try {
@@ -845,6 +847,7 @@ export default function App() {
           setAuditEvents(schedule.auditEvents ?? []);
           setHasLoadedRemote(true);
           setIsWeekInitialized(true);
+          setLoadedWeekId(currentWeekId);
           return;
         }
 
@@ -870,7 +873,7 @@ export default function App() {
   }, [selectedSchoolId, currentWeekId]);
 
   useEffect(() => {
-    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized) return;
+    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) return;
     const payload: ScheduleSavePayload = {
       scheduleWeek: {
         id: currentWeekId,
@@ -928,11 +931,12 @@ export default function App() {
     staffAssignmentsState,
     fieldTripEventsState,
     scheduleStatusOverride,
-    auditEvents
+    auditEvents,
+    loadedWeekId
   ]);
 
   useEffect(() => {
-    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized) {
+    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) {
       return;
     }
     const handleBeforeUnload = () => {
@@ -951,7 +955,7 @@ export default function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [hasLoadedRemote, isConfigured, isWeekInitialized, currentWeekId]);
+  }, [hasLoadedRemote, isConfigured, isWeekInitialized, loadedWeekId, currentWeekId]);
 
   useEffect(() => {
     return () => {
@@ -1164,6 +1168,10 @@ export default function App() {
   ];
 
   const handleWeekShift = (direction: WeekDirection) => {
+    setPendingWeekInitialization(null);
+    setHasLoadedRemote(false);
+    setIsWeekInitialized(false);
+    setLoadedWeekId(null);
     setWeekStartDate((current) => {
       const updated = new Date(current);
       updated.setDate(updated.getDate() + (direction === "next" ? 7 : -7));
@@ -1231,6 +1239,7 @@ export default function App() {
       setPendingWeekInitialization(null);
       setIsWeekInitialized(true);
       setHasLoadedRemote(true);
+      setLoadedWeekId(weekId);
       scheduleDirtyRef.current = false;
       schedulePayloadRef.current = payload;
       completeApiAction("Schedule created");
