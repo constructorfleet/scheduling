@@ -76,7 +76,13 @@ const FIELD_TRIP_OPTIONS = (fieldTripTypes: FieldTripType[]) => [
 ];
 
 const ratioToPair = (ratio: number) => {
-  if (!Number.isFinite(ratio) || ratio <= 0) {
+  if (!Number.isFinite(ratio)) {
+    return { adults: 1, students: 1 };
+  }
+  if (ratio === 0) {
+    return { adults: 0, students: 0 };
+  }
+  if (ratio < 0) {
     return { adults: 1, students: 1 };
   }
   if (ratio >= 1) {

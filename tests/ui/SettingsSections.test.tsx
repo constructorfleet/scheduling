@@ -11,7 +11,13 @@ import type { ScheduleTypeOption } from "../../apps/ui/components/DayMetadataStr
 import type { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "../../apps/ui/components/SettingsPanel";
 
 const ratioToPair = (ratio: number) => {
-  if (!Number.isFinite(ratio) || ratio <= 0) {
+  if (!Number.isFinite(ratio)) {
+    return { adults: 1, students: 1 };
+  }
+  if (ratio === 0) {
+    return { adults: 0, students: 0 };
+  }
+  if (ratio < 0) {
     return { adults: 1, students: 1 };
   }
   if (ratio >= 1) {
@@ -91,6 +97,66 @@ describe("Settings section components", () => {
       await user.click(screen.getByRole("button", { name: "Remove" }));
     });
     expect(onRemove).toHaveBeenCalledWith(0);
+  });
+
+  it("displays explanation text for 0:0 leader ratio behavior", () => {
+    const fieldTrips: FieldTripType[] = [
+      {
+        id: "trip-1",
+        name: "Zoo Visit",
+        minAdultStudentRatio: 1 / 8,
+        minLeaderStudentRatio: 1 / 25,
+        policyCitationId: "policy"
+      }
+    ];
+
+    render(
+      <FieldTripsSection
+        draftFieldTrips={fieldTrips}
+        onChange={jest.fn()}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+        onSave={jest.fn()}
+        canSave={true}
+        ratioToPair={ratioToPair}
+      />
+    );
+
+    expect(screen.getByText(/If the leader ratio is set to 0:0/i)).toBeInTheDocument();
+    expect(screen.getByText(/it will be ignored and only the adult ratio will be enforced/i)).toBeInTheDocument();
+  });
+
+  it("displays 0:0 for disabled field trip ratios", () => {
+    const fieldTrips: FieldTripType[] = [
+      {
+        id: "trip-1",
+        name: "Zoo Visit",
+        minAdultStudentRatio: 1 / 10,
+        minLeaderStudentRatio: 0,
+        policyCitationId: "policy"
+      }
+    ];
+
+    render(
+      <FieldTripsSection
+        draftFieldTrips={fieldTrips}
+        onChange={jest.fn()}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+        onSave={jest.fn()}
+        canSave={true}
+        ratioToPair={ratioToPair}
+      />
+    );
+
+    const allInputs = screen.getAllByRole("spinbutton");
+    // The inputs are in order: Adult-L, Adult-S, Leader-L, Leader-S
+    // When leader ratio is 0, both leader inputs should show 0
+    const leaderAdults = allInputs[2];
+    const leaderStudents = allInputs[3];
+    
+    expect(leaderAdults).toHaveValue(0);
+    expect(leaderStudents).toHaveValue(0);
   });
 
   it("edits job titles and toggles flags", async () => {
