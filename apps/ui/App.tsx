@@ -1508,11 +1508,30 @@ export default function App() {
   const handleDeleteAssignment = (assignmentId: string) => {
     const assignment = staffAssignmentsState.find((item) => item.id === assignmentId);
     const employeeName = assignment ? (employeeNameById.get(assignment.employeeId) ?? assignment.employeeId) : assignmentId;
+    const segment = assignment
+      ? segmentBlocksState.find((block) => block.id === assignment.segmentBlockId)
+      : undefined;
+    const dayName = segment ? (dayDisplayNames[segment.dayOfWeek] ?? segment.dayOfWeek.toUpperCase()) : "";
+    const timeRange = segment ? `${segment.startTime}-${segment.endTime}` : "";
     applyScheduleChange(
-      (current) => ({
-        staffAssignments: current.staffAssignments.filter((assignment) => assignment.id !== assignmentId)
-      }),
-      { action: "Deleted assignment", notes: employeeName }
+      (current) => {
+        const target = current.staffAssignments.find((item) => item.id === assignmentId);
+        if (!target) {
+          return null;
+        }
+        const nextAssignments = current.staffAssignments.filter((item) => item.id !== assignmentId);
+        const segmentStillUsed = nextAssignments.some((item) => item.segmentBlockId === target.segmentBlockId);
+        return {
+          staffAssignments: nextAssignments,
+          segmentBlocks: segmentStillUsed
+            ? current.segmentBlocks
+            : current.segmentBlocks.filter((block) => block.id !== target.segmentBlockId)
+        };
+      },
+      {
+        action: "Deleted time block",
+        notes: `${employeeName}${dayName ? ` (${dayName})` : ""}${timeRange ? ` ${timeRange}` : ""}`
+      }
     );
   };
 
