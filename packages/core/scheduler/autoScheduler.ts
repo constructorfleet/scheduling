@@ -105,13 +105,20 @@ function generateInitialAssignments(
     }
 
     // Create three segment blocks for the day (open, mid, close)
+    // Use more reasonable time boundaries
     const totalMinutes = closeMinutes - openMinutes;
+    
+    // Round segment boundaries to nearest 15 minutes for cleaner times
     const segmentDuration = Math.floor(totalMinutes / 3);
+    const roundToQuarterHour = (minutes: number) => Math.round(minutes / 15) * 15;
+    
+    const midStart = roundToQuarterHour(openMinutes + segmentDuration);
+    const closeStart = roundToQuarterHour(openMinutes + (2 * segmentDuration));
     
     const segments: Array<{ start: number; end: number; segment: 'open' | 'mid' | 'close' }> = [
-      { start: openMinutes, end: openMinutes + segmentDuration, segment: 'open' },
-      { start: openMinutes + segmentDuration, end: openMinutes + (2 * segmentDuration), segment: 'mid' },
-      { start: openMinutes + (2 * segmentDuration), end: closeMinutes, segment: 'close' }
+      { start: openMinutes, end: midStart, segment: 'open' },
+      { start: midStart, end: closeStart, segment: 'mid' },
+      { start: closeStart, end: closeMinutes, segment: 'close' }
     ];
 
     for (const seg of segments) {
@@ -155,16 +162,28 @@ function minutesToTime(minutes: number): string {
 
 /**
  * Check if employee is available for the given day and time window
+ * Also checks if the employee has requested time off on this date
  */
 function isEmployeeAvailable(
   employee: Employee,
   dayOfWeek: DayOfWeek,
   startTime: string,
-  endTime: string
+  endTime: string,
+  date?: string
 ): boolean {
   // Check employment status
   if (employee.employmentStatus !== 'active') {
     return false;
+  }
+
+  // Check if employee has requested time off for this date
+  if (date && employee.requestedDaysOff && employee.requestedDaysOff.length > 0) {
+    for (const timeOff of employee.requestedDaysOff) {
+      // Check if the date falls within the time off request
+      if (date >= timeOff.startDate && date <= timeOff.endDate) {
+        return false; // Employee has requested time off on this day
+      }
+    }
   }
 
   // Check availability windows
@@ -219,6 +238,184 @@ function getEmployeeHoursOnDay(
 }
 
 /**
+ * Try to extend an employee's shift to adjacent blocks on the same day
+ * This helps schedule people for as many hours as possible
+ */
+function tryExtendShift(
+  employee: Employee,
+  block: SegmentBlock,
+  context: AutoSchedulerContext,
+  assignments: StaffAssignment[]
+): { startTime: string; endTime: string } {
+  // Find all blocks on the same day
+  const dayBlocks = context.segmentBlocks
+    .filter(b => b.dayOfWeek === block.dayOfWeek && b.scheduleDayId === block.scheduleDayId)
+    .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+  
+  const blockIndex = dayBlocks.findIndex(b => b.id === block.id);
+  if (blockIndex === -1) {
+    return { startTime: block.startTime, endTime: block.endTime };
+  }
+  
+  // Find schedule day for date checking
+  const scheduleDay = context.scheduleDays.find(d => d.id === block.scheduleDayId);
+  const blockDate = scheduleDay?.date;
+  
+  // Try to find contiguous blocks before and after
+  let earliestBlock = block;
+  let latestBlock = block;
+  
+  // Look backward for adjacent blocks
+  for (let i = blockIndex - 1; i >= 0; i--) {
+    const prevBlock = dayBlocks[i];
+    if (prevBlock.endTime !== earliestBlock.startTime) break;
+    
+    // Check if employee is available for this block
+    if (!isEmployeeAvailable(employee, prevBlock.dayOfWeek, prevBlock.startTime, prevBlock.endTime, blockDate)) {
+      break;
+    }
+    
+    // Check if extending would exceed max hours per day
+    const currentHours = getEmployeeHoursOnDay(assignments, employee.id, block.dayOfWeek, context.segmentBlocks);
+    const extendedDuration = (timeToMinutes(latestBlock.endTime) - timeToMinutes(prevBlock.startTime)) / 60;
+    if (currentHours + extendedDuration > employee.maxHoursPerDay) {
+      break;
+    }
+    
+    // Check if someone else is already assigned to this block
+    const alreadyAssigned = assignments.some(a => 
+      a.segmentBlockId === prevBlock.id && a.employeeId === employee.id
+    );
+    if (alreadyAssigned) break;
+    
+    earliestBlock = prevBlock;
+  }
+  
+  // Look forward for adjacent blocks
+  for (let i = blockIndex + 1; i < dayBlocks.length; i++) {
+    const nextBlock = dayBlocks[i];
+    if (nextBlock.startTime !== latestBlock.endTime) break;
+    
+    // Check if employee is available for this block
+    if (!isEmployeeAvailable(employee, nextBlock.dayOfWeek, nextBlock.startTime, nextBlock.endTime, blockDate)) {
+      break;
+    }
+    
+    // Check if extending would exceed max hours per day
+    const currentHours = getEmployeeHoursOnDay(assignments, employee.id, block.dayOfWeek, context.segmentBlocks);
+    const extendedDuration = (timeToMinutes(nextBlock.endTime) - timeToMinutes(earliestBlock.startTime)) / 60;
+    if (currentHours + extendedDuration > employee.maxHoursPerDay) {
+      break;
+    }
+    
+    // Check if someone else is already assigned to this block
+    const alreadyAssigned = assignments.some(a => 
+      a.segmentBlockId === nextBlock.id && a.employeeId === employee.id
+    );
+    if (alreadyAssigned) break;
+    
+    latestBlock = nextBlock;
+  }
+  
+  return { startTime: earliestBlock.startTime, endTime: latestBlock.endTime };
+}
+
+/**
+ * Merge consecutive assignments for the same employee on the same day
+ * If a person has two shifts that are immediately adjacent, merge them into one
+ */
+function mergeConsecutiveAssignments(
+  assignments: StaffAssignment[],
+  segmentBlocks: SegmentBlock[]
+): StaffAssignment[] {
+  const merged: StaffAssignment[] = [];
+  const processed = new Set<string>();
+  
+  // Group assignments by employee
+  const byEmployee = new Map<string, StaffAssignment[]>();
+  for (const assignment of assignments) {
+    if (!byEmployee.has(assignment.employeeId)) {
+      byEmployee.set(assignment.employeeId, []);
+    }
+    byEmployee.get(assignment.employeeId)!.push(assignment);
+  }
+  
+  // Process each employee's assignments
+  for (const [, empAssignments] of byEmployee) {
+    // Group by day
+    const byDay = new Map<string, StaffAssignment[]>();
+    for (const assignment of empAssignments) {
+      const block = segmentBlocks.find(b => b.id === assignment.segmentBlockId);
+      if (!block) continue;
+      
+      const key = `${block.dayOfWeek}`;
+      if (!byDay.has(key)) {
+        byDay.set(key, []);
+      }
+      byDay.get(key)!.push(assignment);
+    }
+    
+    // Merge consecutive assignments on each day
+    for (const [, dayAssignments] of byDay) {
+      // Sort by start time
+      const sorted = dayAssignments.sort((a, b) => 
+        timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+      );
+      
+      let i = 0;
+      while (i < sorted.length) {
+        if (processed.has(sorted[i].id)) {
+          i++;
+          continue;
+        }
+        
+        const current = sorted[i];
+        let endTime = current.endTime;
+        const mergedIds = [current.id];
+        
+        // Look for consecutive assignments
+        let j = i + 1;
+        while (j < sorted.length) {
+          const next = sorted[j];
+          if (processed.has(next.id)) {
+            j++;
+            continue;
+          }
+          
+          // Check if next assignment starts exactly when current ends
+          if (next.startTime === endTime) {
+            endTime = next.endTime;
+            mergedIds.push(next.id);
+            processed.add(next.id);
+            j++;
+          } else {
+            break;
+          }
+        }
+        
+        // Create merged assignment
+        if (mergedIds.length > 1) {
+          // Multiple assignments merged
+          merged.push({
+            ...current,
+            endTime,
+            id: `merged-${mergedIds.join('-')}`
+          });
+        } else {
+          // Single assignment, keep as-is
+          merged.push(current);
+        }
+        
+        processed.add(current.id);
+        i++;
+      }
+    }
+  }
+  
+  return merged;
+}
+
+/**
  * Attempt to fix violations by working through them one by one
  * This is the new violation-based approach
  */
@@ -252,10 +449,14 @@ function attemptViolationFixes(
       .filter((b): b is SegmentBlock => Boolean(b));
 
     for (const block of relatedBlocks) {
+      // Find the schedule day for this block to get the date
+      const scheduleDay = context.scheduleDays.find(d => d.id === block.scheduleDayId);
+      const blockDate = scheduleDay?.date;
+      
       // Find employees who could work this specific block
       const availableEmployees = context.employees
         .filter(emp => emp.employmentStatus === 'active')
-        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime, blockDate))
         .filter(emp => {
           const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
           const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
@@ -276,19 +477,26 @@ function attemptViolationFixes(
       });
 
       // Add staff to this block (we'll add multiple iterations to gradually fill)
-      // For now, just add one staff member per block per iteration
-      if (availableEmployees.length > 0) {
-        const employee = availableEmployees[0];
-        const assignmentId = `auto-assign-${block.id}-${employee.id}-${Date.now()}`;
+      // Try to add multiple staff members per iteration to speed up scheduling
+      // Try to extend their shift to adjacent blocks for max hours
+      let staffAdded = 0;
+      const maxStaffPerBlock = Math.max(2, needed); // Add at least what's needed
+      
+      for (const employee of availableEmployees) {
+        if (staffAdded >= maxStaffPerBlock) break;
+        
+        const extendedShift = tryExtendShift(employee, block, context, updatedAssignments);
+        const assignmentId = `auto-assign-${block.id}-${employee.id}-${Date.now()}-${staffAdded}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: employee.id,
           assignmentSource: 'template',
-          startTime: block.startTime,
-          endTime: block.endTime,
+          startTime: extendedShift.startTime,
+          endTime: extendedShift.endTime,
           status: 'scheduled'
         });
+        staffAdded++;
       }
     }
   }
@@ -310,10 +518,14 @@ function attemptViolationFixes(
     });
 
     if (!hasLeader) {
+      // Find the schedule day for this block to get the date
+      const scheduleDay = context.scheduleDays.find(d => d.id === block.scheduleDayId);
+      const blockDate = scheduleDay?.date;
+      
       // Find a leader who can work this block
       const availableLeaders = context.employees
         .filter(emp => emp.leaderQualified && emp.employmentStatus === 'active')
-        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime, blockDate))
         .filter(emp => {
           const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
           const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
@@ -323,14 +535,15 @@ function attemptViolationFixes(
 
       if (availableLeaders.length > 0) {
         const leader = availableLeaders[0];
+        const extendedShift = tryExtendShift(leader, block, context, updatedAssignments);
         const assignmentId = `auto-leader-${block.id}-${leader.id}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: leader.id,
           assignmentSource: 'template',
-          startTime: block.startTime,
-          endTime: block.endTime,
+          startTime: extendedShift.startTime,
+          endTime: extendedShift.endTime,
           status: 'scheduled'
         });
       }
@@ -357,9 +570,13 @@ function attemptViolationFixes(
     const needed = required - medicallyDelegatedCount;
 
     if (needed > 0) {
+      // Find the schedule day for this block to get the date
+      const scheduleDay = context.scheduleDays.find(d => d.id === block.scheduleDayId);
+      const blockDate = scheduleDay?.date;
+      
       const availableMedical = context.employees
         .filter(emp => emp.medicallyDelegated && emp.employmentStatus === 'active')
-        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime, blockDate))
         .filter(emp => {
           const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
           const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
@@ -371,14 +588,15 @@ function attemptViolationFixes(
       for (const emp of availableMedical) {
         if (added >= needed) break;
         
+        const extendedShift = tryExtendShift(emp, block, context, updatedAssignments);
         const assignmentId = `auto-medical-${block.id}-${emp.id}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: emp.id,
           assignmentSource: 'template',
-          startTime: block.startTime,
-          endTime: block.endTime,
+          startTime: extendedShift.startTime,
+          endTime: extendedShift.endTime,
           status: 'scheduled'
         });
         added++;
@@ -404,7 +622,12 @@ function attemptViolationFixes(
     // Find CPR-current replacement
     const cprStaff = context.employees
       .filter(emp => emp.cprCurrent && emp.employmentStatus === 'active')
-      .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+      .filter(emp => {
+        // Find the schedule day for this block to get the date
+        const scheduleDay = context.scheduleDays.find(d => d.id === block.scheduleDayId);
+        const blockDate = scheduleDay?.date;
+        return isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime, blockDate);
+      })
       .filter(emp => {
         const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
         const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
@@ -420,14 +643,15 @@ function attemptViolationFixes(
       
       // Add the CPR-current replacement
       const replacement = cprStaff[0];
+      const extendedShift = tryExtendShift(replacement, block, context, updatedAssignments);
       const assignmentId = `auto-cpr-${block.id}-${replacement.id}`;
       updatedAssignments.push({
         id: assignmentId,
         segmentBlockId: block.id,
         employeeId: replacement.id,
         assignmentSource: 'template',
-        startTime: block.startTime,
-        endTime: block.endTime,
+        startTime: extendedShift.startTime,
+        endTime: extendedShift.endTime,
         status: 'scheduled'
       });
     }
@@ -458,10 +682,10 @@ export function autoSchedule(
   let allSegmentBlocks: SegmentBlock[];
   
   if (startFromEmpty) {
-    // Start fresh - generate initial segment blocks
+    // Start fresh - generate initial segment blocks and ignore existing ones
     const initialResult = generateInitialAssignments(context);
     currentAssignments = initialResult.assignments;
-    allSegmentBlocks = [...context.segmentBlocks, ...initialResult.segmentBlocks];
+    allSegmentBlocks = initialResult.segmentBlocks; // Use ONLY newly generated blocks
   } else {
     // Start with existing schedule and work through violations
     currentAssignments = [...context.staffAssignments];
@@ -495,6 +719,9 @@ export function autoSchedule(
 
     // If no violations, we're done
     if (violations.length === 0) {
+      // Final merge before returning success
+      currentAssignments = mergeConsecutiveAssignments(currentAssignments, allSegmentBlocks);
+      
       return {
         success: true,
         staffAssignments: currentAssignments,
@@ -526,6 +753,9 @@ export function autoSchedule(
 
     // Update segment blocks in case new ones were created
     allSegmentBlocks = mutableContext.segmentBlocks;
+    
+    // Merge consecutive assignments for the same employee
+    currentAssignments = mergeConsecutiveAssignments(currentAssignments, allSegmentBlocks);
 
     // If no changes were made, we can't fix any more violations
     if (currentAssignments.length === previousAssignmentCount && 
@@ -533,6 +763,9 @@ export function autoSchedule(
       break;
     }
   }
+
+  // Final merge of consecutive assignments before returning
+  currentAssignments = mergeConsecutiveAssignments(currentAssignments, allSegmentBlocks);
 
   // Reached max iterations or couldn't fix violations
   return {
