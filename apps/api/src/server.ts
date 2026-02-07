@@ -533,6 +533,20 @@ const buildServer = async () => {
     };
   });
 
+  fastify.delete("/api/schedule/:weekId/staff-assignments", async (request, reply) => {
+    const { weekId } = request.params as { weekId: string };
+    const prisma = getPrisma();
+    try {
+      await backupBeforeWrite();
+    } catch (error) {
+      request.log.warn({ error }, "Database backup before staff assignment delete failed");
+    }
+    const result = await prisma.staffAssignment.deleteMany({
+      where: { scheduleWeekId: weekId }
+    });
+    return reply.send({ ok: true, deleted: result.count });
+  });
+
   fastify.put("/api/schedule/:weekId", async (request, reply) => {
     const { weekId } = request.params as { weekId: string };
     const payload = request.body as Partial<{

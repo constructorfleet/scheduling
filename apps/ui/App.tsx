@@ -44,6 +44,7 @@ import type {
 import { createRulesEngine } from "@core/rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
 import {
+  deleteScheduleAssignments,
   fetchSchedule,
   fetchSettings,
   saveSchedule,
@@ -1666,8 +1667,12 @@ export default function App() {
     setShowAutoScheduleModal(true);
     
     // Use setTimeout to allow UI to update with spinner
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
+        if (!keepExisting) {
+          await deleteScheduleAssignments(currentWeekId);
+        }
+
         const result = autoSchedule(
           {
             scheduleDays: scheduleDaysState,
