@@ -163,7 +163,7 @@ export default function ClockBlockTimeline({
       const guardrailEnd = parseTimeToMinutes(guardrailForDraftDay.close);
       if (startMinutes < guardrailStart || endMinutes > guardrailEnd) {
         setFormError(
-          `Clock block must stay within operating hours (${formatExactTime(
+          `Schedule block must stay within operating hours (${formatExactTime(
             guardrailForDraftDay.open
           )}–${formatExactTime(guardrailForDraftDay.close)}).`
         );
@@ -197,7 +197,7 @@ export default function ClockBlockTimeline({
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <h3 style={{ margin: 0 }}>Clock block timeline</h3>
+          <h3 style={{ margin: 0 }}>Schedule block timeline</h3>
           <p style={{ margin: 0, color: "#6b7280" }}>Drag, extend, or add precise clock-in/out windows.</p>
         </div>
         <div style={{ display: "flex", gap: "0.5rem" }}>
@@ -212,7 +212,7 @@ export default function ClockBlockTimeline({
               padding: "0.45rem 1rem"
             }}
           >
-            {isAddFormOpen ? "Hide add block form" : "Add clock block"}
+            {isAddFormOpen ? "Hide add block form" : "Add schdule block"}
           </button>
           <button
             onClick={() => onAutoBalance?.()}
@@ -243,7 +243,7 @@ export default function ClockBlockTimeline({
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ margin: 0, fontWeight: 600 }}>Add clock block</p>
+            <p style={{ margin: 0, fontWeight: 600 }}>Add schdule block</p>
             <span style={{ fontSize: "0.8rem", color: "#475569" }}>
               {guardrailForDraftDay
                 ? `${formatExactTime(guardrailForDraftDay.open)} – ${formatExactTime(guardrailForDraftDay.close)} operating window`
@@ -357,7 +357,7 @@ export default function ClockBlockTimeline({
                 opacity: !draftBlock.startTime || !draftBlock.endTime ? 0.6 : 1
               }}
             >
-              Save clock block
+              Save schdule block
             </button>
           </div>
         </div>

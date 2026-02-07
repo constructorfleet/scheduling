@@ -42,6 +42,10 @@ export interface AutoSchedulerResult {
 
 const MAX_ITERATIONS = 10;
 
+function toIdToken(value: string): string {
+    return value.replace(/[^a-zA-Z0-9_-]+/g, "-");
+}
+
 function normalizeChildrenPerStaff(value: number | undefined): number {
     if (!Number.isFinite(value) || !value || value <= 0) {
         return 1;
@@ -162,7 +166,8 @@ function generateInitialAssignments(
         ];
 
         for (const seg of segments) {
-            const blockId = `auto-block-${ day.dayOfWeek }-${ seg.segment }-${ minutesToTime(seg.start) }`;
+            const weekToken = toIdToken(day.scheduleWeekId);
+            const blockId = `auto-block-${ weekToken }-${ day.dayOfWeek }-${ seg.segment }-${ minutesToTime(seg.start) }`;
             const segmentBlock: SegmentBlock = {
                 id: blockId,
                 scheduleWeekId: day.scheduleWeekId,
@@ -227,7 +232,7 @@ function generateInitialAssignments(
             );
             if (!bestOpener) break;
             seededAssignments.push({
-                id: `auto-seed-open-${ day.dayOfWeek }-${ i }-${ bestOpener.employee.id }`,
+                id: `auto-seed-open-${ toIdToken(day.scheduleWeekId) }-${ day.dayOfWeek }-${ i }-${ bestOpener.employee.id }`,
                 segmentBlockId: openBlock.id,
                 employeeId: bestOpener.employee.id,
                 assignmentSource: "template",
@@ -241,7 +246,7 @@ function generateInitialAssignments(
             const bestCloser = findBestClosingSeedCandidate(seedingContext, seededAssignments, day, closeBlock);
             if (!bestCloser) break;
             seededAssignments.push({
-                id: `auto-seed-close-${ day.dayOfWeek }-${ i }-${ bestCloser.employee.id }`,
+                id: `auto-seed-close-${ toIdToken(day.scheduleWeekId) }-${ day.dayOfWeek }-${ i }-${ bestCloser.employee.id }`,
                 segmentBlockId: closeBlock.id,
                 employeeId: bestCloser.employee.id,
                 assignmentSource: "template",

@@ -74,6 +74,53 @@ const createFieldTripEvent = (
 });
 
 describe("autoSchedule - Time Off Fixes", () => {
+  it("generates week-scoped IDs so one week does not overwrite another", () => {
+    const commonEmployees = [
+      createEmployee("emp-a", "Alex", { leaderQualified: true, cprCurrent: true }),
+      createEmployee("emp-b", "Blair", { leaderQualified: true, cprCurrent: true })
+    ];
+
+    const firstWeekId = "week-2026-02-15";
+    const secondWeekId = "week-2026-02-22";
+
+    const buildContext = (weekId: string, date: string): AutoSchedulerContext => ({
+      scheduleDays: [
+        createScheduleDay(`${weekId}-day-mon`, "mon", date, {
+          scheduleWeekId: weekId,
+          scheduleType: "full_day",
+          enrollmentCount: 10
+        })
+      ],
+      segmentBlocks: [],
+      staffAssignments: [],
+      employees: commonEmployees,
+      fieldTripEvents: [createFieldTripEvent(`${weekId}-ft-mon`, "mon", { scheduleWeekId: weekId })],
+      operatingHours: [createOperatingHours(`${weekId}-op-mon`, "mon", "07:00", "17:00")],
+      scheduleTypeRatios: { full_day: 10 },
+      schoolRules: {
+        openerCount: 1,
+        closerCount: 1,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      }
+    });
+
+    const firstResult = autoSchedule(buildContext(firstWeekId, "2026-02-16"), firstWeekId, true);
+    const secondResult = autoSchedule(buildContext(secondWeekId, "2026-02-23"), secondWeekId, true);
+
+    const firstBlockIds = new Set(firstResult.segmentBlocks.map((block) => block.id));
+    const secondBlockIds = new Set(secondResult.segmentBlocks.map((block) => block.id));
+    const blockOverlap = [...firstBlockIds].filter((id) => secondBlockIds.has(id));
+
+    expect(blockOverlap).toEqual([]);
+    firstResult.segmentBlocks.forEach((block) => {
+      expect(block.id).toContain(firstWeekId);
+    });
+    secondResult.segmentBlocks.forEach((block) => {
+      expect(block.id).toContain(secondWeekId);
+    });
+  });
+
   it("should interpret AM/PM operating hours and availability without timeline violations", () => {
     const context: AutoSchedulerContext = {
       scheduleDays: [
