@@ -36,7 +36,7 @@
     "rules-engine"
   ],
   "author": "Teagan",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "devDependencies": {
     "@playwright/test": "^1.45.0",
     "@testing-library/jest-dom": "^6.0.0",
