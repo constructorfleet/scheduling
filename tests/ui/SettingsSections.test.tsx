@@ -10,22 +10,6 @@ import type { Employee, FieldTripType } from "@core/domain/types";
 import type { ScheduleTypeOption } from "../../apps/ui/components/DayMetadataStrip";
 import type { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "../../apps/ui/components/SettingsPanel";
 
-const ratioToPair = (ratio: number) => {
-  if (!Number.isFinite(ratio)) {
-    return { adults: 1, students: 1 };
-  }
-  if (ratio === 0) {
-    return { adults: 0, students: 0 };
-  }
-  if (ratio < 0) {
-    return { adults: 1, students: 1 };
-  }
-  if (ratio >= 1) {
-    return { adults: Math.max(1, Math.round(ratio)), students: 1 };
-  }
-  return { adults: 1, students: Math.max(1, Math.round(1 / ratio)) };
-};
-
 describe("Settings section components", () => {
   it("updates schedule type ratios and labels", async () => {
     const user = userEvent.setup();
@@ -68,8 +52,10 @@ describe("Settings section components", () => {
       {
         id: "trip-1",
         name: "Zoo Visit",
-        minAdultStudentRatio: 1 / 8,
-        minLeaderStudentRatio: 1 / 25,
+        adultRatioAdults: 1,
+        adultRatioStudents: 8,
+        leaderRatioAdults: 1,
+        leaderRatioStudents: 25,
         policyCitationId: "policy"
       }
     ];
@@ -82,7 +68,6 @@ describe("Settings section components", () => {
         onRemove={onRemove}
         onSave={jest.fn()}
         canSave={true}
-        ratioToPair={ratioToPair}
       />
     );
 
@@ -104,8 +89,10 @@ describe("Settings section components", () => {
       {
         id: "trip-1",
         name: "Zoo Visit",
-        minAdultStudentRatio: 1 / 8,
-        minLeaderStudentRatio: 1 / 25,
+        adultRatioAdults: 1,
+        adultRatioStudents: 8,
+        leaderRatioAdults: 1,
+        leaderRatioStudents: 25,
         policyCitationId: "policy"
       }
     ];
@@ -118,7 +105,6 @@ describe("Settings section components", () => {
         onRemove={jest.fn()}
         onSave={jest.fn()}
         canSave={true}
-        ratioToPair={ratioToPair}
       />
     );
 
@@ -131,8 +117,10 @@ describe("Settings section components", () => {
       {
         id: "trip-1",
         name: "Zoo Visit",
-        minAdultStudentRatio: 1 / 10,
-        minLeaderStudentRatio: 0,
+        adultRatioAdults: 1,
+        adultRatioStudents: 10,
+        leaderRatioAdults: 0,
+        leaderRatioStudents: 0,
         policyCitationId: "policy"
       }
     ];
@@ -145,7 +133,6 @@ describe("Settings section components", () => {
         onRemove={jest.fn()}
         onSave={jest.fn()}
         canSave={true}
-        ratioToPair={ratioToPair}
       />
     );
 

@@ -1413,8 +1413,10 @@ describe("autoSchedule", () => {
         {
           id: "ft-type-museum",
           name: "Children's Museum",
-          minAdultStudentRatio: 10, // 1:10 ratio (1 adult per 10 children)
-          minLeaderStudentRatio: 30, // 1:30 ratio (1 leader per 30 children)
+          adultRatioAdults: 1,
+          adultRatioStudents: 10, // 1:10 ratio (1 adult per 10 children)
+          leaderRatioAdults: 1,
+          leaderRatioStudents: 30, // 1:30 ratio (1 leader per 30 children)
           policyCitationId: "citation-museum",
           notes: "Children's Museum field trip"
         }
@@ -1509,8 +1511,10 @@ describe("autoSchedule", () => {
         {
           id: "ft-type-museum",
           name: "Children's Museum",
-          minAdultStudentRatio: 10, // 1:10 ratio (1 adult per 10 children)
-          minLeaderStudentRatio: 30, // 1:30 ratio (1 leader per 30 children)
+          adultRatioAdults: 1,
+          adultRatioStudents: 10, // 1:10 ratio (1 adult per 10 children)
+          leaderRatioAdults: 1,
+          leaderRatioStudents: 30, // 1:30 ratio (1 leader per 30 children)
           policyCitationId: "citation-museum",
           notes: "Children's Museum field trip"
         }

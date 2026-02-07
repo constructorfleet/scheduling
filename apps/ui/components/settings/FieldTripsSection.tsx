@@ -7,7 +7,6 @@ interface FieldTripsSectionProps {
   onRemove: (index: number) => void;
   onSave: () => void;
   canSave: boolean;
-  ratioToPair: (ratio: number) => { adults: number; students: number };
 }
 
 export default function FieldTripsSection({
@@ -16,8 +15,7 @@ export default function FieldTripsSection({
   onAdd,
   onRemove,
   onSave,
-  canSave,
-  ratioToPair
+  canSave
 }: FieldTripsSectionProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -51,12 +49,6 @@ export default function FieldTripsSection({
         <span />
       </div>
       {draftFieldTrips.map((trip, index) => {
-        const adultPair = ratioToPair(trip.minAdultStudentRatio);
-        const leaderPair =
-          trip.minLeaderStudentRatio > 0
-            ? ratioToPair(trip.minLeaderStudentRatio)
-            : { adults: 0, students: 0 };
-
         return (
           <div
             key={trip.id}
@@ -88,13 +80,13 @@ export default function FieldTripsSection({
               <input
                 type="number"
                 min={1}
-                value={adultPair.adults}
+                value={trip.adultRatioAdults}
                 onChange={(event) => {
                   const nextAdults = Math.max(1, Number(event.target.value) || 1);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minAdultStudentRatio: nextAdults / Math.max(1, adultPair.students)
+                    adultRatioAdults: nextAdults
                   };
                   onChange(next);
                 }}
@@ -111,13 +103,13 @@ export default function FieldTripsSection({
               <input
                 type="number"
                 min={1}
-                value={adultPair.students}
+                value={trip.adultRatioStudents}
                 onChange={(event) => {
                   const nextStudents = Math.max(1, Number(event.target.value) || 1);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minAdultStudentRatio: Math.max(1, adultPair.adults) / nextStudents
+                    adultRatioStudents: nextStudents
                   };
                   onChange(next);
                 }}
@@ -135,16 +127,14 @@ export default function FieldTripsSection({
               <input
                 type="number"
                 min={0}
-                value={leaderPair.adults}
+                value={trip.leaderRatioAdults}
                 onChange={(event) => {
                   const nextAdults = Math.max(0, Number(event.target.value) || 0);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minLeaderStudentRatio:
-                      nextAdults === 0 || leaderPair.students === 0
-                        ? 0
-                        : nextAdults / leaderPair.students
+                    leaderRatioAdults: nextAdults,
+                    leaderRatioStudents: nextAdults === 0 ? 0 : trip.leaderRatioStudents
                   };
                   onChange(next);
                 }}
@@ -161,16 +151,14 @@ export default function FieldTripsSection({
               <input
                 type="number"
                 min={0}
-                value={leaderPair.students}
+                value={trip.leaderRatioStudents}
                 onChange={(event) => {
                   const nextStudents = Math.max(0, Number(event.target.value) || 0);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minLeaderStudentRatio:
-                      nextStudents === 0 || leaderPair.adults === 0
-                        ? 0
-                        : leaderPair.adults / nextStudents
+                    leaderRatioAdults: nextStudents === 0 ? 0 : trip.leaderRatioAdults,
+                    leaderRatioStudents: nextStudents
                   };
                   onChange(next);
                 }}
