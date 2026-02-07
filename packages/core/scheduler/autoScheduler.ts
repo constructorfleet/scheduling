@@ -1,6 +1,5 @@
 import type {
   DayOfWeek,
-  DaySegment,
   Employee,
   FieldTripEvent,
   OperatingHours,
@@ -14,6 +13,7 @@ import { createRulesEngine } from "../rules/engine";
 export interface AutoSchedulerContext {
   scheduleDays: ScheduleDay[];
   segmentBlocks: SegmentBlock[];
+  staffAssignments: StaffAssignment[];
   employees: Employee[];
   fieldTripEvents: FieldTripEvent[];
   operatingHours: OperatingHours[];
@@ -70,182 +70,78 @@ export function validateDayMetadata(scheduleDays: ScheduleDay[]): MissingMetadat
 }
 
 /**
- * Generates initial staff assignments based on availability and operating hours
+ * Generates initial staff assignments based on violations
+ * This creates basic segment blocks for each day and then lets violation fixing handle staffing
  */
 function generateInitialAssignments(
   context: AutoSchedulerContext
 ): { assignments: StaffAssignment[]; segmentBlocks: SegmentBlock[] } {
-  const assignments: StaffAssignment[] = [];
   const createdSegmentBlocks: SegmentBlock[] = [];
-  const availableEmployees = context.employees.filter(emp => emp.employmentStatus === 'active');
 
-  // Sort employees by leader qualification (leaders first for better coverage)
-  const sortedEmployees = [...availableEmployees].sort((a, b) => {
-    if (a.leaderQualified && !b.leaderQualified) return -1;
-    if (!a.leaderQualified && b.leaderQualified) return 1;
-    return 0;
-  });
-
-  // Process each schedule day
+  // Create segment blocks for each schedule day that needs them
   for (const day of context.scheduleDays) {
-    // Skip days without required metadata
+    // Skip days without required metadata or closed days
     if (!day.scheduleType || day.enrollmentCount === undefined) {
       continue;
     }
+    if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+      continue;
+    }
 
-    // Find operating hours for this day (prefer exact match, fallback to any hours for this day)
+    // Find operating hours for this day
     const opHours = context.operatingHours.find(
       oh => oh.dayOfWeek === day.dayOfWeek && oh.dayScheduleType === day.dayScheduleType
-    );
+    ) || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
     
-    const effectiveOpHours = opHours || context.operatingHours.find(oh => oh.dayOfWeek === day.dayOfWeek);
-    
-    if (!effectiveOpHours) {
-      continue; // Skip days without operating hours
+    if (!opHours || !opHours.open || !opHours.close) {
+      continue;
     }
 
-    const openTime = effectiveOpHours.open;
-    const closeTime = effectiveOpHours.close;
-
-    if (!openTime || !closeTime) {
-      continue; // Skip if we can't determine operating hours
+    const openMinutes = timeToMinutes(opHours.open);
+    const closeMinutes = timeToMinutes(opHours.close);
+    
+    if (closeMinutes <= openMinutes) {
+      continue;
     }
 
-    // Track hours assigned per employee for this day
-    const employeeHoursToday = new Map<string, number>();
+    // Create three segment blocks for the day (open, mid, close)
+    const totalMinutes = closeMinutes - openMinutes;
+    const segmentDuration = Math.floor(totalMinutes / 3);
+    
+    const segments: Array<{ start: number; end: number; segment: 'open' | 'mid' | 'close' }> = [
+      { start: openMinutes, end: openMinutes + segmentDuration, segment: 'open' },
+      { start: openMinutes + segmentDuration, end: openMinutes + (2 * segmentDuration), segment: 'mid' },
+      { start: openMinutes + (2 * segmentDuration), end: closeMinutes, segment: 'close' }
+    ];
 
-    // Schedule employees starting from opening time, one at a time
-    for (const employee of sortedEmployees) {
-      const currentHours = employeeHoursToday.get(employee.id) || 0;
+    for (const seg of segments) {
+      const blockId = `auto-block-${day.dayOfWeek}-${seg.segment}-${minutesToTime(seg.start)}`;
+      const segmentBlock: SegmentBlock = {
+        id: blockId,
+        scheduleWeekId: day.scheduleWeekId,
+        scheduleDayId: day.id,
+        dayOfWeek: day.dayOfWeek,
+        segment: seg.segment,
+        startTime: minutesToTime(seg.start),
+        endTime: minutesToTime(seg.end),
+        childCount: day.enrollmentCount,
+        status: 'draft'
+      };
       
-      // Check if employee has reached max hours for the day
-      if (currentHours >= employee.maxHoursPerDay) {
-        continue;
-      }
-
-      // Check if employee is available on this day
-      const dayAvailability = employee.availability?.find(a => a.dayOfWeek === day.dayOfWeek);
-      
-      // If employee has defined availability but none for this day, skip
-      if (employee.availability && employee.availability.length > 0 && !dayAvailability) {
-        continue; // Employee explicitly not available on this day
-      }
-      
-      // If no availability restrictions at all, assume available during all operating hours
-      if (!employee.availability || employee.availability.length === 0) {
-        const remainingHours = employee.maxHoursPerDay - currentHours;
-        if (remainingHours > 0) {
-          // Schedule for remaining hours or until close, whichever is less
-          const openMinutes = timeToMinutes(openTime);
-          const closeMinutes = timeToMinutes(closeTime);
-          const currentStartMinutes = openMinutes + (currentHours * 60);
-          
-          if (currentStartMinutes >= closeMinutes) {
-            continue; // Can't schedule beyond closing time
-          }
-          
-          const endMinutes = Math.min(
-            currentStartMinutes + (remainingHours * 60),
-            closeMinutes
-          );
-          const startTime = minutesToTime(currentStartMinutes);
-          const endTime = minutesToTime(endMinutes);
-          const actualHours = (endMinutes - currentStartMinutes) / 60;
-          
-          if (actualHours > 0) {
-            const blockId = `auto-block-${day.dayOfWeek}-${employee.id}-${startTime}-${endTime}`;
-            const segmentBlock: SegmentBlock = {
-              id: blockId,
-              scheduleWeekId: day.scheduleWeekId,
-              scheduleDayId: day.id,
-              dayOfWeek: day.dayOfWeek,
-              segment: determineSegment(startTime, openTime, closeTime),
-              startTime: startTime,
-              endTime: endTime,
-              childCount: day.enrollmentCount,
-              status: 'draft'
-            };
-            
-            createdSegmentBlocks.push(segmentBlock);
-            assignments.push({
-              id: `auto-${blockId}-${employee.id}`,
-              segmentBlockId: blockId,
-              employeeId: employee.id,
-              assignmentSource: 'template',
-              startTime: startTime,
-              endTime: endTime,
-              status: 'scheduled'
-            });
-            
-            employeeHoursToday.set(employee.id, currentHours + actualHours);
-          }
-        }
-        continue;
-      }
-
-      // Employee has specific availability windows for this day
-      // TypeScript needs explicit null check even though dayAvailability is guaranteed above
-      if (!dayAvailability?.blocks || dayAvailability.blocks.length === 0) {
-        continue; // No availability blocks for this day
-      }
-
-      // Sort availability blocks chronologically
-      const sortedBlocks = [...dayAvailability.blocks].sort((a, b) => a.startTime.localeCompare(b.startTime));
-      
-      for (const availBlock of sortedBlocks) {
-        const remainingHours = employee.maxHoursPerDay - (employeeHoursToday.get(employee.id) || 0);
-        if (remainingHours <= 0) {
-          break;
-        }
-
-        // Constrain availability block to operating hours
-        const blockStart = Math.max(timeToMinutes(availBlock.startTime), timeToMinutes(openTime));
-        const blockEnd = Math.min(timeToMinutes(availBlock.endTime), timeToMinutes(closeTime));
-
-        if (blockEnd <= blockStart) {
-          continue; // No overlap with operating hours
-        }
-
-        const availableHours = (blockEnd - blockStart) / 60;
-        const hoursToSchedule = Math.min(availableHours, remainingHours);
-
-        if (hoursToSchedule <= 0) {
-          continue;
-        }
-
-        const startTime = minutesToTime(blockStart);
-        const endTime = minutesToTime(blockStart + (hoursToSchedule * 60));
-
-        const blockId = `auto-block-${day.dayOfWeek}-${employee.id}-${startTime}-${endTime}`;
-        const segmentBlock: SegmentBlock = {
-          id: blockId,
-          scheduleWeekId: day.scheduleWeekId,
-          scheduleDayId: day.id,
-          dayOfWeek: day.dayOfWeek,
-          segment: determineSegment(startTime, openTime, closeTime),
-          startTime: startTime,
-          endTime: endTime,
-          childCount: day.enrollmentCount,
-          status: 'draft'
-        };
-
-        createdSegmentBlocks.push(segmentBlock);
-        assignments.push({
-          id: `auto-${blockId}-${employee.id}`,
-          segmentBlockId: blockId,
-          employeeId: employee.id,
-          assignmentSource: 'template',
-          startTime: startTime,
-          endTime: endTime,
-          status: 'scheduled'
-        });
-        
-        employeeHoursToday.set(employee.id, (employeeHoursToday.get(employee.id) || 0) + hoursToSchedule);
-      }
+      createdSegmentBlocks.push(segmentBlock);
     }
   }
 
-  return { assignments, segmentBlocks: createdSegmentBlocks };
+  // Return empty assignments - let violation fixing populate them
+  return { assignments: [], segmentBlocks: createdSegmentBlocks };
+}
+
+/**
+ * Convert time string (HH:MM) to minutes since midnight
+ */
+function timeToMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
 }
 
 /**
@@ -258,26 +154,7 @@ function minutesToTime(minutes: number): string {
 }
 
 /**
- * Determine segment type based on time within operating hours
- */
-function determineSegment(time: string, openTime: string, closeTime: string): DaySegment {
-  const timeMin = timeToMinutes(time);
-  const openMin = timeToMinutes(openTime);
-  const closeMin = timeToMinutes(closeTime);
-  const totalMinutes = closeMin - openMin;
-  const minutesFromOpen = timeMin - openMin;
-
-  if (minutesFromOpen < totalMinutes / 3) {
-    return 'open';
-  } else if (minutesFromOpen < (2 * totalMinutes) / 3) {
-    return 'mid';
-  } else {
-    return 'close';
-  }
-}
-
-/**
- * Check if employee is available for the given day and time
+ * Check if employee is available for the given day and time window
  */
 function isEmployeeAvailable(
   employee: Employee,
@@ -285,6 +162,11 @@ function isEmployeeAvailable(
   startTime: string,
   endTime: string
 ): boolean {
+  // Check employment status
+  if (employee.employmentStatus !== 'active') {
+    return false;
+  }
+
   // Check availability windows
   if (!employee.availability || employee.availability.length === 0) {
     return true; // No restrictions means available
@@ -312,15 +194,33 @@ function isEmployeeAvailable(
 }
 
 /**
- * Convert time string (HH:MM) to minutes since midnight
+ * Calculate hours already assigned to an employee on a specific day
  */
-function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  return hours * 60 + minutes;
+function getEmployeeHoursOnDay(
+  assignments: StaffAssignment[],
+  employeeId: string,
+  dayOfWeek: DayOfWeek,
+  segmentBlocks: SegmentBlock[]
+): number {
+  let totalHours = 0;
+  
+  for (const assignment of assignments) {
+    if (assignment.employeeId !== employeeId) continue;
+    
+    const block = segmentBlocks.find(b => b.id === assignment.segmentBlockId);
+    if (!block || block.dayOfWeek !== dayOfWeek) continue;
+    
+    const startMinutes = timeToMinutes(assignment.startTime);
+    const endMinutes = timeToMinutes(assignment.endTime);
+    totalHours += (endMinutes - startMinutes) / 60;
+  }
+  
+  return totalHours;
 }
 
 /**
- * Attempt to fix violations by adjusting assignments
+ * Attempt to fix violations by working through them one by one
+ * This is the new violation-based approach
  */
 function attemptViolationFixes(
   context: AutoSchedulerContext,
@@ -329,110 +229,61 @@ function attemptViolationFixes(
 ): StaffAssignment[] {
   let updatedAssignments = [...assignments];
 
-  // Group violations by type
+  // Process ratio violations first as they're most critical
   const ratioViolations = violations.filter(v => v.ruleId === 'ratio-segment');
-  const leaderViolations = violations.filter(v => v.ruleId === 'open-close-coverage');
-  const cprViolations = violations.filter(v => v.ruleId === 'cpr-current-required');
-
-  // Try to fix ratio violations by adding more staff
+  
   for (const violation of ratioViolations) {
-    if (violation.target.entity === 'SegmentBlock') {
-      const block = context.segmentBlocks.find(b => b.id === violation.target.id);
-      if (!block) continue;
+    if (violation.target.entity !== 'ScheduleDay') continue;
+    
+    const metadata = violation.target.metadata;
+    if (!metadata) continue;
+    
+    const required = metadata.required as number;
+    const actual = metadata.actual as number;
+    const relatedBlockIds = (metadata.relatedSegmentBlockIds as string[]) || [];
+    
+    const needed = required - actual;
+    if (needed <= 0) continue;
 
-      // Try to add one more staff member to this block
-      const availableEmployees = context.employees.filter(emp => 
-        emp.employmentStatus === 'active' &&
-        !updatedAssignments.some(a => a.segmentBlockId === block.id && a.employeeId === emp.id)
-      );
+    // Instead of trying to assign for the full violation period,
+    // work with the related segment blocks and assign staff to those
+    const relatedBlocks = relatedBlockIds
+      .map(id => context.segmentBlocks.find(b => b.id === id))
+      .filter((b): b is SegmentBlock => Boolean(b));
 
-      for (const employee of availableEmployees) {
-        if (isEmployeeAvailable(employee, block.dayOfWeek, block.startTime, block.endTime)) {
-          updatedAssignments.push({
-            id: `auto-fix-${block.id}-${employee.id}`,
-            segmentBlockId: block.id,
-            employeeId: employee.id,
-            assignmentSource: 'template',
-            startTime: block.startTime,
-            endTime: block.endTime,
-            status: 'scheduled'
-          });
-          break; // Added one staff, move to next violation
-        }
-      }
-    }
-  }
+    for (const block of relatedBlocks) {
+      // Find employees who could work this specific block
+      const availableEmployees = context.employees
+        .filter(emp => emp.employmentStatus === 'active')
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => {
+          const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
+          const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
+          return hoursOnDay + shiftDuration <= emp.maxHoursPerDay;
+        })
+        .filter(emp => {
+          // Check if this employee is already assigned to this block
+          return !updatedAssignments.some(a => 
+            a.segmentBlockId === block.id && a.employeeId === emp.id
+          );
+        });
 
-  // Try to fix leader violations by replacing non-leader with leader
-  for (const violation of leaderViolations) {
-    if (violation.target.entity === 'SegmentBlock') {
-      const block = context.segmentBlocks.find(b => b.id === violation.target.id);
-      if (!block) continue;
-
-      const blockAssignments = updatedAssignments.filter(a => a.segmentBlockId === block.id);
-      const hasLeader = blockAssignments.some(a => {
-        const emp = context.employees.find(e => e.id === a.employeeId);
-        return emp?.leaderQualified;
+      // Sort by qualifications (prefer leaders and medically delegated)
+      availableEmployees.sort((a, b) => {
+        const aScore = (a.leaderQualified ? 2 : 0) + (a.medicallyDelegated ? 1 : 0) + (a.cprCurrent ? 1 : 0);
+        const bScore = (b.leaderQualified ? 2 : 0) + (b.medicallyDelegated ? 1 : 0) + (b.cprCurrent ? 1 : 0);
+        return bScore - aScore;
       });
 
-      if (!hasLeader) {
-        // Try to replace a non-leader with a leader
-        const leaders = context.employees.filter(emp => 
-          emp.leaderQualified && 
-          emp.employmentStatus === 'active' &&
-          isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime)
-        );
-
-        if (leaders.length > 0 && blockAssignments.length > 0) {
-          // Remove first non-leader assignment
-          const nonLeaderAssignment = blockAssignments.find(a => {
-            const emp = context.employees.find(e => e.id === a.employeeId);
-            return !emp?.leaderQualified;
-          });
-
-          if (nonLeaderAssignment) {
-            updatedAssignments = updatedAssignments.filter(a => a.id !== nonLeaderAssignment.id);
-            updatedAssignments.push({
-              id: `auto-fix-leader-${block.id}-${leaders[0].id}`,
-              segmentBlockId: block.id,
-              employeeId: leaders[0].id,
-              assignmentSource: 'template',
-              startTime: block.startTime,
-              endTime: block.endTime,
-              status: 'scheduled'
-            });
-          }
-        }
-      }
-    }
-  }
-
-  // Try to fix CPR violations by replacing non-CPR with CPR-current staff
-  for (const violation of cprViolations) {
-    if (violation.target.entity === 'StaffAssignment') {
-      const assignment = updatedAssignments.find(a => a.id === violation.target.id);
-      if (!assignment) continue;
-
-      const employee = context.employees.find(e => e.id === assignment.employeeId);
-      if (!employee || employee.cprCurrent) continue;
-
-      // Try to find a CPR-current replacement
-      const block = context.segmentBlocks.find(b => b.id === assignment.segmentBlockId);
-      if (!block) continue;
-
-      const cprStaff = context.employees.filter(emp => 
-        emp.cprCurrent && 
-        emp.employmentStatus === 'active' &&
-        isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime) &&
-        !updatedAssignments.some(a => a.segmentBlockId === block.id && a.employeeId === emp.id)
-      );
-
-      if (cprStaff.length > 0) {
-        updatedAssignments = updatedAssignments.filter(a => a.id !== assignment.id);
+      // Add staff to this block (we'll add multiple iterations to gradually fill)
+      // For now, just add one staff member per block per iteration
+      if (availableEmployees.length > 0) {
+        const employee = availableEmployees[0];
+        const assignmentId = `auto-assign-${block.id}-${employee.id}-${Date.now()}`;
         updatedAssignments.push({
-          id: `auto-fix-cpr-${block.id}-${cprStaff[0].id}`,
+          id: assignmentId,
           segmentBlockId: block.id,
-          employeeId: cprStaff[0].id,
+          employeeId: employee.id,
           assignmentSource: 'template',
           startTime: block.startTime,
           endTime: block.endTime,
@@ -442,23 +293,185 @@ function attemptViolationFixes(
     }
   }
 
+  // Process open-close-coverage violations
+  const openCloseViolations = violations.filter(v => v.ruleId === 'open-close-coverage');
+  
+  for (const violation of openCloseViolations) {
+    if (violation.target.entity !== 'SegmentBlock') continue;
+    
+    const block = context.segmentBlocks.find(b => b.id === violation.target.id);
+    if (!block) continue;
+
+    // Check if we need a leader
+    const blockAssignments = updatedAssignments.filter(a => a.segmentBlockId === block.id);
+    const hasLeader = blockAssignments.some(a => {
+      const emp = context.employees.find(e => e.id === a.employeeId);
+      return emp?.leaderQualified;
+    });
+
+    if (!hasLeader) {
+      // Find a leader who can work this block
+      const availableLeaders = context.employees
+        .filter(emp => emp.leaderQualified && emp.employmentStatus === 'active')
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => {
+          const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
+          const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
+          return hoursOnDay + shiftDuration <= emp.maxHoursPerDay;
+        })
+        .filter(emp => !blockAssignments.some(a => a.employeeId === emp.id));
+
+      if (availableLeaders.length > 0) {
+        const leader = availableLeaders[0];
+        const assignmentId = `auto-leader-${block.id}-${leader.id}`;
+        updatedAssignments.push({
+          id: assignmentId,
+          segmentBlockId: block.id,
+          employeeId: leader.id,
+          assignmentSource: 'template',
+          startTime: block.startTime,
+          endTime: block.endTime,
+          status: 'scheduled'
+        });
+      }
+    }
+  }
+
+  // Process medical-delegated-coverage violations
+  const medicalViolations = violations.filter(v => v.ruleId === 'medical-delegated-coverage');
+  
+  for (const violation of medicalViolations) {
+    if (violation.target.entity !== 'SegmentBlock') continue;
+    
+    const block = context.segmentBlocks.find(b => b.id === violation.target.id);
+    if (!block) continue;
+
+    const blockAssignments = updatedAssignments.filter(a => a.segmentBlockId === block.id);
+    const medicallyDelegatedCount = blockAssignments.filter(a => {
+      const emp = context.employees.find(e => e.id === a.employeeId);
+      return emp?.medicallyDelegated;
+    }).length;
+
+    const metadata = violation.target.metadata;
+    const required = (metadata?.required as number) || 1;
+    const needed = required - medicallyDelegatedCount;
+
+    if (needed > 0) {
+      const availableMedical = context.employees
+        .filter(emp => emp.medicallyDelegated && emp.employmentStatus === 'active')
+        .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+        .filter(emp => {
+          const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
+          const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
+          return hoursOnDay + shiftDuration <= emp.maxHoursPerDay;
+        })
+        .filter(emp => !blockAssignments.some(a => a.employeeId === emp.id));
+
+      let added = 0;
+      for (const emp of availableMedical) {
+        if (added >= needed) break;
+        
+        const assignmentId = `auto-medical-${block.id}-${emp.id}`;
+        updatedAssignments.push({
+          id: assignmentId,
+          segmentBlockId: block.id,
+          employeeId: emp.id,
+          assignmentSource: 'template',
+          startTime: block.startTime,
+          endTime: block.endTime,
+          status: 'scheduled'
+        });
+        added++;
+      }
+    }
+  }
+
+  // Process CPR violations - replace non-CPR staff
+  const cprViolations = violations.filter(v => v.ruleId === 'cpr-current-required');
+  
+  for (const violation of cprViolations) {
+    if (violation.target.entity !== 'StaffAssignment') continue;
+    
+    const assignment = updatedAssignments.find(a => a.id === violation.target.id);
+    if (!assignment) continue;
+
+    const employee = context.employees.find(e => e.id === assignment.employeeId);
+    if (!employee || employee.cprCurrent) continue;
+
+    const block = context.segmentBlocks.find(b => b.id === assignment.segmentBlockId);
+    if (!block) continue;
+
+    // Find CPR-current replacement
+    const cprStaff = context.employees
+      .filter(emp => emp.cprCurrent && emp.employmentStatus === 'active')
+      .filter(emp => isEmployeeAvailable(emp, block.dayOfWeek, block.startTime, block.endTime))
+      .filter(emp => {
+        const hoursOnDay = getEmployeeHoursOnDay(updatedAssignments, emp.id, block.dayOfWeek, context.segmentBlocks);
+        const shiftDuration = (timeToMinutes(block.endTime) - timeToMinutes(block.startTime)) / 60;
+        return hoursOnDay + shiftDuration <= emp.maxHoursPerDay;
+      })
+      .filter(emp => !updatedAssignments.some(a => 
+        a.segmentBlockId === block.id && a.employeeId === emp.id
+      ));
+
+    if (cprStaff.length > 0) {
+      // Remove the non-CPR assignment
+      updatedAssignments = updatedAssignments.filter(a => a.id !== assignment.id);
+      
+      // Add the CPR-current replacement
+      const replacement = cprStaff[0];
+      const assignmentId = `auto-cpr-${block.id}-${replacement.id}`;
+      updatedAssignments.push({
+        id: assignmentId,
+        segmentBlockId: block.id,
+        employeeId: replacement.id,
+        assignmentSource: 'template',
+        startTime: block.startTime,
+        endTime: block.endTime,
+        status: 'scheduled'
+      });
+    }
+  }
+
   return updatedAssignments;
 }
 
 /**
  * Main auto-scheduler function
+ * 
+ * New approach: Work through violations one by one instead of person-by-day scheduling
+ * 
+ * @param context - The scheduling context including existing assignments and segment blocks
+ * @param _weekId - The week identifier (currently unused)
+ * @param startFromEmpty - If true, starts with empty assignments; if false, starts with existing assignments from context
+ * @returns Result containing the final assignments, segment blocks, violations, and metadata
  */
-export function autoSchedule(context: AutoSchedulerContext, _weekId: string): AutoSchedulerResult {
+export function autoSchedule(
+  context: AutoSchedulerContext, 
+  _weekId: string,
+  startFromEmpty: boolean = true
+): AutoSchedulerResult {
   const engine = createRulesEngine();
 
-  // Generate initial assignments and segment blocks
-  const initialResult = generateInitialAssignments(context);
-  let currentAssignments = initialResult.assignments;
-  const allSegmentBlocks = [...context.segmentBlocks, ...initialResult.segmentBlocks];
+  // Determine starting point based on startFromEmpty parameter
+  let currentAssignments: StaffAssignment[];
+  let allSegmentBlocks: SegmentBlock[];
+  
+  if (startFromEmpty) {
+    // Start fresh - generate initial segment blocks
+    const initialResult = generateInitialAssignments(context);
+    currentAssignments = initialResult.assignments;
+    allSegmentBlocks = [...context.segmentBlocks, ...initialResult.segmentBlocks];
+  } else {
+    // Start with existing schedule and work through violations
+    currentAssignments = [...context.staffAssignments];
+    allSegmentBlocks = [...context.segmentBlocks];
+  }
+
   let iterations = 0;
   let violations: RuleViolation[] = [];
 
-  // Iteratively try to resolve violations
+  // Work through violations iteratively
   while (iterations < MAX_ITERATIONS) {
     iterations++;
 
@@ -488,20 +501,35 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
         segmentBlocks: allSegmentBlocks,
         violations: [],
         iterations,
-        message: `Successfully auto-scheduled staff with no violations in ${iterations} iteration(s).`
+        message: startFromEmpty 
+          ? `Successfully auto-scheduled staff with no violations in ${iterations} iteration(s).`
+          : `Successfully resolved all violations in ${iterations} iteration(s).`
       };
     }
 
-    // Try to fix violations
+    // Try to fix violations one by one
     const previousAssignmentCount = currentAssignments.length;
+    const previousBlockCount = allSegmentBlocks.length;
+    
+    // Create a mutable context for attemptViolationFixes to modify
+    const mutableContext = {
+      ...context,
+      segmentBlocks: allSegmentBlocks,
+      staffAssignments: currentAssignments
+    };
+    
     currentAssignments = attemptViolationFixes(
-      { ...context, segmentBlocks: allSegmentBlocks },
+      mutableContext,
       currentAssignments,
       violations
     );
 
+    // Update segment blocks in case new ones were created
+    allSegmentBlocks = mutableContext.segmentBlocks;
+
     // If no changes were made, we can't fix any more violations
-    if (currentAssignments.length === previousAssignmentCount) {
+    if (currentAssignments.length === previousAssignmentCount && 
+        allSegmentBlocks.length === previousBlockCount) {
       break;
     }
   }
@@ -514,7 +542,7 @@ export function autoSchedule(context: AutoSchedulerContext, _weekId: string): Au
     violations,
     iterations,
     message: violations.length > 0
-      ? `Auto-scheduling completed with ${violations.length} remaining violation(s) after ${iterations} iteration(s).`
+      ? `Auto-scheduling incomplete: ${violations.length} violation(s) remain after ${iterations} iteration(s).`
       : `Auto-scheduling completed successfully in ${iterations} iteration(s).`
   };
 }

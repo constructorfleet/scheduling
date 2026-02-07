@@ -1670,6 +1670,7 @@ export default function App() {
           {
             scheduleDays: scheduleDaysState,
             segmentBlocks: segmentBlocksState,
+            staffAssignments: staffAssignmentsState,
             employees: employeesDerived,
             fieldTripEvents: fieldTripEventsState,
             operatingHours: derivedOperatingHours,
@@ -1680,28 +1681,21 @@ export default function App() {
             policyCitations: POLICY_CITATION_LIST,
             rulePolicyCitations: RULE_POLICY_CITATIONS
           },
-          currentWeekId
+          currentWeekId,
+          !keepExisting // startFromEmpty = !keepExisting
         );
 
-        // Apply the new assignments and segment blocks
-        const finalAssignments = keepExisting
-          ? [...staffAssignmentsState, ...result.staffAssignments]
-          : result.staffAssignments;
-
-        // Merge segment blocks (avoid duplicates)
-        const existingBlockIds = new Set(segmentBlocksState.map(b => b.id));
-        const newBlocks = result.segmentBlocks.filter(b => !existingBlockIds.has(b.id));
-        const finalSegmentBlocks = keepExisting
-          ? [...segmentBlocksState, ...newBlocks]
-          : result.segmentBlocks;
-
+        // The autoScheduler now handles the keepExisting logic internally
+        // Simply use the results directly
         applyScheduleChange(
           () => ({
-            staffAssignments: finalAssignments,
-            segmentBlocks: finalSegmentBlocks
+            staffAssignments: result.staffAssignments,
+            segmentBlocks: result.segmentBlocks
           }),
           {
-            action: "Auto-scheduled staff assignments",
+            action: keepExisting 
+              ? "Auto-scheduled: fixed violations in existing schedule"
+              : "Auto-scheduled: created new schedule from scratch",
             notes: result.message
           }
         );

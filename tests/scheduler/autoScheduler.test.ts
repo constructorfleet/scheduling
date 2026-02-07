@@ -5,7 +5,9 @@ import type {
   Employee,
   FieldTripEvent,
   OperatingHours,
-  ScheduleDay
+  ScheduleDay,
+  SegmentBlock,
+  StaffAssignment
 } from "@core/domain/types";
 
 /**
@@ -148,6 +150,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Sarah Johnson", {
             leaderQualified: true,
@@ -159,7 +162,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }, // 1:5 ratio
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio
         schoolRules: {
           openerCount: 1,
           closerCount: 1,
@@ -215,6 +218,7 @@ describe("autoSchedule", () => {
       const context: AutoSchedulerContext = {
         scheduleDays,
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Sarah Johnson", {
             leaderQualified: true,
@@ -235,7 +239,7 @@ describe("autoSchedule", () => {
         ],
         fieldTripEvents,
         operatingHours,
-        scheduleTypeRatios: { full_day: 0.2 }, // 1:5 ratio = 5 staff needed for 25 kids
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 5 staff needed for 25 kids
         schoolRules: {
           openerCount: 1,
           closerCount: 1,
@@ -288,6 +292,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "John Afternoon", {
             leaderQualified: true,
@@ -320,7 +325,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -358,6 +363,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Part-time Paula", {
             leaderQualified: true,
@@ -374,7 +380,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "07:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.25 } // 1:4 ratio
+        scheduleTypeRatios: { full_day: 4 } // 1:4 ratio
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -420,6 +426,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Leader Lisa", {
             leaderQualified: true,
@@ -441,7 +448,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -465,12 +472,13 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [],
         fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -490,6 +498,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Part-timer Pete", {
             leaderQualified: true,
@@ -501,7 +510,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 } // Needs 5 staff for 25 kids
+        scheduleTypeRatios: { full_day: 5 } // Needs 5 staff for 25 kids
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -522,6 +531,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Tuesday Tom", {
             leaderQualified: true,
@@ -550,7 +560,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -574,6 +584,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Ready Rachel", {
             leaderQualified: true,
@@ -585,7 +596,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -596,15 +607,16 @@ describe("autoSchedule", () => {
     });
 
     it("should handle scenario with high child-to-staff ratio requirements", () => {
-      // Realistic scenario: Infant room with 1:3 ratio but not enough staff
+      // Realistic scenario: Small ratio (1:3) with not enough staff
       const context: AutoSchedulerContext = {
         scheduleDays: [
           createScheduleDay("day-mon", "mon", "2026-02-16", {
-            scheduleType: "infant",
-            enrollmentCount: 12 // Need 4 staff members
+            scheduleType: "full_day",
+            enrollmentCount: 12 // Need 4 staff members with 1:3 ratio
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Solo Sally", {
             leaderQualified: true,
@@ -616,7 +628,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { infant: 0.33 } // 1:3 ratio
+        scheduleTypeRatios: { full_day: 3 } // 1:3 ratio
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -667,6 +679,7 @@ describe("autoSchedule", () => {
       const context: AutoSchedulerContext = {
         scheduleDays,
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Early Week Worker", {
             leaderQualified: true,
@@ -681,7 +694,7 @@ describe("autoSchedule", () => {
         ],
         fieldTripEvents,
         operatingHours,
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -719,6 +732,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Split-shift Steve", {
             leaderQualified: true,
@@ -739,7 +753,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "06:00", "18:00")
         ],
-        scheduleTypeRatios: { full_day: 0.2 }
+        scheduleTypeRatios: { full_day: 5 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -767,6 +781,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Half-day Helen", {
             leaderQualified: true,
@@ -778,7 +793,7 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "09:00", "12:00")
         ],
-        scheduleTypeRatios: { half_day: 0.25 }
+        scheduleTypeRatios: { half_day: 4 }
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
@@ -802,6 +817,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Teacher Terry", {
             leaderQualified: true,
@@ -813,15 +829,398 @@ describe("autoSchedule", () => {
         operatingHours: [
           createOperatingHours("op-mon", "mon", "08:00", "16:00")
         ],
-        scheduleTypeRatios: { pd_day: 1.0 } // Different ratio for PD days
+        scheduleTypeRatios: { pd_day: 1 } // Different ratio for PD days
       };
 
       const result = autoSchedule(context, "week-test-2026-02-16");
 
-      // With 0 enrollment and 1.0 ratio, we'd calculate neededStaff = max(2, ceil(0 * 1.0)) = 2
+      // With 0 enrollment and 1:1 ratio, we'd calculate neededStaff = max(2, ceil(0 / 1)) = 2
       // So there might still be assignments, but the logic should handle it gracefully
       expect(result).toBeDefined();
       expect(result.iterations).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Advanced scheduling scenarios", () => {
+    it("should handle multiple employees with different hour limits", () => {
+      // Realistic scenario: Mix of full-time and part-time staff
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-mon", "mon", "2026-02-16", {
+            scheduleType: "full_day",
+            enrollmentCount: 20
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Full-time Fred", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            maxHoursPerWeek: 40,
+            cprCurrent: true
+          }),
+          createEmployee("emp-2", "Part-time Pat", {
+            leaderQualified: false,
+            maxHoursPerDay: 4,
+            maxHoursPerWeek: 20,
+            cprCurrent: true
+          }),
+          createEmployee("emp-3", "Full-time Fran", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            maxHoursPerWeek: 40,
+            cprCurrent: true,
+            medicallyDelegated: true
+          }),
+          createEmployee("emp-4", "Part-time Pete", {
+            leaderQualified: false,
+            maxHoursPerDay: 5,
+            maxHoursPerWeek: 25,
+            cprCurrent: true
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
+        operatingHours: [
+          createOperatingHours("op-mon", "mon", "06:00", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 4 staff for 20 kids
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      expect(result.segmentBlocks.length).toBeGreaterThan(0);
+      
+      // Check that part-time employees don't exceed their limits
+      const partTimePat = result.staffAssignments.filter(a => a.employeeId === "emp-2");
+      let patHours = 0;
+      partTimePat.forEach(a => {
+        const start = parseInt(a.startTime.split(':')[0]) * 60 + parseInt(a.startTime.split(':')[1]);
+        const end = parseInt(a.endTime.split(':')[0]) * 60 + parseInt(a.endTime.split(':')[1]);
+        patHours += (end - start) / 60;
+      });
+      expect(patHours).toBeLessThanOrEqual(4);
+
+      // Check that full-time employees don't exceed their limits
+      const fullTimeFred = result.staffAssignments.filter(a => a.employeeId === "emp-1");
+      let fredHours = 0;
+      fullTimeFred.forEach(a => {
+        const start = parseInt(a.startTime.split(':')[0]) * 60 + parseInt(a.startTime.split(':')[1]);
+        const end = parseInt(a.endTime.split(':')[0]) * 60 + parseInt(a.endTime.split(':')[1]);
+        fredHours += (end - start) / 60;
+      });
+      expect(fredHours).toBeLessThanOrEqual(8);
+    });
+
+    it("should handle employees with overlapping availability", () => {
+      // Realistic scenario: Two employees both available in afternoon, need coverage all day
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-tue", "tue", "2026-02-17", {
+            scheduleType: "full_day",
+            enrollmentCount: 15
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Morning Mary", {
+            leaderQualified: true,
+            maxHoursPerDay: 6,
+            cprCurrent: true,
+            availability: [
+              {
+                dayOfWeek: "tue",
+                blocks: [
+                  { startTime: "06:00", endTime: "14:00" }
+                ]
+              }
+            ]
+          }),
+          createEmployee("emp-2", "Afternoon Ann", {
+            leaderQualified: false,
+            maxHoursPerDay: 6,
+            cprCurrent: true,
+            availability: [
+              {
+                dayOfWeek: "tue",
+                blocks: [
+                  { startTime: "10:00", endTime: "18:00" }
+                ]
+              }
+            ]
+          }),
+          createEmployee("emp-3", "All-day Andy", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            availability: [
+              {
+                dayOfWeek: "tue",
+                blocks: [
+                  { startTime: "06:00", endTime: "18:00" }
+                ]
+              }
+            ]
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-tue", "tue")],
+        operatingHours: [
+          createOperatingHours("op-tue", "tue", "06:00", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 3 staff for 15 kids
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 0,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      
+      // Verify assignments respect availability windows
+      result.staffAssignments.forEach(assignment => {
+        const emp = context.employees.find(e => e.id === assignment.employeeId);
+        expect(emp).toBeDefined();
+        
+        if (emp?.availability && emp.availability.length > 0) {
+          const dayAvail = emp.availability.find(a => a.dayOfWeek === "tue");
+          expect(dayAvail).toBeDefined();
+          
+          // Assignment should be within at least one availability block
+          const startMin = parseInt(assignment.startTime.split(':')[0]) * 60 + parseInt(assignment.startTime.split(':')[1]);
+          const endMin = parseInt(assignment.endTime.split(':')[0]) * 60 + parseInt(assignment.endTime.split(':')[1]);
+          
+          const inRange = dayAvail!.blocks.some(block => {
+            const blockStart = parseInt(block.startTime.split(':')[0]) * 60 + parseInt(block.startTime.split(':')[1]);
+            const blockEnd = parseInt(block.endTime.split(':')[0]) * 60 + parseInt(block.endTime.split(':')[1]);
+            return startMin >= blockStart && endMin <= blockEnd;
+          });
+          expect(inRange).toBe(true);
+        }
+      });
+    });
+
+    it("should prioritize qualified staff for appropriate roles", () => {
+      // Realistic scenario: Mix of qualified and unqualified staff
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-wed", "wed", "2026-02-18", {
+            scheduleType: "full_day",
+            enrollmentCount: 20
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Leader Lisa", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: true
+          }),
+          createEmployee("emp-2", "Helper Harry", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          }),
+          createEmployee("emp-3", "Medical Mike", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: true
+          }),
+          createEmployee("emp-4", "Leader Lucy", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-wed", "wed")],
+        operatingHours: [
+          createOperatingHours("op-wed", "wed", "06:00", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 4 staff for 20 kids
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      
+      // Check that leaders are assigned (for open/close coverage)
+      const leaderAssignments = result.staffAssignments.filter(a => 
+        a.employeeId === "emp-1" || a.employeeId === "emp-4"
+      );
+      expect(leaderAssignments.length).toBeGreaterThan(0);
+      
+      // Check that medically delegated staff is assigned
+      const medicalAssignments = result.staffAssignments.filter(a => 
+        a.employeeId === "emp-1" || a.employeeId === "emp-3"
+      );
+      expect(medicalAssignments.length).toBeGreaterThan(0);
+    });
+
+    it("should iterate to fix multiple violation types", () => {
+      // Realistic scenario: Start with violations and fix them iteratively
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-thu", "thu", "2026-02-19", {
+            scheduleType: "full_day",
+            enrollmentCount: 25
+          })
+        ],
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: [
+          createEmployee("emp-1", "Leader One", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          }),
+          createEmployee("emp-2", "Medical Two", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: true
+          }),
+          createEmployee("emp-3", "Helper Three", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          }),
+          createEmployee("emp-4", "Helper Four", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          }),
+          createEmployee("emp-5", "Helper Five", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true,
+            medicallyDelegated: false
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-thu", "thu")],
+        operatingHours: [
+          createOperatingHours("op-thu", "thu", "06:00", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 5 staff for 25 kids
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      // Should iterate multiple times to fix violations
+      expect(result.iterations).toBeGreaterThan(1);
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      expect(result.segmentBlocks.length).toBeGreaterThan(0);
+      
+      // Check that we have assignments from multiple employees
+      const uniqueEmployees = new Set(result.staffAssignments.map(a => a.employeeId));
+      expect(uniqueEmployees.size).toBeGreaterThanOrEqual(4); // Should use most/all employees
+    });
+
+    it("should handle startFromEmpty=false with existing schedule", () => {
+      // Test the "fix existing schedule" mode
+      const existingBlock: SegmentBlock = {
+        id: "existing-block-1",
+        scheduleWeekId: "week-test-2026-02-16",
+        scheduleDayId: "day-fri",
+        dayOfWeek: "fri",
+        segment: "open",
+        startTime: "06:00",
+        endTime: "10:00",
+        childCount: 15,
+        status: "draft"
+      };
+
+      const existingAssignment: StaffAssignment = {
+        id: "existing-assign-1",
+        segmentBlockId: "existing-block-1",
+        employeeId: "emp-1",
+        assignmentSource: "manual_adjustment",
+        startTime: "06:00",
+        endTime: "10:00",
+        status: "scheduled"
+      };
+
+      const context: AutoSchedulerContext = {
+        scheduleDays: [
+          createScheduleDay("day-fri", "fri", "2026-02-20", {
+            scheduleType: "full_day",
+            enrollmentCount: 15
+          })
+        ],
+        segmentBlocks: [existingBlock],
+        staffAssignments: [existingAssignment],
+        employees: [
+          createEmployee("emp-1", "Existing Emma", {
+            leaderQualified: true,
+            maxHoursPerDay: 8,
+            cprCurrent: true
+          }),
+          createEmployee("emp-2", "Available Adam", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true
+          }),
+          createEmployee("emp-3", "Available Alice", {
+            leaderQualified: false,
+            maxHoursPerDay: 8,
+            cprCurrent: true
+          })
+        ],
+        fieldTripEvents: [createFieldTripEvent("ft-fri", "fri")],
+        operatingHours: [
+          createOperatingHours("op-fri", "fri", "06:00", "18:00")
+        ],
+        scheduleTypeRatios: { full_day: 5 }, // 1:5 ratio = 3 staff for 15 kids
+        schoolRules: {
+          openerCount: 1,
+          closerCount: 1,
+          minimumMedicalDelegated: 0,
+          requireCurrentCpr: true
+        }
+      };
+
+      // Call with startFromEmpty=false to test fixing existing schedule
+      const result = autoSchedule(context, "week-test-2026-02-16", false);
+
+      expect(result).toBeDefined();
+      expect(result.iterations).toBeGreaterThan(0);
+      
+      // Should keep the existing assignment
+      const keptAssignment = result.staffAssignments.find(a => a.id === "existing-assign-1");
+      expect(keptAssignment).toBeDefined();
+      
+      // Should add more assignments to fix violations
+      expect(result.staffAssignments.length).toBeGreaterThan(1);
     });
   });
 });
