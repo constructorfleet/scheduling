@@ -25,6 +25,11 @@ interface WeekNavigationBannerProps {
   onOpenSettings: () => void;
   isSettingsOpen: boolean;
   onAutoSchedule: () => void;
+  canManageSettings: boolean;
+  canEditSchedule: boolean;
+  userDisplayName?: string;
+  userRoleLabel?: string;
+  onLogout: () => void;
   apiStatus: {
     state: "loading" | "saving" | "saved" | "error" | "idle";
     message: string;
@@ -47,6 +52,11 @@ export default function WeekNavigationBanner({
   onOpenSettings,
   isSettingsOpen,
   onAutoSchedule,
+  canManageSettings,
+  canEditSchedule,
+  userDisplayName,
+  userRoleLabel,
+  onLogout,
   apiStatus
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
@@ -205,15 +215,21 @@ export default function WeekNavigationBanner({
             <button
               type="button"
               onClick={onOpenSettings}
+              disabled={!canManageSettings}
               style={{
                 borderRadius: 999,
                 border: "1px solid rgba(255,255,255,0.35)",
-                background: isSettingsOpen ? "rgba(99,102,241,0.25)" : "rgba(255,255,255,0.12)",
-                color: "#f9fafb",
+                background: !canManageSettings
+                  ? "rgba(255,255,255,0.05)"
+                  : isSettingsOpen
+                    ? "rgba(99,102,241,0.25)"
+                    : "rgba(255,255,255,0.12)",
+                color: canManageSettings ? "#f9fafb" : "#9ca3af",
                 padding: "0.35rem 0.8rem",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "0.4rem"
+                gap: "0.4rem",
+                cursor: canManageSettings ? "pointer" : "not-allowed"
               }}
             >
               <span
@@ -242,13 +258,15 @@ export default function WeekNavigationBanner({
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               onClick={onAutoSchedule}
+              disabled={!canEditSchedule}
               style={{
                 borderRadius: 999,
                 border: "1px solid rgba(255,255,255,0.4)",
-                background: "#10b981",
-                color: "#fff",
+                background: canEditSchedule ? "#10b981" : "rgba(255,255,255,0.12)",
+                color: canEditSchedule ? "#fff" : "#9ca3af",
                 padding: "0.4rem 0.9rem",
-                fontWeight: 600
+                fontWeight: 600,
+                cursor: canEditSchedule ? "pointer" : "not-allowed"
               }}
             >
               ⚡ Auto
@@ -277,7 +295,26 @@ export default function WeekNavigationBanner({
             >
               Next →
             </button>
+            <button
+              type="button"
+              onClick={onLogout}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.4)",
+                background: "rgba(239, 68, 68, 0.2)",
+                color: "#fecaca",
+                padding: "0.4rem 0.9rem"
+              }}
+            >
+              Log out
+            </button>
           </div>
+          {userDisplayName && (
+            <p style={{ margin: 0, fontSize: "0.8rem", color: "#cbd5f5" }}>
+              Signed in as {userDisplayName}
+              {userRoleLabel ? ` (${userRoleLabel})` : ""}
+            </p>
+          )}
         </div>
       </div>
       <div

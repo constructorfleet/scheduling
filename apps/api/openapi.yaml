@@ -15,9 +15,61 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+  /api/auth/login:
+    post:
+      summary: Authenticate a user and create a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginPayload'
+      responses:
+        '200':
+          description: Authenticated user context
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSessionResponse'
+        '401':
+          description: Invalid credentials
+        '423':
+          description: Account locked
+        '429':
+          description: Too many login attempts
+  /api/auth/logout:
+    post:
+      summary: Revoke current session and clear cookie
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      responses:
+        '200':
+          description: Logout complete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+  /api/auth/me:
+    get:
+      summary: Get current authenticated user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Authenticated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Not authenticated
   /api/settings/{schoolId}:
     get:
       summary: Get settings for a school
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: schoolId
@@ -31,9 +83,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
     put:
       summary: Save settings for a school
+      security:
+        - cookieAuth: []
       parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
         - in: path
           name: schoolId
           required: true
@@ -52,9 +111,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SettingsSaveResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
   /api/schedule/{weekId}:
     get:
       summary: Get schedule week
+      security:
+        - cookieAuth: []
       parameters:
         - in: path
           name: weekId
@@ -68,9 +133,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduleWeekResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
     put:
       summary: Save schedule week
+      security:
+        - cookieAuth: []
       parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
         - in: path
           name: weekId
           required: true
@@ -89,7 +161,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericOk'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
+  /api/schedule/{weekId}/staff-assignments:
+    delete:
+      summary: Clear staff assignments for a schedule week
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  deleted:
+                    type: integer
+                required: [ok, deleted]
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sched_session
+  parameters:
+    CsrfHeader:
+      in: header
+      name: x-csrf-token
+      required: true
+      schema:
+        type: string
+      description: CSRF protection token. Must match the `sched_csrf` cookie.
   schemas:
     HealthResponse:
       type: object
@@ -97,6 +215,72 @@ components:
         status:
           type: string
       required: [status]
+    Role:
+      type: string
+      enum: [owner, director, scheduler, viewer]
+    LoginPayload:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        schoolId:
+          type: string
+      required: [email, password]
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+      required: [id, email, displayName]
+    SchoolMembership:
+      type: object
+      properties:
+        schoolId:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+      required: [schoolId, role]
+    SessionInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+      required: [id, expiresAt]
+    AuthSessionResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/AuthUser'
+        currentSchoolId:
+          type: string
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+        session:
+          $ref: '#/components/schemas/SessionInfo'
+        csrfToken:
+          type: string
+      required: [user, currentSchoolId, memberships, session, csrfToken]
+    MeResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/AuthUser'
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+      required: [user, memberships]
     DayOfWeek:
       type: string
       enum: [mon, tue, wed, thu, fri, sat, sun]

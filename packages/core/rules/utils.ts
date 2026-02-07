@@ -99,14 +99,46 @@ export const parseTimeToMinutes = (value: string): number => {
   if (!value) {
     return 0;
   }
-  const [hours = "0", minutes = "0", seconds = "0"] = value.split(":");
-  const parsedHours = parseInt(hours, 10);
-  const parsedMinutes = parseInt(minutes, 10);
-  const parsedSeconds = parseInt(seconds, 10);
-  if (Number.isNaN(parsedHours) || Number.isNaN(parsedMinutes) || Number.isNaN(parsedSeconds)) {
+
+  const normalized = value.trim();
+  const match = normalized.match(
+    /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?$/
+  );
+  if (!match) {
     return 0;
   }
-  return parsedHours * 60 + parsedMinutes + Math.round(parsedSeconds / 60);
+
+  const parsedHours = parseInt(match[1], 10);
+  const parsedMinutes = parseInt(match[2], 10);
+  const parsedSeconds = parseInt(match[3] ?? "0", 10);
+  const meridiem = match[4]?.toLowerCase();
+
+  if (
+    Number.isNaN(parsedHours) ||
+    Number.isNaN(parsedMinutes) ||
+    Number.isNaN(parsedSeconds) ||
+    parsedMinutes < 0 ||
+    parsedMinutes > 59 ||
+    parsedSeconds < 0 ||
+    parsedSeconds > 59
+  ) {
+    return 0;
+  }
+
+  let hours = parsedHours;
+  if (meridiem) {
+    if (hours < 1 || hours > 12) {
+      return 0;
+    }
+    hours = hours % 12;
+    if (meridiem === "pm") {
+      hours += 12;
+    }
+  } else if (hours < 0 || hours > 23) {
+    return 0;
+  }
+
+  return hours * 60 + parsedMinutes + Math.round(parsedSeconds / 60);
 };
 
 export const calculateDurationHours = (start: string, end: string): number => {

@@ -1,8 +1,85 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from "../../apps/ui/App";
+import * as apiClient from "../../apps/ui/data/apiClient";
+import { daySequence, weekMeta } from "../../apps/ui/data/runtimeDefaults";
+
+jest.mock("../../apps/ui/data/apiClient");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const App = require("../../apps/ui/App").default as typeof import("../../apps/ui/App").default;
 
 describe("App violation navigator integration", () => {
+  const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
+  const fetchSettingsMock = apiClient.fetchSettings as jest.MockedFunction<typeof apiClient.fetchSettings>;
+  const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fetchAuthMeMock.mockResolvedValue({
+      user: {
+        id: "user-1",
+        email: "viewer@example.com",
+        displayName: "Viewer"
+      },
+      memberships: [{ schoolId: "school-evergreen", role: "viewer" }]
+    });
+    fetchSettingsMock.mockResolvedValue({
+      school: {
+        id: "school-evergreen",
+        name: "Evergreen",
+        closedDays: [],
+        openerCount: 1,
+        closerCount: 1,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      },
+      scheduleTypes: [
+        {
+          id: "regular",
+          schoolId: "school-evergreen",
+          value: "regular",
+          label: "Regular",
+          ratioAdults: 1,
+          ratioStudents: 15,
+          description: ""
+        }
+      ],
+      jobTitles: [],
+      employees: [],
+      operatingHours: [],
+      fieldTripTypes: []
+    });
+    fetchScheduleMock.mockResolvedValue({
+      id: weekMeta.id,
+      schoolId: "school-evergreen",
+      label: "Week",
+      status: "draft",
+      startDate: weekMeta.startDate,
+      scheduleDays: daySequence.map((day, index) => ({
+        id: `${weekMeta.id}-day-${day}`,
+        scheduleWeekId: weekMeta.id,
+        date: new Date(new Date(`${weekMeta.startDate}T00:00:00`).getTime() + index * 86400000)
+          .toISOString()
+          .slice(0, 10),
+        dayOfWeek: day,
+        scheduleType: "regular" as const,
+        dayScheduleType: "full_day" as const,
+        enrollmentCount: 20,
+        fieldTripEventId: `${weekMeta.id}-field-trip-${day}`
+      })),
+      segmentBlocks: [],
+      staffAssignments: [],
+      fieldTripEvents: daySequence.map((day) => ({
+        id: `${weekMeta.id}-field-trip-${day}`,
+        scheduleWeekId: weekMeta.id,
+        dayOfWeek: day,
+        segment: "mid",
+        scheduleDayId: `${weekMeta.id}-day-${day}`,
+        isNoFieldTrip: true
+      })),
+      auditEvents: []
+    });
+  });
+
   it("focuses a schedule block when jumping from a violation", async () => {
     const user = userEvent.setup();
     const originalScroll = HTMLElement.prototype.scrollIntoView;

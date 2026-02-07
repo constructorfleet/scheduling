@@ -1,12 +1,24 @@
-import Fastify from "fastify";
+import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
+import fastifyCookie from "@fastify/cookie";
 import { getPrisma } from "./db";
 import { applyDbEnv, isDebugEnabled } from "./config";
 import { backupBeforeWrite, startPeriodicBackups } from "./backups";
 import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
+import {
+  createCsrfToken,
+  createSessionExpiry,
+  createSessionToken,
+  CSRF_COOKIE_NAME,
+  hashSessionToken,
+  normalizeEmail,
+  SESSION_COOKIE_NAME,
+  verifyPassword
+} from "./auth";
+import { canAccessSchoolWithRole } from "./access";
 import type { Prisma as CorePrisma } from "../generated/prisma-client";
 import type {
   DayOfWeek,
@@ -15,6 +27,7 @@ import type {
   EmployeeTimeOffRequest,
   PolicyCitation
 } from "@core/domain/types";
+import type { Role } from "../generated/prisma-client";
 
 type DbTransaction = CorePrisma.TransactionClient;
 const toJsonValue = (value: unknown): CorePrisma.InputJsonValue => value as CorePrisma.InputJsonValue;
@@ -137,9 +150,41 @@ type AuditEventPayload = {
   notes?: string;
 };
 
+type AuthContext = {
+  sessionId: string;
+  userId: string;
+  displayName: string;
+  email: string;
+  memberships: Array<{
+    schoolId: string;
+    role: Role;
+  }>;
+};
+
+const SESSION_COOKIE_OPTIONS = {
+  httpOnly: true,
+  path: "/",
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production"
+};
+const CSRF_COOKIE_OPTIONS = {
+  httpOnly: false,
+  path: "/",
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production"
+};
+
+const LOGIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 20;
+const USER_LOGIN_MAX_FAILURES = 5;
+const USER_LOCKOUT_MS = 15 * 60 * 1000;
+
+const ipLoginAttempts = new Map<string, number[]>();
+
 const buildServer = async () => {
   const fastify = Fastify({ logger: isDebugEnabled() });
   await fastify.register(cors, { origin: true });
+  await fastify.register(fastifyCookie);
 
   const swaggerEditorRoot = path.resolve(__dirname, "../../../node_modules/swagger-editor-dist");
   await fastify.register(fastifyStatic, {
@@ -155,6 +200,87 @@ const buildServer = async () => {
     serve: false
   });
 
+  const resolveAuth = async (request: FastifyRequest): Promise<AuthContext | null> => {
+    const token = request.cookies[SESSION_COOKIE_NAME];
+    if (!token) {
+      return null;
+    }
+    const prisma = getPrisma();
+    const session = await prisma.session.findUnique({
+      where: { tokenHash: hashSessionToken(token) },
+      include: {
+        user: {
+          include: {
+            memberships: true
+          }
+        }
+      }
+    });
+    if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) {
+      return null;
+    }
+    if (session.user.status !== "active") {
+      return null;
+    }
+    return {
+      sessionId: session.id,
+      userId: session.user.id,
+      displayName: session.user.displayName,
+      email: session.user.email,
+      memberships: session.user.memberships.map((membership) => ({
+        schoolId: membership.schoolId,
+        role: membership.role
+      }))
+    };
+  };
+
+  const requireRoleForSchool = async (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    schoolId: string,
+    requiredRole: Role
+  ) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      reply.code(401).send({ message: "Authentication required." });
+      return null;
+    }
+    if (!canAccessSchoolWithRole(auth, schoolId, requiredRole)) {
+      reply.code(403).send({ message: "Insufficient access for this school." });
+      return null;
+    }
+    return auth;
+  };
+
+  const isIpRateLimited = (ipAddress: string) => {
+    const now = Date.now();
+    const cutoff = now - LOGIN_RATE_LIMIT_WINDOW_MS;
+    const attempts = ipLoginAttempts.get(ipAddress) ?? [];
+    const recent = attempts.filter((timestamp) => timestamp >= cutoff);
+    if (recent.length >= LOGIN_RATE_LIMIT_MAX_ATTEMPTS) {
+      ipLoginAttempts.set(ipAddress, recent);
+      return true;
+    }
+    recent.push(now);
+    ipLoginAttempts.set(ipAddress, recent);
+    return false;
+  };
+
+  const clearIpRateLimit = (ipAddress: string) => {
+    ipLoginAttempts.delete(ipAddress);
+  };
+
+  const requireCsrf = (request: FastifyRequest, reply: FastifyReply) => {
+    const csrfCookie = request.cookies[CSRF_COOKIE_NAME];
+    const csrfHeader = request.headers["x-csrf-token"];
+    const headerValue = Array.isArray(csrfHeader) ? csrfHeader[0] : csrfHeader;
+    if (!csrfCookie || !headerValue || headerValue !== csrfCookie) {
+      reply.code(403).send({ message: "Invalid CSRF token." });
+      return false;
+    }
+    return true;
+  };
+
   fastify.get("/api/health", async () => ({ status: "ok" }));
 
   fastify.get("/api/openapi.yaml", async (_, reply) => {
@@ -165,6 +291,155 @@ const buildServer = async () => {
   fastify.get("/api/docs", async (_, reply) => {
     const html = `<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n  <title>OpenAPI Editor</title>\n  <link rel="stylesheet" href="/api/docs/swagger-editor.css" />\n  <style>html, body { margin: 0; padding: 0; height: 100%; } #swagger-editor { height: 100vh; }</style>\n</head>\n<body>\n  <div id="swagger-editor"></div>\n  <script src="/api/docs/swagger-editor-bundle.js"></script>\n  <script src="/api/docs/swagger-editor-standalone-preset.js"></script>\n  <script>\n    window.onload = function () {\n      SwaggerEditorBundle({\n        url: '/api/openapi.yaml',\n        dom_id: '#swagger-editor',\n        layout: 'StandaloneLayout',\n        presets: [SwaggerEditorStandalonePreset]\n      });\n    };\n  </script>\n</body>\n</html>`;
     reply.type("text/html").send(html);
+  });
+
+  fastify.post("/api/auth/login", async (request, reply) => {
+    const ipAddress = request.ip;
+    if (isIpRateLimited(ipAddress)) {
+      return reply.code(429).send({ message: "Too many login attempts. Try again shortly." });
+    }
+
+    const body = (request.body ?? {}) as {
+      email?: string;
+      password?: string;
+      schoolId?: string;
+    };
+    const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+    const password = typeof body.password === "string" ? body.password : "";
+    const requestedSchoolId = typeof body.schoolId === "string" ? body.schoolId : undefined;
+
+    if (!email || !password) {
+      return reply.code(400).send({ message: "Email and password are required." });
+    }
+
+    const prisma = getPrisma();
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { memberships: true }
+    });
+
+    if (!user || user.status !== "active") {
+      return reply.code(401).send({ message: "Invalid credentials." });
+    }
+    if (user.lockoutUntil && user.lockoutUntil.getTime() > Date.now()) {
+      return reply.code(423).send({ message: "Account temporarily locked. Please try again later." });
+    }
+    if (!verifyPassword(password, user.passwordHash)) {
+      const nextFailures = user.failedLoginAttempts + 1;
+      const shouldLock = nextFailures >= USER_LOGIN_MAX_FAILURES;
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: shouldLock ? 0 : nextFailures,
+          lockoutUntil: shouldLock ? new Date(Date.now() + USER_LOCKOUT_MS) : null
+        }
+      });
+      return reply.code(401).send({ message: "Invalid credentials." });
+    }
+
+    const targetMembership = requestedSchoolId
+      ? user.memberships.find((membership) => membership.schoolId === requestedSchoolId)
+      : user.memberships[0];
+
+    if (!targetMembership) {
+      return reply.code(403).send({ message: "No school access assigned for this user." });
+    }
+
+    const token = createSessionToken();
+    const csrfToken = createCsrfToken();
+    const tokenHash = hashSessionToken(token);
+    const expiresAt = createSessionExpiry();
+    const userAgent = request.headers["user-agent"] ?? null;
+
+    await prisma.session.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null
+      },
+      data: {
+        revokedAt: new Date()
+      }
+    });
+
+    const session = await prisma.session.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+        ipAddress,
+        userAgent
+      }
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        lastLoginAt: new Date(),
+        failedLoginAttempts: 0,
+        lockoutUntil: null
+      }
+    });
+
+    reply.setCookie(SESSION_COOKIE_NAME, token, {
+      ...SESSION_COOKIE_OPTIONS,
+      expires: expiresAt
+    });
+    reply.setCookie(CSRF_COOKIE_NAME, csrfToken, {
+      ...CSRF_COOKIE_OPTIONS,
+      expires: expiresAt
+    });
+    clearIpRateLimit(ipAddress);
+
+    return reply.send({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      },
+      currentSchoolId: targetMembership.schoolId,
+      memberships: user.memberships.map((membership) => ({
+        schoolId: membership.schoolId,
+        role: membership.role
+      })),
+      session: {
+        id: session.id,
+        expiresAt: expiresAt.toISOString()
+      },
+      csrfToken
+    });
+  });
+
+  fastify.post("/api/auth/logout", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const auth = await resolveAuth(request);
+    if (auth) {
+      const prisma = getPrisma();
+      await prisma.session.update({
+        where: { id: auth.sessionId },
+        data: { revokedAt: new Date() }
+      });
+    }
+
+    reply.clearCookie(SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS);
+    reply.clearCookie(CSRF_COOKIE_NAME, CSRF_COOKIE_OPTIONS);
+    return reply.send({ ok: true });
+  });
+
+  fastify.get("/api/auth/me", async (request, reply) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      return reply.code(401).send({ message: "Authentication required." });
+    }
+    return reply.send({
+      user: {
+        id: auth.userId,
+        email: auth.email,
+        displayName: auth.displayName
+      },
+      memberships: auth.memberships
+    });
   });
 
   fastify.get("/", async (_, reply) => {
@@ -183,8 +458,11 @@ const buildServer = async () => {
     return reply.sendFile("index.html");
   });
 
-  fastify.get("/api/settings/:schoolId", async (request) => {
+  fastify.get("/api/settings/:schoolId", async (request, reply) => {
     const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireRoleForSchool(request, reply, schoolId, "viewer"))) {
+      return;
+    }
     const prisma = getPrisma();
     const school = await prisma.school.findUnique({
       where: { id: schoolId },
@@ -213,8 +491,14 @@ const buildServer = async () => {
     };
   });
 
-  fastify.put("/api/settings/:schoolId", async (request) => {
+  fastify.put("/api/settings/:schoolId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireRoleForSchool(request, reply, schoolId, "director"))) {
+      return;
+    }
     const payload = request.body as {
       school?: {
         name: string;
@@ -515,6 +799,9 @@ const buildServer = async () => {
     if (!scheduleWeek) {
       return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
     }
+    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "viewer"))) {
+      return;
+    }
     return {
       ...scheduleWeek,
       auditEvents: scheduleWeek.auditEvents.map((event) => ({
@@ -534,8 +821,21 @@ const buildServer = async () => {
   });
 
   fastify.delete("/api/schedule/:weekId/staff-assignments", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { weekId } = request.params as { weekId: string };
     const prisma = getPrisma();
+    const scheduleWeek = await prisma.scheduleWeek.findUnique({
+      where: { id: weekId },
+      select: { schoolId: true }
+    });
+    if (!scheduleWeek) {
+      return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
+    }
+    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "scheduler"))) {
+      return;
+    }
     try {
       await backupBeforeWrite();
     } catch (error) {
@@ -548,6 +848,9 @@ const buildServer = async () => {
   });
 
   fastify.put("/api/schedule/:weekId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
     const { weekId } = request.params as { weekId: string };
     const payload = request.body as Partial<{
       scheduleWeek: ScheduleWeekPayload;
@@ -573,14 +876,19 @@ const buildServer = async () => {
         startDate: true
       }
     });
-
-    const scheduleWeekPayload = payload.scheduleWeek;
-    const resolvedSchoolId = scheduleWeekPayload?.schoolId ?? existingWeek?.schoolId;
-    if (!resolvedSchoolId) {
+    const targetSchoolId = existingWeek?.schoolId ?? payload.scheduleWeek?.schoolId;
+    if (!targetSchoolId) {
       return reply.code(400).send({
         message: "Cannot save schedule chunk before scheduleWeek exists. Include scheduleWeek in the first save."
       });
     }
+    const auth = await requireRoleForSchool(request, reply, targetSchoolId, "scheduler");
+    if (!auth) {
+      return;
+    }
+
+    const scheduleWeekPayload = payload.scheduleWeek;
+    const resolvedSchoolId: string = targetSchoolId;
 
     const resolvedLabel = scheduleWeekPayload?.label ?? existingWeek?.label ?? null;
     const resolvedStatus = scheduleWeekPayload?.status ?? existingWeek?.status ?? "draft";
@@ -762,7 +1070,7 @@ const buildServer = async () => {
               id: event.id,
               scheduleWeekId: weekId,
               timestamp: new Date(event.timestamp),
-              user: event.user,
+              user: auth.displayName,
               action: event.action,
               citationId: event.policyCitation?.id ?? null,
               citationName: event.policyCitation?.name ?? null,
@@ -773,7 +1081,7 @@ const buildServer = async () => {
             update: {
               scheduleWeekId: weekId,
               timestamp: new Date(event.timestamp),
-              user: event.user,
+              user: auth.displayName,
               action: event.action,
               citationId: event.policyCitation?.id ?? null,
               citationName: event.policyCitation?.name ?? null,
@@ -811,4 +1119,8 @@ const start = async () => {
   }
 };
 
-start();
+if (require.main === module) {
+  start();
+}
+
+export { buildServer, start };

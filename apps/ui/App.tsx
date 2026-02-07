@@ -38,6 +38,9 @@ import {
 import type {
   EmployeePayload,
   FieldTripTypePayload,
+  LoginPayload,
+  Role,
+  SchoolMembership,
   SettingsPayload as SettingsPayloadModel,
   ScheduleTypePayload as ScheduleTypePayloadModel
 } from "./data/generated";
@@ -45,8 +48,12 @@ import { createRulesEngine } from "@core/rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
 import {
   deleteScheduleAssignments,
+  fetchAuthMe,
   fetchSchedule,
   fetchSettings,
+  isApiErrorStatus,
+  login,
+  logout,
   saveSchedule,
   saveSettings,
   type ScheduleSavePayload
@@ -61,7 +68,7 @@ const RULE_TITLES: Record<string, string> = {
   "medical-delegated-coverage": "Medical delegation",
   "cpr-current-required": "CPR current required",
   "schedule-day-metadata": "Missing day details",
-  "segment-block-timeline": "Clock block timeline issue",
+  "segment-block-timeline": "Schedule block timeline issue",
   "employee-availability": "Employee availability",
   "field-trip-event": "Field trip data issue",
   "certification-per-segment": "Certification coverage gap",
@@ -147,6 +154,15 @@ const formatShortDate = (value?: string) => {
   return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 };
 const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const getCookieValue = (name: string) => {
+  if (typeof document === "undefined") return "";
+  const prefix = `${name}=`;
+  const entry = document.cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(prefix));
+  return entry ? decodeURIComponent(entry.slice(prefix.length)) : "";
+};
 
 type ScheduleSnapshot = {
   scheduleDays: ScheduleDay[];
@@ -165,12 +181,29 @@ type WeekInitializationState = {
   copySourceAuditEvents: AuditEvent[];
 };
 
+type AuthUserState = {
+  id: string;
+  email: string;
+  displayName: string;
+};
+
+const ROLE_ORDER: Record<Role, number> = {
+  viewer: 1,
+  scheduler: 2,
+  director: 3,
+  owner: 4
+};
+
+const hasRole = (role: Role | null, required: Role) =>
+  role !== null && ROLE_ORDER[role] >= ROLE_ORDER[required];
+
 const USER_POLICY_CITATION: PolicyCitation = {
   id: "ui-audit",
   name: "User schedule action",
   document: "UI action log",
   section: "N/A"
 };
+const IS_TEST_ENV = typeof process !== "undefined" && process.env.NODE_ENV === "test";
 
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
@@ -178,6 +211,19 @@ export default function App() {
   const currentWeekId = useMemo(() => `week-${currentWeekStartDateIso}`, [currentWeekStartDateIso]);
   const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
+  const [authStatus, setAuthStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
+    IS_TEST_ENV ? "authenticated" : "loading"
+  );
+  const [authUser, setAuthUser] = useState<AuthUserState | null>(
+    IS_TEST_ENV ? { id: "test-user", email: "test@example.com", displayName: "Test User" } : null
+  );
+  const [memberships, setMemberships] = useState<SchoolMembership[]>(
+    IS_TEST_ENV ? [{ schoolId: schools[0].id, role: "owner" }] : []
+  );
+  const [loginForm, setLoginForm] = useState<LoginPayload>({ email: "", password: "", schoolId: undefined });
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [schoolName, setSchoolName] = useState(schools[0].name);
   const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(
     ensureClosedScheduleType(scheduleTypeOptions)
@@ -234,6 +280,29 @@ export default function App() {
     | { type: "scheduling" }
     | { type: "complete"; success: boolean; message: string; violations: number }
   >({ type: "idle" });
+
+  const schoolOptions = useMemo(() => {
+    if (memberships.length === 0) {
+      return schools;
+    }
+    const defaultById = new Map(schools.map((school) => [school.id, school]));
+    return memberships.map((membership) => {
+      const fallback = defaultById.get(membership.schoolId);
+      return {
+        id: membership.schoolId,
+        name: fallback?.name ?? membership.schoolId
+      };
+    });
+  }, [memberships]);
+
+  const membershipBySchool = useMemo(
+    () => new Map(memberships.map((membership) => [membership.schoolId, membership.role])),
+    [memberships]
+  );
+  const currentRole = membershipBySchool.get(selectedSchoolId) ?? null;
+  const canViewSchool = currentRole !== null;
+  const canEditSchedule = hasRole(currentRole, "scheduler");
+  const canManageSettings = hasRole(currentRole, "director");
 
   const makeSnapshot = (
     next: Partial<ScheduleSnapshot> = {},
@@ -706,6 +775,10 @@ export default function App() {
   };
 
   const persistSettings = async (overrides: Parameters<typeof buildSettingsPayload>[0] = {}) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings for this school.");
+      return;
+    }
     beginApiAction("saving", "Saving settings...");
     try {
       await saveSettings(selectedSchoolId, buildSettingsPayload(overrides));
@@ -719,6 +792,90 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (IS_TEST_ENV) {
+      return;
+    }
+    let isActive = true;
+    const hydrateAuth = async () => {
+      setAuthStatus("loading");
+      setLoginError(null);
+      try {
+        const response = await fetchAuthMe();
+        if (!isActive) {
+          return;
+        }
+        setAuthUser(response.user);
+        setMemberships(response.memberships ?? []);
+        if (response.memberships.length > 0) {
+          setSelectedSchoolId((current) => {
+            if (response.memberships.some((membership) => membership.schoolId === current)) {
+              return current;
+            }
+            return response.memberships[0].schoolId;
+          });
+        }
+        setAuthStatus("authenticated");
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+        setAuthUser(null);
+        setMemberships([]);
+        setAuthStatus("unauthenticated");
+        if (!isApiErrorStatus(error, 401)) {
+          setLoginError("Could not verify your session. Please sign in.");
+        }
+      }
+    };
+    void hydrateAuth();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const handleLogin = async () => {
+    setIsAuthenticating(true);
+    setLoginError(null);
+    try {
+      const response = await login(loginForm);
+      setAuthUser(response.user);
+      setMemberships(response.memberships ?? []);
+      setSelectedSchoolId(response.currentSchoolId);
+      setAuthStatus("authenticated");
+      setAuthMessage(null);
+      setLoginForm((prev) => ({ ...prev, password: "" }));
+    } catch (error) {
+      if (isApiErrorStatus(error, 401)) {
+        setLoginError("Invalid email or password.");
+      } else if (isApiErrorStatus(error, 403)) {
+        setLoginError("Your account does not have access to the selected school.");
+      } else {
+        setLoginError("Login failed. Please try again.");
+      }
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // intentionally ignore logout API failures and clear local auth state
+    }
+    setAuthStatus("unauthenticated");
+    setAuthUser(null);
+    setMemberships([]);
+    setLoginForm((prev) => ({ ...prev, password: "" }));
+    setShowSettings(false);
+    setShowAuditTimeline(false);
+    setShowViolationNavigator(false);
+  };
+
+  useEffect(() => {
+    if (authStatus !== "authenticated") {
+      return;
+    }
     let isActive = true;
     const hydrate = async () => {
       try {
@@ -818,9 +975,12 @@ export default function App() {
     return () => {
       isActive = false;
     };
-  }, [selectedSchoolId]);
+  }, [selectedSchoolId, authStatus]);
 
   useEffect(() => {
+    if (IS_TEST_ENV) {
+      return;
+    }
     let isActive = true;
     const sourceSnapshot = makeSnapshot();
     const sourceAudit = auditEvents;
@@ -942,9 +1102,12 @@ export default function App() {
     return () => {
       isActive = false;
     };
-  }, [selectedSchoolId, currentWeekId]);
+  }, [selectedSchoolId, currentWeekId, authStatus, canViewSchool]);
 
   useEffect(() => {
+    if (!canEditSchedule) {
+      return;
+    }
     if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) return;
     const payload: ScheduleSavePayload = {
       scheduleWeek: {
@@ -1008,6 +1171,9 @@ export default function App() {
   ]);
 
   useEffect(() => {
+    if (!canEditSchedule) {
+      return;
+    }
     if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) {
       return;
     }
@@ -1018,7 +1184,10 @@ export default function App() {
       }
       void fetch(`/api/schedule/${currentWeekId}`, {
         method: "PUT",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "x-csrf-token": getCookieValue("sched_csrf")
+        },
         body: JSON.stringify(pendingPayload),
         keepalive: true
       });
@@ -1027,7 +1196,7 @@ export default function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [hasLoadedRemote, isConfigured, isWeekInitialized, loadedWeekId, currentWeekId]);
+  }, [hasLoadedRemote, isConfigured, isWeekInitialized, loadedWeekId, currentWeekId, canEditSchedule]);
 
   useEffect(() => {
     return () => {
@@ -1101,11 +1270,11 @@ export default function App() {
 
   const getSegmentDisplayLabel = (segmentId?: string) => {
     if (!segmentId) {
-      return "Clock block";
+      return "Schedule block";
     }
     const block = segmentBlocksState.find((item) => item.id === segmentId);
     if (!block) {
-      return "Clock block";
+      return "Schedule block";
     }
     const dayLabel = dayDisplayNames[block.dayOfWeek]?.toUpperCase() ?? block.dayOfWeek.toUpperCase();
     return `${dayLabel} ${block.startTime}-${block.endTime}`;
@@ -1252,6 +1421,10 @@ export default function App() {
   };
 
   const handleInitializeWeek = async (choice: WeekInitializationChoice) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to initialize schedule weeks.");
+      return;
+    }
     if (!pendingWeekInitialization) {
       return;
     }
@@ -1331,6 +1504,10 @@ export default function App() {
   };
 
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit day metadata.");
+      return;
+    }
     const dayLabel = formatDayLabel(dayId);
     applyScheduleChange(
       (current) => ({
@@ -1343,6 +1520,10 @@ export default function App() {
   };
 
   const handleScheduleTypeUpdate = (dayId: string, scheduleType: ScheduleType | undefined) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit day metadata.");
+      return;
+    }
     const dayLabel = formatDayLabel(dayId);
     const typeLabel = scheduleType ? (scheduleTypeLabelByValue.get(scheduleType) ?? scheduleType) : "unset";
     applyScheduleChange(
@@ -1374,6 +1555,10 @@ export default function App() {
   };
 
   const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit day metadata.");
+      return;
+    }
     const day = scheduleDaysState.find((item) => item.id === dayId);
     const dayOfWeek = day?.dayOfWeek;
     const dayLabel = formatDayLabel(dayId);
@@ -1437,11 +1622,19 @@ export default function App() {
   };
 
   const handlePublish = () => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to publish schedules.");
+      return;
+    }
     if (!readyToPublish) return;
     setPublishMessage(`Schedule published ${new Date().toLocaleString()}`);
   };
 
   const handleUndo = () => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit schedules.");
+      return;
+    }
     setHistoryPast((past) => {
       if (past.length === 0) {
         return past;
@@ -1456,6 +1649,10 @@ export default function App() {
   };
 
   const handleRedo = () => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit schedules.");
+      return;
+    }
     setHistoryFuture((future) => {
       if (future.length === 0) {
         return future;
@@ -1503,6 +1700,10 @@ export default function App() {
   }, [handleRedo, handleUndo]);
 
   const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit assignments.");
+      return;
+    }
     const assignment = staffAssignmentsState.find((item) => item.id === assignmentId);
     const segment = assignment
       ? segmentBlocksState.find((block) => block.id === assignment.segmentBlockId)
@@ -1520,6 +1721,10 @@ export default function App() {
   };
 
   const handleDeleteAssignment = (assignmentId: string) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to edit assignments.");
+      return;
+    }
     const assignment = staffAssignmentsState.find((item) => item.id === assignmentId);
     const employeeName = assignment ? (employeeNameById.get(assignment.employeeId) ?? assignment.employeeId) : assignmentId;
     const segment = assignment
@@ -1550,6 +1755,10 @@ export default function App() {
   };
 
   const handleReassignUnlinkedStaff = (fromEmployeeId: string, toEmployeeId: string) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to reassign staff.");
+      return;
+    }
     if (!fromEmployeeId || !toEmployeeId || fromEmployeeId === toEmployeeId) {
       return;
     }
@@ -1601,47 +1810,83 @@ export default function App() {
   }, [auditEvents, employeeNameById, fieldTripNameById, scheduleDayById]);
 
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     const nextWithClosed = ensureClosedScheduleType(next);
     setScheduleTypeOptionsState(nextWithClosed);
     void persistSettings({ scheduleTypes: nextWithClosed });
   };
 
   const handleUpdateJobTitles = (next: JobTitleSetting[]) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setJobTitlesState(next);
     void persistSettings({ jobTitles: next });
   };
 
   const handleUpdateOperatingHours = (next: OperatingHoursConfig[]) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setOperatingHoursConfigState(next);
     void persistSettings({ operatingHours: next });
   };
 
   const handleUpdateClosedDays = (next: DayOfWeek[]) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setClosedDaysState(next);
     void persistSettings({ closedDays: next });
   };
 
   const handleUpdateSchoolName = (next: string) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setSchoolName(next);
     void persistSettings({ schoolName: next });
   };
 
   const handleUpdateSchoolRules = (next: SchoolRules) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setSchoolRulesState(next);
     void persistSettings({ schoolRules: next });
   };
 
   const handleUpdateFieldTrips = (next: typeof fieldTripTypesState) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setFieldTripTypesState(next);
     void persistSettings({ fieldTripTypes: next });
   };
 
   const handleUpdateEmployees = (next: typeof employeesState) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
     setEmployeesState(next);
     void persistSettings({ employees: next });
   };
 
   const handleAutoSchedule = () => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to auto-schedule.");
+      return;
+    }
     // First, validate that all days have metadata
     const missingMetadata = validateDayMetadata(scheduleDaysState);
     
@@ -1663,6 +1908,10 @@ export default function App() {
   };
 
   const executeAutoSchedule = (keepExisting: boolean) => {
+    if (!canEditSchedule) {
+      setAuthMessage("You do not have permission to auto-schedule.");
+      return;
+    }
     setAutoScheduleState({ type: "scheduling" });
     setShowAutoScheduleModal(true);
     
@@ -1738,6 +1987,116 @@ export default function App() {
     }, 300);
   };
 
+  const roleLabel = currentRole ? currentRole.replace("_", " ").toUpperCase() : undefined;
+
+  if (authStatus === "loading") {
+    return (
+      <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", fontFamily: "Inter, sans-serif" }}>
+        <p style={{ color: "#334155" }}>Checking session...</p>
+      </div>
+    );
+  }
+
+  if (authStatus === "unauthenticated") {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
+          padding: "1.5rem",
+          fontFamily: "Inter, sans-serif"
+        }}
+      >
+        <section
+          style={{
+            width: "min(420px, 100%)",
+            background: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 14,
+            boxShadow: "0 20px 40px rgba(15,23,42,0.1)",
+            padding: "1rem"
+          }}
+        >
+          <h2 style={{ margin: "0 0 0.5rem" }}>Sign in</h2>
+          <p style={{ margin: "0 0 1rem", color: "#475569", fontSize: "0.9rem" }}>
+            Use your scheduler account to access school schedules.
+          </p>
+          <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Email</label>
+          <input
+            value={loginForm.email}
+            onChange={(event) => setLoginForm((prev) => ({ ...prev, email: event.target.value }))}
+            placeholder="name@school.org"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: 8,
+              border: "1px solid #cbd5e1",
+              padding: "0.5rem 0.65rem",
+              marginBottom: "0.65rem"
+            }}
+          />
+          <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Password</label>
+          <input
+            type="password"
+            value={loginForm.password}
+            onChange={(event) => setLoginForm((prev) => ({ ...prev, password: event.target.value }))}
+            placeholder="••••••••"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: 8,
+              border: "1px solid #cbd5e1",
+              padding: "0.5rem 0.65rem",
+              marginBottom: "0.65rem"
+            }}
+          />
+          <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>
+            School (optional)
+          </label>
+          <input
+            value={loginForm.schoolId ?? ""}
+            onChange={(event) =>
+              setLoginForm((prev) => ({
+                ...prev,
+                schoolId: event.target.value.trim() === "" ? undefined : event.target.value
+              }))
+            }
+            placeholder="school-evergreen"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: 8,
+              border: "1px solid #cbd5e1",
+              padding: "0.5rem 0.65rem"
+            }}
+          />
+          {loginError && <p style={{ color: "#b91c1c", fontSize: "0.85rem", margin: "0.65rem 0 0" }}>{loginError}</p>}
+          <button
+            type="button"
+            onClick={() => {
+              void handleLogin();
+            }}
+            disabled={isAuthenticating || !loginForm.email || !loginForm.password}
+            style={{
+              marginTop: "0.9rem",
+              width: "100%",
+              borderRadius: 999,
+              border: "none",
+              background: isAuthenticating ? "#94a3b8" : "#2563eb",
+              color: "#fff",
+              padding: "0.55rem 0.9rem",
+              cursor: isAuthenticating ? "not-allowed" : "pointer"
+            }}
+          >
+            {isAuthenticating ? "Signing in..." : "Sign in"}
+          </button>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <MotionConfig transition={{ type: "tween", ease: "linear", duration: 0.2 }}>
       <motion.div
@@ -1762,9 +2121,12 @@ export default function App() {
         }
       `}</style>
       <WeekNavigationBanner
-        schoolOptions={schools}
+        schoolOptions={schoolOptions}
         selectedSchoolId={selectedSchoolId}
-        onSchoolChange={setSelectedSchoolId}
+        onSchoolChange={(schoolId) => {
+          setSelectedSchoolId(schoolId);
+          setAuthMessage(null);
+        }}
         weekLabel={weekLabel}
         status={scheduleStatus}
         complianceHighlights={complianceHighlights}
@@ -1776,7 +2138,18 @@ export default function App() {
         isAuditOpen={showAuditTimeline}
         apiStatus={apiStatus}
         onAutoSchedule={handleAutoSchedule}
+        canEditSchedule={canEditSchedule}
+        canManageSettings={canManageSettings}
+        userDisplayName={authUser?.displayName}
+        userRoleLabel={roleLabel}
+        onLogout={() => {
+          void handleLogout();
+        }}
         onOpenSettings={() => {
+          if (!canManageSettings) {
+            setAuthMessage("You do not have permission to edit settings for this school.");
+            return;
+          }
           if (showSettings && settingsDirty) {
             setSettingsCloseAttempt((prev) => prev + 1);
             return;
@@ -1796,6 +2169,9 @@ export default function App() {
         )}
         {scheduleSaveError && (
           <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
+        )}
+        {authMessage && (
+          <p style={{ margin: "0.5rem 0 0", color: "#b45309", fontSize: "0.85rem" }}>{authMessage}</p>
         )}
       </motion.div>
 
@@ -1823,6 +2199,10 @@ export default function App() {
           onDeleteAssignment={handleDeleteAssignment}
           onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
           onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
+            if (!canEditSchedule) {
+              setAuthMessage("You do not have permission to edit assignments.");
+              return;
+            }
             applyScheduleChange(
               (current) => {
                 const scheduleDay = current.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);

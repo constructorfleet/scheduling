@@ -2,8 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AuthSessionResponse } from '../models/AuthSessionResponse';
 import type { GenericOk } from '../models/GenericOk';
 import type { HealthResponse } from '../models/HealthResponse';
+import type { LoginPayload } from '../models/LoginPayload';
+import type { MeResponse } from '../models/MeResponse';
 import type { ScheduleSavePayload } from '../models/ScheduleSavePayload';
 import type { ScheduleWeekResponse } from '../models/ScheduleWeekResponse';
 import type { SettingsPayload } from '../models/SettingsPayload';
@@ -25,6 +28,58 @@ export class DefaultService {
         });
     }
     /**
+     * Authenticate a user and create a session
+     * @param requestBody
+     * @returns AuthSessionResponse Authenticated user context
+     * @throws ApiError
+     */
+    public static postApiAuthLogin(
+        requestBody: LoginPayload,
+    ): CancelablePromise<AuthSessionResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/login',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `Invalid credentials`,
+                423: `Account locked`,
+                429: `Too many login attempts`,
+            },
+        });
+    }
+    /**
+     * Revoke current session and clear cookie
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @returns GenericOk Logout complete
+     * @throws ApiError
+     */
+    public static postApiAuthLogout(
+        xCsrfToken: string,
+    ): CancelablePromise<GenericOk> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/logout',
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+        });
+    }
+    /**
+     * Get current authenticated user
+     * @returns MeResponse Authenticated user profile
+     * @throws ApiError
+     */
+    public static getApiAuthMe(): CancelablePromise<MeResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/auth/me',
+            errors: {
+                401: `Not authenticated`,
+            },
+        });
+    }
+    /**
      * Get settings for a school
      * @param schoolId
      * @returns SettingsResponse Settings payload
@@ -39,16 +94,22 @@ export class DefaultService {
             path: {
                 'schoolId': schoolId,
             },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
     /**
      * Save settings for a school
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @param schoolId
      * @param requestBody
      * @returns SettingsSaveResponse OK
      * @throws ApiError
      */
     public static putApiSettings(
+        xCsrfToken: string,
         schoolId: string,
         requestBody: SettingsPayload,
     ): CancelablePromise<SettingsSaveResponse> {
@@ -58,8 +119,15 @@ export class DefaultService {
             path: {
                 'schoolId': schoolId,
             },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
     /**
@@ -77,16 +145,22 @@ export class DefaultService {
             path: {
                 'weekId': weekId,
             },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
     /**
      * Save schedule week
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
      * @param weekId
      * @param requestBody
      * @returns GenericOk OK
      * @throws ApiError
      */
     public static putApiSchedule(
+        xCsrfToken: string,
         weekId: string,
         requestBody: ScheduleSavePayload,
     ): CancelablePromise<GenericOk> {
@@ -96,8 +170,44 @@ export class DefaultService {
             path: {
                 'weekId': weekId,
             },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
+        });
+    }
+    /**
+     * Clear staff assignments for a schedule week
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param weekId
+     * @returns any Delete result
+     * @throws ApiError
+     */
+    public static deleteApiScheduleStaffAssignments(
+        xCsrfToken: string,
+        weekId: string,
+    ): CancelablePromise<{
+        ok: boolean;
+        deleted: number;
+    }> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/schedule/{weekId}/staff-assignments',
+            path: {
+                'weekId': weekId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
         });
     }
 }

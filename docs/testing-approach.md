@@ -5,7 +5,7 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 
 ## Testing philosophy
 - **Compliance-first traceability.** Each QA rule listed in `RULES_TEST_CASES.md` links a policy citation to a violation/clean fixture pair in `tests/rules/rulesEngine.test.ts`, so the UI’s violation navigator can point back to the exact rule definition in `packages/core/rules/definitions.ts` and the underlying operating policy.
-- **Data-driven revalidation.** There is no “mark addressed” button—`GuidedStatusTracker` guides directors to the unresolved field trip, ratio, or clock block, and the rules engine clears every violation automatically once the submitted metadata is compliant.
+- **Data-driven revalidation.** There is no “mark addressed” button—`GuidedStatusTracker` guides directors to the unresolved field trip, ratio, or schdule block, and the rules engine clears every violation automatically once the submitted metadata is compliant.
 - **Auditable automation.** Every Jest or Playwright run creates validation data (`test-results/`) that can be attached to release notes, QA dashboards, or compliance reports, ensuring the same scripts executed in each school deployment produce identical outputs.
 - **Offline parity.** The available automation runs locally (Vite dev server + Playwright, Jest with `ts-jest` and `jsdom`), so even air-gapped deployments can execute the same commands and capture JSON/journal snapshots for auditors.
 
@@ -28,12 +28,12 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 ## Automation layers
 ### Rule engine & helpers (Jest)
 - `tests/rules/rulesEngine.test.ts` walks through every QA rule ID, firing compliant and violating fixtures so auditors can replay a violation from the UI back to the policy citation exported alongside `packages/core/rules/definitions.ts`.
-- Utility suites such as `tests/utils/rulesUtils.test.ts` protect the shared math helpers (`parseTimeToMinutes`, ratio calculations, clock block duration checks) that keep coverage consistent when block windows span midnight or combine non-contiguous assignments.
+- Utility suites such as `tests/utils/rulesUtils.test.ts` protect the shared math helpers (`parseTimeToMinutes`, ratio calculations, schdule block duration checks) that keep coverage consistent when block windows span midnight or combine non-contiguous assignments.
 - Jest uses `ts-jest`, the `jsdom` environment configured in `jest.config.ts`, and DOM helpers from `tests/setupTests.ts` so the React components and rule engine agree on the same helpers and mocking story.
 
 ### Component & guided workspace integration (React Testing Library)
 - `tests/ui/GuidedStatusTracker.test.tsx` proves the tracker renders statuses, focuses the relevant card, and never mutates data—it only scrolls directors toward the outstanding violation, and the rules engine clears the violation once their edits are committed.
-- `tests/ui/ViolationNavigator.test.tsx` ensures each card highlights all impacted clock blocks, links to the policy metadata, surfaces the leader/adult delta, and never provides a “resolve manually” control.
+- `tests/ui/ViolationNavigator.test.tsx` ensures each card highlights all impacted schdule blocks, links to the policy metadata, surfaces the leader/adult delta, and never provides a “resolve manually” control.
 - Supporting tests (`FieldTripApprovalPanel`, `SubstituteAssignmentPanel`, `StaffPalette`) keep guided panels and selection affordances aligned with the mocked domain state from `apps/ui/data/mockScheduleData.ts` and the `ScheduleDay`/`FieldTripEvent` metadata model.
 - `tests/ui/DayMetadataStrip.test.tsx` validates each metadata card flags missing enrollment/schedule/field-trip details, surfaces the chosen ratio hint, and dispatches the correct payload per control change.
 - `tests/ui/ClockBlockTimeline.test.tsx` exercises the timeline blocks so assigned staff, required-staff/ratio data, and violation badges render, the focused block toggles `aria-pressed`, and the auto-balance/focus callbacks fire when the user interacts.
@@ -43,7 +43,7 @@ This guide describes how the scheduling app’s automation layers (rule-engine J
 - `tests/e2e/day-metadata-workflows.spec.ts` covers the DayMetadataStrip interactions: showing ratio hints for each schedule type, reflecting field-trip approvals, and re-blocking publish until the director signs off again.
 - `tests/e2e/guided-workflows.spec.ts` walks through a full guided week: navigating the workspace, resolving violations, signing off field trips, approving substitutes, and unlocking the publish CTA only when all metadata and approvals are complete.
 - `tests/e2e/workspace-interactions.spec.ts` verifies the workspace toolbar hints (“Field trip needs signature”, “Publish blocked”), the violation navigator’s auto-focus, and the auto-select behavior inside the staff palette once a violation has been chosen.
-- `tests/e2e/violation-workflows.spec.ts` focuses on the violation navigator and guided tracker so UX reviewers can see the compliance highlight drop to zero only after the rules engine reruns with edited clock blocks or approvals—it confirms there is never a manual dismiss path.
+- `tests/e2e/violation-workflows.spec.ts` focuses on the violation navigator and guided tracker so UX reviewers can see the compliance highlight drop to zero only after the rules engine reruns with edited schdule blocks or approvals—it confirms there is never a manual dismiss path.
 - Playwright reuses `playwright.config.ts`, which currently expects `http://127.0.0.1:4174`; retained traces/screenshots unlock root-cause debugging when runs fail offline.
 
 ## Running the suites

@@ -1,1414 +1,1493 @@
 import { RuleDefinition } from "./types";
 import {
-  calculateDurationHours,
-  getAssignmentsForBlock,
-  getCitationId,
-  getDayOfWeekForAssignment,
-  getEmployeeById,
-  getFieldTripTypeById,
-  parseTimeToMinutes,
-  getOperatingHoursForDay,
-  getScheduleDayById
+    calculateDurationHours,
+    getCitationId,
+    getDayOfWeekForAssignment,
+    getEmployeeById,
+    getFieldTripTypeById,
+    parseTimeToMinutes,
+    getOperatingHoursForDay,
+    getScheduleDayById
 } from "./utils";
 import type { RulesContext, RuleViolation } from "./types";
-import type { SegmentBlock, StaffAssignment } from "../domain/types";
+import type { DayOfWeek, StaffAssignment } from "../domain/types";
 
 const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
-  "ratio-segment": "policy-ratio",
-  "certification-per-segment": "policy-certification",
-  "shift-break-limits": "policy-shift-limits",
-  "segment-coverage": "policy-coverage",
-  "field-trip-ratios": "policy-field-trip",
-  "schedule-day-metadata": "policy-schedule-day",
-  "field-trip-event": "policy-field-trip-event",
-  "segment-block-timeline": "policy-coverage",
-  "employee-availability": "policy-coverage",
-  "open-close-coverage": "policy-open-close",
-  "medical-delegated-coverage": "policy-med-delegated",
-  "cpr-current-required": "policy-cpr-current"
-};
-
-const assignedEmployeesForBlock = (context: RulesContext, blockId: string) => {
-  const assignments = getAssignmentsForBlock(context, blockId);
-  const unique: Record<string, boolean> = {};
-  const employees = assignments
-    .map((assignment) => getEmployeeById(context, assignment.employeeId))
-    .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee));
-  return employees.filter((employee) => {
-    if (unique[employee.id]) {
-      return false;
-    }
-    unique[employee.id] = true;
-    return true;
-  });
+    "ratio-segment": "policy-ratio",
+    "certification-per-segment": "policy-certification",
+    "shift-break-limits": "policy-shift-limits",
+    "segment-coverage": "policy-coverage",
+    "field-trip-ratios": "policy-field-trip",
+    "schedule-day-metadata": "policy-schedule-day",
+    "field-trip-event": "policy-field-trip-event",
+    "segment-block-timeline": "policy-coverage",
+    "employee-availability": "policy-coverage",
+    "open-close-coverage": "policy-open-close",
+    "medical-delegated-coverage": "policy-med-delegated",
+    "cpr-current-required": "policy-cpr-current"
 };
 
 const buildViolation = (
-  ruleId: string,
-  message: string,
-  targetEntity: string,
-  targetId: string,
-  citationId?: string,
-  severity: "error" | "warning" = "error",
-  metadata?: Record<string, unknown>
+    ruleId: string,
+    message: string,
+    targetEntity: string,
+    targetId: string,
+    citationId?: string,
+    severity: "error" | "warning" = "error",
+    metadata?: Record<string, unknown>
 ) => ({
-  id: `${ruleId}:${targetEntity}:${targetId}`,
-  ruleId,
-  message,
-  severity,
-  target: {
-    entity: targetEntity,
-    id: targetId,
-    metadata
-  },
-  citationId
+    id: `${ ruleId }:${ targetEntity }:${ targetId }`,
+    ruleId,
+    message,
+    severity,
+    target: {
+        entity: targetEntity,
+        id: targetId,
+        metadata
+    },
+    citationId
 });
 
 const getSchoolRules = (context: RulesContext) => {
-  return {
-    openerCount: context.schoolRules?.openerCount ?? 0,
-    closerCount: context.schoolRules?.closerCount ?? 0,
-    minimumMedicalDelegated: context.schoolRules?.minimumMedicalDelegated ?? 0,
-    requireCurrentCpr: context.schoolRules?.requireCurrentCpr ?? false,
-    openerWindowMinutes: context.schoolRules?.openerWindowMinutes ?? 15,
-    closerWindowMinutes: context.schoolRules?.closerWindowMinutes ?? 15
-  };
+    return {
+        openerCount: context.schoolRules?.openerCount ?? 0,
+        closerCount: context.schoolRules?.closerCount ?? 0,
+        minimumMedicalDelegated: context.schoolRules?.minimumMedicalDelegated ?? 0,
+        requireCurrentCpr: context.schoolRules?.requireCurrentCpr ?? false,
+        openerWindowMinutes: context.schoolRules?.openerWindowMinutes ?? 15,
+        closerWindowMinutes: context.schoolRules?.closerWindowMinutes ?? 15
+    };
 };
 
 const formatMinutesAsTime = (value: number) => {
-  const clamped = Math.max(0, value);
-  const hours = Math.floor(clamped / 60)
-    .toString()
-    .padStart(2, "0");
-  const minutes = (clamped % 60).toString().padStart(2, "0");
-  return `${hours}:${minutes}`;
+    const clamped = Math.max(0, value);
+    const hours = Math.floor(clamped / 60)
+        .toString()
+        .padStart(2, "0");
+    const minutes = (clamped % 60).toString().padStart(2, "0");
+    return `${ hours }:${ minutes }`;
 };
 
 const normalizeChildrenPerStaff = (value: number) => {
-  if (!Number.isFinite(value) || value <= 0) {
-    return 1;
-  }
-  const rounded = Math.round(value);
-  if (Math.abs(value - rounded) < 1e-6) {
-    return Math.max(1, rounded);
-  }
-  return Math.max(1, Math.ceil(value));
-};
-
-const isClosedScheduleDay = (context: RulesContext, block: SegmentBlock) => {
-  const scheduleDay =
-    getScheduleDayById(context, block.scheduleDayId) ??
-    context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-  if (!scheduleDay) {
-    return false;
-  }
-  return scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed";
+    if (!Number.isFinite(value) || value <= 0) {
+        return 1;
+    }
+    const rounded = Math.round(value);
+    if (Math.abs(value - rounded) < 1e-6) {
+        return Math.max(1, rounded);
+    }
+    return Math.max(1, Math.ceil(value));
 };
 
 type DayAssignmentWithEmployee = {
-  assignment: StaffAssignment;
-  employee: NonNullable<ReturnType<typeof getEmployeeById>>;
-  start: number;
-  end: number;
+    assignment: StaffAssignment;
+    employee: NonNullable<ReturnType<typeof getEmployeeById>>;
+    start: number;
+    end: number;
 };
 
 type CoverageInterval = {
-  start: number;
-  end: number;
-  actual: number;
+    start: number;
+    end: number;
+    actual: number;
 };
 
 const getActiveAssignmentsForDay = (
-  context: RulesContext,
-  dayOfWeek: SegmentBlock["dayOfWeek"]
+    context: RulesContext,
+    dayOfWeek: DayOfWeek
 ): DayAssignmentWithEmployee[] =>
-  context.staffAssignments
-    .filter((assignment) => assignment.status !== "completed")
-    .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === dayOfWeek)
-    .map((assignment) => {
-      const employee = getEmployeeById(context, assignment.employeeId);
-      if (!employee) {
-        return undefined;
-      }
-      return {
-        assignment,
-        employee,
-        start: parseTimeToMinutes(assignment.startTime),
-        end: parseTimeToMinutes(assignment.endTime)
-      };
-    })
-    .filter((entry): entry is DayAssignmentWithEmployee => Boolean(entry));
+    context.staffAssignments
+        .filter((assignment) => assignment.status !== "completed")
+        .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === dayOfWeek)
+        .map((assignment) => {
+            const employee = getEmployeeById(context, assignment.employeeId);
+            if (!employee) {
+                return undefined;
+            }
+            return {
+                assignment,
+                employee,
+                start: parseTimeToMinutes(assignment.startTime),
+                end: parseTimeToMinutes(assignment.endTime)
+            };
+        })
+        .filter((entry): entry is DayAssignmentWithEmployee => Boolean(entry));
 
 const mergeCoverageIntervals = (intervals: CoverageInterval[]): CoverageInterval[] => {
-  const merged: CoverageInterval[] = [];
-  intervals.forEach((interval) => {
-    const previous = merged[merged.length - 1];
-    if (previous && previous.end === interval.start && previous.actual === interval.actual) {
-      previous.end = interval.end;
-      return;
-    }
-    merged.push({ ...interval });
-  });
-  return merged;
+    const merged: CoverageInterval[] = [];
+    intervals.forEach((interval) => {
+        const previous = merged[ merged.length - 1 ];
+        if (previous && previous.end === interval.start && previous.actual === interval.actual) {
+            previous.end = interval.end;
+            return;
+        }
+        merged.push({ ...interval });
+    });
+    return merged;
 };
 
 const addEvent = (
-  events: Map<number, { starts: string[]; ends: string[] }>,
-  time: number,
-  key: "starts" | "ends",
-  employeeId: string
+    events: Map<number, { starts: string[]; ends: string[]; }>,
+    time: number,
+    key: "starts" | "ends",
+    employeeId: string
 ) => {
-  const current = events.get(time) ?? { starts: [], ends: [] };
-  current[key].push(employeeId);
-  events.set(time, current);
+    const current = events.get(time) ?? { starts: [], ends: [] };
+    current[ key ].push(employeeId);
+    events.set(time, current);
 };
 
 const evaluateMinimumCoverage = (
-  dayAssignments: DayAssignmentWithEmployee[],
-  windowStart: number,
-  windowEnd: number,
-  requiredCount: number,
-  predicate: (entry: DayAssignmentWithEmployee) => boolean
-): { minimumActual: number; failingIntervals: CoverageInterval[] } => {
-  if (windowEnd <= windowStart || requiredCount <= 0) {
-    return { minimumActual: requiredCount > 0 ? 0 : Number.POSITIVE_INFINITY, failingIntervals: [] };
-  }
-
-  const events = new Map<number, { starts: string[]; ends: string[] }>();
-  const boundaries = new Set<number>([windowStart, windowEnd]);
-  dayAssignments.forEach((entry) => {
-    if (!predicate(entry)) {
-      return;
+    dayAssignments: DayAssignmentWithEmployee[],
+    windowStart: number,
+    windowEnd: number,
+    requiredCount: number,
+    predicate: (entry: DayAssignmentWithEmployee) => boolean
+): { minimumActual: number; failingIntervals: CoverageInterval[]; } => {
+    if (windowEnd <= windowStart || requiredCount <= 0) {
+        return { minimumActual: requiredCount > 0 ? 0 : Number.POSITIVE_INFINITY, failingIntervals: [] };
     }
-    const clippedStart = Math.max(windowStart, entry.start);
-    const clippedEnd = Math.min(windowEnd, entry.end);
-    if (clippedEnd <= clippedStart) {
-      return;
-    }
-    boundaries.add(clippedStart);
-    boundaries.add(clippedEnd);
-    addEvent(events, clippedStart, "starts", entry.employee.id);
-    addEvent(events, clippedEnd, "ends", entry.employee.id);
-  });
 
-  const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-  if (sortedBoundaries.length < 2) {
-    return { minimumActual: 0, failingIntervals: [] };
-  }
-
-  const activeEmployeeCounts = new Map<string, number>();
-  const failingIntervals: CoverageInterval[] = [];
-  let minimumActual = Number.POSITIVE_INFINITY;
-  for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
-    const start = sortedBoundaries[index];
-    const end = sortedBoundaries[index + 1];
-    if (end <= start) {
-      continue;
-    }
-    const intervalEvents = events.get(start);
-    intervalEvents?.ends.forEach((employeeId) => {
-      const nextCount = (activeEmployeeCounts.get(employeeId) ?? 0) - 1;
-      if (nextCount <= 0) {
-        activeEmployeeCounts.delete(employeeId);
-      } else {
-        activeEmployeeCounts.set(employeeId, nextCount);
-      }
-    });
-    intervalEvents?.starts.forEach((employeeId) => {
-      const nextCount = (activeEmployeeCounts.get(employeeId) ?? 0) + 1;
-      activeEmployeeCounts.set(employeeId, nextCount);
+    const events = new Map<number, { starts: string[]; ends: string[]; }>();
+    const boundaries = new Set<number>([ windowStart, windowEnd ]);
+    dayAssignments.forEach((entry) => {
+        if (!predicate(entry)) {
+            return;
+        }
+        const clippedStart = Math.max(windowStart, entry.start);
+        const clippedEnd = Math.min(windowEnd, entry.end);
+        if (clippedEnd <= clippedStart) {
+            return;
+        }
+        boundaries.add(clippedStart);
+        boundaries.add(clippedEnd);
+        addEvent(events, clippedStart, "starts", entry.employee.id);
+        addEvent(events, clippedEnd, "ends", entry.employee.id);
     });
 
-    const actual = activeEmployeeCounts.size;
-    minimumActual = Math.min(minimumActual, actual);
-    if (actual < requiredCount) {
-      failingIntervals.push({ start, end, actual });
+    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+    if (sortedBoundaries.length < 2) {
+        return { minimumActual: 0, failingIntervals: [] };
     }
-  }
 
-  return {
-    minimumActual: Number.isFinite(minimumActual) ? minimumActual : 0,
-    failingIntervals: mergeCoverageIntervals(failingIntervals)
-  };
+    const activeEmployeeCounts = new Map<string, number>();
+    const failingIntervals: CoverageInterval[] = [];
+    let minimumActual = Number.POSITIVE_INFINITY;
+    for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
+        const start = sortedBoundaries[ index ];
+        const end = sortedBoundaries[ index + 1 ];
+        if (end <= start) {
+            continue;
+        }
+        const intervalEvents = events.get(start);
+        intervalEvents?.ends.forEach((employeeId) => {
+            const nextCount = (activeEmployeeCounts.get(employeeId) ?? 0) - 1;
+            if (nextCount <= 0) {
+                activeEmployeeCounts.delete(employeeId);
+            } else {
+                activeEmployeeCounts.set(employeeId, nextCount);
+            }
+        });
+        intervalEvents?.starts.forEach((employeeId) => {
+            const nextCount = (activeEmployeeCounts.get(employeeId) ?? 0) + 1;
+            activeEmployeeCounts.set(employeeId, nextCount);
+        });
+
+        const actual = activeEmployeeCounts.size;
+        minimumActual = Math.min(minimumActual, actual);
+        if (actual < requiredCount) {
+            failingIntervals.push({ start, end, actual });
+        }
+    }
+
+    return {
+        minimumActual: Number.isFinite(minimumActual) ? minimumActual : 0,
+        failingIntervals: mergeCoverageIntervals(failingIntervals)
+    };
 };
 
 const evaluateConditionalLeaderCoverage = (
-  dayAssignments: DayAssignmentWithEmployee[],
-  windowStart: number,
-  windowEnd: number,
-  requiresLeaderPredicate: (entry: DayAssignmentWithEmployee) => boolean,
-  isLeaderPredicate: (entry: DayAssignmentWithEmployee) => boolean
+    dayAssignments: DayAssignmentWithEmployee[],
+    windowStart: number,
+    windowEnd: number,
+    requiresLeaderPredicate: (entry: DayAssignmentWithEmployee) => boolean,
+    isLeaderPredicate: (entry: DayAssignmentWithEmployee) => boolean
 ): CoverageInterval[] => {
-  if (windowEnd <= windowStart) {
-    return [];
-  }
+    if (windowEnd <= windowStart) {
+        return [];
+    }
 
-  const boundaries = new Set<number>([windowStart, windowEnd]);
-  const requiresEvents = new Map<number, { starts: string[]; ends: string[] }>();
-  const leaderEvents = new Map<number, { starts: string[]; ends: string[] }>();
-  dayAssignments.forEach((entry) => {
-    const clippedStart = Math.max(windowStart, entry.start);
-    const clippedEnd = Math.min(windowEnd, entry.end);
-    if (clippedEnd <= clippedStart) {
-      return;
-    }
-    boundaries.add(clippedStart);
-    boundaries.add(clippedEnd);
-    if (requiresLeaderPredicate(entry)) {
-      addEvent(requiresEvents, clippedStart, "starts", entry.employee.id);
-      addEvent(requiresEvents, clippedEnd, "ends", entry.employee.id);
-    }
-    if (isLeaderPredicate(entry)) {
-      addEvent(leaderEvents, clippedStart, "starts", entry.employee.id);
-      addEvent(leaderEvents, clippedEnd, "ends", entry.employee.id);
-    }
-  });
-
-  const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-  const activeRequires = new Map<string, number>();
-  const activeLeaders = new Map<string, number>();
-  const failing: CoverageInterval[] = [];
-  for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
-    const start = sortedBoundaries[index];
-    const end = sortedBoundaries[index + 1];
-    if (end <= start) {
-      continue;
-    }
-    const requireEvents = requiresEvents.get(start);
-    requireEvents?.ends.forEach((employeeId) => {
-      const nextCount = (activeRequires.get(employeeId) ?? 0) - 1;
-      if (nextCount <= 0) {
-        activeRequires.delete(employeeId);
-      } else {
-        activeRequires.set(employeeId, nextCount);
-      }
-    });
-    requireEvents?.starts.forEach((employeeId) => {
-      const nextCount = (activeRequires.get(employeeId) ?? 0) + 1;
-      activeRequires.set(employeeId, nextCount);
+    const boundaries = new Set<number>([ windowStart, windowEnd ]);
+    const requiresEvents = new Map<number, { starts: string[]; ends: string[]; }>();
+    const leaderEvents = new Map<number, { starts: string[]; ends: string[]; }>();
+    dayAssignments.forEach((entry) => {
+        const clippedStart = Math.max(windowStart, entry.start);
+        const clippedEnd = Math.min(windowEnd, entry.end);
+        if (clippedEnd <= clippedStart) {
+            return;
+        }
+        boundaries.add(clippedStart);
+        boundaries.add(clippedEnd);
+        if (requiresLeaderPredicate(entry)) {
+            addEvent(requiresEvents, clippedStart, "starts", entry.employee.id);
+            addEvent(requiresEvents, clippedEnd, "ends", entry.employee.id);
+        }
+        if (isLeaderPredicate(entry)) {
+            addEvent(leaderEvents, clippedStart, "starts", entry.employee.id);
+            addEvent(leaderEvents, clippedEnd, "ends", entry.employee.id);
+        }
     });
 
-    const currentLeaderEvents = leaderEvents.get(start);
-    currentLeaderEvents?.ends.forEach((employeeId) => {
-      const nextCount = (activeLeaders.get(employeeId) ?? 0) - 1;
-      if (nextCount <= 0) {
-        activeLeaders.delete(employeeId);
-      } else {
-        activeLeaders.set(employeeId, nextCount);
-      }
-    });
-    currentLeaderEvents?.starts.forEach((employeeId) => {
-      const nextCount = (activeLeaders.get(employeeId) ?? 0) + 1;
-      activeLeaders.set(employeeId, nextCount);
-    });
+    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+    const activeRequires = new Map<string, number>();
+    const activeLeaders = new Map<string, number>();
+    const failing: CoverageInterval[] = [];
+    for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
+        const start = sortedBoundaries[ index ];
+        const end = sortedBoundaries[ index + 1 ];
+        if (end <= start) {
+            continue;
+        }
+        const requireEvents = requiresEvents.get(start);
+        requireEvents?.ends.forEach((employeeId) => {
+            const nextCount = (activeRequires.get(employeeId) ?? 0) - 1;
+            if (nextCount <= 0) {
+                activeRequires.delete(employeeId);
+            } else {
+                activeRequires.set(employeeId, nextCount);
+            }
+        });
+        requireEvents?.starts.forEach((employeeId) => {
+            const nextCount = (activeRequires.get(employeeId) ?? 0) + 1;
+            activeRequires.set(employeeId, nextCount);
+        });
 
-    if (activeRequires.size > 0 && activeLeaders.size === 0) {
-      failing.push({ start, end, actual: 0 });
+        const currentLeaderEvents = leaderEvents.get(start);
+        currentLeaderEvents?.ends.forEach((employeeId) => {
+            const nextCount = (activeLeaders.get(employeeId) ?? 0) - 1;
+            if (nextCount <= 0) {
+                activeLeaders.delete(employeeId);
+            } else {
+                activeLeaders.set(employeeId, nextCount);
+            }
+        });
+        currentLeaderEvents?.starts.forEach((employeeId) => {
+            const nextCount = (activeLeaders.get(employeeId) ?? 0) + 1;
+            activeLeaders.set(employeeId, nextCount);
+        });
+
+        if (activeRequires.size > 0 && activeLeaders.size === 0) {
+            failing.push({ start, end, actual: 0 });
+        }
     }
-  }
 
-  return mergeCoverageIntervals(failing);
+    return mergeCoverageIntervals(failing);
 };
 
 export const ratioSegmentRule: RuleDefinition = {
-  id: "ratio-segment",
-  description:
-    "Ensures each segment block has enough staff to meet the higher of the ratio-derived minimum or the configured minimum staff",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const schoolRules = getSchoolRules(context);
-    (context.scheduleDays ?? []).forEach((day) => {
-      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
-        return;
-      }
-      const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
-      if (!hours) {
-        return;
-      }
-      const scheduleType = day.scheduleType;
-      const effectiveChildCount =
-        typeof day.enrollmentCount === "number"
-          ? day.enrollmentCount
-          : Math.max(
-              0,
-              ...context.segmentBlocks
-                .filter((block) => block.dayOfWeek === day.dayOfWeek)
-                .map((block) => block.childCount)
-            );
-      const activeFieldTripEvent = context.fieldTripEvents.find((event) => {
-        if (event.dayOfWeek !== day.dayOfWeek) {
-          return false;
-        }
-        if (event.scheduleDayId && event.scheduleDayId !== day.id) {
-          return false;
-        }
-        return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
-      });
-      const activeFieldTripType = getFieldTripTypeById(context, activeFieldTripEvent?.fieldTripTypeId);
-      // Field trip ratios use same format as schedule type ratios: children per adult
-      // e.g., 1:10 ratio means adultRatioAdults=1, adultRatioStudents=10
-      const fieldTripChildrenPerStaff =
-        activeFieldTripType && activeFieldTripType.adultRatioStudents > 0
-          ? activeFieldTripType.adultRatioStudents / activeFieldTripType.adultRatioAdults
-          : undefined;
-      const childrenPerStaff =
-        fieldTripChildrenPerStaff ??
-        (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ??
-        1;
-      const normalizedChildrenPerStaff = normalizeChildrenPerStaff(childrenPerStaff);
-      const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
-      const openMinutes = parseTimeToMinutes(hours.open);
-      const closeMinutes = parseTimeToMinutes(hours.close);
-      if (closeMinutes <= openMinutes) {
-        return;
-      }
-      const openerWindowEnd = openMinutes + schoolRules.openerWindowMinutes;
-      const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
-      const dayAssignments = context.staffAssignments
-        .filter((assignment) => assignment.status !== "completed")
-        .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
-        .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
-      const boundaries = new Set<number>([openMinutes, closeMinutes]);
-      dayAssignments.forEach((assignment) => {
-        const start = parseTimeToMinutes(assignment.startTime);
-        const end = parseTimeToMinutes(assignment.endTime);
-        if (end <= openMinutes || start >= closeMinutes) {
-          return;
-        }
-        boundaries.add(Math.max(openMinutes, start));
-        boundaries.add(Math.min(closeMinutes, end));
-      });
-      const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-      const failingIntervals: Array<{
-        start: number;
-        end: number;
-        required: number;
-        minStaff: number;
-        assigned: number;
-      }> = [];
-      for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
-        const start = sortedBoundaries[index];
-        const end = sortedBoundaries[index + 1];
-        if (end <= start) {
-          continue;
-        }
-        let minStaff = 0;
-        if (schoolRules.openerCount > 0 && start < openerWindowEnd && end > openMinutes) {
-          minStaff = Math.max(minStaff, schoolRules.openerCount);
-        }
-        if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
-          minStaff = Math.max(minStaff, schoolRules.closerCount);
-        }
-        const required = Math.max(minStaff, requiredFromRatio);
-        const assigned = new Set(
-          dayAssignments
-            .filter((assignment) => {
-              const assignmentStart = parseTimeToMinutes(assignment.startTime);
-              const assignmentEnd = parseTimeToMinutes(assignment.endTime);
-              return assignmentStart < end && assignmentEnd > start;
-            })
-            .map((assignment) => assignment.employeeId)
-        ).size;
-        if (assigned < required) {
-          failingIntervals.push({ start, end, required, minStaff, assigned });
-        }
-      }
-      if (failingIntervals.length === 0) {
-        return;
-      }
-      const mergedIntervals: typeof failingIntervals = [];
-      failingIntervals.forEach((interval) => {
-        const previous = mergedIntervals[mergedIntervals.length - 1];
-        if (
-          previous &&
-          previous.end === interval.start &&
-          previous.required === interval.required &&
-          previous.minStaff === interval.minStaff &&
-          previous.assigned === interval.assigned
-        ) {
-          previous.end = interval.end;
-          return;
-        }
-        mergedIntervals.push({ ...interval });
-      });
-      const citationId = getCitationId(context, "ratio-segment", DEFAULT_POLICY_CITATIONS["ratio-segment"]);
-      mergedIntervals.forEach((interval, intervalIndex) => {
-        const relatedBlocks = context.segmentBlocks.filter((block) => {
-          if (block.dayOfWeek !== day.dayOfWeek) {
-            return false;
-          }
-          const blockStart = parseTimeToMinutes(block.startTime);
-          const blockEnd = parseTimeToMinutes(block.endTime);
-          return blockStart < interval.end && blockEnd > interval.start;
-        });
-        const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
-        const message =
-          `${day.dayOfWeek.toUpperCase()} ${formatMinutesAsTime(interval.start)}-${formatMinutesAsTime(interval.end)} ` +
-          `requires ${interval.required} staff (min ${interval.minStaff}, ratio ${normalizedChildrenPerStaff} from ${sourceLabel}, children ${effectiveChildCount}) ` +
-          `but only ${interval.assigned} assigned`;
-        violations.push(
-          buildViolation(
-            "ratio-segment",
-            message,
-            "ScheduleDay",
-            `${day.id}:${intervalIndex}`,
-            citationId,
-            "error",
-            {
-              dayOfWeek: day.dayOfWeek,
-              childCount: effectiveChildCount,
-              ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType",
-              required: interval.required,
-              actual: interval.assigned,
-              minStaff: interval.minStaff,
-              ratioChildrenPerStaff: normalizedChildrenPerStaff,
-              startTime: formatMinutesAsTime(interval.start),
-              endTime: formatMinutesAsTime(interval.end),
-              relatedSegmentBlockIds: relatedBlocks.map((block) => block.id)
+    id: "ratio-segment",
+    description:
+        "Ensures each segment block has enough staff to meet the higher of the ratio-derived minimum or the configured minimum staff",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const schoolRules = getSchoolRules(context);
+        (context.scheduleDays ?? []).forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
             }
-          )
-        );
-      });
-    });
-    return violations;
-  }
+            const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!hours) {
+                return;
+            }
+            const scheduleType = day.scheduleType;
+            const effectiveChildCount =
+                typeof day.enrollmentCount === "number"
+                    ? day.enrollmentCount
+                    : 0;
+            const activeFieldTripEvent = context.fieldTripEvents.find((event) => {
+                if (event.dayOfWeek !== day.dayOfWeek) {
+                    return false;
+                }
+                if (event.scheduleDayId && event.scheduleDayId !== day.id) {
+                    return false;
+                }
+                return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
+            });
+            const activeFieldTripType = getFieldTripTypeById(context, activeFieldTripEvent?.fieldTripTypeId);
+            // Field trip ratios use same format as schedule type ratios: children per adult
+            // e.g., 1:10 ratio means adultRatioAdults=1, adultRatioStudents=10
+            const fieldTripChildrenPerStaff =
+                activeFieldTripType && activeFieldTripType.adultRatioStudents > 0
+                    ? activeFieldTripType.adultRatioStudents / activeFieldTripType.adultRatioAdults
+                    : undefined;
+            const childrenPerStaff =
+                fieldTripChildrenPerStaff ??
+                (scheduleType ? context.scheduleTypeRatios?.[ scheduleType ] : undefined) ??
+                1;
+            const normalizedChildrenPerStaff = normalizeChildrenPerStaff(childrenPerStaff);
+            const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
+            const openMinutes = parseTimeToMinutes(hours.open);
+            const closeMinutes = parseTimeToMinutes(hours.close);
+            if (closeMinutes <= openMinutes) {
+                return;
+            }
+            const openerWindowEnd = openMinutes + schoolRules.openerWindowMinutes;
+            const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
+            const dayAssignments = context.staffAssignments
+                .filter((assignment) => assignment.status !== "completed")
+                .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
+                .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
+            const boundaries = new Set<number>([ openMinutes, closeMinutes ]);
+            dayAssignments.forEach((assignment) => {
+                const start = parseTimeToMinutes(assignment.startTime);
+                const end = parseTimeToMinutes(assignment.endTime);
+                if (end <= openMinutes || start >= closeMinutes) {
+                    return;
+                }
+                boundaries.add(Math.max(openMinutes, start));
+                boundaries.add(Math.min(closeMinutes, end));
+            });
+            const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+            const failingIntervals: Array<{
+                start: number;
+                end: number;
+                required: number;
+                minStaff: number;
+                assigned: number;
+            }> = [];
+            for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
+                const start = sortedBoundaries[ index ];
+                const end = sortedBoundaries[ index + 1 ];
+                if (end <= start) {
+                    continue;
+                }
+                let minStaff = 0;
+                if (schoolRules.openerCount > 0 && start < openerWindowEnd && end > openMinutes) {
+                    minStaff = Math.max(minStaff, schoolRules.openerCount);
+                }
+                if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
+                    minStaff = Math.max(minStaff, schoolRules.closerCount);
+                }
+                const required = Math.max(minStaff, requiredFromRatio);
+                const assigned = new Set(
+                    dayAssignments
+                        .filter((assignment) => {
+                            const assignmentStart = parseTimeToMinutes(assignment.startTime);
+                            const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+                            return assignmentStart < end && assignmentEnd > start;
+                        })
+                        .map((assignment) => assignment.employeeId)
+                ).size;
+                if (assigned < required) {
+                    failingIntervals.push({ start, end, required, minStaff, assigned });
+                }
+            }
+            if (failingIntervals.length === 0) {
+                return;
+            }
+            const mergedIntervals: typeof failingIntervals = [];
+            failingIntervals.forEach((interval) => {
+                const previous = mergedIntervals[ mergedIntervals.length - 1 ];
+                if (
+                    previous &&
+                    previous.end === interval.start &&
+                    previous.required === interval.required &&
+                    previous.minStaff === interval.minStaff &&
+                    previous.assigned === interval.assigned
+                ) {
+                    previous.end = interval.end;
+                    return;
+                }
+                mergedIntervals.push({ ...interval });
+            });
+            const citationId = getCitationId(context, "ratio-segment", DEFAULT_POLICY_CITATIONS[ "ratio-segment" ]);
+            mergedIntervals.forEach((interval, intervalIndex) => {
+                const relatedSegmentBlockIds = Array.from(
+                    new Set(
+                        dayAssignments
+                            .filter((assignment) => {
+                                const assignmentStart = parseTimeToMinutes(assignment.startTime);
+                                const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+                                return assignmentStart < interval.end && assignmentEnd > interval.start;
+                            })
+                            .map((assignment) => assignment.segmentBlockId)
+                            .filter((segmentBlockId) => Boolean(segmentBlockId))
+                    )
+                );
+                const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
+                const message =
+                    `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
+                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ effectiveChildCount }) ` +
+                    `but only ${ interval.assigned } assigned`;
+                violations.push(
+                    buildViolation(
+                        "ratio-segment",
+                        message,
+                        "ScheduleDay",
+                        `${ day.id }:${ intervalIndex }`,
+                        citationId,
+                        "error",
+                        {
+                            dayOfWeek: day.dayOfWeek,
+                            childCount: effectiveChildCount,
+                            ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType",
+                            required: interval.required,
+                            actual: interval.assigned,
+                            minStaff: interval.minStaff,
+                            ratioChildrenPerStaff: normalizedChildrenPerStaff,
+                            startTime: formatMinutesAsTime(interval.start),
+                            endTime: formatMinutesAsTime(interval.end),
+                            relatedSegmentBlockIds
+                        }
+                    )
+                );
+            });
+        });
+        return violations;
+    }
 };
 
 export const scheduleDayMetadataRule: RuleDefinition = {
-  id: "schedule-day-metadata",
-  description:
-    "Each schedule day must capture a schedule type, enrollment headcount, and an explicit field trip decision before the week can advance",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const citationId = getCitationId(
-      context,
-      "schedule-day-metadata",
-      DEFAULT_POLICY_CITATIONS["schedule-day-metadata"]
-    );
-    (context.scheduleDays ?? []).forEach((day) => {
-      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
-        return;
-      }
-      if (!day.scheduleType) {
-        violations.push(
-          buildViolation(
+    id: "schedule-day-metadata",
+    description:
+        "Each schedule day must capture a schedule type, enrollment headcount, and an explicit field trip decision before the week can advance",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
             "schedule-day-metadata",
-            `Schedule day ${day.date} lacks a selected schedule type`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { missing: ["scheduleType"] }
-          )
+            DEFAULT_POLICY_CITATIONS[ "schedule-day-metadata" ]
         );
-      }
-      if (day.enrollmentCount === undefined || day.enrollmentCount === null) {
-        violations.push(
-          buildViolation(
-            "schedule-day-metadata",
-            `Schedule day ${day.date} needs an enrollment headcount`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { missing: ["enrollmentCount"] }
-          )
-        );
-      }
-      if (!day.fieldTripEventId) {
-        violations.push(
-          buildViolation(
-            "schedule-day-metadata",
-            `Schedule day ${day.date} must link to a field trip decision (or mark "No Field Trip")`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { missing: ["fieldTripEventId"] }
-          )
-        );
-        return;
-      }
-      const hasEvent = context.fieldTripEvents.some((event) => event.id === day.fieldTripEventId);
-      if (!hasEvent) {
-        violations.push(
-          buildViolation(
-            "schedule-day-metadata",
-            `Schedule day ${day.date} references a missing field trip decision (${day.fieldTripEventId})`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { fieldTripEventId: day.fieldTripEventId }
-          )
-        );
-      }
-    });
-    return violations;
-  }
+        (context.scheduleDays ?? []).forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
+            }
+            if (!day.scheduleType) {
+                violations.push(
+                    buildViolation(
+                        "schedule-day-metadata",
+                        `Schedule day ${ day.date } lacks a selected schedule type`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { missing: [ "scheduleType" ] }
+                    )
+                );
+            }
+            if (day.enrollmentCount === undefined || day.enrollmentCount === null) {
+                violations.push(
+                    buildViolation(
+                        "schedule-day-metadata",
+                        `Schedule day ${ day.date } needs an enrollment headcount`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { missing: [ "enrollmentCount" ] }
+                    )
+                );
+            }
+            if (!day.fieldTripEventId) {
+                violations.push(
+                    buildViolation(
+                        "schedule-day-metadata",
+                        `Schedule day ${ day.date } must link to a field trip decision (or mark "No Field Trip")`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { missing: [ "fieldTripEventId" ] }
+                    )
+                );
+                return;
+            }
+            const hasEvent = context.fieldTripEvents.some((event) => event.id === day.fieldTripEventId);
+            if (!hasEvent) {
+                violations.push(
+                    buildViolation(
+                        "schedule-day-metadata",
+                        `Schedule day ${ day.date } references a missing field trip decision (${ day.fieldTripEventId })`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { fieldTripEventId: day.fieldTripEventId }
+                    )
+                );
+            }
+        });
+        return violations;
+    }
 };
 
 export const certificationPerSegmentRule: RuleDefinition = {
-  id: "certification-per-segment",
-  description:
-    "Validates that each segment includes employees with current CPR, medical delegation, and leader qualifications when required",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const schoolRules = getSchoolRules(context);
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
-        return;
-      }
-      const employees = assignedEmployeesForBlock(context, block.id);
-      const citationId = getCitationId(
-        context,
-        "certification-per-segment",
-        DEFAULT_POLICY_CITATIONS["certification-per-segment"]
-      );
-      const requiresLeader =
-        (block.segment === "open" || block.segment === "close") &&
-        employees.some((employee) => {
-          return context.jobTitleRules?.[employee.jobTitle]?.requiresLeaderForOpenClose ?? false;
+    id: "certification-per-segment",
+    description:
+        "Validates assignment coverage includes CPR, medical delegation, and leader qualifications when required",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const schoolRules = getSchoolRules(context);
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
+            }
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
+            }
+
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const citationId = getCitationId(
+                context,
+                "certification-per-segment",
+                DEFAULT_POLICY_CITATIONS[ "certification-per-segment" ]
+            );
+
+            if (schoolRules.requireCurrentCpr) {
+                const cprCoverage = evaluateMinimumCoverage(
+                    dayAssignments,
+                    windowStart,
+                    windowEnd,
+                    1,
+                    (entry) => entry.employee.cprCurrent
+                );
+                if (cprCoverage.failingIntervals.length > 0) {
+                    const firstGap = cprCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "certification-per-segment",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours lack an employee with current CPR certification`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                dayOfWeek: day.dayOfWeek,
+                                operatingHoursId: operatingHours.id,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
+                }
+            }
+
+            if (schoolRules.minimumMedicalDelegated > 0) {
+                const medCoverage = evaluateMinimumCoverage(
+                    dayAssignments,
+                    windowStart,
+                    windowEnd,
+                    1,
+                    (entry) => entry.employee.medicallyDelegated
+                );
+                if (medCoverage.failingIntervals.length > 0) {
+                    const firstGap = medCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "certification-per-segment",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours lack medically delegated staff`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                dayOfWeek: day.dayOfWeek,
+                                operatingHoursId: operatingHours.id,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
+                }
+            }
+
+            const openWindowEnd = Math.min(windowStart + schoolRules.openerWindowMinutes, windowEnd);
+            const closeWindowStart = Math.max(windowEnd - schoolRules.closerWindowMinutes, windowStart);
+            const openerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                windowStart,
+                openWindowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (openerLeaderGaps.length > 0) {
+                const firstGap = openerLeaderGaps[ 0 ];
+                violations.push(
+                    buildViolation(
+                        "certification-per-segment",
+                        `${ day.dayOfWeek.toUpperCase() } opener window lacks a leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "opener",
+                            dayOfWeek: day.dayOfWeek,
+                            operatingHoursId: operatingHours.id,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
+
+            const closerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                closeWindowStart,
+                windowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (closerLeaderGaps.length > 0) {
+                const firstGap = closerLeaderGaps[ 0 ];
+                violations.push(
+                    buildViolation(
+                        "certification-per-segment",
+                        `${ day.dayOfWeek.toUpperCase() } closer window lacks a leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "closer",
+                            dayOfWeek: day.dayOfWeek,
+                            operatingHoursId: operatingHours.id,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
         });
-
-      if (schoolRules.requireCurrentCpr && !employees.some((employee) => employee.cprCurrent)) {
-        violations.push(
-          buildViolation(
-            "certification-per-segment",
-            `Segment ${block.dayOfWeek}/${block.segment} lacks an employee with current CPR certification`,
-            "SegmentBlock",
-            block.id,
-            citationId
-          )
-        );
-      }
-
-      if (
-        schoolRules.minimumMedicalDelegated > 0 &&
-        !employees.some((employee) => employee.medicallyDelegated)
-      ) {
-        violations.push(
-          buildViolation(
-            "certification-per-segment",
-            `Segment ${block.dayOfWeek}/${block.segment} lacks medically delegated staff`,
-            "SegmentBlock",
-            block.id,
-            citationId
-          )
-        );
-      }
-
-      if (requiresLeader && !employees.some((employee) => employee.leaderQualified)) {
-        violations.push(
-          buildViolation(
-            "certification-per-segment",
-            `Segment ${block.dayOfWeek}/${block.segment} lacks a leader-qualified employee`,
-            "SegmentBlock",
-            block.id,
-            citationId
-          )
-        );
-      }
-    });
-    return violations;
-  }
+        return violations;
+    }
 };
 
 export const segmentCoverageRule: RuleDefinition = {
-  id: "segment-coverage",
-  description: "Enforces leader and medical coverage guardrails per segment",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const schoolRules = getSchoolRules(context);
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
-        return;
-      }
-      const blockStart = parseTimeToMinutes(block.startTime);
-      const blockEnd = parseTimeToMinutes(block.endTime);
-      if (blockEnd <= blockStart) {
-        return;
-      }
-      const dayAssignments = getActiveAssignmentsForDay(context, block.dayOfWeek);
-      const citationId = getCitationId(
-        context,
-        "segment-coverage",
-        DEFAULT_POLICY_CITATIONS["segment-coverage"]
-      );
-      const leaderCoverageGaps =
-        block.segment === "open" || block.segment === "close"
-          ? evaluateConditionalLeaderCoverage(
-              dayAssignments,
-              blockStart,
-              blockEnd,
-              (entry) => context.jobTitleRules?.[entry.employee.jobTitle]?.requiresLeaderForOpenClose ?? false,
-              (entry) => entry.employee.leaderQualified
-            )
-          : [];
-
-      if (leaderCoverageGaps.length > 0) {
-        const firstGap = leaderCoverageGaps[0];
-        violations.push(
-          buildViolation(
-            "segment-coverage",
-            `Segment ${block.dayOfWeek}/${block.segment} needs at least one leader-qualified employee`,
-            "SegmentBlock",
-            block.id,
-            citationId,
-            "error",
-            {
-              startTime: formatMinutesAsTime(firstGap.start),
-              endTime: formatMinutesAsTime(firstGap.end)
+    id: "segment-coverage",
+    description: "Enforces leader and medical coverage guardrails from assignment windows",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const schoolRules = getSchoolRules(context);
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
             }
-          )
-        );
-      }
-
-      if (schoolRules.minimumMedicalDelegated > 0) {
-        const medicalCoverage = evaluateMinimumCoverage(
-          dayAssignments,
-          blockStart,
-          blockEnd,
-          1,
-          (entry) => entry.employee.medicallyDelegated
-        );
-        if (medicalCoverage.failingIntervals.length === 0) {
-          return;
-        }
-        const firstGap = medicalCoverage.failingIntervals[0];
-        violations.push(
-          buildViolation(
-            "segment-coverage",
-            `Segment ${block.dayOfWeek}/${block.segment} needs medically delegated coverage`,
-            "SegmentBlock",
-            block.id,
-            citationId,
-            "error",
-            {
-              required: 1,
-              actual: medicalCoverage.minimumActual,
-              startTime: formatMinutesAsTime(firstGap.start),
-              endTime: formatMinutesAsTime(firstGap.end)
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
             }
-          )
-        );
-      }
-    });
-    return violations;
-  }
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const citationId = getCitationId(
+                context,
+                "segment-coverage",
+                DEFAULT_POLICY_CITATIONS[ "segment-coverage" ]
+            );
+            const openerWindowEnd = Math.min(windowStart + schoolRules.openerWindowMinutes, windowEnd);
+            const closerWindowStart = Math.max(windowEnd - schoolRules.closerWindowMinutes, windowStart);
+            const openerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                windowStart,
+                openerWindowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            const closerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                closerWindowStart,
+                windowEnd,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+
+            if (openerLeaderGaps.length > 0) {
+                const firstGap = openerLeaderGaps[ 0 ];
+                violations.push(
+                    buildViolation(
+                        "segment-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } opener window needs at least one leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "opener",
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
+            if (closerLeaderGaps.length > 0) {
+                const firstGap = closerLeaderGaps[ 0 ];
+                violations.push(
+                    buildViolation(
+                        "segment-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } closer window needs at least one leader-qualified employee`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            type: "closer",
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
+
+            if (schoolRules.minimumMedicalDelegated > 0) {
+                const medicalCoverage = evaluateMinimumCoverage(
+                    dayAssignments,
+                    windowStart,
+                    windowEnd,
+                    1,
+                    (entry) => entry.employee.medicallyDelegated
+                );
+                if (medicalCoverage.failingIntervals.length > 0) {
+                    const firstGap = medicalCoverage.failingIntervals[ 0 ];
+                    violations.push(
+                        buildViolation(
+                            "segment-coverage",
+                            `${ day.dayOfWeek.toUpperCase() } operating hours need medically delegated coverage`,
+                            "ScheduleDay",
+                            day.id,
+                            citationId,
+                            "error",
+                            {
+                                required: 1,
+                                actual: medicalCoverage.minimumActual,
+                                startTime: formatMinutesAsTime(firstGap.start),
+                                endTime: formatMinutesAsTime(firstGap.end)
+                            }
+                        )
+                    );
+                }
+            }
+        });
+        return violations;
+    }
 };
 
 export const segmentBlockTimelineRule: RuleDefinition = {
-  id: "segment-block-timeline",
-  description: "Detects invalid clock windows and overlapping shifts for the same employee",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const citationId = getCitationId(
-      context,
-      "segment-block-timeline",
-      DEFAULT_POLICY_CITATIONS["segment-block-timeline"]
-    );
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
-        return;
-      }
-      const blockAssignments = getAssignmentsForBlock(context, block.id).filter(
-        (assignment) => assignment.status !== "completed"
-      );
-      const scheduleDay =
-        getScheduleDayById(context, block.scheduleDayId) ??
-        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-      const operatingHours = getOperatingHoursForDay(
-        context,
-        block.dayOfWeek,
-        scheduleDay?.dayScheduleType
-      );
-      const windows =
-        blockAssignments.length > 0
-          ? blockAssignments.map((assignment) => ({
-              entity: "StaffAssignment" as const,
-              id: assignment.id,
-              startTime: assignment.startTime,
-              endTime: assignment.endTime,
-              metadata: { relatedSegmentBlockIds: [block.id] as string[] }
-            }))
-          : [
-              {
-                entity: "SegmentBlock" as const,
-                id: block.id,
-                startTime: block.startTime,
-                endTime: block.endTime,
-                metadata: {}
-              }
-            ];
+    id: "segment-block-timeline",
+    description: "Detects invalid assignment windows and overlapping shifts for the same employee",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "segment-block-timeline",
+            DEFAULT_POLICY_CITATIONS[ "segment-block-timeline" ]
+        );
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (!dayOfWeek) {
+                    return;
+                }
+                const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+                if (scheduleDay?.scheduleType === "closed" || scheduleDay?.dayScheduleType === "closed") {
+                    return;
+                }
+                const start = parseTimeToMinutes(assignment.startTime);
+                const end = parseTimeToMinutes(assignment.endTime);
+                if (start >= end) {
+                    violations.push(
+                        buildViolation(
+                            "segment-block-timeline",
+                            `Schedule block ${ dayOfWeek.toUpperCase() } ${ assignment.startTime }-${ assignment.endTime } has an invalid window`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                startTime: assignment.startTime,
+                                endTime: assignment.endTime,
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                    return;
+                }
+                const operatingHours = getOperatingHoursForDay(context, dayOfWeek, scheduleDay?.dayScheduleType);
+                if (!operatingHours) {
+                    return;
+                }
+                const openMinutes = parseTimeToMinutes(operatingHours.open);
+                const closeMinutes = parseTimeToMinutes(operatingHours.close);
+                if (start < openMinutes) {
+                    violations.push(
+                        buildViolation(
+                            "segment-block-timeline",
+                            `Schedule block on ${ dayOfWeek.toUpperCase() } starts before operating hours (${ operatingHours.open })`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                operatingHoursId: operatingHours.id,
+                                startTime: assignment.startTime,
+                                boundary: operatingHours.open,
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                }
+                if (end > closeMinutes) {
+                    violations.push(
+                        buildViolation(
+                            "segment-block-timeline",
+                            `Schedule block on ${ dayOfWeek.toUpperCase() } ends after operating hours (${ operatingHours.close })`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                operatingHoursId: operatingHours.id,
+                                endTime: assignment.endTime,
+                                boundary: operatingHours.close,
+                                dayOfWeek,
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                }
+            });
 
-      windows.forEach((window) => {
-        const start = parseTimeToMinutes(window.startTime);
-        const end = parseTimeToMinutes(window.endTime);
-        if (start >= end) {
-          violations.push(
-            buildViolation(
-              "segment-block-timeline",
-              `Clock block ${block.dayOfWeek.toUpperCase()} ${window.startTime}-${window.endTime} has an invalid window`,
-              window.entity,
-              window.id,
-              citationId,
-              "error",
-              {
-                startTime: window.startTime,
-                endTime: window.endTime,
-                dayOfWeek: block.dayOfWeek,
-                ...window.metadata
-              }
-            )
-          );
-          return;
-        }
-        if (!operatingHours) {
-          return;
-        }
-        const openMinutes = parseTimeToMinutes(operatingHours.open);
-        const closeMinutes = parseTimeToMinutes(operatingHours.close);
-        if (start < openMinutes) {
-          violations.push(
-            buildViolation(
-              "segment-block-timeline",
-              `Clock block on ${block.dayOfWeek.toUpperCase()} starts before operating hours (${operatingHours.open})`,
-              window.entity,
-              window.id,
-              citationId,
-              "error",
-              {
-                operatingHoursId: operatingHours.id,
-                startTime: window.startTime,
-                boundary: operatingHours.open,
-                dayOfWeek: block.dayOfWeek,
-                ...window.metadata
-              }
-            )
-          );
-        }
-        if (end > closeMinutes) {
-          violations.push(
-            buildViolation(
-              "segment-block-timeline",
-              `Clock block on ${block.dayOfWeek.toUpperCase()} ends after operating hours (${operatingHours.close})`,
-              window.entity,
-              window.id,
-              citationId,
-              "error",
-              {
-                operatingHoursId: operatingHours.id,
-                endTime: window.endTime,
-                boundary: operatingHours.close,
-                dayOfWeek: block.dayOfWeek,
-                ...window.metadata
-              }
-            )
-          );
-        }
-      });
-    });
+        const assignmentsByEmployeeDay: Record<string, StaffAssignment[]> = {};
+        context.staffAssignments.forEach((assignment) => {
+            const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+            if (!dayOfWeek) {
+                return;
+            }
+            const dayMeta = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+            if (dayMeta?.scheduleType === "closed" || dayMeta?.dayScheduleType === "closed") {
+                return;
+            }
+            const key = `${ assignment.employeeId }:${ dayOfWeek }`;
+            if (!assignmentsByEmployeeDay[ key ]) {
+                assignmentsByEmployeeDay[ key ] = [];
+            }
+            assignmentsByEmployeeDay[ key ].push(assignment);
+        });
 
-    const assignmentsByEmployeeDay: Record<string, StaffAssignment[]> = {};
-    context.staffAssignments.forEach((assignment) => {
-      const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
-      if (!dayOfWeek) {
-        return;
-      }
-      const dayMeta = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
-      if (dayMeta?.scheduleType === "closed" || dayMeta?.dayScheduleType === "closed") {
-        return;
-      }
-      const key = `${assignment.employeeId}:${dayOfWeek}`;
-      if (!assignmentsByEmployeeDay[key]) {
-        assignmentsByEmployeeDay[key] = [];
-      }
-      assignmentsByEmployeeDay[key].push(assignment);
-    });
+        Object.entries(assignmentsByEmployeeDay).forEach(([ key, assignments ]) => {
+            const [ employeeId, dayOfWeek ] = key.split(":");
+            const sorted = [ ...assignments ].sort(
+                (a, b) => parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime)
+            );
+            let activeAssignment: StaffAssignment | null = null;
+            let activeEnd = 0;
 
-    Object.entries(assignmentsByEmployeeDay).forEach(([key, assignments]) => {
-      const [employeeId, dayOfWeek] = key.split(":");
-      const sorted = [...assignments].sort(
-        (a, b) => parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime)
-      );
-      let activeAssignment: StaffAssignment | null = null;
-      let activeEnd = 0;
+            sorted.forEach((assignment) => {
+                const start = parseTimeToMinutes(assignment.startTime);
+                const end = parseTimeToMinutes(assignment.endTime);
+                if (activeAssignment && start < activeEnd) {
+                    const employee = getEmployeeById(context, employeeId);
+                    const primarySegmentId = assignment.segmentBlockId;
+                    const secondarySegmentId = activeAssignment.segmentBlockId;
+                    violations.push(
+                        buildViolation(
+                            "segment-block-timeline",
+                            `${ employee?.name ?? "Employee" } has overlapping schdule blocks on ${ dayOfWeek.toUpperCase() } (${ activeAssignment.startTime }-${ activeAssignment.endTime } and ${ assignment.startTime }-${ assignment.endTime })`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                overlapsWithAssignmentId: activeAssignment.id,
+                                relatedSegmentBlockIds: [ primarySegmentId, secondarySegmentId ],
+                                dayOfWeek
+                            }
+                        )
+                    );
+                }
 
-      sorted.forEach((assignment) => {
-        const start = parseTimeToMinutes(assignment.startTime);
-        const end = parseTimeToMinutes(assignment.endTime);
-        if (activeAssignment && start < activeEnd) {
-          const employee = getEmployeeById(context, employeeId);
-          const primarySegmentId = assignment.segmentBlockId;
-          const secondarySegmentId = activeAssignment.segmentBlockId;
-          violations.push(
-            buildViolation(
-              "segment-block-timeline",
-              `${employee?.name ?? "Employee"} has overlapping clock blocks on ${dayOfWeek.toUpperCase()} (${activeAssignment.startTime}-${activeAssignment.endTime} and ${assignment.startTime}-${assignment.endTime})`,
-              "StaffAssignment",
-              assignment.id,
-              citationId,
-              "error",
-              {
-                overlapsWithAssignmentId: activeAssignment.id,
-                relatedSegmentBlockIds: [primarySegmentId, secondarySegmentId],
-                dayOfWeek
-              }
-            )
-          );
-        }
+                if (!activeAssignment || end >= activeEnd) {
+                    activeAssignment = assignment;
+                    activeEnd = end;
+                }
+            });
+        });
 
-        if (!activeAssignment || end >= activeEnd) {
-          activeAssignment = assignment;
-          activeEnd = end;
-        }
-      });
-    });
-
-    return violations;
-  }
+        return violations;
+    }
 };
 
-const normalizeDateOnly = (value: string) => value.split("T")[0];
+const normalizeDateOnly = (value: string) => value.split("T")[ 0 ];
 const isDateInRange = (date: string, startDate: string, endDate: string) => {
-  const normalized = normalizeDateOnly(date);
-  const start = normalizeDateOnly(startDate);
-  const end = normalizeDateOnly(endDate);
-  return normalized >= start && normalized <= end;
+    const normalized = normalizeDateOnly(date);
+    const start = normalizeDateOnly(startDate);
+    const end = normalizeDateOnly(endDate);
+    return normalized >= start && normalized <= end;
 };
 
 export const employeeAvailabilityRule: RuleDefinition = {
-  id: "employee-availability",
-  description:
-    "Ensures assignments only occur on days/times where each employee is available and not marked as requested time off",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const citationId = getCitationId(
-      context,
-      "employee-availability",
-      DEFAULT_POLICY_CITATIONS["employee-availability"]
-    );
-
-    context.staffAssignments
-      .filter((assignment) => assignment.status !== "completed")
-      .forEach((assignment) => {
-        const employee = getEmployeeById(context, assignment.employeeId);
-        if (!employee) {
-          return;
-        }
-        const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
-        if (!dayOfWeek) {
-          return;
-        }
-        const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
-        const date = scheduleDay?.date ? normalizeDateOnly(scheduleDay.date) : undefined;
-        const daysOff = employee.requestedDaysOff ?? [];
-        const isRequestedOff = Boolean(
-          date &&
-            daysOff.some((dayOff) => isDateInRange(date, dayOff.startDate, dayOff.endDate))
+    id: "employee-availability",
+    description:
+        "Ensures assignments only occur on days/times where each employee is available and not marked as requested time off",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "employee-availability",
+            DEFAULT_POLICY_CITATIONS[ "employee-availability" ]
         );
-        if (isRequestedOff) {
-          violations.push(
-            buildViolation(
-              "employee-availability",
-              `${employee.name} is scheduled on a requested day off (${date})`,
-              "StaffAssignment",
-              assignment.id,
-              citationId,
-              "error",
-              {
-                employeeId: employee.id,
-                employeeName: employee.name,
-                dayOfWeek,
-                date,
-                reason: "requested-day-off",
-                relatedSegmentBlockIds: [assignment.segmentBlockId]
-              }
-            )
-          );
-          return;
-        }
 
-        const availabilityForDay = employee.availability?.find((day) => day.dayOfWeek === dayOfWeek);
-        if (!availabilityForDay) {
-          return;
-        }
-        const blocks = availabilityForDay.blocks ?? [];
-        if (blocks.length === 0) {
-          violations.push(
-            buildViolation(
-              "employee-availability",
-              `${employee.name} is not available on ${dayOfWeek.toUpperCase()} but has a scheduled assignment`,
-              "StaffAssignment",
-              assignment.id,
-              citationId,
-              "error",
-              {
-                employeeId: employee.id,
-                employeeName: employee.name,
-                dayOfWeek,
-                date,
-                reason: "not-available-day",
-                relatedSegmentBlockIds: [assignment.segmentBlockId]
-              }
-            )
-          );
-          return;
-        }
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                const employee = getEmployeeById(context, assignment.employeeId);
+                if (!employee) {
+                    return;
+                }
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (!dayOfWeek) {
+                    return;
+                }
+                const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+                const date = scheduleDay?.date ? normalizeDateOnly(scheduleDay.date) : undefined;
+                const daysOff = employee.requestedDaysOff ?? [];
+                const isRequestedOff = Boolean(
+                    date &&
+                    daysOff.some((dayOff) => isDateInRange(date, dayOff.startDate, dayOff.endDate))
+                );
+                if (isRequestedOff) {
+                    violations.push(
+                        buildViolation(
+                            "employee-availability",
+                            `${ employee.name } is scheduled on a requested day off (${ date })`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                employeeId: employee.id,
+                                employeeName: employee.name,
+                                dayOfWeek,
+                                date,
+                                reason: "requested-day-off",
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                    return;
+                }
 
-        const assignmentStart = parseTimeToMinutes(assignment.startTime);
-        const assignmentEnd = parseTimeToMinutes(assignment.endTime);
-        const fitsAvailability = blocks.some((block) => {
-          const blockStart = parseTimeToMinutes(block.startTime);
-          const blockEnd = parseTimeToMinutes(block.endTime);
-          return assignmentStart >= blockStart && assignmentEnd <= blockEnd;
-        });
+                const availabilityForDay = employee.availability?.find((day) => day.dayOfWeek === dayOfWeek);
+                if (!availabilityForDay) {
+                    return;
+                }
+                const blocks = availabilityForDay.blocks ?? [];
+                if (blocks.length === 0) {
+                    violations.push(
+                        buildViolation(
+                            "employee-availability",
+                            `${ employee.name } is not available on ${ dayOfWeek.toUpperCase() } but has a scheduled assignment`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                employeeId: employee.id,
+                                employeeName: employee.name,
+                                dayOfWeek,
+                                date,
+                                reason: "not-available-day",
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                    return;
+                }
 
-        if (!fitsAvailability) {
-          violations.push(
-            buildViolation(
-              "employee-availability",
-              `${employee.name} is scheduled outside availability on ${dayOfWeek.toUpperCase()} (${assignment.startTime}-${assignment.endTime})`,
-              "StaffAssignment",
-              assignment.id,
-              citationId,
-              "error",
-              {
-                employeeId: employee.id,
-                employeeName: employee.name,
-                dayOfWeek,
-                date,
-                reason: "outside-availability-window",
-                assignmentWindow: `${assignment.startTime}-${assignment.endTime}`,
-                availableWindows: blocks.map((block) => `${block.startTime}-${block.endTime}`),
-                relatedSegmentBlockIds: [assignment.segmentBlockId]
-              }
-            )
-          );
-        }
-      });
+                const assignmentStart = parseTimeToMinutes(assignment.startTime);
+                const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+                const fitsAvailability = blocks.some((block) => {
+                    const blockStart = parseTimeToMinutes(block.startTime);
+                    const blockEnd = parseTimeToMinutes(block.endTime);
+                    return assignmentStart >= blockStart && assignmentEnd <= blockEnd;
+                });
 
-    return violations;
-  }
+                if (!fitsAvailability) {
+                    violations.push(
+                        buildViolation(
+                            "employee-availability",
+                            `${ employee.name } is scheduled outside availability on ${ dayOfWeek.toUpperCase() } (${ assignment.startTime }-${ assignment.endTime })`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            {
+                                employeeId: employee.id,
+                                employeeName: employee.name,
+                                dayOfWeek,
+                                date,
+                                reason: "outside-availability-window",
+                                assignmentWindow: `${ assignment.startTime }-${ assignment.endTime }`,
+                                availableWindows: blocks.map((block) => `${ block.startTime }-${ block.endTime }`),
+                                relatedSegmentBlockIds: [ assignment.segmentBlockId ]
+                            }
+                        )
+                    );
+                }
+            });
+
+        return violations;
+    }
 };
 
 export const shiftBreakLimitsRule: RuleDefinition = {
-  id: "shift-break-limits",
-  description: "Prevents exceeding max shift lengths or weekly hour caps",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const dailyViolations = new Set<string>();
-    const weeklyViolations = new Set<string>();
-    const dailyTotals: Record<string, Record<string, number>> = {};
-    const weeklyTotals: Record<string, number> = {};
+    id: "shift-break-limits",
+    description: "Prevents exceeding max shift lengths or weekly hour caps",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const dailyViolations = new Set<string>();
+        const weeklyViolations = new Set<string>();
+        const dailyTotals: Record<string, Record<string, number>> = {};
+        const weeklyTotals: Record<string, number> = {};
 
-    context.staffAssignments.forEach((assignment) => {
-      const employee = getEmployeeById(context, assignment.employeeId);
-      if (!employee) {
-        return;
-      }
-      const day = getDayOfWeekForAssignment(context, assignment);
-      if (!day) {
-        return;
-      }
-      const duration = calculateDurationHours(assignment.startTime, assignment.endTime);
-      if (duration <= 0) {
-        return;
-      }
-      dailyTotals[employee.id] = dailyTotals[employee.id] || {};
-      dailyTotals[employee.id][day] = (dailyTotals[employee.id][day] ?? 0) + duration;
-      weeklyTotals[employee.id] = (weeklyTotals[employee.id] ?? 0) + duration;
+        context.staffAssignments.forEach((assignment) => {
+            const employee = getEmployeeById(context, assignment.employeeId);
+            if (!employee) {
+                return;
+            }
+            const day = getDayOfWeekForAssignment(context, assignment);
+            if (!day) {
+                return;
+            }
+            const duration = calculateDurationHours(assignment.startTime, assignment.endTime);
+            if (duration <= 0) {
+                return;
+            }
+            dailyTotals[ employee.id ] = dailyTotals[ employee.id ] || {};
+            dailyTotals[ employee.id ][ day ] = (dailyTotals[ employee.id ][ day ] ?? 0) + duration;
+            weeklyTotals[ employee.id ] = (weeklyTotals[ employee.id ] ?? 0) + duration;
 
-      const cumulativeDay = dailyTotals[employee.id][day];
-      if (
-        employee.maxHoursPerDay > 0 &&
-        cumulativeDay > employee.maxHoursPerDay &&
-        !dailyViolations.has(`${employee.id}:${day}`)
-      ) {
-        dailyViolations.add(`${employee.id}:${day}`);
-        const citationId = getCitationId(context, "shift-break-limits", employee.id);
-        violations.push(
-          buildViolation(
-            "shift-break-limits",
-            `${employee.name} exceeds daily limit (${cumulativeDay.toFixed(2)}h > ${employee.maxHoursPerDay}h)`,
-            "StaffAssignment",
-            assignment.id,
-            citationId,
-            "error",
-            { employeeId: employee.id, day }
-          )
-        );
-      }
+            const cumulativeDay = dailyTotals[ employee.id ][ day ];
+            if (
+                employee.maxHoursPerDay > 0 &&
+                cumulativeDay > employee.maxHoursPerDay &&
+                !dailyViolations.has(`${ employee.id }:${ day }`)
+            ) {
+                dailyViolations.add(`${ employee.id }:${ day }`);
+                const citationId = getCitationId(context, "shift-break-limits", employee.id);
+                violations.push(
+                    buildViolation(
+                        "shift-break-limits",
+                        `${ employee.name } exceeds daily limit (${ cumulativeDay.toFixed(2) }h > ${ employee.maxHoursPerDay }h)`,
+                        "StaffAssignment",
+                        assignment.id,
+                        citationId,
+                        "error",
+                        { employeeId: employee.id, day }
+                    )
+                );
+            }
 
-      const cumulativeWeek = weeklyTotals[employee.id];
-      if (
-        employee.maxHoursPerWeek > 0 &&
-        cumulativeWeek > employee.maxHoursPerWeek &&
-        !weeklyViolations.has(employee.id)
-      ) {
-        weeklyViolations.add(employee.id);
-        const citationId = getCitationId(context, "shift-break-limits", employee.id);
-        violations.push(
-          buildViolation(
-            "shift-break-limits",
-            `${employee.name} exceeds weekly limit (${cumulativeWeek.toFixed(2)}h > ${employee.maxHoursPerWeek}h)`,
-            "StaffAssignment",
-            assignment.id,
-            citationId,
-            "error",
-            { employeeId: employee.id }
-          )
-        );
-      }
-    });
-    return violations;
-  }
+            const cumulativeWeek = weeklyTotals[ employee.id ];
+            if (
+                employee.maxHoursPerWeek > 0 &&
+                cumulativeWeek > employee.maxHoursPerWeek &&
+                !weeklyViolations.has(employee.id)
+            ) {
+                weeklyViolations.add(employee.id);
+                const citationId = getCitationId(context, "shift-break-limits", employee.id);
+                violations.push(
+                    buildViolation(
+                        "shift-break-limits",
+                        `${ employee.name } exceeds weekly limit (${ cumulativeWeek.toFixed(2) }h > ${ employee.maxHoursPerWeek }h)`,
+                        "StaffAssignment",
+                        assignment.id,
+                        citationId,
+                        "error",
+                        { employeeId: employee.id }
+                    )
+                );
+            }
+        });
+        return violations;
+    }
 };
 
 export const openCloseCoverageRule: RuleDefinition = {
-  id: "open-close-coverage",
-  description: "Ensures required opener/closer staffing and leader-qualified coverage for open/close windows",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const rules = getSchoolRules(context);
-    if (rules.openerCount <= 0 && rules.closerCount <= 0) {
-      return violations;
+    id: "open-close-coverage",
+    description: "Ensures required opener/closer staffing and leader-qualified coverage for open/close windows",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const rules = getSchoolRules(context);
+        if (rules.openerCount <= 0 && rules.closerCount <= 0) {
+            return violations;
+        }
+        const citationId = getCitationId(context, "open-close-coverage", DEFAULT_POLICY_CITATIONS[ "open-close-coverage" ]);
+
+        (context.scheduleDays ?? []).forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
+            }
+            const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!hours) {
+                return;
+            }
+            const openMinutes = parseTimeToMinutes(hours.open);
+            const closeMinutes = parseTimeToMinutes(hours.close);
+            const openerWindowEnd = openMinutes + rules.openerWindowMinutes;
+            const closerWindowStart = closeMinutes - rules.closerWindowMinutes;
+
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const openerCoverage = evaluateMinimumCoverage(
+                dayAssignments,
+                openMinutes,
+                Math.min(openerWindowEnd, closeMinutes),
+                Math.max(rules.openerCount, 0),
+                () => true
+            );
+            const closerCoverage = evaluateMinimumCoverage(
+                dayAssignments,
+                Math.max(closerWindowStart, openMinutes),
+                closeMinutes,
+                Math.max(rules.closerCount, 0),
+                () => true
+            );
+
+            if (rules.openerCount > 0 && openerCoverage.failingIntervals.length > 0) {
+                violations.push(
+                    buildViolation(
+                        "open-close-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } requires ${ rules.openerCount } opener(s) within ${ rules.openerWindowMinutes } minutes of open`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { type: "opener", required: rules.openerCount, actual: openerCoverage.minimumActual }
+                    )
+                );
+            }
+
+            if (rules.closerCount > 0 && closerCoverage.failingIntervals.length > 0) {
+                violations.push(
+                    buildViolation(
+                        "open-close-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } requires ${ rules.closerCount } closer(s) within ${ rules.closerWindowMinutes } minutes of close`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { type: "closer", required: rules.closerCount, actual: closerCoverage.minimumActual }
+                    )
+                );
+            }
+
+            const openerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                openMinutes,
+                Math.min(openerWindowEnd, closeMinutes),
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (openerLeaderGaps.length > 0) {
+                violations.push(
+                    buildViolation(
+                        "open-close-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } opener coverage requires a leader-qualified staff member`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { type: "opener", requiresLeader: true }
+                    )
+                );
+            }
+
+            const closerLeaderGaps = evaluateConditionalLeaderCoverage(
+                dayAssignments,
+                Math.max(closerWindowStart, openMinutes),
+                closeMinutes,
+                (entry) => context.jobTitleRules?.[ entry.employee.jobTitle ]?.requiresLeaderForOpenClose ?? false,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (closerLeaderGaps.length > 0) {
+                violations.push(
+                    buildViolation(
+                        "open-close-coverage",
+                        `${ day.dayOfWeek.toUpperCase() } closer coverage requires a leader-qualified staff member`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        { type: "closer", requiresLeader: true }
+                    )
+                );
+            }
+        });
+
+        return violations;
     }
-    const citationId = getCitationId(context, "open-close-coverage", DEFAULT_POLICY_CITATIONS["open-close-coverage"]);
-
-    (context.scheduleDays ?? []).forEach((day) => {
-      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
-        return;
-      }
-      const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
-      if (!hours) {
-        return;
-      }
-      const openMinutes = parseTimeToMinutes(hours.open);
-      const closeMinutes = parseTimeToMinutes(hours.close);
-      const openerWindowEnd = openMinutes + rules.openerWindowMinutes;
-      const closerWindowStart = closeMinutes - rules.closerWindowMinutes;
-
-      const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
-      const openerCoverage = evaluateMinimumCoverage(
-        dayAssignments,
-        openMinutes,
-        Math.min(openerWindowEnd, closeMinutes),
-        Math.max(rules.openerCount, 0),
-        () => true
-      );
-      const closerCoverage = evaluateMinimumCoverage(
-        dayAssignments,
-        Math.max(closerWindowStart, openMinutes),
-        closeMinutes,
-        Math.max(rules.closerCount, 0),
-        () => true
-      );
-
-      if (rules.openerCount > 0 && openerCoverage.failingIntervals.length > 0) {
-        violations.push(
-          buildViolation(
-            "open-close-coverage",
-            `${day.dayOfWeek.toUpperCase()} requires ${rules.openerCount} opener(s) within ${rules.openerWindowMinutes} minutes of open`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { type: "opener", required: rules.openerCount, actual: openerCoverage.minimumActual }
-          )
-        );
-      }
-
-      if (rules.closerCount > 0 && closerCoverage.failingIntervals.length > 0) {
-        violations.push(
-          buildViolation(
-            "open-close-coverage",
-            `${day.dayOfWeek.toUpperCase()} requires ${rules.closerCount} closer(s) within ${rules.closerWindowMinutes} minutes of close`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { type: "closer", required: rules.closerCount, actual: closerCoverage.minimumActual }
-          )
-        );
-      }
-
-      const openerLeaderGaps = evaluateConditionalLeaderCoverage(
-        dayAssignments,
-        openMinutes,
-        Math.min(openerWindowEnd, closeMinutes),
-        (entry) => context.jobTitleRules?.[entry.employee.jobTitle]?.requiresLeaderForOpenClose ?? false,
-        (entry) => entry.employee.leaderQualified
-      );
-      if (openerLeaderGaps.length > 0) {
-        violations.push(
-          buildViolation(
-            "open-close-coverage",
-            `${day.dayOfWeek.toUpperCase()} opener coverage requires a leader-qualified staff member`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { type: "opener", requiresLeader: true }
-          )
-        );
-      }
-
-      const closerLeaderGaps = evaluateConditionalLeaderCoverage(
-        dayAssignments,
-        Math.max(closerWindowStart, openMinutes),
-        closeMinutes,
-        (entry) => context.jobTitleRules?.[entry.employee.jobTitle]?.requiresLeaderForOpenClose ?? false,
-        (entry) => entry.employee.leaderQualified
-      );
-      if (closerLeaderGaps.length > 0) {
-        violations.push(
-          buildViolation(
-            "open-close-coverage",
-            `${day.dayOfWeek.toUpperCase()} closer coverage requires a leader-qualified staff member`,
-            "ScheduleDay",
-            day.id,
-            citationId,
-            "error",
-            { type: "closer", requiresLeader: true }
-          )
-        );
-      }
-    });
-
-    return violations;
-  }
 };
 
 export const medicalDelegatedCoverageRule: RuleDefinition = {
-  id: "medical-delegated-coverage",
-  description: "Requires minimum medically delegated staff per segment block",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const rules = getSchoolRules(context);
-    if (rules.minimumMedicalDelegated <= 0) {
-      return violations;
+    id: "medical-delegated-coverage",
+    description: "Requires minimum medically delegated staff across operating hours",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const rules = getSchoolRules(context);
+        if (rules.minimumMedicalDelegated <= 0) {
+            return violations;
+        }
+
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
+            }
+
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
+            }
+
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const coverage = evaluateMinimumCoverage(
+                dayAssignments,
+                windowStart,
+                windowEnd,
+                rules.minimumMedicalDelegated,
+                (entry) => entry.employee.medicallyDelegated
+            );
+            if (coverage.failingIntervals.length === 0) {
+                return;
+            }
+            const citationId = getCitationId(
+                context,
+                "medical-delegated-coverage",
+                DEFAULT_POLICY_CITATIONS[ "medical-delegated-coverage" ]
+            );
+            const firstGap = coverage.failingIntervals[ 0 ];
+            const relatedSegmentBlockIds = Array.from(
+                new Set(
+                    dayAssignments
+                        .map((entry) => entry.assignment.segmentBlockId)
+                        .filter((segmentBlockId) => Boolean(segmentBlockId))
+                )
+            );
+            violations.push(
+                buildViolation(
+                    "medical-delegated-coverage",
+                    `${ day.dayOfWeek.toUpperCase() } operating hours require ${ rules.minimumMedicalDelegated } medically delegated staff`,
+                    "ScheduleDay",
+                    day.id,
+                    citationId,
+                    "error",
+                    {
+                        required: rules.minimumMedicalDelegated,
+                        actual: coverage.minimumActual,
+                        dayOfWeek: day.dayOfWeek,
+                        operatingHoursId: operatingHours.id,
+                        boundaryStart: operatingHours.open,
+                        boundaryEnd: operatingHours.close,
+                        startTime: formatMinutesAsTime(firstGap.start),
+                        endTime: formatMinutesAsTime(firstGap.end),
+                        relatedSegmentBlockIds
+                    }
+                )
+            );
+        });
+        return violations;
     }
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
-        return;
-      }
-      const blockStart = parseTimeToMinutes(block.startTime);
-      const blockEnd = parseTimeToMinutes(block.endTime);
-      if (blockEnd <= blockStart) {
-        return;
-      }
-      const dayAssignments = getActiveAssignmentsForDay(context, block.dayOfWeek);
-      const coverage = evaluateMinimumCoverage(
-        dayAssignments,
-        blockStart,
-        blockEnd,
-        rules.minimumMedicalDelegated,
-        (entry) => entry.employee.medicallyDelegated
-      );
-      if (coverage.failingIntervals.length === 0) {
-        return;
-      }
-      const citationId = getCitationId(
-        context,
-        "medical-delegated-coverage",
-        DEFAULT_POLICY_CITATIONS["medical-delegated-coverage"]
-      );
-      const firstGap = coverage.failingIntervals[0];
-      violations.push(
-        buildViolation(
-          "medical-delegated-coverage",
-          `${block.dayOfWeek.toUpperCase()} ${block.segment} requires ${rules.minimumMedicalDelegated} medically delegated staff`,
-          "SegmentBlock",
-          block.id,
-          citationId,
-          "error",
-          {
-            required: rules.minimumMedicalDelegated,
-            actual: coverage.minimumActual,
-            dayOfWeek: block.dayOfWeek,
-            startTime: formatMinutesAsTime(firstGap.start),
-            endTime: formatMinutesAsTime(firstGap.end),
-            relatedSegmentBlockIds: [block.id]
-          }
-        )
-      );
-    });
-    return violations;
-  }
 };
 
 export const cprCurrentRequiredRule: RuleDefinition = {
-  id: "cpr-current-required",
-  description: "Prevents scheduling staff with lapsed CPR when current CPR is required",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const rules = getSchoolRules(context);
-    if (!rules.requireCurrentCpr) {
-      return violations;
+    id: "cpr-current-required",
+    description: "Prevents scheduling staff with lapsed CPR when current CPR is required",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const rules = getSchoolRules(context);
+        if (!rules.requireCurrentCpr) {
+            return violations;
+        }
+        context.staffAssignments.forEach((assignment) => {
+            const employee = getEmployeeById(context, assignment.employeeId);
+            if (!employee) {
+                return;
+            }
+            if (!employee.cprCurrent) {
+                const citationId = getCitationId(
+                    context,
+                    "cpr-current-required",
+                    DEFAULT_POLICY_CITATIONS[ "cpr-current-required" ]
+                );
+                violations.push(
+                    buildViolation(
+                        "cpr-current-required",
+                        `${ employee.name } cannot be scheduled without current CPR certification`,
+                        "StaffAssignment",
+                        assignment.id,
+                        citationId,
+                        "error",
+                        { employeeId: employee.id }
+                    )
+                );
+            }
+        });
+        return violations;
     }
-    context.staffAssignments.forEach((assignment) => {
-      const employee = getEmployeeById(context, assignment.employeeId);
-      if (!employee) {
-        return;
-      }
-      if (!employee.cprCurrent) {
-        const citationId = getCitationId(
-          context,
-          "cpr-current-required",
-          DEFAULT_POLICY_CITATIONS["cpr-current-required"]
-        );
-        violations.push(
-          buildViolation(
-            "cpr-current-required",
-            `${employee.name} cannot be scheduled without current CPR certification`,
-            "StaffAssignment",
-            assignment.id,
-            citationId,
-            "error",
-            { employeeId: employee.id }
-          )
-        );
-      }
-    });
-    return violations;
-  }
 };
 
 export const fieldTripEventIntegrityRule: RuleDefinition = {
-  id: "field-trip-event",
-  description:
-    "Field trip events must either declare “No Field Trip” or point to an existing FieldTripType before they can be applied",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    const citationId = getCitationId(
-      context,
-      "field-trip-event",
-      DEFAULT_POLICY_CITATIONS["field-trip-event"]
-    );
-    context.fieldTripEvents.forEach((event) => {
-      const scheduleDay =
-        getScheduleDayById(context, event.scheduleDayId) ??
-        context.scheduleDays.find((day) => day.dayOfWeek === event.dayOfWeek);
-      if (scheduleDay && (scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed")) {
-        return;
-      }
+    id: "field-trip-event",
+    description:
+        "Field trip events must either declare “No Field Trip” or point to an existing FieldTripType before they can be applied",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "field-trip-event",
+            DEFAULT_POLICY_CITATIONS[ "field-trip-event" ]
+        );
+        context.fieldTripEvents.forEach((event) => {
+            const scheduleDay =
+                getScheduleDayById(context, event.scheduleDayId) ??
+                context.scheduleDays.find((day) => day.dayOfWeek === event.dayOfWeek);
+            if (scheduleDay && (scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed")) {
+                return;
+            }
 
-      const noFieldTripSelected = !event.fieldTripTypeId || event.isNoFieldTrip === true;
-      if (noFieldTripSelected) {
-        return;
-      }
-      if (!event.fieldTripTypeId) {
-        violations.push(
-          buildViolation(
-            "field-trip-event",
-            `Field trip for ${event.dayOfWeek.toUpperCase()} must reference a field trip type or declare "No Field Trip"`,
-            "FieldTripEvent",
-            event.id,
-            citationId,
-            "error",
-            { missing: ["fieldTripTypeId", "isNoFieldTrip"], dayOfWeek: event.dayOfWeek }
-          )
-        );
-        return;
-      }
-      const typeExists = context.fieldTripTypes.some((type) => type.id === event.fieldTripTypeId);
-      if (!typeExists) {
-        violations.push(
-          buildViolation(
-            "field-trip-event",
-            `Field trip for ${event.dayOfWeek.toUpperCase()} points to an unknown field trip type`,
-            "FieldTripEvent",
-            event.id,
-            citationId,
-            "error",
-            { fieldTripTypeId: event.fieldTripTypeId, dayOfWeek: event.dayOfWeek }
-          )
-        );
-      }
-    });
-    return violations;
-  }
+            const noFieldTripSelected = !event.fieldTripTypeId || event.isNoFieldTrip === true;
+            if (noFieldTripSelected) {
+                return;
+            }
+            if (!event.fieldTripTypeId) {
+                violations.push(
+                    buildViolation(
+                        "field-trip-event",
+                        `Field trip for ${ event.dayOfWeek.toUpperCase() } must reference a field trip type or declare "No Field Trip"`,
+                        "FieldTripEvent",
+                        event.id,
+                        citationId,
+                        "error",
+                        { missing: [ "fieldTripTypeId", "isNoFieldTrip" ], dayOfWeek: event.dayOfWeek }
+                    )
+                );
+                return;
+            }
+            const typeExists = context.fieldTripTypes.some((type) => type.id === event.fieldTripTypeId);
+            if (!typeExists) {
+                violations.push(
+                    buildViolation(
+                        "field-trip-event",
+                        `Field trip for ${ event.dayOfWeek.toUpperCase() } points to an unknown field trip type`,
+                        "FieldTripEvent",
+                        event.id,
+                        citationId,
+                        "error",
+                        { fieldTripTypeId: event.fieldTripTypeId, dayOfWeek: event.dayOfWeek }
+                    )
+                );
+            }
+        });
+        return violations;
+    }
 };
 
 export const fieldTripRatiosRule: RuleDefinition = {
-  id: "field-trip-ratios",
-  description: "Applies field trip leader ratios for segments on days with field trips",
-  evaluate: (context: RulesContext) => {
-    const violations: RuleViolation[] = [];
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
-        return;
-      }
-      const scheduleDay =
-        getScheduleDayById(context, block.scheduleDayId) ??
-        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-      const event = context.fieldTripEvents.find((candidate) => {
-        if (candidate.dayOfWeek !== block.dayOfWeek) {
-          return false;
-        }
-        if (candidate.scheduleDayId && scheduleDay?.id && candidate.scheduleDayId !== scheduleDay.id) {
-          return false;
-        }
-        return Boolean(candidate.fieldTripTypeId) && !candidate.isNoFieldTrip;
-      });
-      const type = event && getFieldTripTypeById(context, event.fieldTripTypeId);
-      if (!event || !type || type.leaderRatioStudents <= 0) {
-        return;
-      }
-      const effectiveChildCount =
-        typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
-      // Field trip ratios: leaderRatioAdults:leaderRatioStudents (e.g., 1:30 ratio)
-      const childrenPerLeader = type.leaderRatioStudents / type.leaderRatioAdults;
-      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / childrenPerLeader));
-      const blockStart = parseTimeToMinutes(block.startTime);
-      const blockEnd = parseTimeToMinutes(block.endTime);
-      const assignedLeaderIds = new Set(
-        context.staffAssignments
-          .filter((assignment) => assignment.status !== "completed")
-          .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === block.dayOfWeek)
-          .filter((assignment) => {
-            const assignmentStart = parseTimeToMinutes(assignment.startTime);
-            const assignmentEnd = parseTimeToMinutes(assignment.endTime);
-            return assignmentStart < blockEnd && assignmentEnd > blockStart;
-          })
-          .map((assignment) => getEmployeeById(context, assignment.employeeId))
-          .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee?.leaderQualified))
-          .map((employee) => employee.id)
-      );
-      if (assignedLeaderIds.size < requiredLeaders) {
-        const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
-        violations.push(
-          buildViolation(
-            "field-trip-ratios",
-            `Field trip ${block.dayOfWeek.toUpperCase()} ${block.segment} needs ${requiredLeaders} leaders but only ${assignedLeaderIds.size} assigned`,
-            "SegmentBlock",
-            block.id,
-            citationId,
-            "error",
-            {
-              assignedLeaders: assignedLeaderIds.size,
-              requiredLeaders,
-              dayOfWeek: block.dayOfWeek
+    id: "field-trip-ratios",
+    description: "Applies field trip leader ratios across assignment windows on days with field trips",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        context.scheduleDays.forEach((day) => {
+            if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+                return;
             }
-          )
-        );
-      }
-    });
-    return violations;
-  }
+            const event = context.fieldTripEvents.find((candidate) => {
+                if (candidate.dayOfWeek !== day.dayOfWeek) {
+                    return false;
+                }
+                if (candidate.scheduleDayId && candidate.scheduleDayId !== day.id) {
+                    return false;
+                }
+                return Boolean(candidate.fieldTripTypeId) && !candidate.isNoFieldTrip;
+            });
+            const type = event && getFieldTripTypeById(context, event.fieldTripTypeId);
+            if (!event || !type || type.leaderRatioStudents <= 0) {
+                return;
+            }
+            const effectiveChildCount = typeof day.enrollmentCount === "number" ? day.enrollmentCount : 0;
+            // Field trip ratios: leaderRatioAdults:leaderRatioStudents (e.g., 1:30 ratio)
+            const childrenPerLeader = type.leaderRatioStudents / type.leaderRatioAdults;
+            const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / childrenPerLeader));
+            const operatingHours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+            if (!operatingHours) {
+                return;
+            }
+            const windowStart = parseTimeToMinutes(operatingHours.open);
+            const windowEnd = parseTimeToMinutes(operatingHours.close);
+            if (windowEnd <= windowStart) {
+                return;
+            }
+            const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
+            const leaderCoverage = evaluateMinimumCoverage(
+                dayAssignments,
+                windowStart,
+                windowEnd,
+                requiredLeaders,
+                (entry) => entry.employee.leaderQualified
+            );
+            if (leaderCoverage.failingIntervals.length > 0) {
+                const firstGap = leaderCoverage.failingIntervals[ 0 ];
+                const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
+                violations.push(
+                    buildViolation(
+                        "field-trip-ratios",
+                        `Field trip ${ day.dayOfWeek.toUpperCase() } needs ${ requiredLeaders } leaders but only ${ leaderCoverage.minimumActual } assigned`,
+                        "ScheduleDay",
+                        day.id,
+                        citationId,
+                        "error",
+                        {
+                            assignedLeaders: leaderCoverage.minimumActual,
+                            requiredLeaders,
+                            dayOfWeek: day.dayOfWeek,
+                            startTime: formatMinutesAsTime(firstGap.start),
+                            endTime: formatMinutesAsTime(firstGap.end)
+                        }
+                    )
+                );
+            }
+        });
+        return violations;
+    }
 };
 
 export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
-  scheduleDayMetadataRule,
-  ratioSegmentRule,
-  segmentBlockTimelineRule,
-  employeeAvailabilityRule,
-  shiftBreakLimitsRule,
-  openCloseCoverageRule,
-  medicalDelegatedCoverageRule,
-  cprCurrentRequiredRule,
-  fieldTripEventIntegrityRule,
-  fieldTripRatiosRule
+    scheduleDayMetadataRule,
+    ratioSegmentRule,
+    segmentBlockTimelineRule,
+    employeeAvailabilityRule,
+    shiftBreakLimitsRule,
+    openCloseCoverageRule,
+    medicalDelegatedCoverageRule,
+    cprCurrentRequiredRule,
+    fieldTripEventIntegrityRule,
+    fieldTripRatiosRule
 ];

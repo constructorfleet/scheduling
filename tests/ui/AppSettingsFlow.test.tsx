@@ -1,11 +1,13 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import App from "../../apps/ui/App";
 import * as apiClient from "../../apps/ui/data/apiClient";
 import { daySequence, weekMeta } from "../../apps/ui/data/runtimeDefaults";
 import type { ScheduleWeekResponse } from "../../apps/ui/data/generated";
 
 jest.mock("../../apps/ui/data/apiClient");
+// Load App after apiClient is mocked so auth/session calls are stubbed in tests.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const App = require("../../apps/ui/App").default as typeof import("../../apps/ui/App").default;
 
 const buildSchedule = (weekId: string, startDate: string): ScheduleWeekResponse => {
   const scheduleDays = daySequence.map((day, index) => ({
@@ -45,9 +47,18 @@ describe("App settings flow", () => {
   const fetchSettingsMock = apiClient.fetchSettings as jest.MockedFunction<typeof apiClient.fetchSettings>;
   const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
   const saveSettingsMock = apiClient.saveSettings as jest.MockedFunction<typeof apiClient.saveSettings>;
+  const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    fetchAuthMeMock.mockResolvedValue({
+      user: {
+        id: "user-1",
+        email: "director@example.com",
+        displayName: "Director"
+      },
+      memberships: [{ schoolId: "school-evergreen", role: "director" }]
+    });
     fetchSettingsMock.mockResolvedValue({
       school: {
         id: "school-evergreen",

@@ -22,6 +22,11 @@ describe("WeekNavigationBanner", () => {
     onOpenSettings: jest.fn(),
     isSettingsOpen: false,
     onAutoSchedule: jest.fn(),
+    canManageSettings: true,
+    canEditSchedule: true,
+    userDisplayName: "Test User",
+    userRoleLabel: "DIRECTOR",
+    onLogout: jest.fn(),
     apiStatus: {
       state: "idle" as const,
       message: "Idle"

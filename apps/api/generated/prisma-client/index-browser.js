@@ -257,6 +257,40 @@ exports.Prisma.AuditEventScalarFieldEnum = {
   notes: 'notes'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  displayName: 'displayName',
+  status: 'status',
+  failedLoginAttempts: 'failedLoginAttempts',
+  lockoutUntil: 'lockoutUntil',
+  lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SchoolMembershipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  schoolId: 'schoolId',
+  role: 'role',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -286,7 +320,17 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.UserStatus = exports.$Enums.UserStatus = {
+  active: 'active',
+  disabled: 'disabled'
+};
 
+exports.Role = exports.$Enums.Role = {
+  owner: 'owner',
+  director: 'director',
+  scheduler: 'scheduler',
+  viewer: 'viewer'
+};
 
 exports.Prisma.ModelName = {
   School: 'School',
@@ -300,7 +344,10 @@ exports.Prisma.ModelName = {
   FieldTripEvent: 'FieldTripEvent',
   SegmentBlock: 'SegmentBlock',
   StaffAssignment: 'StaffAssignment',
-  AuditEvent: 'AuditEvent'
+  AuditEvent: 'AuditEvent',
+  User: 'User',
+  SchoolMembership: 'SchoolMembership',
+  Session: 'Session'
 };
 
 /**
