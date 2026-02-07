@@ -30,7 +30,7 @@ interface ScheduleMatrixProps {
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
-  focusedSegmentId?: string | null;
+  focusedSegmentIds?: string[] | null;
 }
 
 const formatTime = (value: string) => {
@@ -75,8 +75,10 @@ export default function ScheduleMatrix({
   onFieldTripSelection,
   onUpdateAssignmentTime,
   onCreateAssignment,
-  focusedSegmentId
+  focusedSegmentIds
 }: ScheduleMatrixProps) {
+  const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
+  const primaryFocusedSegmentId = focusedSegmentIds?.[0] ?? null;
   const [editing, setEditing] = useState<{
     assignmentId?: string;
     employeeId: string;
@@ -166,11 +168,11 @@ export default function ScheduleMatrix({
   }, {} as Record<DayOfWeek, SegmentBlock[]>);
 
   useEffect(() => {
-    if (!focusedSegmentId) return;
-    const focusedSegment = segmentById[focusedSegmentId];
+    if (!primaryFocusedSegmentId) return;
+    const focusedSegment = segmentById[primaryFocusedSegmentId];
     const target =
       document.querySelector<HTMLElement>(
-        `[data-segment-id="${focusedSegmentId}"]:not([data-segment-anchor="true"])`
+        `[data-segment-id="${primaryFocusedSegmentId}"]:not([data-segment-anchor="true"])`
       ) ??
       (focusedSegment
         ? document.querySelector<HTMLElement>(`[data-day-column-header="${focusedSegment.dayOfWeek}"]`)
@@ -178,7 +180,7 @@ export default function ScheduleMatrix({
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
-  }, [focusedSegmentId, segmentById]);
+  }, [primaryFocusedSegmentId, segmentById]);
 
   return (
     <motion.section
@@ -229,7 +231,7 @@ export default function ScheduleMatrix({
             {daySequence.map((day) => {
               const dayMeta = dayMetadataByDay[day];
               const fieldTripEvent = fieldTripEventsByDay[day];
-              const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
+              const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
               const isFocusedDay = focusedDay === day;
               const closedDay = isClosedDay(day);
               return (
@@ -426,7 +428,7 @@ export default function ScheduleMatrix({
                   const dayHours = getHoursForDay(member.id, day);
                   const isOverDaily = dayHours > member.maxHoursPerDay;
                   const cellBorder = isOverDaily ? "2px solid #dc2626" : "1px solid #e5e7eb";
-                  const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
+                  const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
                   const isFocusedDay = focusedDay === day;
                   const closedDay = isClosedDay(day);
 
@@ -499,7 +501,7 @@ export default function ScheduleMatrix({
                                 ? "rgba(132, 0, 255, 0.25)"
                                 : "#ecfeff";
                           const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
-                          const isFocused = focusedSegmentId === block.segmentBlockId;
+                          const isFocused = focusedSet.has(block.segmentBlockId);
 
                           return (
                             <motion.div

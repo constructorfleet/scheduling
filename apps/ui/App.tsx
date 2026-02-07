@@ -56,7 +56,12 @@ const RULE_TITLES: Record<string, string> = {
   "field-trip-ratios": "Field trip ratio",
   "open-close-coverage": "Open/close coverage",
   "medical-delegated-coverage": "Medical delegation",
-  "cpr-current-required": "CPR current required"
+  "cpr-current-required": "CPR current required",
+  "schedule-day-metadata": "Missing day details",
+  "segment-block-timeline": "Clock block timeline issue",
+  "field-trip-event": "Field trip data issue",
+  "certification-per-segment": "Certification coverage gap",
+  "segment-coverage": "Coverage gap"
 };
 
 const RECOMMENDED_ACTIONS: Record<string, string> = {
@@ -677,7 +682,26 @@ export default function App() {
     if (target.entity === "FieldTripEvent") {
       return segmentBlocksState.find((block) => block.fieldTripEventId === target.id)?.id;
     }
+    if (target.entity === "ScheduleDay") {
+      const day = scheduleDaysState.find((item) => item.id === target.id);
+      if (!day) {
+        return undefined;
+      }
+      return segmentBlocksState.find((block) => block.scheduleDayId === day.id || block.dayOfWeek === day.dayOfWeek)?.id;
+    }
     return undefined;
+  };
+
+  const getSegmentDisplayLabel = (segmentId?: string) => {
+    if (!segmentId) {
+      return "Clock block";
+    }
+    const block = segmentBlocksState.find((item) => item.id === segmentId);
+    if (!block) {
+      return "Clock block";
+    }
+    const dayLabel = dayDisplayNames[block.dayOfWeek]?.toUpperCase() ?? block.dayOfWeek.toUpperCase();
+    return `${dayLabel} ${block.startTime}-${block.endTime}`;
   };
 
   const violationRecords = useMemo(() => {
@@ -690,19 +714,32 @@ export default function App() {
           document: "Rules engine"
         } as PolicyCitation);
       const segmentBlockId = resolveSegmentBlockId(engineViolation.target) ?? engineViolation.target.id;
+      const relatedSegmentBlockIds = Array.isArray(engineViolation.target.metadata?.relatedSegmentBlockIds)
+        ? (engineViolation.target.metadata?.relatedSegmentBlockIds as string[])
+        : [];
+      const segmentLabel = getSegmentDisplayLabel(segmentBlockId);
+      const relatedLabel = relatedSegmentBlockIds[0]
+        ? getSegmentDisplayLabel(relatedSegmentBlockIds[0])
+        : "";
+      const description = engineViolation.ruleId === "segment-block-timeline" &&
+        relatedSegmentBlockIds.length > 0 &&
+        relatedLabel
+        ? `${segmentLabel} overlaps ${relatedLabel}.`
+        : engineViolation.message;
 
       return {
         id: engineViolation.id,
         title: RULE_TITLES[engineViolation.ruleId] ?? engineViolation.ruleId,
         severity: SEVERITY_MAP[engineViolation.severity] ?? "warning",
-        description: engineViolation.message,
+        description,
         segmentBlockId,
+        relatedSegmentBlockIds,
         policyCitation: citation,
         recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage.",
         metadata: engineViolation.target.metadata
       } satisfies UiRuleViolation;
     });
-  }, [ruleViolationsFromEngine, policyCitations, segmentBlocksState, staffAssignmentsState]);
+  }, [ruleViolationsFromEngine, policyCitations, segmentBlocksState, staffAssignmentsState, scheduleDaysState]);
 
   const validationComplete = violationRecords.length === 0;
   const readyToPublish = validationComplete;
@@ -808,16 +845,16 @@ export default function App() {
     }
   };
 
-  const [focusedSegmentId, setFocusedSegmentId] = useState<string | null>(null);
+  const [focusedSegmentIds, setFocusedSegmentIds] = useState<string[]>([]);
   const focusResetRef = useRef<number | null>(null);
 
-  const handleFocusSegment = (segmentId: string) => {
-    setFocusedSegmentId(segmentId);
+  const handleFocusSegments = (segmentIds: string[]) => {
+    setFocusedSegmentIds(segmentIds);
     if (focusResetRef.current) {
       window.clearTimeout(focusResetRef.current);
     }
     focusResetRef.current = window.setTimeout(() => {
-      setFocusedSegmentId((prev) => (prev === segmentId ? null : prev));
+      setFocusedSegmentIds((prev) => (prev.length ? [] : prev));
     }, 2500);
   };
 
@@ -993,7 +1030,7 @@ export default function App() {
             ]);
             setSegmentBlocksState((prev) => [...prev, newBlock]);
           }}
-          focusedSegmentId={focusedSegmentId}
+          focusedSegmentIds={focusedSegmentIds}
         />
       </motion.div>
 
@@ -1001,7 +1038,7 @@ export default function App() {
         {showViolationNavigator && (
           <ViolationNavigator
             violations={violationRecords}
-            onFocusSegment={handleFocusSegment}
+            onFocusSegments={handleFocusSegments}
             isOpen={showViolationNavigator}
             onClose={() => setShowViolationNavigator(false)}
           />

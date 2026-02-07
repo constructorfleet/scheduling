@@ -4,7 +4,7 @@ import { RuleViolation } from "../types";
 
 interface ViolationNavigatorProps {
   violations: RuleViolation[];
-  onFocusSegment: (segmentId: string) => void;
+  onFocusSegments: (segmentIds: string[]) => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -17,7 +17,7 @@ const severityStyles: Record<RuleViolation["severity"], { label: string; color: 
 
 export default function ViolationNavigator({
   violations,
-  onFocusSegment,
+  onFocusSegments,
   isOpen,
   onClose
 }: ViolationNavigatorProps) {
@@ -67,7 +67,7 @@ export default function ViolationNavigator({
     setIsDragging(false);
   };
 
-  const getTargetForSegment = (segmentId: string) => {
+  const getTargetForSegment = (segmentId: string, dayOfWeek?: string) => {
     const visibleTimeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
     if (visibleTimeline && visibleTimeline.offsetParent !== null) {
       return visibleTimeline;
@@ -78,20 +78,23 @@ export default function ViolationNavigator({
     if (visibleBlock && visibleBlock.offsetParent !== null) {
       return visibleBlock;
     }
-    const anchor = document.querySelector<HTMLElement>(`[data-segment-anchor-id="${segmentId}"]`);
-    const dayColumn = anchor?.closest("td")?.cellIndex;
-    if (typeof dayColumn === "number" && dayColumn > 0) {
-      const header = document.querySelector<HTMLElement>(`th:nth-child(${dayColumn + 1})[data-day-column-header]`);
-      if (header) {
+    if (dayOfWeek) {
+      const header = document.querySelector<HTMLElement>(`[data-day-column-header="${dayOfWeek}"]`);
+      if (header && header.offsetParent !== null) {
         return header;
       }
+    }
+    const anchor = document.querySelector<HTMLElement>(`[data-segment-anchor-id="${segmentId}"]`);
+    if (anchor && anchor.offsetParent !== null) {
+      return anchor;
     }
     return anchor;
   };
 
-  const adjustForTarget = (segmentId: string) => {
+  const adjustForTarget = (segmentIds: string[], dayOfWeek?: string) => {
     const overlay = containerRef.current;
-    const target = getTargetForSegment(segmentId);
+    const target =
+      segmentIds.map((segmentId) => getTargetForSegment(segmentId, dayOfWeek)).find(Boolean) ?? null;
     if (!overlay || !target) return;
     const overlayRect = overlay.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
@@ -262,8 +265,16 @@ export default function ViolationNavigator({
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.35rem" }}>
                 <button
                   onClick={() => {
-                    onFocusSegment(violation.segmentBlockId);
-                    window.setTimeout(() => adjustForTarget(violation.segmentBlockId), 220);
+                    const segmentIds = [
+                      violation.segmentBlockId,
+                      ...(violation.relatedSegmentBlockIds ?? [])
+                    ];
+                    const uniqueSegmentIds = Array.from(new Set(segmentIds.filter(Boolean)));
+                    onFocusSegments(uniqueSegmentIds);
+                    window.setTimeout(
+                      () => adjustForTarget(uniqueSegmentIds, String(violation.metadata?.dayOfWeek ?? "")),
+                      220
+                    );
                   }}
                   style={{
                     borderRadius: 999,

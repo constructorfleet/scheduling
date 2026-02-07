@@ -35,7 +35,7 @@ const violations: RuleViolation[] = [
 
 describe("ViolationNavigator", () => {
   it("renders violation cards with severity badges and action buttons", () => {
-    render(<ViolationNavigator violations={violations} onFocusSegment={jest.fn()} isOpen={true} onClose={() => {}} />);
+    render(<ViolationNavigator violations={violations} onFocusSegments={jest.fn()} isOpen={true} onClose={() => {}} />);
 
     expect(screen.getByText("Critical")).toBeInTheDocument();
     expect(screen.getByText("Operating hours guardrail")).toBeInTheDocument();
@@ -48,9 +48,9 @@ describe("ViolationNavigator", () => {
   it("calls handlers when action buttons are used", () => {
     const focus = jest.fn();
 
-    render(<ViolationNavigator violations={violations} onFocusSegment={focus} isOpen={true} onClose={() => {}} />);
+    render(<ViolationNavigator violations={violations} onFocusSegments={focus} isOpen={true} onClose={() => {}} />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "Jump to block" })[0]);
-    expect(focus).toHaveBeenCalledWith("segment-mon-open");
+    expect(focus).toHaveBeenCalledWith(["segment-mon-open"]);
   });
 });

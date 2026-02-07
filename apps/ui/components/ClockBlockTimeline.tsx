@@ -17,7 +17,7 @@ interface ClockBlockTimelineProps {
   assignments: StaffAssignment[];
   employees: Employee[];
   violations: RuleViolation[];
-  focusedSegmentId?: string;
+  focusedSegmentIds?: string[];
   schoolRules?: Pick<SchoolRules, "openerCount" | "closerCount">;
   scheduleDays: Array<{ id: string; dayOfWeek: DayOfWeek; scheduleType?: string }>;
   scheduleTypeRatios: Record<string, number>;
@@ -56,7 +56,7 @@ export default function ClockBlockTimeline({
   assignments,
   employees,
   violations,
-  focusedSegmentId,
+  focusedSegmentIds,
   schoolRules,
   scheduleDays,
   scheduleTypeRatios,
@@ -68,6 +68,8 @@ export default function ClockBlockTimeline({
   segmentSlotDefinitions,
   onAddClockBlock
 }: ClockBlockTimelineProps) {
+  const focusedSet = new Set(focusedSegmentIds ?? []);
+  const primaryFocusedSegmentId = focusedSegmentIds?.[0];
   const assignmentsByBlock = assignments.reduce<Record<string, StaffAssignment[]>>((map, assignment) => {
     if (!map[assignment.segmentBlockId]) {
       map[assignment.segmentBlockId] = [];
@@ -116,12 +118,12 @@ export default function ClockBlockTimeline({
   const timelineHeight = 360;
 
   useEffect(() => {
-    if (!focusedSegmentId) return;
-    const target = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${focusedSegmentId}"]`);
+    if (!primaryFocusedSegmentId) return;
+    const target = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${primaryFocusedSegmentId}"]`);
     if (target && typeof target.scrollIntoView === "function") {
       target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
-  }, [focusedSegmentId]);
+  }, [primaryFocusedSegmentId]);
 
   const segmentsByDay = daySequence.reduce<Record<DayOfWeek, SegmentBlock[]>>((map, day) => {
     map[day] = segments
@@ -459,7 +461,7 @@ export default function ClockBlockTimeline({
                     );
                     const hasLeader = assignedStaff.some((employee) => employee.leaderQualified);
                     const violationsForBlock = violationsByBlock[segment.id] ?? [];
-                    const blockFocused = focusedSegmentId === segment.id;
+                    const blockFocused = focusedSet.has(segment.id);
                     const hasGuardrailViolation = violationsForBlock.some(
                       (violation) => Boolean(violation.metadata?.operatingHoursId)
                     );

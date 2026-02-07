@@ -234,6 +234,50 @@ export default function SettingsPanel({
 
   const canSaveOperatingHours = dirtyTabs.operatingHours && operatingHoursOverlap.length === 0;
 
+  const saveActiveTab = () => {
+    if (activeTab === "school") {
+      onUpdateSchoolName(draftSchoolName);
+      onUpdateClosedDays(draftClosedDays);
+      onUpdateSchoolRules(draftSchoolRules);
+      resetDirty("school");
+      setTabWarning(null);
+      return;
+    }
+    if (activeTab === "scheduleTypes") {
+      onUpdateScheduleTypes(draftScheduleTypes);
+      resetDirty("scheduleTypes");
+      setTabWarning(null);
+      return;
+    }
+    if (activeTab === "operatingHours") {
+      if (operatingHoursOverlap.length > 0) {
+        return;
+      }
+      onUpdateOperatingHoursConfig(draftOperatingHours);
+      resetDirty("operatingHours");
+      setTabWarning(null);
+      return;
+    }
+    if (activeTab === "fieldTrips") {
+      onUpdateFieldTrips(draftFieldTrips);
+      resetDirty("fieldTrips");
+      setTabWarning(null);
+      return;
+    }
+    if (activeTab === "jobTitles") {
+      onUpdateJobTitles(draftJobTitles);
+      resetDirty("jobTitles");
+      setTabWarning(null);
+      return;
+    }
+    onUpdateEmployees(draftEmployees);
+    resetDirty("employees");
+    setTabWarning(null);
+  };
+
+  const canSaveActiveTab =
+    activeTab === "operatingHours" ? canSaveOperatingHours : dirtyTabs[activeTab];
+
   if (!isOpen) {
     return null;
   }
@@ -266,7 +310,10 @@ export default function SettingsPanel({
           borderRadius: 18,
           boxShadow: "0 30px 60px rgba(15, 23, 42, 0.2)",
           border: "1px solid #e2e8f0",
-          overflow: "hidden"
+          overflow: "hidden",
+          maxHeight: "calc(100vh - 6rem)",
+          display: "flex",
+          flexDirection: "column"
         }}
       >
         <div
@@ -330,7 +377,16 @@ export default function SettingsPanel({
           ))}
         </div>
 
-        <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div
+          style={{
+            padding: "1.5rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            overflowY: "auto",
+            flex: 1
+          }}
+        >
           {tabWarning && (
             <div style={{ border: "1px solid #fecaca", background: "#fee2e2", color: "#b91c1c", padding: "0.5rem 0.75rem", borderRadius: 10 }}>
               {tabWarning}
@@ -495,6 +551,33 @@ export default function SettingsPanel({
               canSave={dirtyTabs.employees}
             />
           )}
+        </div>
+        <div
+          style={{
+            borderTop: "1px solid #e5e7eb",
+            background: "#ffffff",
+            padding: "0.75rem 1.5rem",
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: "0.75rem"
+          }}
+        >
+          <button
+            type="button"
+            onClick={saveActiveTab}
+            disabled={!canSaveActiveTab}
+            style={{
+              borderRadius: 999,
+              border: "1px solid #2563eb",
+              background: canSaveActiveTab ? "#2563eb" : "#94a3b8",
+              color: "#ffffff",
+              padding: "0.45rem 1rem",
+              cursor: canSaveActiveTab ? "pointer" : "not-allowed"
+            }}
+          >
+            Save {activeTab === "scheduleTypes" ? "schedule types" : activeTab}
+          </button>
         </div>
       </motion.div>
     </motion.section>

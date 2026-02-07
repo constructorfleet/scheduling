@@ -711,12 +711,13 @@ describe("RulesEngine", () => {
     expect(timelineViolations[0].target.id).toBe(invalidBlock.id);
     expect(timelineViolations[0].target.metadata).toEqual({
       startTime: invalidBlock.startTime,
-      endTime: invalidBlock.endTime
+      endTime: invalidBlock.endTime,
+      dayOfWeek: "mon"
     });
     expect(timelineViolations[0].message).toContain("invalid window");
   });
 
-  test("flags overlapping segment blocks on the same day", () => {
+  test("flags overlapping assignments for the same employee/day", () => {
     const dayId = "day-timeline-overlap";
     const fieldTripEvent = createFieldTripEvent("ft-day-timeline", {
       scheduleDayId: dayId,
@@ -740,8 +741,17 @@ describe("RulesEngine", () => {
     const context: RulesContext = withDefaultScheduleInfo({
       scheduleDays: [scheduleDay],
       segmentBlocks: [firstBlock, overlappingBlock],
-      staffAssignments: [],
-      employees: [],
+      staffAssignments: [
+        createAssignment("assign-overlap-first", firstBlock.id, "emp-overlap", {
+          startTime: "08:00",
+          endTime: "10:00"
+        }),
+        createAssignment("assign-overlap-second", overlappingBlock.id, "emp-overlap", {
+          startTime: "09:30",
+          endTime: "11:00"
+        })
+      ],
+      employees: [createEmployee("emp-overlap", { name: "Taylor" })],
       fieldTripEvents: [fieldTripEvent],
       fieldTripTypes: []
     });
@@ -749,9 +759,13 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const timelineViolations = violations.filter((violation) => violation.ruleId === "segment-block-timeline");
     expect(timelineViolations).toHaveLength(1);
-    expect(timelineViolations[0].target.id).toBe(overlappingBlock.id);
-    expect(timelineViolations[0].target.metadata).toEqual({ overlapsWith: firstBlock.id });
-    expect(timelineViolations[0].message).toContain("overlaps with");
+    expect(timelineViolations[0].target.entity).toBe("StaffAssignment");
+    expect(timelineViolations[0].target.metadata).toEqual({
+      overlapsWithAssignmentId: "assign-overlap-first",
+      relatedSegmentBlockIds: [overlappingBlock.id, firstBlock.id],
+      dayOfWeek: "mon"
+    });
+    expect(timelineViolations[0].message).toContain("overlapping clock blocks");
   });
 
   test("flags segment blocks that start before operating hours", () => {
@@ -783,7 +797,8 @@ describe("RulesEngine", () => {
     expect(timelineViolations[0].target.metadata).toEqual({
       operatingHoursId: customHours.id,
       startTime: earlyBlock.startTime,
-      boundary: customHours.open
+      boundary: customHours.open,
+      dayOfWeek: "mon"
     });
   });
 
@@ -816,7 +831,8 @@ describe("RulesEngine", () => {
     expect(timelineViolations[0].target.metadata).toEqual({
       operatingHoursId: customHours.id,
       endTime: lateBlock.endTime,
-      boundary: customHours.close
+      boundary: customHours.close,
+      dayOfWeek: "mon"
     });
   });
 

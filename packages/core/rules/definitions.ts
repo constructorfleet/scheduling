@@ -331,7 +331,7 @@ export const segmentCoverageRule: RuleDefinition = {
 
 export const segmentBlockTimelineRule: RuleDefinition = {
   id: "segment-block-timeline",
-  description: "Detects invalid or overlapping clock windows for segment blocks attached to the same day",
+  description: "Detects invalid clock windows and overlapping shifts for the same employee",
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     const citationId = getCitationId(
@@ -339,106 +339,128 @@ export const segmentBlockTimelineRule: RuleDefinition = {
       "segment-block-timeline",
       DEFAULT_POLICY_CITATIONS["segment-block-timeline"]
     );
-    const groupedBlocks: Record<string, SegmentBlock[]> = {};
     context.segmentBlocks.forEach((block) => {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
-      const dayKey = block.scheduleDayId ?? `${block.scheduleWeekId}:${block.dayOfWeek}`;
-      if (!groupedBlocks[dayKey]) {
-        groupedBlocks[dayKey] = [];
+      const start = parseTimeToMinutes(block.startTime);
+      const end = parseTimeToMinutes(block.endTime);
+
+      if (start >= end) {
+        violations.push(
+          buildViolation(
+            "segment-block-timeline",
+            `Clock block ${block.dayOfWeek.toUpperCase()} ${block.startTime}-${block.endTime} has an invalid window`,
+            "SegmentBlock",
+            block.id,
+            citationId,
+            "error",
+            { startTime: block.startTime, endTime: block.endTime, dayOfWeek: block.dayOfWeek }
+          )
+        );
+        return;
       }
-      groupedBlocks[dayKey].push(block);
+
+      const scheduleDay = getScheduleDayById(context, block.scheduleDayId);
+      const operatingHours = getOperatingHoursForDay(
+        context,
+        block.dayOfWeek,
+        scheduleDay?.dayScheduleType
+      );
+
+      if (operatingHours) {
+        const openMinutes = parseTimeToMinutes(operatingHours.open);
+        const closeMinutes = parseTimeToMinutes(operatingHours.close);
+        if (start < openMinutes) {
+          violations.push(
+            buildViolation(
+              "segment-block-timeline",
+              `Clock block on ${block.dayOfWeek.toUpperCase()} starts before operating hours (${operatingHours.open})`,
+              "SegmentBlock",
+              block.id,
+              citationId,
+              "error",
+              {
+                operatingHoursId: operatingHours.id,
+                startTime: block.startTime,
+                boundary: operatingHours.open,
+                dayOfWeek: block.dayOfWeek
+              }
+            )
+          );
+        }
+        if (end > closeMinutes) {
+          violations.push(
+            buildViolation(
+              "segment-block-timeline",
+              `Clock block on ${block.dayOfWeek.toUpperCase()} ends after operating hours (${operatingHours.close})`,
+              "SegmentBlock",
+              block.id,
+              citationId,
+              "error",
+              {
+                operatingHoursId: operatingHours.id,
+                endTime: block.endTime,
+                boundary: operatingHours.close,
+                dayOfWeek: block.dayOfWeek
+              }
+            )
+          );
+        }
+      }
     });
 
-    Object.values(groupedBlocks).forEach((blocks) => {
-      const sortedBlocks = [...blocks].sort(
+    const assignmentsByEmployeeDay: Record<string, StaffAssignment[]> = {};
+    context.staffAssignments.forEach((assignment) => {
+      const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+      if (!dayOfWeek) {
+        return;
+      }
+      const dayMeta = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+      if (dayMeta?.scheduleType === "closed" || dayMeta?.dayScheduleType === "closed") {
+        return;
+      }
+      const key = `${assignment.employeeId}:${dayOfWeek}`;
+      if (!assignmentsByEmployeeDay[key]) {
+        assignmentsByEmployeeDay[key] = [];
+      }
+      assignmentsByEmployeeDay[key].push(assignment);
+    });
+
+    Object.entries(assignmentsByEmployeeDay).forEach(([key, assignments]) => {
+      const [employeeId, dayOfWeek] = key.split(":");
+      const sorted = [...assignments].sort(
         (a, b) => parseTimeToMinutes(a.startTime) - parseTimeToMinutes(b.startTime)
       );
-      let activeBlock: SegmentBlock | null = null;
+      let activeAssignment: StaffAssignment | null = null;
       let activeEnd = 0;
 
-      sortedBlocks.forEach((block) => {
-        const start = parseTimeToMinutes(block.startTime);
-        const end = parseTimeToMinutes(block.endTime);
-
-        if (start >= end) {
+      sorted.forEach((assignment) => {
+        const start = parseTimeToMinutes(assignment.startTime);
+        const end = parseTimeToMinutes(assignment.endTime);
+        if (activeAssignment && start < activeEnd) {
+          const employee = getEmployeeById(context, employeeId);
+          const primarySegmentId = assignment.segmentBlockId;
+          const secondarySegmentId = activeAssignment.segmentBlockId;
           violations.push(
             buildViolation(
               "segment-block-timeline",
-              `Segment block ${block.id} has an invalid window (${block.startTime} ≥ ${block.endTime})`,
-              "SegmentBlock",
-              block.id,
+              `${employee?.name ?? "Employee"} has overlapping clock blocks on ${dayOfWeek.toUpperCase()} (${activeAssignment.startTime}-${activeAssignment.endTime} and ${assignment.startTime}-${assignment.endTime})`,
+              "StaffAssignment",
+              assignment.id,
               citationId,
               "error",
-              { startTime: block.startTime, endTime: block.endTime }
-            )
-          );
-          return;
-        }
-
-        const scheduleDay = getScheduleDayById(context, block.scheduleDayId);
-        const operatingHours = getOperatingHoursForDay(
-          context,
-          block.dayOfWeek,
-          scheduleDay?.dayScheduleType
-        );
-
-        if (operatingHours) {
-          const openMinutes = parseTimeToMinutes(operatingHours.open);
-          const closeMinutes = parseTimeToMinutes(operatingHours.close);
-          if (start < openMinutes) {
-            violations.push(
-              buildViolation(
-                "segment-block-timeline",
-                `Segment block ${block.id} starts before operating hours (${operatingHours.open})`,
-                "SegmentBlock",
-                block.id,
-                citationId,
-                "error",
-                {
-                  operatingHoursId: operatingHours.id,
-                  startTime: block.startTime,
-                  boundary: operatingHours.open
-                }
-              )
-            );
-          }
-          if (end > closeMinutes) {
-            violations.push(
-              buildViolation(
-                "segment-block-timeline",
-                `Segment block ${block.id} ends after operating hours (${operatingHours.close})`,
-                "SegmentBlock",
-                block.id,
-                citationId,
-                "error",
-                {
-                  operatingHoursId: operatingHours.id,
-                  endTime: block.endTime,
-                  boundary: operatingHours.close
-                }
-              )
-            );
-          }
-        }
-
-        if (activeBlock && start < activeEnd) {
-          violations.push(
-            buildViolation(
-              "segment-block-timeline",
-              `Segment block ${block.id} overlaps with ${activeBlock.id} (${activeBlock.startTime}-${activeBlock.endTime})`,
-              "SegmentBlock",
-              block.id,
-              citationId,
-              "error",
-              { overlapsWith: activeBlock.id }
+              {
+                overlapsWithAssignmentId: activeAssignment.id,
+                relatedSegmentBlockIds: [primarySegmentId, secondarySegmentId],
+                dayOfWeek
+              }
             )
           );
         }
 
-        if (!activeBlock || end >= activeEnd) {
-          activeBlock = block;
+        if (!activeAssignment || end >= activeEnd) {
+          activeAssignment = assignment;
           activeEnd = end;
         }
       });

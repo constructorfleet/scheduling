@@ -156,7 +156,7 @@ describe("ScheduleMatrix", () => {
         onFieldTripSelection={jest.fn()}
         onUpdateAssignmentTime={jest.fn()}
         onCreateAssignment={jest.fn()}
-        focusedSegmentId="segment-mon-open"
+        focusedSegmentIds={["segment-mon-open"]}
       />
     );
 
