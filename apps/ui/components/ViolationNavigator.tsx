@@ -133,14 +133,14 @@ export default function ViolationNavigator({
   return (
     <motion.section
       ref={containerRef}
-      initial={{ opacity: 0, scale: 0.96, x: position.x, y: position.y }}
-      animate={{ opacity: 1, scale: 1, x: position.x, y: position.y }}
-      exit={{ opacity: 0, scale: 0.96, x: position.x, y: position.y }}
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2, ease: "linear" }}
       style={{
         position: "fixed",
-        top: 0,
-        left: 0,
+        top: position.y,
+        left: position.x,
         width: 360,
         maxHeight: "70vh",
         overflow: "hidden",

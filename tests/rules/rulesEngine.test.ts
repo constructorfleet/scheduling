@@ -196,6 +196,31 @@ describe("RulesEngine", () => {
     expect(ratioViolations[0].message).toContain("but only 0 assigned");
   });
 
+  test("skips ratio checks for closed schedule days", () => {
+    const closedDay = createScheduleDay("day-closed", {
+      dayOfWeek: "sat",
+      scheduleType: "closed",
+      dayScheduleType: "closed"
+    });
+    const closedBlock = createSegmentBlock("block-closed", {
+      dayOfWeek: "sat",
+      scheduleDayId: closedDay.id,
+      childCount: 30
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [closedDay],
+      segmentBlocks: [closedBlock],
+      staffAssignments: [],
+      employees: [],
+      fieldTripEvents: [],
+      fieldTripTypes: []
+    });
+
+    const violations = engine.evaluate(context);
+    const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
+    expect(ratioViolations).toHaveLength(0);
+  });
+
   test("allows ratio compliance when ratio and minimums are met", () => {
     const block = createSegmentBlock("block-ratio-clean", {
       childCount: 24,
@@ -463,6 +488,51 @@ describe("RulesEngine", () => {
     const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
     expect(tripViolations).toHaveLength(1);
     expect(tripViolations[0].message).toContain("leaders");
+  });
+
+  test("does not require leaders when field trip leader ratio is disabled", () => {
+    const fieldTripType: FieldTripType = {
+      id: "trip-type-no-leader-ratio",
+      name: "Community Walk",
+      minAdultStudentRatio: 0.2,
+      minLeaderStudentRatio: 0,
+      policyCitationId: "policy-field-trip",
+      notes: undefined
+    };
+    const fieldTripEvent: FieldTripEvent = {
+      id: "ft-event-no-leader-ratio",
+      scheduleWeekId: "week-1",
+      dayOfWeek: "thu" as DayOfWeek,
+      segment: "open" as DaySegment,
+      fieldTripTypeId: fieldTripType.id
+    };
+    const block = createSegmentBlock("block-trip-no-leader-ratio", {
+      childCount: 20,
+      fieldTripEventId: fieldTripEvent.id
+    });
+    const assignments = [
+      createAssignment("assign-trip-no-leader-1", block.id, "emp-trip-no-leader-1"),
+      createAssignment("assign-trip-no-leader-2", block.id, "emp-trip-no-leader-2"),
+      createAssignment("assign-trip-no-leader-3", block.id, "emp-trip-no-leader-3"),
+      createAssignment("assign-trip-no-leader-4", block.id, "emp-trip-no-leader-4")
+    ];
+    const employees = [
+      createEmployee("emp-trip-no-leader-1"),
+      createEmployee("emp-trip-no-leader-2"),
+      createEmployee("emp-trip-no-leader-3"),
+      createEmployee("emp-trip-no-leader-4")
+    ];
+    const context: RulesContext = withDefaultScheduleInfo({
+      segmentBlocks: [block],
+      staffAssignments: assignments,
+      employees,
+      fieldTripEvents: [fieldTripEvent],
+      fieldTripTypes: [fieldTripType]
+    });
+
+    const violations = engine.evaluate(context);
+    const tripViolations = violations.filter((violation) => violation.ruleId === "field-trip-ratios");
+    expect(tripViolations).toHaveLength(0);
   });
 
   test("flags schedule days missing critical metadata", () => {

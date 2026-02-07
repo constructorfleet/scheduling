@@ -120,6 +120,7 @@ const renderMatrix = (overrides?: Partial<{
   assignments: StaffAssignment[];
   segmentBlocks: SegmentBlock[];
   operatingHoursByDay: Record<DayOfWeek, OperatingHours | undefined>;
+  days: typeof baseDays;
 }>) => {
   const onCreateAssignment = jest.fn();
   const onUpdateAssignmentTime = jest.fn();
@@ -128,7 +129,7 @@ const renderMatrix = (overrides?: Partial<{
       staff={overrides?.staff ?? baseStaff}
       assignments={overrides?.assignments ?? assignments}
       segmentBlocks={overrides?.segmentBlocks ?? segmentBlocks}
-      days={baseDays}
+      days={overrides?.days ?? baseDays}
       daySequence={daySequence}
       dayDisplayNames={dayDisplayNames}
       scheduleTypeOptions={scheduleTypeOptions}
@@ -317,5 +318,24 @@ describe("ScheduleMatrix", () => {
     expect(dayCell?.style.border).toContain("rgb(220, 38, 38)");
     const tooltip = within(dayCell as HTMLElement).getByTitle("Over max hours");
     expect(tooltip).toBeInTheDocument();
+  });
+
+  it("disables scheduling interactions for closed schedule days", () => {
+    const closedDays = [
+      {
+        ...baseDays[0],
+        scheduleType: "closed",
+        dayScheduleType: "closed",
+        enrollmentCount: 0
+      }
+    ];
+    renderMatrix({ days: closedDays });
+
+    expect(screen.queryByRole("button", { name: "Add block" })).not.toBeInTheDocument();
+    const allSelects = screen.getAllByRole("combobox");
+    expect(allSelects[0]).not.toBeDisabled();
+    expect(allSelects[1]).toBeDisabled();
+    const enrollmentInput = screen.getByRole("spinbutton");
+    expect(enrollmentInput).toBeDisabled();
   });
 });

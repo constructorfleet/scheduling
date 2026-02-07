@@ -40,7 +40,10 @@ export default function FieldTripsSection({
       </div>
       {draftFieldTrips.map((trip, index) => {
         const adultPair = ratioToPair(trip.minAdultStudentRatio);
-        const leaderPair = ratioToPair(trip.minLeaderStudentRatio);
+        const leaderPair =
+          trip.minLeaderStudentRatio > 0
+            ? ratioToPair(trip.minLeaderStudentRatio)
+            : { adults: 0, students: 0 };
 
         return (
           <div
@@ -119,14 +122,17 @@ export default function FieldTripsSection({
             <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
               <input
                 type="number"
-                min={1}
+                min={0}
                 value={leaderPair.adults}
                 onChange={(event) => {
-                  const nextAdults = Math.max(1, Number(event.target.value) || 1);
+                  const nextAdults = Math.max(0, Number(event.target.value) || 0);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minLeaderStudentRatio: nextAdults / Math.max(1, leaderPair.students)
+                    minLeaderStudentRatio:
+                      nextAdults === 0 || leaderPair.students === 0
+                        ? 0
+                        : nextAdults / leaderPair.students
                   };
                   onChange(next);
                 }}
@@ -142,14 +148,17 @@ export default function FieldTripsSection({
               <span style={{ color: "#6b7280", fontWeight: 600 }}>:</span>
               <input
                 type="number"
-                min={1}
+                min={0}
                 value={leaderPair.students}
                 onChange={(event) => {
-                  const nextStudents = Math.max(1, Number(event.target.value) || 1);
+                  const nextStudents = Math.max(0, Number(event.target.value) || 0);
                   const next = [...draftFieldTrips];
                   next[index] = {
                     ...trip,
-                    minLeaderStudentRatio: Math.max(1, leaderPair.adults) / nextStudents
+                    minLeaderStudentRatio:
+                      nextStudents === 0 || leaderPair.adults === 0
+                        ? 0
+                        : leaderPair.adults / nextStudents
                   };
                   onChange(next);
                 }}

@@ -30,7 +30,10 @@ const FIELD_TRIP_OPTIONS = (fieldTripTypes: FieldTripType[]) => [
   ...fieldTripTypes.map((type) => ({
     value: type.id,
     label: type.name,
-    hint: `Adults 1:${type.minAdultStudentRatio} · Leaders 1:${type.minLeaderStudentRatio}`
+    hint:
+      type.minLeaderStudentRatio > 0
+        ? `Adults 1:${type.minAdultStudentRatio} · Leaders 1:${type.minLeaderStudentRatio}`
+        : `Adults 1:${type.minAdultStudentRatio} · Leader ratio not required`
   }))
 ];
 

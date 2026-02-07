@@ -76,6 +76,16 @@ const getSchoolRules = (context: RulesContext) => {
   };
 };
 
+const isClosedScheduleDay = (context: RulesContext, block: SegmentBlock) => {
+  const scheduleDay =
+    getScheduleDayById(context, block.scheduleDayId) ??
+    context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
+  if (!scheduleDay) {
+    return false;
+  }
+  return scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed";
+};
+
 export const ratioSegmentRule: RuleDefinition = {
   id: "ratio-segment",
   description:
@@ -83,6 +93,9 @@ export const ratioSegmentRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       const fieldTripEvent = getFieldTripEventForBlock(context, block);
       if (fieldTripEvent && !fieldTripEvent.isNoFieldTrip) {
         return;
@@ -135,6 +148,9 @@ export const scheduleDayMetadataRule: RuleDefinition = {
       DEFAULT_POLICY_CITATIONS["schedule-day-metadata"]
     );
     (context.scheduleDays ?? []).forEach((day) => {
+      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
+        return;
+      }
       if (!day.scheduleType) {
         violations.push(
           buildViolation(
@@ -201,6 +217,9 @@ export const certificationPerSegmentRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       const employees = assignedEmployeesForBlock(context, block.id);
       const { requiresCpr, requiresMedicalDelegation, requiresLeader, policyCitationId } =
         block.requirementTemplate;
@@ -259,6 +278,9 @@ export const segmentCoverageRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       const employees = assignedEmployeesForBlock(context, block.id);
       const { requiresLeader, requiresMedicalDelegation, policyCitationId } =
         block.requirementTemplate;
@@ -307,6 +329,9 @@ export const segmentBlockTimelineRule: RuleDefinition = {
     );
     const groupedBlocks: Record<string, SegmentBlock[]> = {};
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       const dayKey = block.scheduleDayId ?? `${block.scheduleWeekId}:${block.dayOfWeek}`;
       if (!groupedBlocks[dayKey]) {
         groupedBlocks[dayKey] = [];
@@ -607,6 +632,9 @@ export const medicalDelegatedCoverageRule: RuleDefinition = {
       return violations;
     }
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       const assignments = getAssignmentsForBlock(context, block.id);
       const medicallyDelegatedCount = assignments.filter((assignment) => {
         const employee = getEmployeeById(context, assignment.employeeId);
@@ -726,6 +754,9 @@ export const fieldTripRatiosRule: RuleDefinition = {
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
     context.segmentBlocks.forEach((block) => {
+      if (isClosedScheduleDay(context, block)) {
+        return;
+      }
       if (!block.fieldTripEventId) {
         return;
       }
@@ -741,7 +772,10 @@ export const fieldTripRatiosRule: RuleDefinition = {
         .filter((employee): employee is NonNullable<typeof employee> => Boolean(employee))
         .filter((employee) => employee.leaderQualified);
       const requiredAdults = Math.max(1, Math.ceil(block.childCount * type.minAdultStudentRatio));
-      const requiredLeaders = Math.max(1, Math.ceil(block.childCount * type.minLeaderStudentRatio));
+      const requiredLeaders =
+        type.minLeaderStudentRatio > 0
+          ? Math.max(1, Math.ceil(block.childCount * type.minLeaderStudentRatio))
+          : 0;
       if (uniqueEmployeeIds.size < requiredAdults) {
         const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
         violations.push(
@@ -756,7 +790,7 @@ export const fieldTripRatiosRule: RuleDefinition = {
           )
         );
       }
-      if (leaderCount.length < requiredLeaders) {
+      if (requiredLeaders > 0 && leaderCount.length < requiredLeaders) {
         const citationId = getCitationId(context, "field-trip-ratios", type.policyCitationId);
         violations.push(
           buildViolation(

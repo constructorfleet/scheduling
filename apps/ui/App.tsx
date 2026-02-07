@@ -46,8 +46,6 @@ import { fetchSchedule, fetchSettings, saveSchedule, saveSettings } from "./data
 
 const RULE_TITLES: Record<string, string> = {
   "ratio-segment": "Ratio staffing gap",
-  "certification-per-segment": "Certification missing",
-  "segment-coverage": "Coverage guardrail",
   "shift-break-limits": "Shift limit breach",
   "field-trip-ratios": "Field trip ratio",
   "open-close-coverage": "Open/close coverage",
@@ -57,8 +55,6 @@ const RULE_TITLES: Record<string, string> = {
 
 const RECOMMENDED_ACTIONS: Record<string, string> = {
   "ratio-segment": "Add a certified staff member or adjust child counts so the segment meets the ratio.",
-  "certification-per-segment": "Reassign staff with the required CPR, medical delegation, or leader qualification.",
-  "segment-coverage": "Bring a leader-qualified or medically delegated staff member into the block.",
   "shift-break-limits": "Split the shift into shorter blocks or assign a break to stay under the cap.",
   "field-trip-ratios": "Reconcile adult and leader counts with the ratio required for this trip.",
   "open-close-coverage": "Add the required opener/closer coverage and ensure a leader-qualified staff member is present.",
@@ -68,8 +64,6 @@ const RECOMMENDED_ACTIONS: Record<string, string> = {
 
 const RULE_POLICY_CITATIONS = {
   "ratio-segment": policyCitations.ratio.id,
-  "certification-per-segment": policyCitations.ratio.id,
-  "segment-coverage": policyCitations.leaderCoverage.id,
   "shift-break-limits": policyCitations.breakPolicy.id,
   "field-trip-ratios": policyCitations.fieldTrip.id,
   "open-close-coverage": policyCitations.leaderCoverage.id,
@@ -89,6 +83,19 @@ type WeekDirection = "prev" | "next";
 const DAY_OF_WEEK_VALUES: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const isDayOfWeek = (value: string): value is DayOfWeek =>
   DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
+const CLOSED_SCHEDULE_TYPE = "closed" as ScheduleType;
+const CLOSED_SCHEDULE_TYPE_OPTION = {
+  value: CLOSED_SCHEDULE_TYPE,
+  label: "Closed",
+  ratio: { adults: 1, students: 1 },
+  description: "School closed for this day."
+};
+const ensureClosedScheduleType = (options: typeof scheduleTypeOptions) => {
+  if (options.some((option) => option.value === CLOSED_SCHEDULE_TYPE)) {
+    return options;
+  }
+  return [...options, CLOSED_SCHEDULE_TYPE_OPTION];
+};
 
 const EMPLOYMENT_STATUS_VALUES: Employee["employmentStatus"][] = ["active", "on_leave", "archived"];
 const coerceEmploymentStatus = (value: string | undefined): Employee["employmentStatus"] =>
@@ -109,7 +116,9 @@ export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
   const [schoolName, setSchoolName] = useState(schools[0].name);
-  const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(scheduleTypeOptions);
+  const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(
+    ensureClosedScheduleType(scheduleTypeOptions)
+  );
   const [fieldTripTypesState, setFieldTripTypesState] = useState(fieldTripTypes);
   const [employeesState, setEmployeesState] = useState(employees);
   const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
@@ -234,6 +243,34 @@ export default function App() {
     return daySequence.filter((day) => !closedDaysState.includes(day));
   }, [daySequence, closedDaysState]);
 
+  useEffect(() => {
+    const defaultOpenScheduleType =
+      scheduleTypeOptionsState.find((type) => type.value !== CLOSED_SCHEDULE_TYPE)?.value;
+    setScheduleDaysState((prev) =>
+      prev.map((day) => {
+        if (closedDaysState.includes(day.dayOfWeek)) {
+          if (day.scheduleType === CLOSED_SCHEDULE_TYPE && day.dayScheduleType === "closed") {
+            return day;
+          }
+          return {
+            ...day,
+            scheduleType: CLOSED_SCHEDULE_TYPE,
+            dayScheduleType: "closed",
+            enrollmentCount: 0
+          };
+        }
+        if (day.scheduleType === CLOSED_SCHEDULE_TYPE) {
+          return {
+            ...day,
+            scheduleType: defaultOpenScheduleType ?? undefined,
+            dayScheduleType: "full_day"
+          };
+        }
+        return day;
+      })
+    );
+  }, [closedDaysState, scheduleTypeOptionsState]);
+
   const ratioByScheduleType = useMemo(() => {
     return scheduleTypeOptionsState.reduce<Record<string, number>>((acc, option) => {
       const adults = option.ratio?.adults ?? 0;
@@ -346,15 +383,17 @@ export default function App() {
           });
           if (settings.scheduleTypes?.length) {
             setScheduleTypeOptionsState(
-              settings.scheduleTypes.map((type) => ({
-                value: type.value,
-                label: type.label,
-                ratio: {
-                  adults: type.ratioAdults ?? 1,
-                  students: type.ratioStudents ?? 1
-                },
-                description: type.description ?? ""
-              }))
+              ensureClosedScheduleType(
+                settings.scheduleTypes.map((type) => ({
+                  value: type.value,
+                  label: type.label,
+                  ratio: {
+                    adults: type.ratioAdults ?? 1,
+                    students: type.ratioStudents ?? 1
+                  },
+                  description: type.description ?? ""
+                }))
+              )
             );
           }
           if (settings.jobTitles?.length) {
@@ -495,26 +534,7 @@ export default function App() {
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
     const context: RulesContext = {
-      segmentBlocks: segmentBlocksState.map((block) => {
-        const scheduleDay = scheduleDaysState.find((day) => day.id === block.scheduleDayId);
-        if (!scheduleDay?.scheduleType) {
-          return block;
-        }
-        const ratio = ratioByScheduleType[scheduleDay.scheduleType];
-        if (!ratio) {
-          return block;
-        }
-        return {
-          ...block,
-          requirementTemplate: {
-            ...block.requirementTemplate,
-            ratioProfile: {
-              ...block.requirementTemplate.ratioProfile,
-              childrenPerStaff: ratio
-            }
-          }
-        };
-      }),
+      segmentBlocks: segmentBlocksState,
       staffAssignments: staffAssignmentsState,
       employees: employeesDerived,
       fieldTripEvents: fieldTripEventsState,
@@ -523,6 +543,7 @@ export default function App() {
       rulePolicyCitations: RULE_POLICY_CITATIONS,
       scheduleDays: scheduleDaysState,
       operatingHours: derivedOperatingHours,
+      scheduleTypeRatios: ratioByScheduleType,
       schoolRules: schoolRulesState,
       jobTitleRules
     };
@@ -625,7 +646,26 @@ export default function App() {
   };
 
   const handleScheduleTypeUpdate = (dayId: string, scheduleType: ScheduleType | undefined) => {
-    setScheduleDaysState((prev) => prev.map((day) => (day.id === dayId ? { ...day, scheduleType } : day)));
+    setScheduleDaysState((prev) =>
+      prev.map((day) => {
+        if (day.id !== dayId) {
+          return day;
+        }
+        if (scheduleType === CLOSED_SCHEDULE_TYPE) {
+          return {
+            ...day,
+            scheduleType,
+            dayScheduleType: "closed",
+            enrollmentCount: 0
+          };
+        }
+        return {
+          ...day,
+          scheduleType,
+          dayScheduleType: day.dayScheduleType === "closed" ? "full_day" : day.dayScheduleType
+        };
+      })
+    );
   };
 
   const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
@@ -666,9 +706,16 @@ export default function App() {
   };
 
   const [focusedSegmentId, setFocusedSegmentId] = useState<string | null>(null);
+  const focusResetRef = useRef<number | null>(null);
 
   const handleFocusSegment = (segmentId: string) => {
     setFocusedSegmentId(segmentId);
+    if (focusResetRef.current) {
+      window.clearTimeout(focusResetRef.current);
+    }
+    focusResetRef.current = window.setTimeout(() => {
+      setFocusedSegmentId((prev) => (prev === segmentId ? null : prev));
+    }, 2500);
   };
 
   const handlePublish = () => {
@@ -695,8 +742,9 @@ export default function App() {
   };
 
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
-    setScheduleTypeOptionsState(next);
-    void persistSettings({ scheduleTypes: next });
+    const nextWithClosed = ensureClosedScheduleType(next);
+    setScheduleTypeOptionsState(nextWithClosed);
+    void persistSettings({ scheduleTypes: nextWithClosed });
   };
 
   const handleUpdateJobTitles = (next: JobTitleSetting[]) => {

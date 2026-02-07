@@ -89,6 +89,10 @@ export default function ScheduleMatrix({
   const closerWindowMinutes = 15;
   const dayMetadataByDay = Object.fromEntries(days.map((day) => [day.dayOfWeek, day]));
   const segmentById = Object.fromEntries(segmentBlocks.map((segment) => [segment.id, segment]));
+  const isClosedDay = (day: DayOfWeek) => {
+    const metadata = dayMetadataByDay[day];
+    return metadata?.scheduleType === "closed" || metadata?.dayScheduleType === "closed";
+  };
 
   const operatingWindowByDay = useMemo(() => {
     return daySequence.reduce<Record<DayOfWeek, { open: number; close: number } | null>>((map, day) => {
@@ -227,6 +231,7 @@ export default function ScheduleMatrix({
               const fieldTripEvent = fieldTripEventsByDay[day];
               const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
               const isFocusedDay = focusedDay === day;
+              const closedDay = isClosedDay(day);
               return (
                 <th
                   key={`header-${day}`}
@@ -274,6 +279,7 @@ export default function ScheduleMatrix({
                       }
                       onChange={(event) => {
                         if (!dayMeta) return;
+                        if (closedDay) return;
                         const value = event.target.value;
                         if (value === "no-field-trip") {
                           onFieldTripSelection(dayMeta.id, { type: "none" });
@@ -285,8 +291,11 @@ export default function ScheduleMatrix({
                         borderRadius: 8,
                         border: "1px solid #d1d5db",
                         padding: "0.3rem 0.5rem",
-                        fontSize: "0.75rem"
+                        fontSize: "0.75rem",
+                        opacity: closedDay ? 0.6 : 1,
+                        cursor: closedDay ? "not-allowed" : "pointer"
                       }}
+                      disabled={closedDay}
                     >
                       {fieldTripOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -302,6 +311,7 @@ export default function ScheduleMatrix({
                     value={dayMeta?.enrollmentCount ?? ""}
                     onChange={(event) => {
                       if (!dayMeta) return;
+                      if (closedDay) return;
                       const raw = event.target.value;
                       if (raw === "") {
                         onEnrollmentChange(dayMeta.id, undefined);
@@ -316,9 +326,15 @@ export default function ScheduleMatrix({
                       borderRadius: 8,
                       border: "1px solid #d1d5db",
                       padding: "0.3rem 0.5rem",
-                      fontSize: "0.75rem"
+                      fontSize: "0.75rem",
+                      opacity: closedDay ? 0.6 : 1,
+                      cursor: closedDay ? "not-allowed" : "text"
                     }}
+                    disabled={closedDay}
                   />
+                  {closedDay && (
+                    <span style={{ fontSize: "0.7rem", color: "#b45309", fontWeight: 600 }}>Closed day</span>
+                  )}
                   {operatingHoursByDay[day] ? (
                     <span style={{ fontSize: "0.7rem", color: "#475569" }}>
                       Hours: {formatTime(operatingHoursByDay[day]!.open)} – {formatTime(operatingHoursByDay[day]!.close)}
@@ -412,6 +428,7 @@ export default function ScheduleMatrix({
                   const cellBorder = isOverDaily ? "2px solid #dc2626" : "1px solid #e5e7eb";
                   const focusedDay = focusedSegmentId ? segmentById[focusedSegmentId]?.dayOfWeek : undefined;
                   const isFocusedDay = focusedDay === day;
+                  const closedDay = isClosedDay(day);
 
                   return (
                     <td
@@ -420,7 +437,7 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: isFocusedDay ? "#f6faff" : "#fff",
+                        background: closedDay ? "#f8fafc" : isFocusedDay ? "#f6faff" : "#fff",
                         position: "relative"
                       }}
                     >
@@ -503,17 +520,19 @@ export default function ScheduleMatrix({
                                 boxShadow: isFocused ? "0 0 0 2px rgba(37, 99, 235, 0.6)" : "none"
                               }}
                               data-segment-id={block.segmentBlockId}
-                              onClick={() =>
+                              onClick={() => {
+                                if (closedDay) {
+                                  return;
+                                }
                                 setEditing({
                                   assignmentId: block.id,
                                   employeeId: member.id,
                                   dayOfWeek: day,
                                   startTime: block.startTime,
-                                  endTime: block.endTime
-                                  ,
+                                  endTime: block.endTime,
                                   isNew: false
-                                })
-                              }
+                                });
+                              }}
                             >
                               {editing?.assignmentId === block.id ? (
                                 <>
@@ -621,7 +640,7 @@ export default function ScheduleMatrix({
                             </motion.div>
                           );
                         })}
-                        {dayHours < member.maxHoursPerDay && (
+                        {!closedDay && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
                             transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
@@ -664,7 +683,10 @@ export default function ScheduleMatrix({
                             Add block
                           </motion.button>
                         )}
-                        {editing?.isNew && editing.employeeId === member.id && editing.dayOfWeek === day && (
+                        {!closedDay &&
+                          editing?.isNew &&
+                          editing.employeeId === member.id &&
+                          editing.dayOfWeek === day && (
                           <motion.div
                             layout
                             transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
@@ -752,7 +774,7 @@ export default function ScheduleMatrix({
                               );
                             })()}
                           </motion.div>
-                        )}
+                          )}
                       </div>
                     </td>
                   );

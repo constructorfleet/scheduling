@@ -78,6 +78,12 @@ export const scheduleTypeOptions: {
     label: "Enrichment focus",
     ratio: { adults: 1, students: 4 },
     description: "Smaller cohorts for project-based learning."
+  },
+  {
+    value: "closed",
+    label: "Closed",
+    ratio: { adults: 1, students: 1 },
+    description: "School closed for the day."
   }
 ];
 
