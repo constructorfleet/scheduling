@@ -21,6 +21,7 @@ describe("WeekNavigationBanner", () => {
     isAuditOpen: false,
     onOpenSettings: jest.fn(),
     isSettingsOpen: false,
+    onAutoSchedule: jest.fn(),
     apiStatus: {
       state: "idle" as const,
       message: "Idle"

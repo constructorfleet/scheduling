@@ -50,6 +50,7 @@ import {
   saveSettings,
   type ScheduleSavePayload
 } from "./data/apiClient";
+import { autoSchedule, validateDayMetadata, type MissingMetadata } from "@core/scheduler";
 
 const RULE_TITLES: Record<string, string> = {
   "ratio-segment": "Ratio staffing gap",
@@ -222,6 +223,16 @@ export default function App() {
   const activeApiRequestsRef = useRef(0);
   const apiStatusResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suspendHistoryRef = useRef(false);
+  
+  const [showAutoScheduleModal, setShowAutoScheduleModal] = useState(false);
+  const [autoScheduleState, setAutoScheduleState] = useState<
+    | { type: "idle" }
+    | { type: "validating" }
+    | { type: "missing_metadata"; missing: MissingMetadata[] }
+    | { type: "confirm_replace" }
+    | { type: "scheduling" }
+    | { type: "complete"; success: boolean; message: string; violations: number }
+  >({ type: "idle" });
 
   const makeSnapshot = (
     next: Partial<ScheduleSnapshot> = {},
@@ -1627,6 +1638,97 @@ export default function App() {
     void persistSettings({ employees: next });
   };
 
+  const handleAutoSchedule = () => {
+    // First, validate that all days have metadata
+    const missingMetadata = validateDayMetadata(scheduleDaysState);
+    
+    if (missingMetadata.length > 0) {
+      setAutoScheduleState({ type: "missing_metadata", missing: missingMetadata });
+      setShowAutoScheduleModal(true);
+      return;
+    }
+    
+    // Check if there are existing assignments
+    const hasExistingAssignments = staffAssignmentsState.length > 0;
+    
+    if (hasExistingAssignments) {
+      setAutoScheduleState({ type: "confirm_replace" });
+      setShowAutoScheduleModal(true);
+    } else {
+      executeAutoSchedule(false);
+    }
+  };
+
+  const executeAutoSchedule = (keepExisting: boolean) => {
+    setAutoScheduleState({ type: "scheduling" });
+    setShowAutoScheduleModal(true);
+    
+    // Use setTimeout to allow UI to update with spinner
+    setTimeout(() => {
+      try {
+        const result = autoSchedule(
+          {
+            scheduleDays: scheduleDaysState,
+            segmentBlocks: segmentBlocksState,
+            employees: employeesDerived,
+            fieldTripEvents: fieldTripEventsState,
+            operatingHours: derivedOperatingHours,
+            scheduleTypeRatios: ratioByScheduleType,
+            schoolRules: schoolRulesState,
+            jobTitleRules,
+            fieldTripTypes: fieldTripTypesState,
+            policyCitations: POLICY_CITATION_LIST,
+            rulePolicyCitations: RULE_POLICY_CITATIONS
+          },
+          currentWeekId
+        );
+
+        // Apply the new assignments
+        const finalAssignments = keepExisting
+          ? [...staffAssignmentsState, ...result.staffAssignments]
+          : result.staffAssignments;
+
+        applyScheduleChange(
+          () => ({
+            staffAssignments: finalAssignments
+          }),
+          {
+            action: "Auto-scheduled staff assignments",
+            notes: result.message
+          }
+        );
+
+        setAutoScheduleState({
+          type: "complete",
+          success: result.success,
+          message: result.message,
+          violations: result.violations.length
+        });
+
+        // If there are violations, auto-open the violations panel after a brief delay
+        if (result.violations.length > 0) {
+          setTimeout(() => {
+            setShowViolationNavigator(true);
+          }, 2000);
+        }
+      } catch (error) {
+        setAutoScheduleState({
+          type: "complete",
+          success: false,
+          message: error instanceof Error ? error.message : "An error occurred during auto-scheduling",
+          violations: 0
+        });
+      }
+    }, 100);
+  };
+
+  const closeAutoScheduleModal = () => {
+    setShowAutoScheduleModal(false);
+    setTimeout(() => {
+      setAutoScheduleState({ type: "idle" });
+    }, 300);
+  };
+
   return (
     <MotionConfig transition={{ type: "tween", ease: "linear", duration: 0.2 }}>
       <motion.div
@@ -1664,6 +1766,7 @@ export default function App() {
         isViolationsOpen={showViolationNavigator}
         isAuditOpen={showAuditTimeline}
         apiStatus={apiStatus}
+        onAutoSchedule={handleAutoSchedule}
         onOpenSettings={() => {
           if (showSettings && settingsDirty) {
             setSettingsCloseAttempt((prev) => prev + 1);
@@ -1903,6 +2006,184 @@ export default function App() {
                   Copy current schedule
                 </button>
               </div>
+            </motion.div>
+          </motion.section>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAutoScheduleModal && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "linear" }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(15, 23, 42, 0.35)",
+              zIndex: 70,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1.5rem"
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2, ease: "linear" }}
+              style={{
+                width: "min(520px, 100%)",
+                background: "#fff",
+                borderRadius: 14,
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 24px 48px rgba(15, 23, 42, 0.24)",
+                padding: "1rem 1.1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem"
+              }}
+            >
+              {autoScheduleState.type === "missing_metadata" && (
+                <>
+                  <h3 style={{ margin: 0 }}>Missing Day Metadata</h3>
+                  <p style={{ margin: 0, color: "#475569", fontSize: "0.9rem" }}>
+                    The following days are missing required information. Please populate these fields before auto-scheduling:
+                  </p>
+                  <div style={{ background: "#fff7f6", borderRadius: 8, padding: "0.75rem", border: "1px solid #fee2e2" }}>
+                    {autoScheduleState.missing.map((item) => (
+                      <div key={item.dayOfWeek} style={{ marginBottom: "0.5rem" }}>
+                        <strong>{dayDisplayNames[item.dayOfWeek]}:</strong> {item.missingFields.join(", ")}
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                    <button
+                      type="button"
+                      onClick={closeAutoScheduleModal}
+                      style={{
+                        borderRadius: 999,
+                        border: "none",
+                        background: "#2563eb",
+                        color: "#fff",
+                        padding: "0.35rem 0.9rem"
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </>
+              )}
+              
+              {autoScheduleState.type === "confirm_replace" && (
+                <>
+                  <h3 style={{ margin: 0 }}>Existing Staff Assignments</h3>
+                  <p style={{ margin: 0, color: "#475569", fontSize: "0.9rem" }}>
+                    There are already staff assignments for this week. Would you like to:
+                  </p>
+                  <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      onClick={closeAutoScheduleModal}
+                      style={{
+                        borderRadius: 999,
+                        border: "1px solid #cbd5e1",
+                        background: "#f8fafc",
+                        color: "#0f172a",
+                        padding: "0.35rem 0.85rem"
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => executeAutoSchedule(true)}
+                      style={{
+                        borderRadius: 999,
+                        border: "1px solid #cbd5f5",
+                        background: "#eff6ff",
+                        color: "#1d4ed8",
+                        padding: "0.35rem 0.85rem"
+                      }}
+                    >
+                      Keep existing assignments
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => executeAutoSchedule(false)}
+                      style={{
+                        borderRadius: 999,
+                        border: "none",
+                        background: "#2563eb",
+                        color: "#fff",
+                        padding: "0.35rem 0.9rem"
+                      }}
+                    >
+                      Start from scratch
+                    </button>
+                  </div>
+                </>
+              )}
+              
+              {autoScheduleState.type === "scheduling" && (
+                <>
+                  <h3 style={{ margin: 0 }}>Auto-Scheduling...</h3>
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "1rem" }}>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        border: "4px solid #e5e7eb",
+                        borderTopColor: "#2563eb",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite"
+                      }}
+                    />
+                    <p style={{ margin: 0, color: "#475569" }}>
+                      Generating staff assignments and resolving violations...
+                    </p>
+                  </div>
+                  <style>{`
+                    @keyframes spin {
+                      to { transform: rotate(360deg); }
+                    }
+                  `}</style>
+                </>
+              )}
+              
+              {autoScheduleState.type === "complete" && (
+                <>
+                  <h3 style={{ margin: 0 }}>
+                    {autoScheduleState.success ? "✓ Auto-Scheduling Complete" : "Auto-Scheduling Complete"}
+                  </h3>
+                  <p style={{ margin: 0, color: "#475569", fontSize: "0.9rem" }}>
+                    {autoScheduleState.message}
+                  </p>
+                  {autoScheduleState.violations > 0 && (
+                    <div style={{ background: "#fff7f6", borderRadius: 8, padding: "0.75rem", border: "1px solid #fee2e2" }}>
+                      <p style={{ margin: 0, fontSize: "0.85rem", color: "#991b1b" }}>
+                        {autoScheduleState.violations} violation(s) remain. The violations panel will open to help you resolve them.
+                      </p>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+                    <button
+                      type="button"
+                      onClick={closeAutoScheduleModal}
+                      style={{
+                        borderRadius: 999,
+                        border: "none",
+                        background: "#2563eb",
+                        color: "#fff",
+                        padding: "0.35rem 0.9rem"
+                      }}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </motion.section>
         )}
