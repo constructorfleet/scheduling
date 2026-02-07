@@ -38,6 +38,7 @@ export default function AuditTimeline({
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
     setIsDragging(true);
     dragOffset.current = {
       x: event.clientX - position.x,
@@ -103,6 +104,7 @@ export default function AuditTimeline({
             gap: "0.5rem",
             cursor: isDragging ? "grabbing" : "grab",
             userSelect: "none",
+            touchAction: "none",
             flex: 1
           }}
         >

@@ -592,7 +592,8 @@ describe("RulesEngine", () => {
 
   test("flags field trip events that neither declare no-trip nor point to a type", () => {
     const fieldTripEvent = createFieldTripEvent("ft-event-missing-meta", {
-      scheduleDayId: "day-ft-missing"
+      scheduleDayId: "day-ft-missing",
+      isNoFieldTrip: false
     });
     const day = createScheduleDay("day-ft-missing", {
       fieldTripEventId: fieldTripEvent.id
@@ -609,7 +610,10 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const eventViolation = violations.find((violation) => violation.ruleId === "field-trip-event");
     expect(eventViolation).toBeDefined();
-    expect(eventViolation?.target.metadata).toEqual({ missing: ["fieldTripTypeId", "isNoFieldTrip"] });
+    expect(eventViolation?.target.metadata).toEqual({
+      missing: ["fieldTripTypeId", "isNoFieldTrip"],
+      dayOfWeek: "mon"
+    });
   });
 
   test("allows field trip events that point to configured types", () => {
@@ -689,7 +693,10 @@ describe("RulesEngine", () => {
     const violations = engine.evaluate(context);
     const eventViolation = violations.find((violation) => violation.ruleId === "field-trip-event");
     expect(eventViolation).toBeDefined();
-    expect(eventViolation?.target.metadata).toEqual({ fieldTripTypeId: "missing-type" });
+    expect(eventViolation?.target.metadata).toEqual({
+      fieldTripTypeId: "missing-type",
+      dayOfWeek: "mon"
+    });
   });
 
   test("flags segment blocks with invalid time windows", () => {

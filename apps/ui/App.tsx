@@ -680,7 +680,15 @@ export default function App() {
       return assignment?.segmentBlockId;
     }
     if (target.entity === "FieldTripEvent") {
-      return segmentBlocksState.find((block) => block.fieldTripEventId === target.id)?.id;
+      const byEventId = segmentBlocksState.find((block) => block.fieldTripEventId === target.id)?.id;
+      if (byEventId) {
+        return byEventId;
+      }
+      const dayOfWeek = String(target.metadata?.dayOfWeek ?? "");
+      if (isDayOfWeek(dayOfWeek)) {
+        return segmentBlocksState.find((block) => block.dayOfWeek === dayOfWeek)?.id;
+      }
+      return undefined;
     }
     if (target.entity === "ScheduleDay") {
       const day = scheduleDaysState.find((item) => item.id === target.id);
@@ -809,9 +817,12 @@ export default function App() {
   };
 
   const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
+    const day = scheduleDaysState.find((item) => item.id === dayId);
+    const dayOfWeek = day?.dayOfWeek;
     setFieldTripEventsState((prev) =>
       prev.map((event) => {
-        if (event.scheduleDayId !== dayId) {
+        const matchesDay = event.scheduleDayId === dayId || (dayOfWeek ? event.dayOfWeek === dayOfWeek : false);
+        if (!matchesDay) {
           return event;
         }
         if (selection.type === "none") {
@@ -1004,20 +1015,37 @@ export default function App() {
           onUpdateAssignmentTime={handleUpdateAssignmentTime}
           onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
             const scheduleDay = scheduleDaysState.find((day) => day.dayOfWeek === dayOfWeek);
-            const segmentId = `segment-${dayOfWeek}-custom-${Date.now()}`;
-            const newBlock: SegmentBlock = {
-              id: segmentId,
-              scheduleWeekId: weekMeta.id,
-              dayOfWeek,
-              segment: "open",
-              startTime,
-              endTime,
-              childCount: scheduleDay?.enrollmentCount ?? 0,
-              status: "draft",
-              scheduleDayId: scheduleDay?.id
-            };
+            const existingBlock = segmentBlocksState.find((block) => {
+              return (
+                block.dayOfWeek === dayOfWeek &&
+                block.startTime === startTime &&
+                block.endTime === endTime &&
+                block.scheduleDayId === scheduleDay?.id
+              );
+            });
+            const segmentId = existingBlock?.id ?? `segment-${dayOfWeek}-custom-${Date.now()}`;
+            const newBlock: SegmentBlock | null = existingBlock
+              ? null
+              : {
+                  id: segmentId,
+                  scheduleWeekId: weekMeta.id,
+                  dayOfWeek,
+                  segment: "open",
+                  startTime,
+                  endTime,
+                  childCount: scheduleDay?.enrollmentCount ?? 0,
+                  status: "draft",
+                  scheduleDayId: scheduleDay?.id
+                };
             setStaffAssignmentsState((prev) => [
-              ...prev,
+              ...prev.filter((assignment) => {
+                return !(
+                  assignment.segmentBlockId === segmentId &&
+                  assignment.employeeId === employeeId &&
+                  assignment.startTime === startTime &&
+                  assignment.endTime === endTime
+                );
+              }),
               {
                 id: `assign-${segmentId}-${employeeId}`,
                 segmentBlockId: segmentId,
@@ -1028,7 +1056,9 @@ export default function App() {
                 status: "scheduled"
               }
             ]);
-            setSegmentBlocksState((prev) => [...prev, newBlock]);
+            if (newBlock) {
+              setSegmentBlocksState((prev) => [...prev, newBlock]);
+            }
           }}
           focusedSegmentIds={focusedSegmentIds}
         />

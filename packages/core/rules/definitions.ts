@@ -665,30 +665,56 @@ export const medicalDelegatedCoverageRule: RuleDefinition = {
     if (rules.minimumMedicalDelegated <= 0) {
       return violations;
     }
+    const grouped = new Map<string, SegmentBlock[]>();
     context.segmentBlocks.forEach((block) => {
       if (isClosedScheduleDay(context, block)) {
         return;
       }
-      const assignments = getAssignmentsForBlock(context, block.id);
-      const medicallyDelegatedCount = assignments.filter((assignment) => {
-        const employee = getEmployeeById(context, assignment.employeeId);
-        return Boolean(employee?.medicallyDelegated);
-      }).length;
+      const key = `${block.dayOfWeek}:${block.segment}`;
+      const current = grouped.get(key) ?? [];
+      current.push(block);
+      grouped.set(key, current);
+    });
+
+    grouped.forEach((blocks, key) => {
+      const [dayOfWeek, segment] = key.split(":");
+      const uniqueMedDelegated = new Set<string>();
+      blocks.forEach((block) => {
+        const assignments = getAssignmentsForBlock(context, block.id).filter(
+          (assignment) => assignment.status !== "completed"
+        );
+        assignments.forEach((assignment) => {
+          const employee = getEmployeeById(context, assignment.employeeId);
+          if (employee?.medicallyDelegated) {
+            uniqueMedDelegated.add(employee.id);
+          }
+        });
+      });
+      const medicallyDelegatedCount = uniqueMedDelegated.size;
       if (medicallyDelegatedCount < rules.minimumMedicalDelegated) {
         const citationId = getCitationId(
           context,
           "medical-delegated-coverage",
           DEFAULT_POLICY_CITATIONS["medical-delegated-coverage"]
         );
+        const primaryBlockId = blocks[0]?.id;
+        if (!primaryBlockId) {
+          return;
+        }
         violations.push(
           buildViolation(
             "medical-delegated-coverage",
-            `${block.dayOfWeek.toUpperCase()} ${block.segment} requires ${rules.minimumMedicalDelegated} medically delegated staff`,
+            `${dayOfWeek.toUpperCase()} ${segment} requires ${rules.minimumMedicalDelegated} medically delegated staff`,
             "SegmentBlock",
-            block.id,
+            primaryBlockId,
             citationId,
             "error",
-            { required: rules.minimumMedicalDelegated, actual: medicallyDelegatedCount }
+            {
+              required: rules.minimumMedicalDelegated,
+              actual: medicallyDelegatedCount,
+              dayOfWeek,
+              relatedSegmentBlockIds: blocks.map((block) => block.id)
+            }
           )
         );
       }
@@ -746,19 +772,28 @@ export const fieldTripEventIntegrityRule: RuleDefinition = {
       DEFAULT_POLICY_CITATIONS["field-trip-event"]
     );
     context.fieldTripEvents.forEach((event) => {
-      if (event.isNoFieldTrip) {
+      const scheduleDay =
+        getScheduleDayById(context, event.scheduleDayId) ??
+        context.scheduleDays.find((day) => day.dayOfWeek === event.dayOfWeek);
+      if (scheduleDay && (scheduleDay.scheduleType === "closed" || scheduleDay.dayScheduleType === "closed")) {
+        return;
+      }
+
+      const noFieldTripSelected =
+        event.isNoFieldTrip === true || (!event.fieldTripTypeId && event.isNoFieldTrip !== false);
+      if (noFieldTripSelected) {
         return;
       }
       if (!event.fieldTripTypeId) {
         violations.push(
           buildViolation(
             "field-trip-event",
-            `Field trip event ${event.id} must reference a FieldTripType or declare "No Field Trip"`,
+            `Field trip for ${event.dayOfWeek.toUpperCase()} must reference a field trip type or declare "No Field Trip"`,
             "FieldTripEvent",
             event.id,
             citationId,
             "error",
-            { missing: ["fieldTripTypeId", "isNoFieldTrip"] }
+            { missing: ["fieldTripTypeId", "isNoFieldTrip"], dayOfWeek: event.dayOfWeek }
           )
         );
         return;
@@ -768,12 +803,12 @@ export const fieldTripEventIntegrityRule: RuleDefinition = {
         violations.push(
           buildViolation(
             "field-trip-event",
-            `Field trip event ${event.id} points to an unknown FieldTripType (${event.fieldTripTypeId})`,
+            `Field trip for ${event.dayOfWeek.toUpperCase()} points to an unknown field trip type`,
             "FieldTripEvent",
             event.id,
             citationId,
             "error",
-            { fieldTripTypeId: event.fieldTripTypeId }
+            { fieldTripTypeId: event.fieldTripTypeId, dayOfWeek: event.dayOfWeek }
           )
         );
       }

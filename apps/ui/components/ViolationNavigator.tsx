@@ -38,6 +38,7 @@ export default function ViolationNavigator({
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
     setIsDragging(true);
     dragOffset.current = {
       x: event.clientX - position.x,
@@ -68,15 +69,15 @@ export default function ViolationNavigator({
   };
 
   const getTargetForSegment = (segmentId: string, dayOfWeek?: string) => {
-    const visibleTimeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
-    if (visibleTimeline && visibleTimeline.offsetParent !== null) {
-      return visibleTimeline;
-    }
     const visibleBlock = document.querySelector<HTMLElement>(
       `[data-segment-id="${segmentId}"]`
     );
     if (visibleBlock && visibleBlock.offsetParent !== null) {
       return visibleBlock;
+    }
+    const visibleTimeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
+    if (visibleTimeline && visibleTimeline.offsetParent !== null) {
+      return visibleTimeline;
     }
     if (dayOfWeek) {
       const header = document.querySelector<HTMLElement>(`[data-day-column-header="${dayOfWeek}"]`);
@@ -93,8 +94,11 @@ export default function ViolationNavigator({
 
   const adjustForTarget = (segmentIds: string[], dayOfWeek?: string) => {
     const overlay = containerRef.current;
-    const target =
+    const targetFromSegments =
       segmentIds.map((segmentId) => getTargetForSegment(segmentId, dayOfWeek)).find(Boolean) ?? null;
+    const targetFromDay =
+      dayOfWeek ? document.querySelector<HTMLElement>(`[data-day-column-header="${dayOfWeek}"]`) : null;
+    const target = targetFromSegments ?? targetFromDay;
     if (!overlay || !target) return;
     const overlayRect = overlay.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
@@ -165,6 +169,7 @@ export default function ViolationNavigator({
             gap: "0.5rem",
             cursor: isDragging ? "grabbing" : "grab",
             userSelect: "none",
+            touchAction: "none",
             flex: 1
           }}
         >
@@ -270,7 +275,17 @@ export default function ViolationNavigator({
                       ...(violation.relatedSegmentBlockIds ?? [])
                     ];
                     const uniqueSegmentIds = Array.from(new Set(segmentIds.filter(Boolean)));
-                    onFocusSegments(uniqueSegmentIds);
+                    if (uniqueSegmentIds.length > 0) {
+                      onFocusSegments(uniqueSegmentIds);
+                    } else {
+                      const dayOfWeek = String(violation.metadata?.dayOfWeek ?? "");
+                      if (dayOfWeek) {
+                        const dayHeader = document.querySelector<HTMLElement>(
+                          `[data-day-column-header="${dayOfWeek}"]`
+                        );
+                        dayHeader?.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+                      }
+                    }
                     window.setTimeout(
                       () => adjustForTarget(uniqueSegmentIds, String(violation.metadata?.dayOfWeek ?? "")),
                       220
