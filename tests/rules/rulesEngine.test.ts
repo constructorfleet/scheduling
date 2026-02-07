@@ -980,6 +980,80 @@ describe("RulesEngine", () => {
     expect(leaderViolation).toBeDefined();
   });
 
+  test("requires opener overlap, not just unique opener count in the window", () => {
+    const day = createScheduleDay("day-opener-overlap", { dayOfWeek: "mon", dayScheduleType: "full_day" });
+    const block = createSegmentBlock("block-opener-overlap", { dayOfWeek: "mon" });
+    const first = createEmployee("emp-open-overlap-1");
+    const second = createEmployee("emp-open-overlap-2");
+    const firstAssignment = createAssignment("assign-open-overlap-1", block.id, first.id, {
+      startTime: "06:00",
+      endTime: "06:07"
+    });
+    const secondAssignment = createAssignment("assign-open-overlap-2", block.id, second.id, {
+      startTime: "06:08",
+      endTime: "06:15"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [block],
+      staffAssignments: [firstAssignment, secondAssignment],
+      employees: [first, second],
+      schoolRules: {
+        openerCount: 2,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false,
+        openerWindowMinutes: 15
+      }
+    });
+
+    const violations = engine.evaluate(context);
+    const openerCoverageViolation = violations.find(
+      (violation) => violation.ruleId === "open-close-coverage" && violation.target.metadata?.type === "opener"
+    );
+    expect(openerCoverageViolation).toBeDefined();
+  });
+
+  test("counts medically delegated coverage by overlap even when assignment is anchored to another segment block", () => {
+    const day = createScheduleDay("day-medical-overlap", { dayOfWeek: "mon", dayScheduleType: "full_day" });
+    const openBlock = createSegmentBlock("block-medical-open", {
+      dayOfWeek: "mon",
+      segment: "open",
+      startTime: "06:30",
+      endTime: "10:15"
+    });
+    const midBlock = createSegmentBlock("block-medical-mid", {
+      dayOfWeek: "mon",
+      segment: "mid",
+      startTime: "10:15",
+      endTime: "14:15"
+    });
+    const medEmployee = createEmployee("emp-medical-overlap", {
+      medicallyDelegated: true,
+      cprCurrent: true
+    });
+    const mergedStyleAssignment = createAssignment("assign-medical-overlap", openBlock.id, medEmployee.id, {
+      startTime: "06:30",
+      endTime: "14:15"
+    });
+    const context: RulesContext = withDefaultScheduleInfo({
+      scheduleDays: [day],
+      segmentBlocks: [openBlock, midBlock],
+      staffAssignments: [mergedStyleAssignment],
+      employees: [medEmployee],
+      schoolRules: {
+        openerCount: 0,
+        closerCount: 0,
+        minimumMedicalDelegated: 1,
+        requireCurrentCpr: false
+      }
+    });
+
+    const violations = engine.evaluate(context);
+    const medicalViolations = violations.filter((violation) => violation.ruleId === "medical-delegated-coverage");
+    expect(medicalViolations).toHaveLength(0);
+  });
+
   test("blocks assignments when current CPR is required", () => {
     const block = createSegmentBlock("block-cpr", { dayOfWeek: "mon" });
     const employee = createEmployee("emp-cpr", { cprCurrent: false });
