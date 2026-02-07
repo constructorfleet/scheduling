@@ -8,7 +8,6 @@ import GuidedStatusTracker from "./components/GuidedStatusTracker";
 import AuditTimeline from "./components/AuditTimeline";
 import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
 import {
-  auditTimeline,
   dayDisplayNames,
   daySequence,
   fieldTripEvents,
@@ -23,7 +22,7 @@ import {
   fieldTripTypes,
   employees
 } from "./data/runtimeDefaults";
-import { GuidedStep, RuleViolation as UiRuleViolation } from "./types";
+import { AuditEvent, GuidedStep, RuleViolation as UiRuleViolation } from "./types";
 import {
   DayOfWeek,
   Employee,
@@ -33,7 +32,8 @@ import {
   ScheduleDay,
   ScheduleStatus,
   ScheduleType,
-  SegmentBlock
+  SegmentBlock,
+  StaffAssignment
 } from "@core/domain/types";
 import type {
   EmployeePayload,
@@ -123,6 +123,21 @@ const formatWeekRange = (startDate: Date) => {
   return `${startLabel} – ${endLabel}, ${endDate.getFullYear()}`;
 };
 
+type ScheduleSnapshot = {
+  scheduleDays: ScheduleDay[];
+  segmentBlocks: SegmentBlock[];
+  staffAssignments: StaffAssignment[];
+  fieldTripEvents: FieldTripEvent[];
+  scheduleStatusOverride: ScheduleStatus | null;
+};
+
+const USER_POLICY_CITATION: PolicyCitation = {
+  id: "ui-audit",
+  name: "User schedule action",
+  document: "UI action log",
+  section: "N/A"
+};
+
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
@@ -133,8 +148,9 @@ export default function App() {
   const [fieldTripTypesState, setFieldTripTypesState] = useState(fieldTripTypes);
   const [employeesState, setEmployeesState] = useState(employees);
   const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
-  const [undoCount, setUndoCount] = useState(2);
-  const [redoCount, setRedoCount] = useState(0);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
+  const [historyPast, setHistoryPast] = useState<ScheduleSnapshot[]>([]);
+  const [historyFuture, setHistoryFuture] = useState<ScheduleSnapshot[]>([]);
   const [publishMessage, setPublishMessage] = useState<string | null>(null);
   const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
   const [segmentBlocksState, setSegmentBlocksState] = useState(segmentBlocks);
@@ -167,6 +183,86 @@ export default function App() {
   const scheduleDirtyRef = useRef(false);
   const activeApiRequestsRef = useRef(0);
   const apiStatusResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suspendHistoryRef = useRef(false);
+
+  const makeSnapshot = (
+    next: Partial<ScheduleSnapshot> = {},
+    current?: ScheduleSnapshot
+  ): ScheduleSnapshot => {
+    const source =
+      current ??
+      ({
+        scheduleDays: scheduleDaysState,
+        segmentBlocks: segmentBlocksState,
+        staffAssignments: staffAssignmentsState,
+        fieldTripEvents: fieldTripEventsState,
+        scheduleStatusOverride
+      } satisfies ScheduleSnapshot);
+    return {
+      scheduleDays: next.scheduleDays ?? source.scheduleDays,
+      segmentBlocks: next.segmentBlocks ?? source.segmentBlocks,
+      staffAssignments: next.staffAssignments ?? source.staffAssignments,
+      fieldTripEvents: next.fieldTripEvents ?? source.fieldTripEvents,
+      scheduleStatusOverride:
+        next.scheduleStatusOverride !== undefined
+          ? next.scheduleStatusOverride
+          : source.scheduleStatusOverride
+    };
+  };
+
+  const applySnapshot = (snapshot: ScheduleSnapshot) => {
+    suspendHistoryRef.current = true;
+    setScheduleDaysState(snapshot.scheduleDays);
+    setSegmentBlocksState(snapshot.segmentBlocks);
+    setStaffAssignmentsState(snapshot.staffAssignments);
+    setFieldTripEventsState(snapshot.fieldTripEvents);
+    setScheduleStatusOverride(snapshot.scheduleStatusOverride);
+    queueMicrotask(() => {
+      suspendHistoryRef.current = false;
+    });
+  };
+
+  const appendAuditEvent = (action: string, notes?: string) => {
+    setAuditEvents((prev) => [
+      {
+        id: `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        timestamp: new Date().toISOString(),
+        user: "You",
+        action,
+        policyCitation: USER_POLICY_CITATION,
+        notes
+      },
+      ...prev
+    ]);
+  };
+
+  const applyScheduleChange = (
+    updater: (current: ScheduleSnapshot) => Partial<ScheduleSnapshot> | null,
+    audit: { action: string; notes?: string }
+  ) => {
+    if (suspendHistoryRef.current) {
+      return;
+    }
+    const current = makeSnapshot();
+    const changes = updater(current);
+    if (!changes) {
+      return;
+    }
+    const next = makeSnapshot(changes, current);
+    const changed =
+      next.scheduleDays !== current.scheduleDays ||
+      next.segmentBlocks !== current.segmentBlocks ||
+      next.staffAssignments !== current.staffAssignments ||
+      next.fieldTripEvents !== current.fieldTripEvents ||
+      next.scheduleStatusOverride !== current.scheduleStatusOverride;
+    if (!changed) {
+      return;
+    }
+    setHistoryPast((prev) => [...prev, current]);
+    setHistoryFuture([]);
+    applySnapshot(next);
+    appendAuditEvent(audit.action, audit.notes);
+  };
 
   const beginApiAction = (kind: "loading" | "saving", message: string) => {
     activeApiRequestsRef.current += 1;
@@ -527,24 +623,32 @@ export default function App() {
         completeApiAction("Schedule loaded");
         if (!isActive) return;
         if (schedule) {
-          if (schedule.status) {
-            setScheduleStatusOverride(schedule.status);
-          }
-          setScheduleDaysState(
-            (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
-              ...day,
-              date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
-            }))
-          );
-          setSegmentBlocksState(schedule.segmentBlocks ?? []);
-          setStaffAssignmentsState(schedule.staffAssignments ?? []);
-          setFieldTripEventsState(
-            (schedule.fieldTripEvents ?? []).map((event: FieldTripEvent) => ({
-              ...event,
-              isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
-              signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
-            }))
-          );
+          const loadedScheduleDays = (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
+            ...day,
+            date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
+          }));
+          const loadedSegmentBlocks = schedule.segmentBlocks ?? [];
+          const loadedStaffAssignments = schedule.staffAssignments ?? [];
+          const loadedFieldTripEvents = (schedule.fieldTripEvents ?? []).map((event: FieldTripEvent) => ({
+            ...event,
+            isNoFieldTrip: event.fieldTripTypeId ? false : (event.isNoFieldTrip ?? true),
+            signedOffAt: event.signedOffAt ? new Date(event.signedOffAt).toISOString() : event.signedOffAt
+          }));
+          const loadedSnapshot: ScheduleSnapshot = {
+            scheduleDays: loadedScheduleDays,
+            segmentBlocks: loadedSegmentBlocks,
+            staffAssignments: loadedStaffAssignments,
+            fieldTripEvents: loadedFieldTripEvents,
+            scheduleStatusOverride: schedule.status ?? null
+          };
+          applySnapshot(loadedSnapshot);
+          setHistoryPast([]);
+          setHistoryFuture([]);
+          setAuditEvents([]);
+        } else {
+          setHistoryPast([]);
+          setHistoryFuture([]);
+          setAuditEvents([]);
         }
       } catch (error) {
         failApiAction("Schedule load failed");
@@ -861,14 +965,20 @@ export default function App() {
   };
 
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
-    setScheduleDaysState((prev) =>
-      prev.map((day) => (day.id === dayId ? { ...day, enrollmentCount: enrollment } : day))
+    applyScheduleChange(
+      (current) => ({
+        scheduleDays: current.scheduleDays.map((day) =>
+          day.id === dayId ? { ...day, enrollmentCount: enrollment } : day
+        )
+      }),
+      { action: "Updated enrollment", notes: `Set ${dayId} enrollment to ${enrollment ?? "unset"}` }
     );
   };
 
   const handleScheduleTypeUpdate = (dayId: string, scheduleType: ScheduleType | undefined) => {
-    setScheduleDaysState((prev) =>
-      prev.map((day) => {
+    applyScheduleChange(
+      (current) => ({
+        scheduleDays: current.scheduleDays.map((day) => {
         if (day.id !== dayId) {
           return day;
         }
@@ -885,15 +995,21 @@ export default function App() {
           scheduleType,
           dayScheduleType: day.dayScheduleType === "closed" ? "full_day" : day.dayScheduleType
         };
-      })
+        })
+      }),
+      {
+        action: "Updated schedule type",
+        notes: `Set ${dayId} schedule type to ${scheduleType ?? "unset"}`
+      }
     );
   };
 
   const handleFieldTripSelection = (dayId: string, selection: FieldTripSelection) => {
     const day = scheduleDaysState.find((item) => item.id === dayId);
     const dayOfWeek = day?.dayOfWeek;
-    setFieldTripEventsState((prev) =>
-      prev.map((event) => {
+    applyScheduleChange(
+      (current) => ({
+        fieldTripEvents: current.fieldTripEvents.map((event) => {
         const matchesDay = event.scheduleDayId === dayId || (dayOfWeek ? event.dayOfWeek === dayOfWeek : false);
         if (!matchesDay) {
           return event;
@@ -916,7 +1032,15 @@ export default function App() {
           signedOffAt: undefined,
           notes: "Field trip metadata needs review"
         };
-      })
+        })
+      }),
+      {
+        action: "Updated field trip selection",
+        notes:
+          selection.type === "none"
+            ? `${dayId} set to No Field Trip`
+            : `${dayId} set to field trip ${selection.fieldTripTypeId}`
+      }
     );
   };
 
@@ -948,25 +1072,84 @@ export default function App() {
   };
 
   const handleUndo = () => {
-    setUndoCount((value) => Math.max(0, value - 1));
-    setRedoCount((value) => value + 1);
+    setHistoryPast((past) => {
+      if (past.length === 0) {
+        return past;
+      }
+      const previous = past[past.length - 1];
+      const current = makeSnapshot();
+      setHistoryFuture((future) => [...future, current]);
+      applySnapshot(previous);
+      appendAuditEvent("Undo", "Reverted the latest schedule change");
+      return past.slice(0, -1);
+    });
   };
 
   const handleRedo = () => {
-    setRedoCount((value) => Math.max(0, value - 1));
-    setUndoCount((value) => value + 1);
+    setHistoryFuture((future) => {
+      if (future.length === 0) {
+        return future;
+      }
+      const next = future[future.length - 1];
+      const current = makeSnapshot();
+      setHistoryPast((past) => [...past, current]);
+      applySnapshot(next);
+      appendAuditEvent("Redo", "Re-applied the latest undone schedule change");
+      return future.slice(0, -1);
+    });
   };
 
+  useEffect(() => {
+    const isEditableTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+      if (target.isContentEditable) {
+        return true;
+      }
+      const tag = target.tagName.toLowerCase();
+      return tag === "input" || tag === "textarea" || tag === "select";
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== "z") {
+        return;
+      }
+      event.preventDefault();
+      if (event.shiftKey) {
+        handleRedo();
+        return;
+      }
+      handleUndo();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [handleRedo, handleUndo]);
+
   const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
-    setStaffAssignmentsState((prev) =>
-      prev.map((assignment) =>
-        assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
-      )
+    applyScheduleChange(
+      (current) => ({
+        staffAssignments: current.staffAssignments.map((assignment) =>
+          assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
+        )
+      }),
+      { action: "Updated assignment time", notes: `${assignmentId}: ${startTime}-${endTime}` }
     );
   };
 
   const handleDeleteAssignment = (assignmentId: string) => {
-    setStaffAssignmentsState((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
+    applyScheduleChange(
+      (current) => ({
+        staffAssignments: current.staffAssignments.filter((assignment) => assignment.id !== assignmentId)
+      }),
+      { action: "Deleted assignment", notes: assignmentId }
+    );
   };
 
   const handleUpdateScheduleTypes = (next: typeof scheduleTypeOptionsState) => {
@@ -1092,51 +1275,60 @@ export default function App() {
           onUpdateAssignmentTime={handleUpdateAssignmentTime}
           onDeleteAssignment={handleDeleteAssignment}
           onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
-            const scheduleDay = scheduleDaysState.find((day) => day.dayOfWeek === dayOfWeek);
-            const existingBlock = segmentBlocksState.find((block) => {
-              return (
-                block.dayOfWeek === dayOfWeek &&
-                block.startTime === startTime &&
-                block.endTime === endTime &&
-                block.scheduleDayId === scheduleDay?.id
-              );
-            });
-            const segmentId = existingBlock?.id ?? `segment-${dayOfWeek}-custom-${Date.now()}`;
-            const newBlock: SegmentBlock | null = existingBlock
-              ? null
-              : {
-                  id: segmentId,
-                  scheduleWeekId: weekMeta.id,
-                  dayOfWeek,
-                  segment: "open",
-                  startTime,
-                  endTime,
-                  childCount: scheduleDay?.enrollmentCount ?? 0,
-                  status: "draft",
-                  scheduleDayId: scheduleDay?.id
+            applyScheduleChange(
+              (current) => {
+                const scheduleDay = current.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+                const existingBlock = current.segmentBlocks.find((block) => {
+                  return (
+                    block.dayOfWeek === dayOfWeek &&
+                    block.startTime === startTime &&
+                    block.endTime === endTime &&
+                    block.scheduleDayId === scheduleDay?.id
+                  );
+                });
+                const segmentId = existingBlock?.id ?? `segment-${dayOfWeek}-custom-${Date.now()}`;
+                const newBlock: SegmentBlock | null = existingBlock
+                  ? null
+                  : {
+                      id: segmentId,
+                      scheduleWeekId: weekMeta.id,
+                      dayOfWeek,
+                      segment: "open",
+                      startTime,
+                      endTime,
+                      childCount: scheduleDay?.enrollmentCount ?? 0,
+                      status: "draft",
+                      scheduleDayId: scheduleDay?.id
+                    };
+                const nextAssignments = [
+                  ...current.staffAssignments.filter((assignment) => {
+                    return !(
+                      assignment.segmentBlockId === segmentId &&
+                      assignment.employeeId === employeeId &&
+                      assignment.startTime === startTime &&
+                      assignment.endTime === endTime
+                    );
+                  }),
+                  {
+                    id: `assign-${segmentId}-${employeeId}`,
+                    segmentBlockId: segmentId,
+                    employeeId,
+                    assignmentSource: "manual_adjustment" as const,
+                    startTime,
+                    endTime,
+                    status: "scheduled" as const
+                  }
+                ];
+                return {
+                  staffAssignments: nextAssignments,
+                  segmentBlocks: newBlock ? [...current.segmentBlocks, newBlock] : current.segmentBlocks
                 };
-            setStaffAssignmentsState((prev) => [
-              ...prev.filter((assignment) => {
-                return !(
-                  assignment.segmentBlockId === segmentId &&
-                  assignment.employeeId === employeeId &&
-                  assignment.startTime === startTime &&
-                  assignment.endTime === endTime
-                );
-              }),
+              },
               {
-                id: `assign-${segmentId}-${employeeId}`,
-                segmentBlockId: segmentId,
-                employeeId,
-                assignmentSource: "manual_adjustment",
-                startTime,
-                endTime,
-                status: "scheduled"
+                action: "Created assignment",
+                notes: `${employeeId} ${dayOfWeek} ${startTime}-${endTime}`
               }
-            ]);
-            if (newBlock) {
-              setSegmentBlocksState((prev) => [...prev, newBlock]);
-            }
+            );
           }}
           focusedSegmentIds={focusedSegmentIds}
         />
@@ -1155,11 +1347,11 @@ export default function App() {
       <AnimatePresence>
         {showAuditTimeline && (
           <AuditTimeline
-            events={auditTimeline}
+            events={auditEvents}
             onUndo={handleUndo}
             onRedo={handleRedo}
-            canUndo={undoCount > 0}
-            canRedo={redoCount > 0}
+            canUndo={historyPast.length > 0}
+            canRedo={historyFuture.length > 0}
             isOpen={showAuditTimeline}
             onClose={() => setShowAuditTimeline(false)}
           />
