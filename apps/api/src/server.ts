@@ -529,14 +529,14 @@ const buildServer = async () => {
 
   fastify.put("/api/schedule/:weekId", async (request, reply) => {
     const { weekId } = request.params as { weekId: string };
-    const payload = request.body as {
+    const payload = request.body as Partial<{
       scheduleWeek: ScheduleWeekPayload;
       scheduleDays: ScheduleDayPayload[];
       segmentBlocks: SegmentBlockPayload[];
       staffAssignments: StaffAssignmentPayload[];
       fieldTripEvents: FieldTripEventPayload[];
       auditEvents: AuditEventPayload[];
-    };
+    }>;
 
     const prisma = getPrisma();
     try {
@@ -544,17 +544,44 @@ const buildServer = async () => {
     } catch (error) {
       request.log.warn({ error }, "Database backup before schedule write failed");
     }
-    if (!Array.isArray(payload.scheduleDays) || payload.scheduleDays.length === 0) {
+    const existingWeek = await prisma.scheduleWeek.findUnique({
+      where: { id: weekId },
+      select: {
+        schoolId: true,
+        label: true,
+        status: true,
+        startDate: true
+      }
+    });
+
+    const scheduleWeekPayload = payload.scheduleWeek;
+    const resolvedSchoolId = scheduleWeekPayload?.schoolId ?? existingWeek?.schoolId;
+    if (!resolvedSchoolId) {
       return reply.code(400).send({
-        message: "Refusing to save schedule without scheduleDays. Payload is incomplete."
+        message: "Cannot save schedule chunk before scheduleWeek exists. Include scheduleWeek in the first save."
       });
     }
+
+    const resolvedLabel = scheduleWeekPayload?.label ?? existingWeek?.label ?? null;
+    const resolvedStatus = scheduleWeekPayload?.status ?? existingWeek?.status ?? "draft";
+    const resolvedStartDate =
+      scheduleWeekPayload && Object.prototype.hasOwnProperty.call(scheduleWeekPayload, "startDate")
+        ? scheduleWeekPayload.startDate
+          ? new Date(scheduleWeekPayload.startDate)
+          : null
+        : existingWeek?.startDate ?? null;
+    const scheduleDaysPayload = Array.isArray(payload.scheduleDays) ? payload.scheduleDays : [];
+    const segmentBlocksPayload = Array.isArray(payload.segmentBlocks) ? payload.segmentBlocks : [];
+    const staffAssignmentsPayload = Array.isArray(payload.staffAssignments) ? payload.staffAssignments : [];
+    const fieldTripEventsPayload = Array.isArray(payload.fieldTripEvents) ? payload.fieldTripEvents : [];
+    const auditEventsPayload = Array.isArray(payload.auditEvents) ? payload.auditEvents : [];
+
     await prisma.$transaction(async (tx: DbTransaction) => {
       await tx.school.upsert({
-        where: { id: payload.scheduleWeek.schoolId },
+        where: { id: resolvedSchoolId },
         create: {
-          id: payload.scheduleWeek.schoolId,
-          name: payload.scheduleWeek.schoolId,
+          id: resolvedSchoolId,
+          name: resolvedSchoolId,
           closedDays: [],
           openerCount: 0,
           closerCount: 0,
@@ -568,20 +595,20 @@ const buildServer = async () => {
         where: { id: weekId },
         create: {
           id: weekId,
-          schoolId: payload.scheduleWeek.schoolId,
-          label: payload.scheduleWeek.label ?? null,
-          status: payload.scheduleWeek.status,
-          startDate: payload.scheduleWeek.startDate ? new Date(payload.scheduleWeek.startDate) : null
+          schoolId: resolvedSchoolId,
+          label: resolvedLabel,
+          status: resolvedStatus,
+          startDate: resolvedStartDate
         },
         update: {
-          label: payload.scheduleWeek.label ?? null,
-          status: payload.scheduleWeek.status,
-          startDate: payload.scheduleWeek.startDate ? new Date(payload.scheduleWeek.startDate) : null
+          label: resolvedLabel,
+          status: resolvedStatus,
+          startDate: resolvedStartDate
         }
       });
 
-      if (payload.scheduleDays?.length) {
-        for (const day of payload.scheduleDays) {
+      if (scheduleDaysPayload.length) {
+        for (const day of scheduleDaysPayload) {
           await tx.scheduleDay.upsert({
             where: { id: day.id },
             create: {
@@ -613,8 +640,8 @@ const buildServer = async () => {
         }
       }
 
-      if (payload.fieldTripEvents?.length) {
-        for (const event of payload.fieldTripEvents) {
+      if (fieldTripEventsPayload.length) {
+        for (const event of fieldTripEventsPayload) {
           await tx.fieldTripEvent.upsert({
             where: { id: event.id },
             create: {
@@ -645,8 +672,8 @@ const buildServer = async () => {
         }
       }
 
-      if (payload.segmentBlocks?.length) {
-        for (const block of payload.segmentBlocks) {
+      if (segmentBlocksPayload.length) {
+        for (const block of segmentBlocksPayload) {
           await tx.segmentBlock.upsert({
             where: { id: block.id },
             create: {
@@ -674,10 +701,15 @@ const buildServer = async () => {
         }
       }
 
-      if (payload.staffAssignments?.length) {
-        const segmentBlockIds = new Set((payload.segmentBlocks ?? []).map((block) => block.id));
+      if (staffAssignmentsPayload.length) {
+        const segmentBlockIds = new Set(segmentBlocksPayload.map((block) => block.id));
+        const existingSegmentBlocks = await tx.segmentBlock.findMany({
+          where: { scheduleWeekId: weekId },
+          select: { id: true }
+        });
+        existingSegmentBlocks.forEach((block) => segmentBlockIds.add(block.id));
         const uniqueAssignments = new Map<string, StaffAssignmentPayload>();
-        payload.staffAssignments.forEach((assignment) => {
+        staffAssignmentsPayload.forEach((assignment) => {
           if (!segmentBlockIds.has(assignment.segmentBlockId)) {
             return;
           }
@@ -711,8 +743,8 @@ const buildServer = async () => {
         }
       }
 
-      if (payload.auditEvents?.length) {
-        for (const event of payload.auditEvents) {
+      if (auditEventsPayload.length) {
+        for (const event of auditEventsPayload) {
           await tx.auditEvent.upsert({
             where: { id: event.id },
             create: {
