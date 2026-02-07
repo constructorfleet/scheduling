@@ -38,6 +38,7 @@ import {
 import type {
   EmployeePayload,
   FieldTripTypePayload,
+  SettingsPayload as SettingsPayloadModel,
   ScheduleTypePayload as ScheduleTypePayloadModel
 } from "./data/generated";
 import { createRulesEngine } from "@core/rules/engine";
@@ -505,25 +506,34 @@ export default function App() {
     employees: typeof employeesState;
     operatingHours: OperatingHoursConfig[];
     fieldTripTypes: typeof fieldTripTypesState;
-  }> = {}) => {
-    const schoolRules = overrides.schoolRules ?? schoolRulesState;
-    return {
-      school: {
+  }> = {}): SettingsPayloadModel => {
+    const payload: SettingsPayloadModel = {};
+    const hasSchoolSection =
+      "schoolName" in overrides || "closedDays" in overrides || "schoolRules" in overrides;
+    if (hasSchoolSection) {
+      const schoolRules = overrides.schoolRules ?? schoolRulesState;
+      payload.school = {
         name: overrides.schoolName ?? schoolName,
         closedDays: overrides.closedDays ?? closedDaysState,
         openerCount: schoolRules.openerCount,
         closerCount: schoolRules.closerCount,
         minimumMedicalDelegated: schoolRules.minimumMedicalDelegated,
         requireCurrentCpr: schoolRules.requireCurrentCpr
-      },
-      scheduleTypes: (overrides.scheduleTypes ?? scheduleTypeOptionsState).map((type) => ({
+      };
+    }
+    if ("scheduleTypes" in overrides) {
+      payload.scheduleTypes = (overrides.scheduleTypes ?? scheduleTypeOptionsState).map((type) => ({
         value: type.value,
         label: type.label,
         ratio: type.ratio,
         description: type.description
-      })) as ScheduleTypePayloadModel[],
-      jobTitles: overrides.jobTitles ?? jobTitlesState,
-      employees: (overrides.employees ?? employeesState).map((employee) => ({
+      })) as ScheduleTypePayloadModel[];
+    }
+    if ("jobTitles" in overrides) {
+      payload.jobTitles = overrides.jobTitles ?? jobTitlesState;
+    }
+    if ("employees" in overrides) {
+      payload.employees = (overrides.employees ?? employeesState).map((employee) => ({
         id: employee.id,
         name: employee.name,
         jobTitle: employee.jobTitle,
@@ -535,16 +545,21 @@ export default function App() {
         notes: employee.notes,
         availability: employee.availability ?? [],
         requestedDaysOff: employee.requestedDaysOff ?? []
-      })) as EmployeePayload[],
-      operatingHours: overrides.operatingHours ?? operatingHoursConfigState,
-      fieldTripTypes: (overrides.fieldTripTypes ?? fieldTripTypesState).map((trip) => ({
+      })) as EmployeePayload[];
+    }
+    if ("operatingHours" in overrides) {
+      payload.operatingHours = overrides.operatingHours ?? operatingHoursConfigState;
+    }
+    if ("fieldTripTypes" in overrides) {
+      payload.fieldTripTypes = (overrides.fieldTripTypes ?? fieldTripTypesState).map((trip) => ({
         name: trip.name,
         minAdultStudentRatio: trip.minAdultStudentRatio,
         minLeaderStudentRatio: trip.minLeaderStudentRatio,
         policyCitationId: trip.policyCitationId,
         notes: trip.notes
-      })) as FieldTripTypePayload[]
-    };
+      })) as FieldTripTypePayload[];
+    }
+    return payload;
   };
 
   const persistSettings = async (overrides: Parameters<typeof buildSettingsPayload>[0] = {}) => {

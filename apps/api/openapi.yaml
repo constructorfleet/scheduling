@@ -565,13 +565,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FieldTripTypePayload'
-      required:
-        - school
-        - scheduleTypes
-        - jobTitles
-        - employees
-        - operatingHours
-        - fieldTripTypes
     SettingsResponse:
       type: object
       properties:

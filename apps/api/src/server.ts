@@ -188,7 +188,7 @@ const buildServer = async () => {
   fastify.put("/api/settings/:schoolId", async (request) => {
     const { schoolId } = request.params as { schoolId: string };
     const payload = request.body as {
-      school: {
+      school?: {
         name: string;
         closedDays: string[];
         openerCount: number;
@@ -196,18 +196,18 @@ const buildServer = async () => {
         minimumMedicalDelegated: number;
         requireCurrentCpr: boolean;
       };
-      scheduleTypes: Array<{
+      scheduleTypes?: Array<{
         value: string;
         label: string;
         ratio: { adults: number; students: number };
         description?: string;
       }>;
-      jobTitles: Array<{
+      jobTitles?: Array<{
         title: string;
         leaderQualified: boolean;
         requiresLeaderForOpenClose: boolean;
       }>;
-      employees: Array<{
+      employees?: Array<{
         id?: string;
         name: string;
         jobTitle: string;
@@ -220,13 +220,13 @@ const buildServer = async () => {
         availability?: EmployeeAvailabilityDay[];
         requestedDaysOff?: EmployeeTimeOffRequest[];
       }>;
-      operatingHours: Array<{
+      operatingHours?: Array<{
         scheduleType: string;
         daysOfWeek: string[];
         open: string;
         close: string;
       }>;
-      fieldTripTypes: Array<{
+      fieldTripTypes?: Array<{
         name: string;
         minAdultStudentRatio: number;
         minLeaderStudentRatio: number;
@@ -238,26 +238,42 @@ const buildServer = async () => {
     const prisma = getPrisma();
 
     const school = await prisma.$transaction(async (tx: DbTransaction) => {
-      const upsertedSchool = await tx.school.upsert({
-        where: { id: schoolId },
-        create: {
-          id: schoolId,
-          name: payload.school.name,
-          closedDays: payload.school.closedDays,
-          openerCount: payload.school.openerCount,
-          closerCount: payload.school.closerCount,
-          minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
-          requireCurrentCpr: payload.school.requireCurrentCpr
-        },
-        update: {
-          name: payload.school.name,
-          closedDays: payload.school.closedDays,
-          openerCount: payload.school.openerCount,
-          closerCount: payload.school.closerCount,
-          minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
-          requireCurrentCpr: payload.school.requireCurrentCpr
-        }
-      });
+      let upsertedSchool = await tx.school.findUnique({ where: { id: schoolId } });
+      if (payload.school) {
+        upsertedSchool = await tx.school.upsert({
+          where: { id: schoolId },
+          create: {
+            id: schoolId,
+            name: payload.school.name,
+            closedDays: payload.school.closedDays,
+            openerCount: payload.school.openerCount,
+            closerCount: payload.school.closerCount,
+            minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
+            requireCurrentCpr: payload.school.requireCurrentCpr
+          },
+          update: {
+            name: payload.school.name,
+            closedDays: payload.school.closedDays,
+            openerCount: payload.school.openerCount,
+            closerCount: payload.school.closerCount,
+            minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
+            requireCurrentCpr: payload.school.requireCurrentCpr
+          }
+        });
+      }
+      if (!upsertedSchool) {
+        upsertedSchool = await tx.school.create({
+          data: {
+            id: schoolId,
+            name: schoolId,
+            closedDays: [],
+            openerCount: 0,
+            closerCount: 0,
+            minimumMedicalDelegated: 0,
+            requireCurrentCpr: false
+          }
+        });
+      }
 
       if (payload.scheduleTypes?.length) {
         for (const type of payload.scheduleTypes) {

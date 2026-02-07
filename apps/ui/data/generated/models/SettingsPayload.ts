@@ -9,11 +9,11 @@ import type { OperatingHoursPayload } from './OperatingHoursPayload';
 import type { ScheduleTypePayload } from './ScheduleTypePayload';
 import type { SchoolSettings } from './SchoolSettings';
 export type SettingsPayload = {
-    school: SchoolSettings;
-    scheduleTypes: Array<ScheduleTypePayload>;
-    jobTitles: Array<JobTitlePayload>;
-    employees: Array<EmployeePayload>;
-    operatingHours: Array<OperatingHoursPayload>;
-    fieldTripTypes: Array<FieldTripTypePayload>;
+    school?: SchoolSettings;
+    scheduleTypes?: Array<ScheduleTypePayload>;
+    jobTitles?: Array<JobTitlePayload>;
+    employees?: Array<EmployeePayload>;
+    operatingHours?: Array<OperatingHoursPayload>;
+    fieldTripTypes?: Array<FieldTripTypePayload>;
 };
 
