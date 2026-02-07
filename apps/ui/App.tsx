@@ -252,6 +252,28 @@ export default function App() {
     }));
   }, [employeesState, jobTitleLeaderMap, schoolRulesState.requireCurrentCpr]);
 
+  const scheduleStaff = useMemo(() => {
+    const byId = new Map(employeesDerived.map((employee) => [employee.id, employee]));
+    staffAssignmentsState.forEach((assignment) => {
+      if (byId.has(assignment.employeeId)) {
+        return;
+      }
+      byId.set(assignment.employeeId, {
+        id: assignment.employeeId,
+        name: `Unlinked staff (${assignment.employeeId})`,
+        jobTitle: "Unknown",
+        maxHoursPerDay: 24,
+        maxHoursPerWeek: 168,
+        employmentStatus: "active",
+        leaderQualified: false,
+        medicallyDelegated: false,
+        cprCurrent: true,
+        notes: "This assignment references a missing employee record. Re-link in Settings."
+      });
+    });
+    return Array.from(byId.values());
+  }, [employeesDerived, staffAssignmentsState]);
+
   const fieldTripEventsByDay = useMemo<Record<DayOfWeek, FieldTripEvent | undefined>>(() => {
     return fieldTripEventsState.reduce((map, event) => {
       map[event.dayOfWeek] = event;
@@ -992,7 +1014,7 @@ export default function App() {
         style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
       >
         <ScheduleMatrix
-          staff={employeesDerived}
+          staff={scheduleStaff}
           assignments={staffAssignmentsState}
           segmentBlocks={segmentBlocksState}
           days={scheduleDaysState}
