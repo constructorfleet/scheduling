@@ -140,9 +140,11 @@ export const ratioSegmentRule: RuleDefinition = {
         return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
       });
       const activeFieldTripType = getFieldTripTypeById(context, activeFieldTripEvent?.fieldTripTypeId);
+      // Field trip ratios use same format as schedule type ratios: children per adult
+      // e.g., 10 means 1 adult per 10 children (1:10 ratio)
       const fieldTripChildrenPerStaff =
         activeFieldTripType && activeFieldTripType.minAdultStudentRatio > 0
-          ? 1 / activeFieldTripType.minAdultStudentRatio
+          ? activeFieldTripType.minAdultStudentRatio
           : undefined;
       const childrenPerStaff =
         fieldTripChildrenPerStaff ??
@@ -1131,7 +1133,9 @@ export const fieldTripRatiosRule: RuleDefinition = {
       }
       const effectiveChildCount =
         typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
-      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount * type.minLeaderStudentRatio));
+      // Field trip ratios use same format as schedule type ratios: children per leader
+      // e.g., 30 means 1 leader per 30 children (1:30 ratio)
+      const requiredLeaders = Math.max(1, Math.ceil(effectiveChildCount / type.minLeaderStudentRatio));
       const blockStart = parseTimeToMinutes(block.startTime);
       const blockEnd = parseTimeToMinutes(block.endTime);
       const assignedLeaderIds = new Set(

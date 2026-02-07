@@ -1223,4 +1223,331 @@ describe("autoSchedule", () => {
       expect(result.staffAssignments.length).toBeGreaterThan(1);
     });
   });
+
+  describe("Comprehensive scheduling scenarios", () => {
+    // Create employees based on problem statement
+    const createComprehensiveEmployees = (): Employee[] => [
+      createEmployee("emp-arthur", "Arthur Dent", {
+        jobTitle: "Director",
+        leaderQualified: true,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 40
+      }),
+      createEmployee("emp-zaphod", "Zaphod Beeblebrox", {
+        jobTitle: "Leader",
+        leaderQualified: true,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 40
+      }),
+      createEmployee("emp-trillian", "Trillian", {
+        jobTitle: "Leader",
+        leaderQualified: true,
+        medicallyDelegated: false,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 40
+      }),
+      createEmployee("emp-ford", "Ford Prefect", {
+        jobTitle: "Leader",
+        leaderQualified: true,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 40
+      }),
+      createEmployee("emp-slartibartfast", "Slartibartfast", {
+        jobTitle: "Assistant",
+        leaderQualified: false,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 20
+      }),
+      createEmployee("emp-agrajac", "Agrajac", {
+        jobTitle: "Assistant",
+        leaderQualified: false,
+        medicallyDelegated: false,
+        cprCurrent: true,
+        maxHoursPerDay: 5,
+        maxHoursPerWeek: 20
+      }),
+      createEmployee("emp-whale", "Whale", {
+        jobTitle: "Assistant",
+        leaderQualified: false,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 20
+      }),
+      createEmployee("emp-petunias", "Petunias", {
+        jobTitle: "Leader",
+        leaderQualified: true,
+        medicallyDelegated: true,
+        cprCurrent: true,
+        maxHoursPerDay: 8,
+        maxHoursPerWeek: 20
+      })
+    ];
+
+    it("should schedule full week Mon-Fri FullDay NoFieldTrip 24 kids", () => {
+      // Scenario 1: Monday/Tuesday/Wednesday/Thursday/Friday FullDay NoFieldTrip 24 kids
+      const scheduleDays: ScheduleDay[] = ["mon", "tue", "wed", "thu", "fri"].map((day, index) =>
+        createScheduleDay(`day-${day}`, day as DayOfWeek, `2026-02-${16 + index}`, {
+          scheduleType: "full_day",
+          enrollmentCount: 24,
+          fieldTripEventId: `ft-${day}`
+        })
+      );
+
+      const operatingHours: OperatingHours[] = ["mon", "tue", "wed", "thu", "fri"].map(day =>
+        createOperatingHours(`op-${day}`, day as DayOfWeek, "06:30", "18:00", {
+          dayScheduleType: "full_day"
+        })
+      );
+
+      const fieldTripEvents: FieldTripEvent[] = ["mon", "tue", "wed", "thu", "fri"].map(day =>
+        createFieldTripEvent(`ft-${day}`, day as DayOfWeek, {
+          isNoFieldTrip: true
+        })
+      );
+
+      const context: AutoSchedulerContext = {
+        scheduleDays,
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: createComprehensiveEmployees(),
+        fieldTripEvents,
+        operatingHours,
+        scheduleTypeRatios: { full_day: 15 }, // 1:15 ratio = 2 staff for 24 kids (rounded up)
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 2,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        },
+        jobTitleRules: {
+          Assistant: { requiresLeaderForOpenClose: true }
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.success).toBe(true);
+      expect(result.violations.length).toBe(0);
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      expect(result.segmentBlocks.length).toBeGreaterThan(0);
+
+      // Verify all days have schedules
+      ["mon", "tue", "wed", "thu", "fri"].forEach(day => {
+        const dayBlocks = result.segmentBlocks.filter(b => b.dayOfWeek === day);
+        expect(dayBlocks.length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should schedule mixed week: Mon/Tue/Thu FullDay, Wed SchoolDay Museum, Fri SchoolDay 25 kids", () => {
+      // Scenario 2: Monday/Tuesday/Thursday FullDay NoFieldTrip 24 kids
+      //             Wednesday SchoolDay Children's Museum 20 kids
+      //             Friday SchoolDay NoFieldTrip 25 kids
+      const scheduleDays: ScheduleDay[] = [
+        createScheduleDay("day-mon", "mon", "2026-02-16", {
+          scheduleType: "full_day",
+          enrollmentCount: 24,
+          fieldTripEventId: "ft-mon"
+        }),
+        createScheduleDay("day-tue", "tue", "2026-02-17", {
+          scheduleType: "full_day",
+          enrollmentCount: 24,
+          fieldTripEventId: "ft-tue"
+        }),
+        createScheduleDay("day-wed", "wed", "2026-02-18", {
+          scheduleType: "school_day",
+          enrollmentCount: 20,
+          fieldTripEventId: "ft-wed"
+        }),
+        createScheduleDay("day-thu", "thu", "2026-02-19", {
+          scheduleType: "full_day",
+          enrollmentCount: 24,
+          fieldTripEventId: "ft-thu"
+        }),
+        createScheduleDay("day-fri", "fri", "2026-02-20", {
+          scheduleType: "school_day",
+          enrollmentCount: 25,
+          fieldTripEventId: "ft-fri"
+        })
+      ];
+
+      const operatingHours: OperatingHours[] = [
+        createOperatingHours("op-mon", "mon", "06:30", "18:00", {
+          dayScheduleType: "full_day"
+        }),
+        createOperatingHours("op-tue", "tue", "06:30", "18:00", {
+          dayScheduleType: "full_day"
+        }),
+        createOperatingHours("op-wed", "wed", "07:00", "17:00", {
+          dayScheduleType: "school_day"
+        }),
+        createOperatingHours("op-thu", "thu", "06:30", "18:00", {
+          dayScheduleType: "full_day"
+        }),
+        createOperatingHours("op-fri", "fri", "07:00", "17:00", {
+          dayScheduleType: "school_day"
+        })
+      ];
+
+      const fieldTripEvents: FieldTripEvent[] = [
+        createFieldTripEvent("ft-mon", "mon", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-tue", "tue", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-wed", "wed", {
+          isNoFieldTrip: false,
+          fieldTripTypeId: "ft-type-museum"
+        }),
+        createFieldTripEvent("ft-thu", "thu", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-fri", "fri", { isNoFieldTrip: true })
+      ];
+
+      const fieldTripTypes = [
+        {
+          id: "ft-type-museum",
+          name: "Children's Museum",
+          minAdultStudentRatio: 10, // 1:10 ratio (1 adult per 10 children)
+          minLeaderStudentRatio: 30, // 1:30 ratio (1 leader per 30 children)
+          policyCitationId: "citation-museum",
+          notes: "Children's Museum field trip"
+        }
+      ];
+
+      const context: AutoSchedulerContext = {
+        scheduleDays,
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: createComprehensiveEmployees(),
+        fieldTripEvents,
+        operatingHours,
+        fieldTripTypes,
+        scheduleTypeRatios: {
+          full_day: 15, // 1:15 ratio
+          school_day: 15 // 1:15 ratio
+        },
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 2,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        },
+        jobTitleRules: {
+          Assistant: { requiresLeaderForOpenClose: true }
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.success).toBe(true);
+      expect(result.violations.length).toBe(0);
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      expect(result.segmentBlocks.length).toBeGreaterThan(0);
+
+      // Verify all days have schedules
+      ["mon", "tue", "wed", "thu", "fri"].forEach(day => {
+        const dayBlocks = result.segmentBlocks.filter(b => b.dayOfWeek === day);
+        expect(dayBlocks.length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should schedule week with Wed FullDay Museum: Mon/Tue/Thu/Fri FullDay 20 kids, Wed FullDay Museum 30 kids", () => {
+      // Scenario 3: Monday/Tuesday/Thursday/Friday FullDay NoFieldTrip 20 kids
+      //             Wednesday FullDay Children's Museum 30 kids
+      const scheduleDays: ScheduleDay[] = [
+        createScheduleDay("day-mon", "mon", "2026-02-16", {
+          scheduleType: "full_day",
+          enrollmentCount: 20,
+          fieldTripEventId: "ft-mon"
+        }),
+        createScheduleDay("day-tue", "tue", "2026-02-17", {
+          scheduleType: "full_day",
+          enrollmentCount: 20,
+          fieldTripEventId: "ft-tue"
+        }),
+        createScheduleDay("day-wed", "wed", "2026-02-18", {
+          scheduleType: "full_day",
+          enrollmentCount: 30,
+          fieldTripEventId: "ft-wed"
+        }),
+        createScheduleDay("day-thu", "thu", "2026-02-19", {
+          scheduleType: "full_day",
+          enrollmentCount: 20,
+          fieldTripEventId: "ft-thu"
+        }),
+        createScheduleDay("day-fri", "fri", "2026-02-20", {
+          scheduleType: "full_day",
+          enrollmentCount: 20,
+          fieldTripEventId: "ft-fri"
+        })
+      ];
+
+      const operatingHours: OperatingHours[] = ["mon", "tue", "wed", "thu", "fri"].map(day =>
+        createOperatingHours(`op-${day}`, day as DayOfWeek, "06:30", "18:00", {
+          dayScheduleType: "full_day"
+        })
+      );
+
+      const fieldTripEvents: FieldTripEvent[] = [
+        createFieldTripEvent("ft-mon", "mon", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-tue", "tue", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-wed", "wed", {
+          isNoFieldTrip: false,
+          fieldTripTypeId: "ft-type-museum"
+        }),
+        createFieldTripEvent("ft-thu", "thu", { isNoFieldTrip: true }),
+        createFieldTripEvent("ft-fri", "fri", { isNoFieldTrip: true })
+      ];
+
+      const fieldTripTypes = [
+        {
+          id: "ft-type-museum",
+          name: "Children's Museum",
+          minAdultStudentRatio: 10, // 1:10 ratio (1 adult per 10 children)
+          minLeaderStudentRatio: 30, // 1:30 ratio (1 leader per 30 children)
+          policyCitationId: "citation-museum",
+          notes: "Children's Museum field trip"
+        }
+      ];
+
+      const context: AutoSchedulerContext = {
+        scheduleDays,
+        segmentBlocks: [],
+        staffAssignments: [],
+        employees: createComprehensiveEmployees(),
+        fieldTripEvents,
+        operatingHours,
+        fieldTripTypes,
+        scheduleTypeRatios: { full_day: 15 }, // 1:15 ratio
+        schoolRules: {
+          openerCount: 2,
+          closerCount: 2,
+          minimumMedicalDelegated: 1,
+          requireCurrentCpr: true
+        },
+        jobTitleRules: {
+          Assistant: { requiresLeaderForOpenClose: true }
+        }
+      };
+
+      const result = autoSchedule(context, "week-test-2026-02-16");
+
+      expect(result.success).toBe(true);
+      expect(result.violations.length).toBe(0);
+      expect(result.staffAssignments.length).toBeGreaterThan(0);
+      expect(result.segmentBlocks.length).toBeGreaterThan(0);
+
+      // Verify all days have schedules
+      ["mon", "tue", "wed", "thu", "fri"].forEach(day => {
+        const dayBlocks = result.segmentBlocks.filter(b => b.dayOfWeek === day);
+        expect(dayBlocks.length).toBeGreaterThan(0);
+      });
+    });
+  });
 });
