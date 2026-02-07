@@ -494,7 +494,7 @@ const buildServer = async () => {
     };
   });
 
-  fastify.put("/api/schedule/:weekId", async (request) => {
+  fastify.put("/api/schedule/:weekId", async (request, reply) => {
     const { weekId } = request.params as { weekId: string };
     const payload = request.body as {
       scheduleWeek: ScheduleWeekPayload;
@@ -506,6 +506,11 @@ const buildServer = async () => {
     };
 
     const prisma = getPrisma();
+    if (!Array.isArray(payload.scheduleDays) || payload.scheduleDays.length === 0) {
+      return reply.code(400).send({
+        message: "Refusing to save schedule without scheduleDays. Payload is incomplete."
+      });
+    }
     await prisma.$transaction(async (tx: DbTransaction) => {
       await tx.school.upsert({
         where: { id: payload.scheduleWeek.schoolId },
