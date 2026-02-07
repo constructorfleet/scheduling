@@ -316,8 +316,21 @@ const buildServer = async () => {
     };
 
     const prisma = await getPrisma();
-
     await prisma.$transaction(async (tx: DbTransaction) => {
+      await tx.school.upsert({
+        where: { id: payload.scheduleWeek.schoolId },
+        create: {
+          id: payload.scheduleWeek.schoolId,
+          name: payload.scheduleWeek.schoolId,
+          closedDays: [],
+          openerCount: 0,
+          closerCount: 0,
+          minimumMedicalDelegated: 0,
+          requireCurrentCpr: false
+        },
+        update: {}
+      });
+
       await tx.scheduleWeek.upsert({
         where: { id: weekId },
         create: {

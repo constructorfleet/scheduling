@@ -42,7 +42,13 @@ import type {
 } from "./data/generated";
 import { createRulesEngine } from "@core/rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
-import { fetchSchedule, fetchSettings, saveSchedule, saveSettings } from "./data/apiClient";
+import {
+  fetchSchedule,
+  fetchSettings,
+  saveSchedule,
+  saveSettings,
+  type ScheduleSavePayload
+} from "./data/apiClient";
 
 const RULE_TITLES: Record<string, string> = {
   "ratio-segment": "Ratio staffing gap",
@@ -142,7 +148,10 @@ export default function App() {
   });
   const [scheduleStatusOverride, setScheduleStatusOverride] = useState<ScheduleStatus | null>(null);
   const [hasLoadedRemote, setHasLoadedRemote] = useState(false);
+  const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
   const scheduleSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const schedulePayloadRef = useRef<ScheduleSavePayload | null>(null);
+  const scheduleDirtyRef = useRef(false);
 
   const [jobTitlesState, setJobTitlesState] = useState<JobTitleSetting[]>(() => {
     const map = new Map<string, JobTitleSetting>();
@@ -494,27 +503,40 @@ export default function App() {
 
   useEffect(() => {
     if (!hasLoadedRemote) return;
+    const payload: ScheduleSavePayload = {
+      scheduleWeek: {
+        id: weekMeta.id,
+        schoolId: selectedSchoolId,
+        label: weekMeta.label,
+        status: scheduleStatusOverride ?? weekMeta.status,
+        startDate: weekMeta.startDate
+      },
+      scheduleDays: scheduleDaysState,
+      segmentBlocks: segmentBlocksState,
+      staffAssignments: staffAssignmentsState,
+      fieldTripEvents: fieldTripEventsState
+    };
+    schedulePayloadRef.current = payload;
+    scheduleDirtyRef.current = true;
     if (scheduleSaveTimer.current) {
       clearTimeout(scheduleSaveTimer.current);
     }
     scheduleSaveTimer.current = setTimeout(() => {
-      saveSchedule(weekMeta.id, {
-        scheduleWeek: {
-          id: weekMeta.id,
-          schoolId: selectedSchoolId,
-          label: weekMeta.label,
-          status: scheduleStatusOverride ?? weekMeta.status,
-          startDate: weekMeta.startDate
-        },
-        scheduleDays: scheduleDaysState,
-        segmentBlocks: segmentBlocksState,
-        staffAssignments: staffAssignmentsState,
-        fieldTripEvents: fieldTripEventsState
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error("Failed to save schedule", error);
-      });
-    }, 800);
+      const latestPayload = schedulePayloadRef.current;
+      if (!latestPayload) {
+        return;
+      }
+      saveSchedule(weekMeta.id, latestPayload)
+        .then(() => {
+          scheduleDirtyRef.current = false;
+          setScheduleSaveError(null);
+        })
+        .catch((error) => {
+          setScheduleSaveError("Autosave failed. Changes will retry automatically.");
+          // eslint-disable-next-line no-console
+          console.error("Failed to save schedule", error);
+        });
+    }, 300);
 
     return () => {
       if (scheduleSaveTimer.current) {
@@ -530,6 +552,28 @@ export default function App() {
     fieldTripEventsState,
     scheduleStatusOverride
   ]);
+
+  useEffect(() => {
+    if (!hasLoadedRemote) {
+      return;
+    }
+    const handleBeforeUnload = () => {
+      const pendingPayload = schedulePayloadRef.current;
+      if (!pendingPayload || !scheduleDirtyRef.current) {
+        return;
+      }
+      void fetch(`/api/schedule/${weekMeta.id}`, {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(pendingPayload),
+        keepalive: true
+      });
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [hasLoadedRemote]);
 
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
@@ -835,6 +879,9 @@ export default function App() {
         <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
         {publishMessage && (
           <p style={{ margin: "0.5rem 0 0", color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>
+        )}
+        {scheduleSaveError && (
+          <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
         )}
       </motion.div>
 
