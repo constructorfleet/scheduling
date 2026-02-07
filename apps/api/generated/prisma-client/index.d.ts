@@ -68,6 +68,11 @@ export type SegmentBlock = $Result.DefaultSelection<Prisma.$SegmentBlockPayload>
  * 
  */
 export type StaffAssignment = $Result.DefaultSelection<Prisma.$StaffAssignmentPayload>
+/**
+ * Model AuditEvent
+ * 
+ */
+export type AuditEvent = $Result.DefaultSelection<Prisma.$AuditEventPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -295,6 +300,16 @@ export class PrismaClient<
     * ```
     */
   get staffAssignment(): Prisma.StaffAssignmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.auditEvent`: Exposes CRUD operations for the **AuditEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AuditEvents
+    * const auditEvents = await prisma.auditEvent.findMany()
+    * ```
+    */
+  get auditEvent(): Prisma.AuditEventDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -739,7 +754,8 @@ export namespace Prisma {
     ScheduleDay: 'ScheduleDay',
     FieldTripEvent: 'FieldTripEvent',
     SegmentBlock: 'SegmentBlock',
-    StaffAssignment: 'StaffAssignment'
+    StaffAssignment: 'StaffAssignment',
+    AuditEvent: 'AuditEvent'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -755,7 +771,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment"
+      modelProps: "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1573,6 +1589,80 @@ export namespace Prisma {
           }
         }
       }
+      AuditEvent: {
+        payload: Prisma.$AuditEventPayload<ExtArgs>
+        fields: Prisma.AuditEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AuditEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AuditEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          findFirst: {
+            args: Prisma.AuditEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AuditEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          findMany: {
+            args: Prisma.AuditEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+          }
+          create: {
+            args: Prisma.AuditEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          createMany: {
+            args: Prisma.AuditEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AuditEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+          }
+          delete: {
+            args: Prisma.AuditEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          update: {
+            args: Prisma.AuditEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.AuditEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AuditEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AuditEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.AuditEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditEventPayload>
+          }
+          aggregate: {
+            args: Prisma.AuditEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAuditEvent>
+          }
+          groupBy: {
+            args: Prisma.AuditEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AuditEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AuditEventCountArgs<ExtArgs>
+            result: $Utils.Optional<AuditEventCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1692,6 +1782,7 @@ export namespace Prisma {
     fieldTripEvent?: FieldTripEventOmit
     segmentBlock?: SegmentBlockOmit
     staffAssignment?: StaffAssignmentOmit
+    auditEvent?: AuditEventOmit
   }
 
   /* Types for Logging */
@@ -1852,6 +1943,7 @@ export namespace Prisma {
     segmentBlocks: number
     staffAssignments: number
     fieldTripEvents: number
+    auditEvents: number
   }
 
   export type ScheduleWeekCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1859,6 +1951,7 @@ export namespace Prisma {
     segmentBlocks?: boolean | ScheduleWeekCountOutputTypeCountSegmentBlocksArgs
     staffAssignments?: boolean | ScheduleWeekCountOutputTypeCountStaffAssignmentsArgs
     fieldTripEvents?: boolean | ScheduleWeekCountOutputTypeCountFieldTripEventsArgs
+    auditEvents?: boolean | ScheduleWeekCountOutputTypeCountAuditEventsArgs
   }
 
   // Custom InputTypes
@@ -1898,6 +1991,13 @@ export namespace Prisma {
    */
   export type ScheduleWeekCountOutputTypeCountFieldTripEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FieldTripEventWhereInput
+  }
+
+  /**
+   * ScheduleWeekCountOutputType without action
+   */
+  export type ScheduleWeekCountOutputTypeCountAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuditEventWhereInput
   }
 
 
@@ -8957,6 +9057,7 @@ export namespace Prisma {
     segmentBlocks?: boolean | ScheduleWeek$segmentBlocksArgs<ExtArgs>
     staffAssignments?: boolean | ScheduleWeek$staffAssignmentsArgs<ExtArgs>
     fieldTripEvents?: boolean | ScheduleWeek$fieldTripEventsArgs<ExtArgs>
+    auditEvents?: boolean | ScheduleWeek$auditEventsArgs<ExtArgs>
     _count?: boolean | ScheduleWeekCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["scheduleWeek"]>
 
@@ -8999,6 +9100,7 @@ export namespace Prisma {
     segmentBlocks?: boolean | ScheduleWeek$segmentBlocksArgs<ExtArgs>
     staffAssignments?: boolean | ScheduleWeek$staffAssignmentsArgs<ExtArgs>
     fieldTripEvents?: boolean | ScheduleWeek$fieldTripEventsArgs<ExtArgs>
+    auditEvents?: boolean | ScheduleWeek$auditEventsArgs<ExtArgs>
     _count?: boolean | ScheduleWeekCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ScheduleWeekIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9016,6 +9118,7 @@ export namespace Prisma {
       segmentBlocks: Prisma.$SegmentBlockPayload<ExtArgs>[]
       staffAssignments: Prisma.$StaffAssignmentPayload<ExtArgs>[]
       fieldTripEvents: Prisma.$FieldTripEventPayload<ExtArgs>[]
+      auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9424,6 +9527,7 @@ export namespace Prisma {
     segmentBlocks<T extends ScheduleWeek$segmentBlocksArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$segmentBlocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SegmentBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     staffAssignments<T extends ScheduleWeek$staffAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$staffAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StaffAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fieldTripEvents<T extends ScheduleWeek$fieldTripEventsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$fieldTripEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    auditEvents<T extends ScheduleWeek$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeek$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9947,6 +10051,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FieldTripEventScalarFieldEnum | FieldTripEventScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleWeek.auditEvents
+   */
+  export type ScheduleWeek$auditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    where?: AuditEventWhereInput
+    orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
+    cursor?: AuditEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
   }
 
   /**
@@ -14550,6 +14678,1127 @@ export namespace Prisma {
 
 
   /**
+   * Model AuditEvent
+   */
+
+  export type AggregateAuditEvent = {
+    _count: AuditEventCountAggregateOutputType | null
+    _min: AuditEventMinAggregateOutputType | null
+    _max: AuditEventMaxAggregateOutputType | null
+  }
+
+  export type AuditEventMinAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    timestamp: Date | null
+    user: string | null
+    action: string | null
+    citationId: string | null
+    citationName: string | null
+    citationDoc: string | null
+    citationSection: string | null
+    notes: string | null
+  }
+
+  export type AuditEventMaxAggregateOutputType = {
+    id: string | null
+    scheduleWeekId: string | null
+    timestamp: Date | null
+    user: string | null
+    action: string | null
+    citationId: string | null
+    citationName: string | null
+    citationDoc: string | null
+    citationSection: string | null
+    notes: string | null
+  }
+
+  export type AuditEventCountAggregateOutputType = {
+    id: number
+    scheduleWeekId: number
+    timestamp: number
+    user: number
+    action: number
+    citationId: number
+    citationName: number
+    citationDoc: number
+    citationSection: number
+    notes: number
+    _all: number
+  }
+
+
+  export type AuditEventMinAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    timestamp?: true
+    user?: true
+    action?: true
+    citationId?: true
+    citationName?: true
+    citationDoc?: true
+    citationSection?: true
+    notes?: true
+  }
+
+  export type AuditEventMaxAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    timestamp?: true
+    user?: true
+    action?: true
+    citationId?: true
+    citationName?: true
+    citationDoc?: true
+    citationSection?: true
+    notes?: true
+  }
+
+  export type AuditEventCountAggregateInputType = {
+    id?: true
+    scheduleWeekId?: true
+    timestamp?: true
+    user?: true
+    action?: true
+    citationId?: true
+    citationName?: true
+    citationDoc?: true
+    citationSection?: true
+    notes?: true
+    _all?: true
+  }
+
+  export type AuditEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditEvent to aggregate.
+     */
+    where?: AuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditEvents to fetch.
+     */
+    orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AuditEvents
+    **/
+    _count?: true | AuditEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AuditEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AuditEventMaxAggregateInputType
+  }
+
+  export type GetAuditEventAggregateType<T extends AuditEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateAuditEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAuditEvent[P]>
+      : GetScalarType<T[P], AggregateAuditEvent[P]>
+  }
+
+
+
+
+  export type AuditEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuditEventWhereInput
+    orderBy?: AuditEventOrderByWithAggregationInput | AuditEventOrderByWithAggregationInput[]
+    by: AuditEventScalarFieldEnum[] | AuditEventScalarFieldEnum
+    having?: AuditEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AuditEventCountAggregateInputType | true
+    _min?: AuditEventMinAggregateInputType
+    _max?: AuditEventMaxAggregateInputType
+  }
+
+  export type AuditEventGroupByOutputType = {
+    id: string
+    scheduleWeekId: string
+    timestamp: Date
+    user: string
+    action: string
+    citationId: string | null
+    citationName: string | null
+    citationDoc: string | null
+    citationSection: string | null
+    notes: string | null
+    _count: AuditEventCountAggregateOutputType | null
+    _min: AuditEventMinAggregateOutputType | null
+    _max: AuditEventMaxAggregateOutputType | null
+  }
+
+  type GetAuditEventGroupByPayload<T extends AuditEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AuditEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AuditEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AuditEventGroupByOutputType[P]>
+            : GetScalarType<T[P], AuditEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AuditEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    timestamp?: boolean
+    user?: boolean
+    action?: boolean
+    citationId?: boolean
+    citationName?: boolean
+    citationDoc?: boolean
+    citationSection?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["auditEvent"]>
+
+  export type AuditEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    timestamp?: boolean
+    user?: boolean
+    action?: boolean
+    citationId?: boolean
+    citationName?: boolean
+    citationDoc?: boolean
+    citationSection?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["auditEvent"]>
+
+  export type AuditEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleWeekId?: boolean
+    timestamp?: boolean
+    user?: boolean
+    action?: boolean
+    citationId?: boolean
+    citationName?: boolean
+    citationDoc?: boolean
+    citationSection?: boolean
+    notes?: boolean
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["auditEvent"]>
+
+  export type AuditEventSelectScalar = {
+    id?: boolean
+    scheduleWeekId?: boolean
+    timestamp?: boolean
+    user?: boolean
+    action?: boolean
+    citationId?: boolean
+    citationName?: boolean
+    citationDoc?: boolean
+    citationSection?: boolean
+    notes?: boolean
+  }
+
+  export type AuditEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "timestamp" | "user" | "action" | "citationId" | "citationName" | "citationDoc" | "citationSection" | "notes", ExtArgs["result"]["auditEvent"]>
+  export type AuditEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type AuditEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+  export type AuditEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
+  }
+
+  export type $AuditEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AuditEvent"
+    objects: {
+      scheduleWeek: Prisma.$ScheduleWeekPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleWeekId: string
+      timestamp: Date
+      user: string
+      action: string
+      citationId: string | null
+      citationName: string | null
+      citationDoc: string | null
+      citationSection: string | null
+      notes: string | null
+    }, ExtArgs["result"]["auditEvent"]>
+    composites: {}
+  }
+
+  type AuditEventGetPayload<S extends boolean | null | undefined | AuditEventDefaultArgs> = $Result.GetResult<Prisma.$AuditEventPayload, S>
+
+  type AuditEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AuditEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AuditEventCountAggregateInputType | true
+    }
+
+  export interface AuditEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AuditEvent'], meta: { name: 'AuditEvent' } }
+    /**
+     * Find zero or one AuditEvent that matches the filter.
+     * @param {AuditEventFindUniqueArgs} args - Arguments to find a AuditEvent
+     * @example
+     * // Get one AuditEvent
+     * const auditEvent = await prisma.auditEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AuditEventFindUniqueArgs>(args: SelectSubset<T, AuditEventFindUniqueArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AuditEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AuditEventFindUniqueOrThrowArgs} args - Arguments to find a AuditEvent
+     * @example
+     * // Get one AuditEvent
+     * const auditEvent = await prisma.auditEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AuditEventFindUniqueOrThrowArgs>(args: SelectSubset<T, AuditEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuditEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventFindFirstArgs} args - Arguments to find a AuditEvent
+     * @example
+     * // Get one AuditEvent
+     * const auditEvent = await prisma.auditEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AuditEventFindFirstArgs>(args?: SelectSubset<T, AuditEventFindFirstArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuditEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventFindFirstOrThrowArgs} args - Arguments to find a AuditEvent
+     * @example
+     * // Get one AuditEvent
+     * const auditEvent = await prisma.auditEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AuditEventFindFirstOrThrowArgs>(args?: SelectSubset<T, AuditEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AuditEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AuditEvents
+     * const auditEvents = await prisma.auditEvent.findMany()
+     * 
+     * // Get first 10 AuditEvents
+     * const auditEvents = await prisma.auditEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const auditEventWithIdOnly = await prisma.auditEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AuditEventFindManyArgs>(args?: SelectSubset<T, AuditEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AuditEvent.
+     * @param {AuditEventCreateArgs} args - Arguments to create a AuditEvent.
+     * @example
+     * // Create one AuditEvent
+     * const AuditEvent = await prisma.auditEvent.create({
+     *   data: {
+     *     // ... data to create a AuditEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends AuditEventCreateArgs>(args: SelectSubset<T, AuditEventCreateArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AuditEvents.
+     * @param {AuditEventCreateManyArgs} args - Arguments to create many AuditEvents.
+     * @example
+     * // Create many AuditEvents
+     * const auditEvent = await prisma.auditEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AuditEventCreateManyArgs>(args?: SelectSubset<T, AuditEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AuditEvents and returns the data saved in the database.
+     * @param {AuditEventCreateManyAndReturnArgs} args - Arguments to create many AuditEvents.
+     * @example
+     * // Create many AuditEvents
+     * const auditEvent = await prisma.auditEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AuditEvents and only return the `id`
+     * const auditEventWithIdOnly = await prisma.auditEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AuditEventCreateManyAndReturnArgs>(args?: SelectSubset<T, AuditEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AuditEvent.
+     * @param {AuditEventDeleteArgs} args - Arguments to delete one AuditEvent.
+     * @example
+     * // Delete one AuditEvent
+     * const AuditEvent = await prisma.auditEvent.delete({
+     *   where: {
+     *     // ... filter to delete one AuditEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AuditEventDeleteArgs>(args: SelectSubset<T, AuditEventDeleteArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AuditEvent.
+     * @param {AuditEventUpdateArgs} args - Arguments to update one AuditEvent.
+     * @example
+     * // Update one AuditEvent
+     * const auditEvent = await prisma.auditEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AuditEventUpdateArgs>(args: SelectSubset<T, AuditEventUpdateArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AuditEvents.
+     * @param {AuditEventDeleteManyArgs} args - Arguments to filter AuditEvents to delete.
+     * @example
+     * // Delete a few AuditEvents
+     * const { count } = await prisma.auditEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AuditEventDeleteManyArgs>(args?: SelectSubset<T, AuditEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AuditEvents
+     * const auditEvent = await prisma.auditEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AuditEventUpdateManyArgs>(args: SelectSubset<T, AuditEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuditEvents and returns the data updated in the database.
+     * @param {AuditEventUpdateManyAndReturnArgs} args - Arguments to update many AuditEvents.
+     * @example
+     * // Update many AuditEvents
+     * const auditEvent = await prisma.auditEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AuditEvents and only return the `id`
+     * const auditEventWithIdOnly = await prisma.auditEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AuditEventUpdateManyAndReturnArgs>(args: SelectSubset<T, AuditEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AuditEvent.
+     * @param {AuditEventUpsertArgs} args - Arguments to update or create a AuditEvent.
+     * @example
+     * // Update or create a AuditEvent
+     * const auditEvent = await prisma.auditEvent.upsert({
+     *   create: {
+     *     // ... data to create a AuditEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AuditEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AuditEventUpsertArgs>(args: SelectSubset<T, AuditEventUpsertArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventCountArgs} args - Arguments to filter AuditEvents to count.
+     * @example
+     * // Count the number of AuditEvents
+     * const count = await prisma.auditEvent.count({
+     *   where: {
+     *     // ... the filter for the AuditEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends AuditEventCountArgs>(
+      args?: Subset<T, AuditEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AuditEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AuditEventAggregateArgs>(args: Subset<T, AuditEventAggregateArgs>): Prisma.PrismaPromise<GetAuditEventAggregateType<T>>
+
+    /**
+     * Group by AuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AuditEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AuditEventGroupByArgs['orderBy'] }
+        : { orderBy?: AuditEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AuditEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAuditEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AuditEvent model
+   */
+  readonly fields: AuditEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AuditEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AuditEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleWeek<T extends ScheduleWeekDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleWeekDefaultArgs<ExtArgs>>): Prisma__ScheduleWeekClient<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AuditEvent model
+   */
+  interface AuditEventFieldRefs {
+    readonly id: FieldRef<"AuditEvent", 'String'>
+    readonly scheduleWeekId: FieldRef<"AuditEvent", 'String'>
+    readonly timestamp: FieldRef<"AuditEvent", 'DateTime'>
+    readonly user: FieldRef<"AuditEvent", 'String'>
+    readonly action: FieldRef<"AuditEvent", 'String'>
+    readonly citationId: FieldRef<"AuditEvent", 'String'>
+    readonly citationName: FieldRef<"AuditEvent", 'String'>
+    readonly citationDoc: FieldRef<"AuditEvent", 'String'>
+    readonly citationSection: FieldRef<"AuditEvent", 'String'>
+    readonly notes: FieldRef<"AuditEvent", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AuditEvent findUnique
+   */
+  export type AuditEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditEvent to fetch.
+     */
+    where: AuditEventWhereUniqueInput
+  }
+
+  /**
+   * AuditEvent findUniqueOrThrow
+   */
+  export type AuditEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditEvent to fetch.
+     */
+    where: AuditEventWhereUniqueInput
+  }
+
+  /**
+   * AuditEvent findFirst
+   */
+  export type AuditEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditEvent to fetch.
+     */
+    where?: AuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditEvents to fetch.
+     */
+    orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditEvents.
+     */
+    cursor?: AuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditEvents.
+     */
+    distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AuditEvent findFirstOrThrow
+   */
+  export type AuditEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditEvent to fetch.
+     */
+    where?: AuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditEvents to fetch.
+     */
+    orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditEvents.
+     */
+    cursor?: AuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditEvents.
+     */
+    distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AuditEvent findMany
+   */
+  export type AuditEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AuditEvents to fetch.
+     */
+    where?: AuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditEvents to fetch.
+     */
+    orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AuditEvents.
+     */
+    cursor?: AuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditEvents.
+     */
+    skip?: number
+    distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AuditEvent create
+   */
+  export type AuditEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AuditEvent.
+     */
+    data: XOR<AuditEventCreateInput, AuditEventUncheckedCreateInput>
+  }
+
+  /**
+   * AuditEvent createMany
+   */
+  export type AuditEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AuditEvents.
+     */
+    data: AuditEventCreateManyInput | AuditEventCreateManyInput[]
+  }
+
+  /**
+   * AuditEvent createManyAndReturn
+   */
+  export type AuditEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many AuditEvents.
+     */
+    data: AuditEventCreateManyInput | AuditEventCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuditEvent update
+   */
+  export type AuditEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AuditEvent.
+     */
+    data: XOR<AuditEventUpdateInput, AuditEventUncheckedUpdateInput>
+    /**
+     * Choose, which AuditEvent to update.
+     */
+    where: AuditEventWhereUniqueInput
+  }
+
+  /**
+   * AuditEvent updateMany
+   */
+  export type AuditEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AuditEvents.
+     */
+    data: XOR<AuditEventUpdateManyMutationInput, AuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which AuditEvents to update
+     */
+    where?: AuditEventWhereInput
+    /**
+     * Limit how many AuditEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuditEvent updateManyAndReturn
+   */
+  export type AuditEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to update AuditEvents.
+     */
+    data: XOR<AuditEventUpdateManyMutationInput, AuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which AuditEvents to update
+     */
+    where?: AuditEventWhereInput
+    /**
+     * Limit how many AuditEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AuditEvent upsert
+   */
+  export type AuditEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AuditEvent to update in case it exists.
+     */
+    where: AuditEventWhereUniqueInput
+    /**
+     * In case the AuditEvent found by the `where` argument doesn't exist, create a new AuditEvent with this data.
+     */
+    create: XOR<AuditEventCreateInput, AuditEventUncheckedCreateInput>
+    /**
+     * In case the AuditEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AuditEventUpdateInput, AuditEventUncheckedUpdateInput>
+  }
+
+  /**
+   * AuditEvent delete
+   */
+  export type AuditEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+    /**
+     * Filter which AuditEvent to delete.
+     */
+    where: AuditEventWhereUniqueInput
+  }
+
+  /**
+   * AuditEvent deleteMany
+   */
+  export type AuditEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditEvents to delete
+     */
+    where?: AuditEventWhereInput
+    /**
+     * Limit how many AuditEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuditEvent without action
+   */
+  export type AuditEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditEvent
+     */
+    select?: AuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditEvent
+     */
+    omit?: AuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AuditEventInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -14716,6 +15965,22 @@ export namespace Prisma {
   };
 
   export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
+
+
+  export const AuditEventScalarFieldEnum: {
+    id: 'id',
+    scheduleWeekId: 'scheduleWeekId',
+    timestamp: 'timestamp',
+    user: 'user',
+    action: 'action',
+    citationId: 'citationId',
+    citationName: 'citationName',
+    citationDoc: 'citationDoc',
+    citationSection: 'citationSection',
+    notes: 'notes'
+  };
+
+  export type AuditEventScalarFieldEnum = (typeof AuditEventScalarFieldEnum)[keyof typeof AuditEventScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -15273,6 +16538,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
     fieldTripEvents?: FieldTripEventListRelationFilter
+    auditEvents?: AuditEventListRelationFilter
   }
 
   export type ScheduleWeekOrderByWithRelationInput = {
@@ -15288,6 +16554,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockOrderByRelationAggregateInput
     staffAssignments?: StaffAssignmentOrderByRelationAggregateInput
     fieldTripEvents?: FieldTripEventOrderByRelationAggregateInput
+    auditEvents?: AuditEventOrderByRelationAggregateInput
   }
 
   export type ScheduleWeekWhereUniqueInput = Prisma.AtLeast<{
@@ -15306,6 +16573,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockListRelationFilter
     staffAssignments?: StaffAssignmentListRelationFilter
     fieldTripEvents?: FieldTripEventListRelationFilter
+    auditEvents?: AuditEventListRelationFilter
   }, "id">
 
   export type ScheduleWeekOrderByWithAggregationInput = {
@@ -15657,6 +16925,86 @@ export namespace Prisma {
     endTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
     status?: StringWithAggregatesFilter<"StaffAssignment"> | string
     notes?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
+  }
+
+  export type AuditEventWhereInput = {
+    AND?: AuditEventWhereInput | AuditEventWhereInput[]
+    OR?: AuditEventWhereInput[]
+    NOT?: AuditEventWhereInput | AuditEventWhereInput[]
+    id?: StringFilter<"AuditEvent"> | string
+    scheduleWeekId?: StringFilter<"AuditEvent"> | string
+    timestamp?: DateTimeFilter<"AuditEvent"> | Date | string
+    user?: StringFilter<"AuditEvent"> | string
+    action?: StringFilter<"AuditEvent"> | string
+    citationId?: StringNullableFilter<"AuditEvent"> | string | null
+    citationName?: StringNullableFilter<"AuditEvent"> | string | null
+    citationDoc?: StringNullableFilter<"AuditEvent"> | string | null
+    citationSection?: StringNullableFilter<"AuditEvent"> | string | null
+    notes?: StringNullableFilter<"AuditEvent"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }
+
+  export type AuditEventOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    timestamp?: SortOrder
+    user?: SortOrder
+    action?: SortOrder
+    citationId?: SortOrderInput | SortOrder
+    citationName?: SortOrderInput | SortOrder
+    citationDoc?: SortOrderInput | SortOrder
+    citationSection?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    scheduleWeek?: ScheduleWeekOrderByWithRelationInput
+  }
+
+  export type AuditEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AuditEventWhereInput | AuditEventWhereInput[]
+    OR?: AuditEventWhereInput[]
+    NOT?: AuditEventWhereInput | AuditEventWhereInput[]
+    scheduleWeekId?: StringFilter<"AuditEvent"> | string
+    timestamp?: DateTimeFilter<"AuditEvent"> | Date | string
+    user?: StringFilter<"AuditEvent"> | string
+    action?: StringFilter<"AuditEvent"> | string
+    citationId?: StringNullableFilter<"AuditEvent"> | string | null
+    citationName?: StringNullableFilter<"AuditEvent"> | string | null
+    citationDoc?: StringNullableFilter<"AuditEvent"> | string | null
+    citationSection?: StringNullableFilter<"AuditEvent"> | string | null
+    notes?: StringNullableFilter<"AuditEvent"> | string | null
+    scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
+  }, "id">
+
+  export type AuditEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    timestamp?: SortOrder
+    user?: SortOrder
+    action?: SortOrder
+    citationId?: SortOrderInput | SortOrder
+    citationName?: SortOrderInput | SortOrder
+    citationDoc?: SortOrderInput | SortOrder
+    citationSection?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    _count?: AuditEventCountOrderByAggregateInput
+    _max?: AuditEventMaxOrderByAggregateInput
+    _min?: AuditEventMinOrderByAggregateInput
+  }
+
+  export type AuditEventScalarWhereWithAggregatesInput = {
+    AND?: AuditEventScalarWhereWithAggregatesInput | AuditEventScalarWhereWithAggregatesInput[]
+    OR?: AuditEventScalarWhereWithAggregatesInput[]
+    NOT?: AuditEventScalarWhereWithAggregatesInput | AuditEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AuditEvent"> | string
+    scheduleWeekId?: StringWithAggregatesFilter<"AuditEvent"> | string
+    timestamp?: DateTimeWithAggregatesFilter<"AuditEvent"> | Date | string
+    user?: StringWithAggregatesFilter<"AuditEvent"> | string
+    action?: StringWithAggregatesFilter<"AuditEvent"> | string
+    citationId?: StringNullableWithAggregatesFilter<"AuditEvent"> | string | null
+    citationName?: StringNullableWithAggregatesFilter<"AuditEvent"> | string | null
+    citationDoc?: StringNullableWithAggregatesFilter<"AuditEvent"> | string | null
+    citationSection?: StringNullableWithAggregatesFilter<"AuditEvent"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"AuditEvent"> | string | null
   }
 
   export type SchoolCreateInput = {
@@ -16138,6 +17486,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateInput = {
@@ -16152,6 +17501,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUpdateInput = {
@@ -16166,6 +17516,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateInput = {
@@ -16180,6 +17531,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekCreateManyInput = {
@@ -16564,6 +17916,96 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventCreateInput = {
+    id?: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
+    notes?: string | null
+    scheduleWeek: ScheduleWeekCreateNestedOneWithoutAuditEventsInput
+  }
+
+  export type AuditEventUncheckedCreateInput = {
+    id?: string
+    scheduleWeekId: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
+    notes?: string | null
+  }
+
+  export type AuditEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutAuditEventsNestedInput
+  }
+
+  export type AuditEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventCreateManyInput = {
+    id?: string
+    scheduleWeekId: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
+    notes?: string | null
+  }
+
+  export type AuditEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleWeekId?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -17135,6 +18577,12 @@ export namespace Prisma {
     none?: FieldTripEventWhereInput
   }
 
+  export type AuditEventListRelationFilter = {
+    every?: AuditEventWhereInput
+    some?: AuditEventWhereInput
+    none?: AuditEventWhereInput
+  }
+
   export type ScheduleDayOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -17148,6 +18596,10 @@ export namespace Prisma {
   }
 
   export type FieldTripEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AuditEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17400,6 +18852,45 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type AuditEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    timestamp?: SortOrder
+    user?: SortOrder
+    action?: SortOrder
+    citationId?: SortOrder
+    citationName?: SortOrder
+    citationDoc?: SortOrder
+    citationSection?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type AuditEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    timestamp?: SortOrder
+    user?: SortOrder
+    action?: SortOrder
+    citationId?: SortOrder
+    citationName?: SortOrder
+    citationDoc?: SortOrder
+    citationSection?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type AuditEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleWeekId?: SortOrder
+    timestamp?: SortOrder
+    user?: SortOrder
+    action?: SortOrder
+    citationId?: SortOrder
+    citationName?: SortOrder
+    citationDoc?: SortOrder
+    citationSection?: SortOrder
     notes?: SortOrder
   }
 
@@ -17791,6 +19282,13 @@ export namespace Prisma {
     connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
   }
 
+  export type AuditEventCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput> | AuditEventCreateWithoutScheduleWeekInput[] | AuditEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: AuditEventCreateOrConnectWithoutScheduleWeekInput | AuditEventCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: AuditEventCreateManyScheduleWeekInputEnvelope
+    connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+  }
+
   export type ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput = {
     create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
     connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
@@ -17817,6 +19315,13 @@ export namespace Prisma {
     connectOrCreate?: FieldTripEventCreateOrConnectWithoutScheduleWeekInput | FieldTripEventCreateOrConnectWithoutScheduleWeekInput[]
     createMany?: FieldTripEventCreateManyScheduleWeekInputEnvelope
     connect?: FieldTripEventWhereUniqueInput | FieldTripEventWhereUniqueInput[]
+  }
+
+  export type AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput = {
+    create?: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput> | AuditEventCreateWithoutScheduleWeekInput[] | AuditEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: AuditEventCreateOrConnectWithoutScheduleWeekInput | AuditEventCreateOrConnectWithoutScheduleWeekInput[]
+    createMany?: AuditEventCreateManyScheduleWeekInputEnvelope
+    connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -17887,6 +19392,20 @@ export namespace Prisma {
     deleteMany?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
   }
 
+  export type AuditEventUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput> | AuditEventCreateWithoutScheduleWeekInput[] | AuditEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: AuditEventCreateOrConnectWithoutScheduleWeekInput | AuditEventCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: AuditEventUpsertWithWhereUniqueWithoutScheduleWeekInput | AuditEventUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: AuditEventCreateManyScheduleWeekInputEnvelope
+    set?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    disconnect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    delete?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    update?: AuditEventUpdateWithWhereUniqueWithoutScheduleWeekInput | AuditEventUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: AuditEventUpdateManyWithWhereWithoutScheduleWeekInput | AuditEventUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
+  }
+
   export type ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
     create?: XOR<ScheduleDayCreateWithoutScheduleWeekInput, ScheduleDayUncheckedCreateWithoutScheduleWeekInput> | ScheduleDayCreateWithoutScheduleWeekInput[] | ScheduleDayUncheckedCreateWithoutScheduleWeekInput[]
     connectOrCreate?: ScheduleDayCreateOrConnectWithoutScheduleWeekInput | ScheduleDayCreateOrConnectWithoutScheduleWeekInput[]
@@ -17941,6 +19460,20 @@ export namespace Prisma {
     update?: FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput | FieldTripEventUpdateWithWhereUniqueWithoutScheduleWeekInput[]
     updateMany?: FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput | FieldTripEventUpdateManyWithWhereWithoutScheduleWeekInput[]
     deleteMany?: FieldTripEventScalarWhereInput | FieldTripEventScalarWhereInput[]
+  }
+
+  export type AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput = {
+    create?: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput> | AuditEventCreateWithoutScheduleWeekInput[] | AuditEventUncheckedCreateWithoutScheduleWeekInput[]
+    connectOrCreate?: AuditEventCreateOrConnectWithoutScheduleWeekInput | AuditEventCreateOrConnectWithoutScheduleWeekInput[]
+    upsert?: AuditEventUpsertWithWhereUniqueWithoutScheduleWeekInput | AuditEventUpsertWithWhereUniqueWithoutScheduleWeekInput[]
+    createMany?: AuditEventCreateManyScheduleWeekInputEnvelope
+    set?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    disconnect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    delete?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+    update?: AuditEventUpdateWithWhereUniqueWithoutScheduleWeekInput | AuditEventUpdateWithWhereUniqueWithoutScheduleWeekInput[]
+    updateMany?: AuditEventUpdateManyWithWhereWithoutScheduleWeekInput | AuditEventUpdateManyWithWhereWithoutScheduleWeekInput[]
+    deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
   export type ScheduleWeekCreateNestedOneWithoutScheduleDaysInput = {
@@ -18061,6 +19594,20 @@ export namespace Prisma {
     upsert?: SegmentBlockUpsertWithoutStaffAssignmentsInput
     connect?: SegmentBlockWhereUniqueInput
     update?: XOR<XOR<SegmentBlockUpdateToOneWithWhereWithoutStaffAssignmentsInput, SegmentBlockUpdateWithoutStaffAssignmentsInput>, SegmentBlockUncheckedUpdateWithoutStaffAssignmentsInput>
+  }
+
+  export type ScheduleWeekCreateNestedOneWithoutAuditEventsInput = {
+    create?: XOR<ScheduleWeekCreateWithoutAuditEventsInput, ScheduleWeekUncheckedCreateWithoutAuditEventsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutAuditEventsInput
+    connect?: ScheduleWeekWhereUniqueInput
+  }
+
+  export type ScheduleWeekUpdateOneRequiredWithoutAuditEventsNestedInput = {
+    create?: XOR<ScheduleWeekCreateWithoutAuditEventsInput, ScheduleWeekUncheckedCreateWithoutAuditEventsInput>
+    connectOrCreate?: ScheduleWeekCreateOrConnectWithoutAuditEventsInput
+    upsert?: ScheduleWeekUpsertWithoutAuditEventsInput
+    connect?: ScheduleWeekWhereUniqueInput
+    update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutAuditEventsInput, ScheduleWeekUpdateWithoutAuditEventsInput>, ScheduleWeekUncheckedUpdateWithoutAuditEventsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -18466,6 +20013,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateWithoutSchoolInput = {
@@ -18479,6 +20027,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekCreateOrConnectWithoutSchoolInput = {
@@ -19257,6 +20806,39 @@ export namespace Prisma {
     data: FieldTripEventCreateManyScheduleWeekInput | FieldTripEventCreateManyScheduleWeekInput[]
   }
 
+  export type AuditEventCreateWithoutScheduleWeekInput = {
+    id?: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
+    notes?: string | null
+  }
+
+  export type AuditEventUncheckedCreateWithoutScheduleWeekInput = {
+    id?: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
+    notes?: string | null
+  }
+
+  export type AuditEventCreateOrConnectWithoutScheduleWeekInput = {
+    where: AuditEventWhereUniqueInput
+    create: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type AuditEventCreateManyScheduleWeekInputEnvelope = {
+    data: AuditEventCreateManyScheduleWeekInput | AuditEventCreateManyScheduleWeekInput[]
+  }
+
   export type SchoolUpsertWithoutScheduleWeeksInput = {
     update: XOR<SchoolUpdateWithoutScheduleWeeksInput, SchoolUncheckedUpdateWithoutScheduleWeeksInput>
     create: XOR<SchoolCreateWithoutScheduleWeeksInput, SchoolUncheckedCreateWithoutScheduleWeeksInput>
@@ -19429,6 +21011,38 @@ export namespace Prisma {
     notes?: StringNullableFilter<"FieldTripEvent"> | string | null
   }
 
+  export type AuditEventUpsertWithWhereUniqueWithoutScheduleWeekInput = {
+    where: AuditEventWhereUniqueInput
+    update: XOR<AuditEventUpdateWithoutScheduleWeekInput, AuditEventUncheckedUpdateWithoutScheduleWeekInput>
+    create: XOR<AuditEventCreateWithoutScheduleWeekInput, AuditEventUncheckedCreateWithoutScheduleWeekInput>
+  }
+
+  export type AuditEventUpdateWithWhereUniqueWithoutScheduleWeekInput = {
+    where: AuditEventWhereUniqueInput
+    data: XOR<AuditEventUpdateWithoutScheduleWeekInput, AuditEventUncheckedUpdateWithoutScheduleWeekInput>
+  }
+
+  export type AuditEventUpdateManyWithWhereWithoutScheduleWeekInput = {
+    where: AuditEventScalarWhereInput
+    data: XOR<AuditEventUpdateManyMutationInput, AuditEventUncheckedUpdateManyWithoutScheduleWeekInput>
+  }
+
+  export type AuditEventScalarWhereInput = {
+    AND?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
+    OR?: AuditEventScalarWhereInput[]
+    NOT?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
+    id?: StringFilter<"AuditEvent"> | string
+    scheduleWeekId?: StringFilter<"AuditEvent"> | string
+    timestamp?: DateTimeFilter<"AuditEvent"> | Date | string
+    user?: StringFilter<"AuditEvent"> | string
+    action?: StringFilter<"AuditEvent"> | string
+    citationId?: StringNullableFilter<"AuditEvent"> | string | null
+    citationName?: StringNullableFilter<"AuditEvent"> | string | null
+    citationDoc?: StringNullableFilter<"AuditEvent"> | string | null
+    citationSection?: StringNullableFilter<"AuditEvent"> | string | null
+    notes?: StringNullableFilter<"AuditEvent"> | string | null
+  }
+
   export type ScheduleWeekCreateWithoutScheduleDaysInput = {
     id?: string
     label?: string | null
@@ -19440,6 +21054,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateWithoutScheduleDaysInput = {
@@ -19453,6 +21068,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekCreateOrConnectWithoutScheduleDaysInput = {
@@ -19482,6 +21098,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateWithoutScheduleDaysInput = {
@@ -19495,6 +21112,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekCreateWithoutFieldTripEventsInput = {
@@ -19508,6 +21126,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
     segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateWithoutFieldTripEventsInput = {
@@ -19521,6 +21140,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
     segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekCreateOrConnectWithoutFieldTripEventsInput = {
@@ -19550,6 +21170,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
     segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateWithoutFieldTripEventsInput = {
@@ -19563,6 +21184,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
     segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekCreateWithoutSegmentBlocksInput = {
@@ -19576,6 +21198,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateWithoutSegmentBlocksInput = {
@@ -19589,6 +21212,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
     staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekCreateOrConnectWithoutSegmentBlocksInput = {
@@ -19649,6 +21273,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateWithoutSegmentBlocksInput = {
@@ -19662,6 +21287,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type StaffAssignmentUpsertWithWhereUniqueWithoutSegmentBlockInput = {
@@ -19691,6 +21317,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
     segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekUncheckedCreateWithoutStaffAssignmentsInput = {
@@ -19704,6 +21331,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
     segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
     fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutScheduleWeekInput
   }
 
   export type ScheduleWeekCreateOrConnectWithoutStaffAssignmentsInput = {
@@ -19762,6 +21390,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
     segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateWithoutStaffAssignmentsInput = {
@@ -19775,6 +21404,7 @@ export namespace Prisma {
     scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
     segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type SegmentBlockUpsertWithoutStaffAssignmentsInput = {
@@ -19810,6 +21440,78 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     childCount?: IntFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ScheduleWeekCreateWithoutAuditEventsInput = {
+    id?: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutScheduleWeeksInput
+    scheduleDays?: ScheduleDayCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekUncheckedCreateWithoutAuditEventsInput = {
+    id?: string
+    schoolId: string
+    label?: string | null
+    status: string
+    startDate?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleDays?: ScheduleDayUncheckedCreateNestedManyWithoutScheduleWeekInput
+    segmentBlocks?: SegmentBlockUncheckedCreateNestedManyWithoutScheduleWeekInput
+    staffAssignments?: StaffAssignmentUncheckedCreateNestedManyWithoutScheduleWeekInput
+    fieldTripEvents?: FieldTripEventUncheckedCreateNestedManyWithoutScheduleWeekInput
+  }
+
+  export type ScheduleWeekCreateOrConnectWithoutAuditEventsInput = {
+    where: ScheduleWeekWhereUniqueInput
+    create: XOR<ScheduleWeekCreateWithoutAuditEventsInput, ScheduleWeekUncheckedCreateWithoutAuditEventsInput>
+  }
+
+  export type ScheduleWeekUpsertWithoutAuditEventsInput = {
+    update: XOR<ScheduleWeekUpdateWithoutAuditEventsInput, ScheduleWeekUncheckedUpdateWithoutAuditEventsInput>
+    create: XOR<ScheduleWeekCreateWithoutAuditEventsInput, ScheduleWeekUncheckedCreateWithoutAuditEventsInput>
+    where?: ScheduleWeekWhereInput
+  }
+
+  export type ScheduleWeekUpdateToOneWithWhereWithoutAuditEventsInput = {
+    where?: ScheduleWeekWhereInput
+    data: XOR<ScheduleWeekUpdateWithoutAuditEventsInput, ScheduleWeekUncheckedUpdateWithoutAuditEventsInput>
+  }
+
+  export type ScheduleWeekUpdateWithoutAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutScheduleWeeksNestedInput
+    scheduleDays?: ScheduleDayUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+  }
+
+  export type ScheduleWeekUncheckedUpdateWithoutAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleDays?: ScheduleDayUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleTypeCreateManySchoolInput = {
@@ -20020,6 +21722,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateWithoutSchoolInput = {
@@ -20033,6 +21736,7 @@ export namespace Prisma {
     segmentBlocks?: SegmentBlockUncheckedUpdateManyWithoutScheduleWeekNestedInput
     staffAssignments?: StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekNestedInput
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
   export type ScheduleWeekUncheckedUpdateManyWithoutSchoolInput = {
@@ -20088,6 +21792,18 @@ export namespace Prisma {
     isNoFieldTrip: boolean
     approverId?: string | null
     signedOffAt?: Date | string | null
+    notes?: string | null
+  }
+
+  export type AuditEventCreateManyScheduleWeekInput = {
+    id?: string
+    timestamp: Date | string
+    user: string
+    action: string
+    citationId?: string | null
+    citationName?: string | null
+    citationDoc?: string | null
+    citationSection?: string | null
     notes?: string | null
   }
 
@@ -20231,6 +21947,42 @@ export namespace Prisma {
     isNoFieldTrip?: BoolFieldUpdateOperationsInput | boolean
     approverId?: NullableStringFieldUpdateOperationsInput | string | null
     signedOffAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventUncheckedUpdateWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditEventUncheckedUpdateManyWithoutScheduleWeekInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    citationId?: NullableStringFieldUpdateOperationsInput | string | null
+    citationName?: NullableStringFieldUpdateOperationsInput | string | null
+    citationDoc?: NullableStringFieldUpdateOperationsInput | string | null
+    citationSection?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 

@@ -242,6 +242,19 @@ exports.Prisma.StaffAssignmentScalarFieldEnum = {
   notes: 'notes'
 };
 
+exports.Prisma.AuditEventScalarFieldEnum = {
+  id: 'id',
+  scheduleWeekId: 'scheduleWeekId',
+  timestamp: 'timestamp',
+  user: 'user',
+  action: 'action',
+  citationId: 'citationId',
+  citationName: 'citationName',
+  citationDoc: 'citationDoc',
+  citationSection: 'citationSection',
+  notes: 'notes'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -284,7 +297,8 @@ exports.Prisma.ModelName = {
   ScheduleDay: 'ScheduleDay',
   FieldTripEvent: 'FieldTripEvent',
   SegmentBlock: 'SegmentBlock',
-  StaffAssignment: 'StaffAssignment'
+  StaffAssignment: 'StaffAssignment',
+  AuditEvent: 'AuditEvent'
 };
 
 /**

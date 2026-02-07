@@ -11,7 +11,8 @@ import type {
   DayOfWeek,
   EmployeeAvailabilityBlock,
   EmployeeAvailabilityDay,
-  EmployeeTimeOffRequest
+  EmployeeTimeOffRequest,
+  PolicyCitation
 } from "@core/domain/types";
 
 type DbTransaction = CorePrisma.TransactionClient;
@@ -115,6 +116,15 @@ type StaffAssignmentPayload = {
   startTime: string;
   endTime: string;
   status: string;
+  notes?: string;
+};
+
+type AuditEventPayload = {
+  id: string;
+  timestamp: string;
+  user: string;
+  action: string;
+  policyCitation: PolicyCitation;
   notes?: string;
 };
 
@@ -387,13 +397,29 @@ const buildServer = async () => {
         scheduleDays: true,
         segmentBlocks: true,
         staffAssignments: true,
-        fieldTripEvents: true
+        fieldTripEvents: true,
+        auditEvents: true
       }
     });
     if (!scheduleWeek) {
       return { scheduleWeek: null };
     }
-    return scheduleWeek;
+    return {
+      ...scheduleWeek,
+      auditEvents: scheduleWeek.auditEvents.map((event) => ({
+        id: event.id,
+        timestamp: event.timestamp.toISOString(),
+        user: event.user,
+        action: event.action,
+        policyCitation: {
+          id: event.citationId ?? "ui-audit",
+          name: event.citationName ?? "User schedule action",
+          document: event.citationDoc ?? "UI action log",
+          section: event.citationSection ?? undefined
+        },
+        notes: event.notes ?? undefined
+      }))
+    };
   });
 
   fastify.put("/api/schedule/:weekId", async (request) => {
@@ -404,6 +430,7 @@ const buildServer = async () => {
       segmentBlocks: SegmentBlockPayload[];
       staffAssignments: StaffAssignmentPayload[];
       fieldTripEvents: FieldTripEventPayload[];
+      auditEvents: AuditEventPayload[];
     };
 
     const prisma = getPrisma();
@@ -442,6 +469,7 @@ const buildServer = async () => {
       await tx.segmentBlock.deleteMany({ where: { scheduleWeekId: weekId } });
       await tx.scheduleDay.deleteMany({ where: { scheduleWeekId: weekId } });
       await tx.fieldTripEvent.deleteMany({ where: { scheduleWeekId: weekId } });
+      await tx.auditEvent.deleteMany({ where: { scheduleWeekId: weekId } });
 
       if (payload.scheduleDays?.length) {
         await tx.scheduleDay.createMany({
@@ -515,6 +543,23 @@ const buildServer = async () => {
             endTime: assignment.endTime,
             status: assignment.status,
             notes: assignment.notes ?? null
+          }))
+        });
+      }
+
+      if (payload.auditEvents?.length) {
+        await tx.auditEvent.createMany({
+          data: payload.auditEvents.map((event) => ({
+            id: event.id,
+            scheduleWeekId: weekId,
+            timestamp: new Date(event.timestamp),
+            user: event.user,
+            action: event.action,
+            citationId: event.policyCitation?.id ?? null,
+            citationName: event.policyCitation?.name ?? null,
+            citationDoc: event.policyCitation?.document ?? null,
+            citationSection: event.policyCitation?.section ?? null,
+            notes: event.notes ?? null
           }))
         });
       }

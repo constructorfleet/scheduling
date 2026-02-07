@@ -512,6 +512,34 @@ components:
         notes:
           type: string
       required: [id, scheduleWeekId, dayOfWeek, segment]
+    PolicyCitation:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        document:
+          type: string
+        section:
+          type: string
+      required: [id, name, document]
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+        user:
+          type: string
+        action:
+          type: string
+        policyCitation:
+          $ref: '#/components/schemas/PolicyCitation'
+        notes:
+          type: string
+      required: [id, timestamp, user, action, policyCitation]
     SettingsPayload:
       type: object
       properties:
@@ -598,7 +626,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FieldTripEvent'
-      required: [scheduleWeek, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents]
+        auditEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+      required: [scheduleWeek, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents, auditEvents]
     ScheduleWeekResponse:
       type: object
       properties:
@@ -628,7 +660,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FieldTripEvent'
-      required: [id, schoolId, status, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents]
+        auditEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+      required: [id, schoolId, status, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents, auditEvents]
     GenericOk:
       type: object
       properties:

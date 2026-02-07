@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AuditEvent } from './AuditEvent';
 import type { FieldTripEvent } from './FieldTripEvent';
 import type { ScheduleDay } from './ScheduleDay';
 import type { ScheduleWeek } from './ScheduleWeek';
@@ -13,5 +14,6 @@ export type ScheduleSavePayload = {
     segmentBlocks: Array<SegmentBlock>;
     staffAssignments: Array<StaffAssignment>;
     fieldTripEvents: Array<FieldTripEvent>;
+    auditEvents: Array<AuditEvent>;
 };
 

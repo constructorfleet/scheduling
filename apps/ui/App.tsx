@@ -654,7 +654,7 @@ export default function App() {
           applySnapshot(loadedSnapshot);
           setHistoryPast([]);
           setHistoryFuture([]);
-          setAuditEvents([]);
+          setAuditEvents(schedule.auditEvents ?? []);
         } else {
           setHistoryPast([]);
           setHistoryFuture([]);
@@ -691,7 +691,8 @@ export default function App() {
       scheduleDays: scheduleDaysState,
       segmentBlocks: segmentBlocksState,
       staffAssignments: staffAssignmentsState,
-      fieldTripEvents: fieldTripEventsState
+      fieldTripEvents: fieldTripEventsState,
+      auditEvents
     };
     schedulePayloadRef.current = payload;
     scheduleDirtyRef.current = true;
@@ -731,7 +732,8 @@ export default function App() {
     segmentBlocksState,
     staffAssignmentsState,
     fieldTripEventsState,
-    scheduleStatusOverride
+    scheduleStatusOverride,
+    auditEvents
   ]);
 
   useEffect(() => {

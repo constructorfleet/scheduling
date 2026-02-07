@@ -104,6 +104,7 @@ model ScheduleWeek {
   segmentBlocks    SegmentBlock[]
   staffAssignments StaffAssignment[]
   fieldTripEvents  FieldTripEvent[]
+  auditEvents      AuditEvent[]
 }
 
 model ScheduleDay {
@@ -165,4 +166,19 @@ model StaffAssignment {
 
   scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
   segmentBlock SegmentBlock @relation(fields: [segmentBlockId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id              String   @id @default(cuid())
+  scheduleWeekId  String
+  timestamp       DateTime
+  user            String
+  action          String
+  citationId      String?
+  citationName    String?
+  citationDoc     String?
+  citationSection String?
+  notes           String?
+
+  scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
 }
