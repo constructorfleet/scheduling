@@ -6,7 +6,10 @@ const config: Config.InitialOptions = {
   roots: ["<rootDir>/tests", "<rootDir>/packages/core", "<rootDir>/apps/ui"],
   testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: false,
-  setupFilesAfterEnv: ["<rootDir>/tests/setupTests.ts"]
+  setupFilesAfterEnv: ["<rootDir>/tests/setupTests.ts"],
+  moduleNameMapper: {
+    "^@core/(.*)$": "<rootDir>/packages/core/$1"
+  }
 };
 
 export default config;

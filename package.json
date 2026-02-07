@@ -17,7 +17,7 @@
     "api:migrate:sqlite": "prisma migrate dev --schema prisma/schema.sqlite.prisma",
     "api:migrate:postgres": "prisma migrate dev --schema prisma/schema.postgres.prisma",
     "api:migrate:mysql": "prisma migrate dev --schema prisma/schema.mysql.prisma",
-    "api:openapi:client": "openapi --input apps/api/openapi.yaml --output apps/ui/data/generated --client fetch",
+    "api:openapi:client": "openapi --input apps/api/openapi.yaml --output apps/ui/data/generated --client fetch --useUnionTypes",
     "preview": "vite preview",
     "start": "vite preview",
     "test:e2e": "playwright test",
@@ -26,8 +26,7 @@
     "test:watch": "jest --watch",
     "lint": "eslint packages apps tests",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist coverage"
-    ,
+    "clean": "rm -rf dist coverage",
     "prepare": "husky"
   },
   "keywords": [
@@ -53,6 +52,7 @@
     "eslint": "^8.0.0",
     "husky": "^9.1.7",
     "jest": "^29.5.0",
+    "jest-environment-jsdom": "^30.2.0",
     "lint-staged": "^16.2.7",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.0",
