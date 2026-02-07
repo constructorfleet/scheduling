@@ -240,8 +240,9 @@ function getEmployeeHoursOnDay(
 /**
  * Try to extend an employee's shift to adjacent blocks on the same day
  * This helps schedule people for as many hours as possible
+ * Currently disabled to avoid complications with rules engine evaluation
  */
-function tryExtendShift(
+/* function tryExtendShift(
   employee: Employee,
   block: SegmentBlock,
   context: AutoSchedulerContext,
@@ -319,6 +320,7 @@ function tryExtendShift(
   
   return { startTime: earliestBlock.startTime, endTime: latestBlock.endTime };
 }
+*/
 
 /**
  * Merge consecutive assignments for the same employee on the same day
@@ -346,7 +348,12 @@ function mergeConsecutiveAssignments(
     const byDay = new Map<string, StaffAssignment[]>();
     for (const assignment of empAssignments) {
       const block = segmentBlocks.find(b => b.id === assignment.segmentBlockId);
-      if (!block) continue;
+      if (!block) {
+        // If block not found, keep assignment as-is
+        merged.push(assignment);
+        processed.add(assignment.id);
+        continue;
+      }
       
       const key = `${block.dayOfWeek}`;
       if (!byDay.has(key)) {
@@ -478,22 +485,22 @@ function attemptViolationFixes(
 
       // Add staff to this block (we'll add multiple iterations to gradually fill)
       // Try to add multiple staff members per iteration to speed up scheduling
-      // Try to extend their shift to adjacent blocks for max hours
       let staffAdded = 0;
       const maxStaffPerBlock = Math.max(2, needed); // Add at least what's needed
       
       for (const employee of availableEmployees) {
         if (staffAdded >= maxStaffPerBlock) break;
         
-        const extendedShift = tryExtendShift(employee, block, context, updatedAssignments);
+        // For now, don't extend shifts to avoid complicating violation detection
+        // Just assign to the specific block
         const assignmentId = `auto-assign-${block.id}-${employee.id}-${Date.now()}-${staffAdded}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: employee.id,
           assignmentSource: 'template',
-          startTime: extendedShift.startTime,
-          endTime: extendedShift.endTime,
+          startTime: block.startTime,
+          endTime: block.endTime,
           status: 'scheduled'
         });
         staffAdded++;
@@ -535,15 +542,14 @@ function attemptViolationFixes(
 
       if (availableLeaders.length > 0) {
         const leader = availableLeaders[0];
-        const extendedShift = tryExtendShift(leader, block, context, updatedAssignments);
         const assignmentId = `auto-leader-${block.id}-${leader.id}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: leader.id,
           assignmentSource: 'template',
-          startTime: extendedShift.startTime,
-          endTime: extendedShift.endTime,
+          startTime: block.startTime,
+          endTime: block.endTime,
           status: 'scheduled'
         });
       }
@@ -588,15 +594,14 @@ function attemptViolationFixes(
       for (const emp of availableMedical) {
         if (added >= needed) break;
         
-        const extendedShift = tryExtendShift(emp, block, context, updatedAssignments);
         const assignmentId = `auto-medical-${block.id}-${emp.id}`;
         updatedAssignments.push({
           id: assignmentId,
           segmentBlockId: block.id,
           employeeId: emp.id,
           assignmentSource: 'template',
-          startTime: extendedShift.startTime,
-          endTime: extendedShift.endTime,
+          startTime: block.startTime,
+          endTime: block.endTime,
           status: 'scheduled'
         });
         added++;
@@ -643,15 +648,14 @@ function attemptViolationFixes(
       
       // Add the CPR-current replacement
       const replacement = cprStaff[0];
-      const extendedShift = tryExtendShift(replacement, block, context, updatedAssignments);
       const assignmentId = `auto-cpr-${block.id}-${replacement.id}`;
       updatedAssignments.push({
         id: assignmentId,
         segmentBlockId: block.id,
         employeeId: replacement.id,
         assignmentSource: 'template',
-        startTime: extendedShift.startTime,
-        endTime: extendedShift.endTime,
+        startTime: block.startTime,
+        endTime: block.endTime,
         status: 'scheduled'
       });
     }
