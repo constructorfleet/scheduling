@@ -9,6 +9,7 @@ import type {
 } from "../domain/types";
 import type { RulesContext, RuleViolation } from "../rules/types";
 import { createRulesEngine } from "../rules/engine";
+import { parseTimeToMinutes } from "../rules/utils";
 
 export interface AutoSchedulerContext {
     scheduleDays: ScheduleDay[];
@@ -258,8 +259,7 @@ function generateInitialAssignments(
  * Convert time string (HH:MM) to minutes since midnight
  */
 function timeToMinutes(time: string): number {
-    const [ hours, minutes ] = time.split(':').map(Number);
-    return hours * 60 + minutes;
+    return parseTimeToMinutes(time);
 }
 
 /**

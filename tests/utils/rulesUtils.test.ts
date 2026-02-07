@@ -8,9 +8,17 @@ describe("rules/utils", () => {
       expect(parseTimeToMinutes("23:59:59")).toBe(1440);
     });
 
+    it("parses 12-hour clock values with meridiem", () => {
+      expect(parseTimeToMinutes("7:00 AM")).toBe(420);
+      expect(parseTimeToMinutes("06:30PM")).toBe(1110);
+      expect(parseTimeToMinutes("12:00 AM")).toBe(0);
+      expect(parseTimeToMinutes("12:00 PM")).toBe(720);
+    });
+
     it("returns 0 for malformed or empty times", () => {
       expect(parseTimeToMinutes("bad:input")).toBe(0);
       expect(parseTimeToMinutes("")).toBe(0);
+      expect(parseTimeToMinutes("13:00 PM")).toBe(0);
     });
   });
 
