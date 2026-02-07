@@ -283,7 +283,7 @@ const buildServer = async () => {
         });
       }
 
-      if (payload.employees?.length) {
+      if (Array.isArray(payload.employees) && payload.employees.length > 0) {
         const existingEmployees = await tx.employee.findMany({ where: { schoolId } });
         const keptEmployeeIds = new Set<string>();
         const existingById = new Map(existingEmployees.map((employee) => [employee.id, employee]));
@@ -353,8 +353,6 @@ const buildServer = async () => {
             }
           });
         }
-      } else {
-        await tx.employee.deleteMany({ where: { schoolId } });
       }
 
       if (payload.operatingHours?.length) {
