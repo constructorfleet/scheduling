@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import fastifyStatic from "@fastify/static";
 import { getPrisma } from "./db";
 import { applyDbEnv, isDebugEnabled } from "./config";
+import { backupBeforeWrite, startPeriodicBackups } from "./backups";
 import { openapiPath } from "./openapi";
 import path from "node:path";
 import { readFileSync } from "node:fs";
@@ -236,6 +237,11 @@ const buildServer = async () => {
     };
 
     const prisma = getPrisma();
+    try {
+      await backupBeforeWrite();
+    } catch (error) {
+      request.log.warn({ error }, "Database backup before settings write failed");
+    }
 
     const school = await prisma.$transaction(async (tx: DbTransaction) => {
       let upsertedSchool = await tx.school.findUnique({ where: { id: schoolId } });
@@ -460,7 +466,7 @@ const buildServer = async () => {
     return { school };
   });
 
-  fastify.get("/api/schedule/:weekId", async (request) => {
+  fastify.get("/api/schedule/:weekId", async (request, reply) => {
     const { weekId } = request.params as { weekId: string };
     const prisma = getPrisma();
     const scheduleWeek = await prisma.scheduleWeek.findUnique({
@@ -474,7 +480,7 @@ const buildServer = async () => {
       }
     });
     if (!scheduleWeek) {
-      return { scheduleWeek: null };
+      return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
     }
     return {
       ...scheduleWeek,
@@ -506,6 +512,11 @@ const buildServer = async () => {
     };
 
     const prisma = getPrisma();
+    try {
+      await backupBeforeWrite();
+    } catch (error) {
+      request.log.warn({ error }, "Database backup before schedule write failed");
+    }
     if (!Array.isArray(payload.scheduleDays) || payload.scheduleDays.length === 0) {
       return reply.code(400).send({
         message: "Refusing to save schedule without scheduleDays. Payload is incomplete."
@@ -713,6 +724,7 @@ const buildServer = async () => {
 
 const start = async () => {
   applyDbEnv();
+  startPeriodicBackups();
   const server = await buildServer();
   const port = Number(process.env.PORT ?? 4000);
   const host = process.env.HOST ?? "0.0.0.0";

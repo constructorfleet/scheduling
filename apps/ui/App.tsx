@@ -127,6 +127,17 @@ const formatWeekRange = (startDate: Date) => {
   const endLabel = endDate.toLocaleDateString(undefined, options);
   return `${startLabel} – ${endLabel}, ${endDate.getFullYear()}`;
 };
+const toIsoDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+const addDays = (isoDate: string, offset: number) => {
+  const base = new Date(`${isoDate}T00:00:00`);
+  base.setDate(base.getDate() + offset);
+  return toIsoDate(base);
+};
 const formatShortDate = (value?: string) => {
   if (!value) return "";
   const parsed = new Date(value);
@@ -142,6 +153,15 @@ type ScheduleSnapshot = {
   fieldTripEvents: FieldTripEvent[];
   scheduleStatusOverride: ScheduleStatus | null;
 };
+type WeekInitializationChoice = "blank" | "copy";
+type WeekInitializationState = {
+  weekId: string;
+  weekLabel: string;
+  startDate: string;
+  previousWeekStartDate: Date;
+  copySourceSnapshot: ScheduleSnapshot;
+  copySourceAuditEvents: AuditEvent[];
+};
 
 const USER_POLICY_CITATION: PolicyCitation = {
   id: "ui-audit",
@@ -152,6 +172,9 @@ const USER_POLICY_CITATION: PolicyCitation = {
 
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
+  const currentWeekStartDateIso = useMemo(() => toIsoDate(weekStartDate), [weekStartDate]);
+  const currentWeekId = useMemo(() => `week-${currentWeekStartDateIso}`, [currentWeekStartDateIso]);
+  const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
   const [schoolName, setSchoolName] = useState(schools[0].name);
   const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(
@@ -182,6 +205,8 @@ export default function App() {
   });
   const [scheduleStatusOverride, setScheduleStatusOverride] = useState<ScheduleStatus | null>(null);
   const [hasLoadedRemote, setHasLoadedRemote] = useState(false);
+  const [isWeekInitialized, setIsWeekInitialized] = useState(false);
+  const [pendingWeekInitialization, setPendingWeekInitialization] = useState<WeekInitializationState | null>(null);
   const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
   const [apiStatus, setApiStatus] = useState<{
     state: "loading" | "saving" | "saved" | "error" | "idle";
@@ -274,6 +299,109 @@ export default function App() {
     setHistoryFuture([]);
     applySnapshot(next);
     appendAuditEvent(audit.action, audit.notes);
+  };
+
+  const buildDefaultScheduleDays = (weekId: string, weekStartIso: string): ScheduleDay[] =>
+    daySequence.map((day, index) => {
+      const isClosedDay = closedDaysState.includes(day);
+      return {
+        id: `${weekId}-day-${day}`,
+        scheduleWeekId: weekId,
+        date: addDays(weekStartIso, index),
+        dayOfWeek: day,
+        scheduleType: isClosedDay ? CLOSED_SCHEDULE_TYPE : undefined,
+        dayScheduleType: isClosedDay ? "closed" : "full_day",
+        enrollmentCount: isClosedDay ? 0 : undefined,
+        fieldTripEventId: `${weekId}-field-trip-${day}`
+      };
+    });
+
+  const buildDefaultFieldTripEvents = (weekId: string, scheduleDaysForWeek: ScheduleDay[]): FieldTripEvent[] =>
+    scheduleDaysForWeek.map((day) => ({
+      id: `${weekId}-field-trip-${day.dayOfWeek}`,
+      scheduleWeekId: weekId,
+      dayOfWeek: day.dayOfWeek,
+      segment: "mid",
+      scheduleDayId: day.id,
+      isNoFieldTrip: true
+    }));
+
+  const remapSnapshotForWeek = (
+    source: ScheduleSnapshot,
+    sourceAudit: AuditEvent[],
+    weekId: string,
+    weekStartIso: string
+  ): { snapshot: ScheduleSnapshot; auditEvents: AuditEvent[] } => {
+    const dayIdMap = new Map<string, string>();
+    const normalizedDays = daySequence.map((dayOfWeek, index) => {
+      const sourceDay = source.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+      const id = sourceDay?.id ? `${weekId}-day-${dayOfWeek}` : `${weekId}-day-${dayOfWeek}`;
+      if (sourceDay?.id) dayIdMap.set(sourceDay.id, id);
+      return {
+        ...(sourceDay ?? {}),
+        id,
+        scheduleWeekId: weekId,
+        date: addDays(weekStartIso, index),
+        dayOfWeek
+      } as ScheduleDay;
+    });
+
+    const fieldTripIdMap = new Map<string, string>();
+    const normalizedFieldTrips = daySequence.map((dayOfWeek) => {
+      const sourceEvent = source.fieldTripEvents.find((event) => event.dayOfWeek === dayOfWeek);
+      const id = `${weekId}-field-trip-${dayOfWeek}`;
+      if (sourceEvent?.id) fieldTripIdMap.set(sourceEvent.id, id);
+      const targetDay = normalizedDays.find((day) => day.dayOfWeek === dayOfWeek);
+      return {
+        ...(sourceEvent ?? {}),
+        id,
+        scheduleWeekId: weekId,
+        dayOfWeek,
+        segment: sourceEvent?.segment ?? "mid",
+        scheduleDayId: targetDay?.id
+      } as FieldTripEvent;
+    });
+
+    const segmentIdMap = new Map<string, string>();
+    const normalizedSegments = source.segmentBlocks.map((block, index) => {
+      const id = `${weekId}-segment-${index + 1}`;
+      segmentIdMap.set(block.id, id);
+      return {
+        ...block,
+        id,
+        scheduleWeekId: weekId,
+        scheduleDayId: block.scheduleDayId ? dayIdMap.get(block.scheduleDayId) : undefined,
+        fieldTripEventId: block.fieldTripEventId ? fieldTripIdMap.get(block.fieldTripEventId) : undefined
+      };
+    });
+
+    const normalizedAssignments = source.staffAssignments.map((assignment, index) => ({
+      ...assignment,
+      id: `${weekId}-assignment-${index + 1}`,
+      segmentBlockId: segmentIdMap.get(assignment.segmentBlockId) ?? assignment.segmentBlockId
+    }));
+
+    const normalizedDaysWithFieldTrip = normalizedDays.map((day) => ({
+      ...day,
+      fieldTripEventId: `${weekId}-field-trip-${day.dayOfWeek}`
+    }));
+
+    const remappedAuditEvents = sourceAudit.map((event) => ({
+      ...event,
+      id: `${weekId}-${event.id}`,
+      timestamp: new Date().toISOString()
+    }));
+
+    return {
+      snapshot: {
+        scheduleDays: normalizedDaysWithFieldTrip,
+        fieldTripEvents: normalizedFieldTrips,
+        segmentBlocks: normalizedSegments,
+        staffAssignments: normalizedAssignments,
+        scheduleStatusOverride: source.scheduleStatusOverride
+      },
+      auditEvents: remappedAuditEvents
+    };
   };
 
   const beginApiAction = (kind: "loading" | "saving", message: string) => {
@@ -668,9 +796,28 @@ export default function App() {
         console.error("Failed to load settings", error);
       }
 
+    };
+
+    hydrate();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedSchoolId]);
+
+  useEffect(() => {
+    let isActive = true;
+    const sourceSnapshot = makeSnapshot();
+    const sourceAudit = auditEvents;
+    const previousWeekStartDate = new Date(weekStartDate);
+
+    const loadScheduleWeek = async () => {
+      setHasLoadedRemote(false);
+      setIsWeekInitialized(false);
+      setPendingWeekInitialization(null);
+      beginApiAction("loading", "Loading schedule...");
       try {
-        beginApiAction("loading", "Loading schedule...");
-        const schedule = await fetchSchedule(weekMeta.id);
+        const schedule = await fetchSchedule(currentWeekId);
         completeApiAction("Schedule loaded");
         if (!isActive) return;
         if (schedule) {
@@ -696,38 +843,41 @@ export default function App() {
           setHistoryPast([]);
           setHistoryFuture([]);
           setAuditEvents(schedule.auditEvents ?? []);
-        } else {
-          setHistoryPast([]);
-          setHistoryFuture([]);
-          setAuditEvents([]);
+          setHasLoadedRemote(true);
+          setIsWeekInitialized(true);
+          return;
         }
+
+        setPendingWeekInitialization({
+          weekId: currentWeekId,
+          weekLabel: currentWeekLabel,
+          startDate: currentWeekStartDateIso,
+          previousWeekStartDate,
+          copySourceSnapshot: sourceSnapshot,
+          copySourceAuditEvents: sourceAudit
+        });
       } catch (error) {
         failApiAction("Schedule load failed");
         // eslint-disable-next-line no-console
         console.error("Failed to load schedule", error);
       }
-
-      if (isActive) {
-        setHasLoadedRemote(true);
-      }
     };
 
-    hydrate();
-
+    loadScheduleWeek();
     return () => {
       isActive = false;
     };
-  }, [selectedSchoolId]);
+  }, [selectedSchoolId, currentWeekId]);
 
   useEffect(() => {
-    if (!hasLoadedRemote || !isConfigured) return;
+    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized) return;
     const payload: ScheduleSavePayload = {
       scheduleWeek: {
-        id: weekMeta.id,
+        id: currentWeekId,
         schoolId: selectedSchoolId,
-        label: weekMeta.label,
-        status: scheduleStatusOverride ?? weekMeta.status,
-        startDate: weekMeta.startDate
+        label: currentWeekLabel,
+        status: scheduleStatusOverride ?? "draft",
+        startDate: currentWeekStartDateIso
       },
       scheduleDays: scheduleDaysState,
       segmentBlocks: segmentBlocksState,
@@ -746,7 +896,7 @@ export default function App() {
         return;
       }
       beginApiAction("saving", "Saving schedule...");
-      saveSchedule(weekMeta.id, latestPayload)
+      saveSchedule(currentWeekId, latestPayload)
         .then(() => {
           scheduleDirtyRef.current = false;
           setScheduleSaveError(null);
@@ -768,6 +918,10 @@ export default function App() {
   }, [
     hasLoadedRemote,
     isConfigured,
+    isWeekInitialized,
+    currentWeekId,
+    currentWeekLabel,
+    currentWeekStartDateIso,
     selectedSchoolId,
     scheduleDaysState,
     segmentBlocksState,
@@ -778,7 +932,7 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    if (!hasLoadedRemote || !isConfigured) {
+    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized) {
       return;
     }
     const handleBeforeUnload = () => {
@@ -786,7 +940,7 @@ export default function App() {
       if (!pendingPayload || !scheduleDirtyRef.current) {
         return;
       }
-      void fetch(`/api/schedule/${weekMeta.id}`, {
+      void fetch(`/api/schedule/${currentWeekId}`, {
         method: "PUT",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(pendingPayload),
@@ -797,7 +951,7 @@ export default function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [hasLoadedRemote, isConfigured]);
+  }, [hasLoadedRemote, isConfigured, isWeekInitialized, currentWeekId]);
 
   useEffect(() => {
     return () => {
@@ -983,8 +1137,8 @@ export default function App() {
   const readyToPublish = validationComplete;
   const scheduleStatus: ScheduleStatus = readyToPublish
     ? "ready_for_review"
-    : scheduleStatusOverride ?? weekMeta.status;
-  const weekLabel = formatWeekRange(weekStartDate);
+    : scheduleStatusOverride ?? "draft";
+  const weekLabel = currentWeekLabel;
   const complianceHighlights = [
     `${violationRecords.length} violation${violationRecords.length === 1 ? "" : "s"} outstanding`,
     readyToPublish ? "Ready for publish" : "Resolve blockers before publishing"
@@ -1015,6 +1169,84 @@ export default function App() {
       updated.setDate(updated.getDate() + (direction === "next" ? 7 : -7));
       return updated;
     });
+  };
+
+  const handleInitializeWeek = async (choice: WeekInitializationChoice) => {
+    if (!pendingWeekInitialization) {
+      return;
+    }
+    const { weekId, weekLabel: targetWeekLabel, startDate, copySourceSnapshot, copySourceAuditEvents } =
+      pendingWeekInitialization;
+
+    let nextSnapshot: ScheduleSnapshot;
+    let nextAuditEvents: AuditEvent[];
+    if (choice === "copy") {
+      const copied = remapSnapshotForWeek(copySourceSnapshot, copySourceAuditEvents, weekId, startDate);
+      nextSnapshot = copied.snapshot;
+      nextAuditEvents = copied.auditEvents;
+    } else {
+      const blankDays = buildDefaultScheduleDays(weekId, startDate);
+      nextSnapshot = {
+        scheduleDays: blankDays,
+        fieldTripEvents: buildDefaultFieldTripEvents(weekId, blankDays),
+        segmentBlocks: [],
+        staffAssignments: [],
+        scheduleStatusOverride: "draft"
+      };
+      nextAuditEvents = [];
+    }
+
+    const initializationEvent: AuditEvent = {
+      id: `${weekId}-audit-init-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      user: "You",
+      action: "Initialized week",
+      policyCitation: USER_POLICY_CITATION,
+      notes: `${targetWeekLabel}: ${choice === "copy" ? "Copied previous week schedule" : "Created blank schedule"}`
+    };
+    const payloadAuditEvents = [initializationEvent, ...nextAuditEvents];
+
+    const payload: ScheduleSavePayload = {
+      scheduleWeek: {
+        id: weekId,
+        schoolId: selectedSchoolId,
+        label: targetWeekLabel,
+        status: "draft",
+        startDate
+      },
+      scheduleDays: nextSnapshot.scheduleDays,
+      segmentBlocks: nextSnapshot.segmentBlocks,
+      staffAssignments: nextSnapshot.staffAssignments,
+      fieldTripEvents: nextSnapshot.fieldTripEvents,
+      auditEvents: payloadAuditEvents
+    };
+
+    beginApiAction("saving", "Creating schedule...");
+    try {
+      await saveSchedule(weekId, payload);
+      applySnapshot(nextSnapshot);
+      setAuditEvents(payloadAuditEvents);
+      setHistoryPast([]);
+      setHistoryFuture([]);
+      setPendingWeekInitialization(null);
+      setIsWeekInitialized(true);
+      setHasLoadedRemote(true);
+      scheduleDirtyRef.current = false;
+      schedulePayloadRef.current = payload;
+      completeApiAction("Schedule created");
+    } catch (error) {
+      failApiAction("Failed to create schedule");
+      // eslint-disable-next-line no-console
+      console.error("Failed to initialize week schedule", error);
+    }
+  };
+
+  const handleCancelWeekInitialization = () => {
+    if (!pendingWeekInitialization) {
+      return;
+    }
+    setPendingWeekInitialization(null);
+    setWeekStartDate(new Date(pendingWeekInitialization.previousWeekStartDate));
   };
 
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
@@ -1409,7 +1641,7 @@ export default function App() {
                   ? null
                   : {
                       id: segmentId,
-                      scheduleWeekId: weekMeta.id,
+                      scheduleWeekId: currentWeekId,
                       dayOfWeek,
                       segment: "open",
                       startTime,
@@ -1499,6 +1731,94 @@ export default function App() {
         onDirtyChange={setSettingsDirty}
         closeAttempt={settingsCloseAttempt}
       />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {pendingWeekInitialization && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: "linear" }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(15, 23, 42, 0.35)",
+              zIndex: 70,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1.5rem"
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2, ease: "linear" }}
+              style={{
+                width: "min(520px, 100%)",
+                background: "#fff",
+                borderRadius: 14,
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 24px 48px rgba(15, 23, 42, 0.24)",
+                padding: "1rem 1.1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.75rem"
+              }}
+            >
+              <h3 style={{ margin: 0 }}>No schedule exists for {pendingWeekInitialization.weekLabel}</h3>
+              <p style={{ margin: 0, color: "#475569", fontSize: "0.9rem" }}>
+                Choose how to initialize this week.
+              </p>
+              <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={handleCancelWeekInitialization}
+                  style={{
+                    borderRadius: 999,
+                    border: "1px solid #cbd5e1",
+                    background: "#f8fafc",
+                    color: "#0f172a",
+                    padding: "0.35rem 0.85rem"
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleInitializeWeek("blank");
+                  }}
+                  style={{
+                    borderRadius: 999,
+                    border: "1px solid #cbd5f5",
+                    background: "#eff6ff",
+                    color: "#1d4ed8",
+                    padding: "0.35rem 0.85rem"
+                  }}
+                >
+                  Create blank schedule
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleInitializeWeek("copy");
+                  }}
+                  style={{
+                    borderRadius: 999,
+                    border: "none",
+                    background: "#2563eb",
+                    color: "#fff",
+                    padding: "0.35rem 0.9rem"
+                  }}
+                >
+                  Copy current schedule
+                </button>
+              </div>
+            </motion.div>
+          </motion.section>
         )}
       </AnimatePresence>
       </motion.div>
