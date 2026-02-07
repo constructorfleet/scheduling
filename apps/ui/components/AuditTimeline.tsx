@@ -74,15 +74,14 @@ export default function AuditTimeline({
   return (
     <motion.section
       ref={containerRef}
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.96 }}
+      initial={{ opacity: 0, scale: 0.96, x: position.x, y: position.y }}
+      animate={{ opacity: 1, scale: 1, x: position.x, y: position.y }}
+      exit={{ opacity: 0, scale: 0.96, x: position.x, y: position.y }}
       transition={{ duration: 0.2, ease: "linear" }}
       style={{
         position: "fixed",
         top: 0,
         left: 0,
-        transform: `translate(${position.x}px, ${position.y}px)`,
         width: 380,
         maxHeight: "70vh",
         overflow: "hidden",
