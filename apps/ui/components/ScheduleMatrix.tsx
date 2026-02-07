@@ -662,27 +662,7 @@ export default function ScheduleMatrix({
                           ?
                         </span>
                       )}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-                        {!closedDay && !hasRequestedDayOff && availabilityLabels.length > 0 && (
-                          <div
-                            style={{
-                              borderRadius: 8,
-                              border: "1px solid #c7d2fe",
-                              background: "#eef2ff",
-                              padding: "0.25rem 0.4rem",
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "0.2rem"
-                            }}
-                          >
-                            <span style={{ fontSize: "0.68rem", color: "#4338ca", fontWeight: 700 }}>
-                              Available
-                            </span>
-                            <span style={{ fontSize: "0.68rem", color: "#312e81", fontWeight: 600 }}>
-                              {availabilityLabels.join(", ")}
-                            </span>
-                          </div>
-                        )}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", minHeight: "100%" }}>
                         {blocks.map((block) => {
                           const overlapMessage =
                             editing && editing.assignmentId === block.id ? getOverlapMessage(editing) : null;
@@ -1016,6 +996,33 @@ export default function ScheduleMatrix({
                             })()}
                           </motion.div>
                           )}
+                        {!closedDay && !hasRequestedDayOff && availabilityLabels.length > 0 && (
+                          <div
+                            style={{
+                              marginTop: "auto",
+                              paddingTop: "0.35rem",
+                              borderTop: "1px dashed #cbd5e1",
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "0.15rem"
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: "0.62rem",
+                                letterSpacing: "0.04em",
+                                textTransform: "uppercase",
+                                color: "#64748b",
+                                fontWeight: 700
+                              }}
+                            >
+                              Availability
+                            </span>
+                            <span style={{ fontSize: "0.68rem", color: "#475569", fontWeight: 500 }}>
+                              {availabilityLabels.join(" · ")}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </td>
                   );
