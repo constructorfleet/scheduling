@@ -148,6 +148,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Sarah Johnson", {
             leaderQualified: true,
@@ -215,6 +216,7 @@ describe("autoSchedule", () => {
       const context: AutoSchedulerContext = {
         scheduleDays,
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Sarah Johnson", {
             leaderQualified: true,
@@ -288,6 +290,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "John Afternoon", {
             leaderQualified: true,
@@ -358,6 +361,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Part-time Paula", {
             leaderQualified: true,
@@ -420,6 +424,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Leader Lisa", {
             leaderQualified: true,
@@ -465,6 +470,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [],
         fieldTripEvents: [createFieldTripEvent("ft-mon", "mon")],
         operatingHours: [
@@ -490,6 +496,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Part-timer Pete", {
             leaderQualified: true,
@@ -522,6 +529,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Tuesday Tom", {
             leaderQualified: true,
@@ -574,6 +582,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Ready Rachel", {
             leaderQualified: true,
@@ -605,6 +614,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Solo Sally", {
             leaderQualified: true,
@@ -667,6 +677,7 @@ describe("autoSchedule", () => {
       const context: AutoSchedulerContext = {
         scheduleDays,
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Early Week Worker", {
             leaderQualified: true,
@@ -719,6 +730,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Split-shift Steve", {
             leaderQualified: true,
@@ -767,6 +779,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Half-day Helen", {
             leaderQualified: true,
@@ -802,6 +815,7 @@ describe("autoSchedule", () => {
           })
         ],
         segmentBlocks: [],
+        staffAssignments: [],
         employees: [
           createEmployee("emp-1", "Teacher Terry", {
             leaderQualified: true,
