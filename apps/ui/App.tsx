@@ -9,6 +9,7 @@ import AuditTimeline from "./components/AuditTimeline";
 import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
 import {
   auditTimeline,
+  defaultRequirementTemplate,
   dayDisplayNames,
   daySequence,
   fieldTripEvents,
@@ -22,7 +23,7 @@ import {
   scheduleTypeOptions,
   fieldTripTypes,
   employees
-} from "./data/mockScheduleData";
+} from "./data/runtimeDefaults";
 import { GuidedStep, RuleViolation as UiRuleViolation } from "./types";
 import {
   DayOfWeek,
@@ -916,7 +917,7 @@ export default function App() {
               startTime,
               endTime,
               childCount: scheduleDay?.enrollmentCount ?? 0,
-              requirementTemplate: segmentBlocksState[0]?.requirementTemplate ?? segmentBlocks[0].requirementTemplate,
+              requirementTemplate: segmentBlocksState[0]?.requirementTemplate ?? defaultRequirementTemplate,
               status: "draft",
               scheduleDayId: scheduleDay?.id
             };
