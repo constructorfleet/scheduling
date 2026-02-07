@@ -211,7 +211,11 @@ export default function ScheduleMatrix({
       return false;
     }
     const normalizedDayDate = normalizeDateOnly(dayDate);
-    return (employee.requestedDaysOff ?? []).some((dayOff) => normalizeDateOnly(dayOff.date) === normalizedDayDate);
+    return (employee.requestedDaysOff ?? []).some((dayOff) => {
+      const start = normalizeDateOnly(dayOff.startDate);
+      const end = normalizeDateOnly(dayOff.endDate);
+      return normalizedDayDate >= start && normalizedDayDate <= end;
+    });
   };
 
   const getAvailabilityForDay = (employee: Employee, day: DayOfWeek) =>

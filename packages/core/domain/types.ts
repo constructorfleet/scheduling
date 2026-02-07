@@ -91,7 +91,8 @@ export interface EmployeeAvailabilityDay {
 
 export interface EmployeeTimeOffRequest {
   id: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   note?: string;
 }
 

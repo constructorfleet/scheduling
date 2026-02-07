@@ -633,6 +633,12 @@ export const segmentBlockTimelineRule: RuleDefinition = {
 };
 
 const normalizeDateOnly = (value: string) => value.split("T")[0];
+const isDateInRange = (date: string, startDate: string, endDate: string) => {
+  const normalized = normalizeDateOnly(date);
+  const start = normalizeDateOnly(startDate);
+  const end = normalizeDateOnly(endDate);
+  return normalized >= start && normalized <= end;
+};
 
 export const employeeAvailabilityRule: RuleDefinition = {
   id: "employee-availability",
@@ -660,7 +666,10 @@ export const employeeAvailabilityRule: RuleDefinition = {
         const scheduleDay = context.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
         const date = scheduleDay?.date ? normalizeDateOnly(scheduleDay.date) : undefined;
         const daysOff = employee.requestedDaysOff ?? [];
-        const isRequestedOff = Boolean(date && daysOff.some((dayOff) => normalizeDateOnly(dayOff.date) === date));
+        const isRequestedOff = Boolean(
+          date &&
+            daysOff.some((dayOff) => isDateInRange(date, dayOff.startDate, dayOff.endDate))
+        );
         if (isRequestedOff) {
           violations.push(
             buildViolation(

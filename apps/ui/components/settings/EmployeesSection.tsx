@@ -332,24 +332,39 @@ export default function EmployeesSection({
                   </div>
                 ))}
 
-                <h4 style={{ margin: "0.5rem 0 0", fontSize: "0.9rem" }}>Requested days off</h4>
+                <h4 style={{ margin: "0.5rem 0 0", fontSize: "0.9rem" }}>Requested time off</h4>
                 {daysOff.length === 0 && (
                   <p style={{ margin: 0, color: "#64748b", fontSize: "0.8rem" }}>No requested days off.</p>
                 )}
                 {daysOff.map((request, requestIndex) => (
                   <div
                     key={request.id}
-                    style={{ display: "grid", gridTemplateColumns: "160px 1fr auto", gap: "0.45rem" }}
+                    style={{ display: "grid", gridTemplateColumns: "150px 150px 1fr auto", gap: "0.45rem" }}
                   >
                     <input
                       type="date"
-                      value={request.date}
+                      value={request.startDate}
                       onChange={(event) => {
                         setEmployee(
                           index,
                           updateRequestedDaysOff(employee, (items) =>
                             items.map((item, idx) =>
-                              idx === requestIndex ? { ...item, date: event.target.value } : item
+                              idx === requestIndex ? { ...item, startDate: event.target.value } : item
+                            )
+                          )
+                        );
+                      }}
+                      style={{ borderRadius: 8, border: "1px solid #cbd5e1", padding: "0.35rem 0.45rem" }}
+                    />
+                    <input
+                      type="date"
+                      value={request.endDate}
+                      onChange={(event) => {
+                        setEmployee(
+                          index,
+                          updateRequestedDaysOff(employee, (items) =>
+                            items.map((item, idx) =>
+                              idx === requestIndex ? { ...item, endDate: event.target.value } : item
                             )
                           )
                         );
@@ -397,13 +412,15 @@ export default function EmployeesSection({
                 <button
                   type="button"
                   onClick={() => {
+                    const today = new Date().toISOString().split("T")[0];
                     setEmployee(
                       index,
                       updateRequestedDaysOff(employee, (items) => [
                         ...items,
                         {
                           id: `timeoff-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-                          date: new Date().toISOString().split("T")[0],
+                          startDate: today,
+                          endDate: today,
                           note: ""
                         }
                       ])

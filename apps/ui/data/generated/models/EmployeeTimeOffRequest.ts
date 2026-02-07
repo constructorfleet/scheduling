@@ -4,7 +4,8 @@
 /* eslint-disable */
 export type EmployeeTimeOffRequest = {
     id: string;
-    date: string;
+    startDate: string;
+    endDate: string;
     note?: string;
 };
 

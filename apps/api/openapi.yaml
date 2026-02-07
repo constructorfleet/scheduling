@@ -328,11 +328,13 @@ components:
       properties:
         id:
           type: string
-        date:
+        startDate:
+          type: string
+        endDate:
           type: string
         note:
           type: string
-      required: [id, date]
+      required: [id, startDate, endDate]
     OperatingHoursPayload:
       type: object
       properties:

@@ -372,7 +372,7 @@ describe("ScheduleMatrix", () => {
     const dayOffStaff: Employee[] = [
       {
         ...baseStaff[0],
-        requestedDaysOff: [{ id: "off-1", date: "2026-02-02", note: "Vacation" }]
+        requestedDaysOff: [{ id: "off-1", startDate: "2026-02-02", endDate: "2026-02-04", note: "Vacation" }]
       }
     ];
     renderMatrix({ staff: dayOffStaff });

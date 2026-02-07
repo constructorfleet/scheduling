@@ -58,10 +58,13 @@ const normalizeRequestedDaysOff = (value: unknown): EmployeeTimeOffRequest[] => 
     const raw = asObject(entry);
     if (!raw) return;
     const id = typeof raw.id === "string" && raw.id ? raw.id : `timeoff-${Date.now()}`;
-    const date = typeof raw.date === "string" ? raw.date : "";
-    if (!date) return;
+    const startDate = typeof raw.startDate === "string" ? raw.startDate : "";
+    const endDate = typeof raw.endDate === "string" ? raw.endDate : "";
+    if (!startDate || !endDate) return;
     const note = typeof raw.note === "string" ? raw.note : undefined;
-    normalized.push(note ? { id, date, note } : { id, date });
+    const start = startDate <= endDate ? startDate : endDate;
+    const end = startDate <= endDate ? endDate : startDate;
+    normalized.push(note ? { id, startDate: start, endDate: end, note } : { id, startDate: start, endDate: end });
   });
   return normalized;
 };

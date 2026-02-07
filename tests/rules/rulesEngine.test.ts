@@ -739,7 +739,7 @@ describe("RulesEngine", () => {
     });
     const assignment = createAssignment("assign-timeoff", block.id, "emp-timeoff");
     const employee = createEmployee("emp-timeoff", {
-      requestedDaysOff: [{ id: "off-1", date: "2026-02-16", note: "Personal" }]
+      requestedDaysOff: [{ id: "off-1", startDate: "2026-02-15", endDate: "2026-02-18", note: "Personal" }]
     });
     const context: RulesContext = withDefaultScheduleInfo({
       scheduleDays: [day],
