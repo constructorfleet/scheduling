@@ -74,6 +74,15 @@ const getSchoolRules = (context: RulesContext) => {
   };
 };
 
+const formatMinutesAsTime = (value: number) => {
+  const clamped = Math.max(0, value);
+  const hours = Math.floor(clamped / 60)
+    .toString()
+    .padStart(2, "0");
+  const minutes = (clamped % 60).toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
 const isClosedScheduleDay = (context: RulesContext, block: SegmentBlock) => {
   const scheduleDay =
     getScheduleDayById(context, block.scheduleDayId) ??
@@ -90,21 +99,30 @@ export const ratioSegmentRule: RuleDefinition = {
     "Ensures each segment block has enough staff to meet the higher of the ratio-derived minimum or the configured minimum staff",
   evaluate: (context: RulesContext) => {
     const violations: RuleViolation[] = [];
-    context.segmentBlocks.forEach((block) => {
-      if (isClosedScheduleDay(context, block)) {
+    const schoolRules = getSchoolRules(context);
+    (context.scheduleDays ?? []).forEach((day) => {
+      if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
         return;
       }
-      const scheduleDay =
-        getScheduleDayById(context, block.scheduleDayId) ??
-        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
-      const scheduleType = scheduleDay?.scheduleType;
+      const hours = getOperatingHoursForDay(context, day.dayOfWeek, day.dayScheduleType);
+      if (!hours) {
+        return;
+      }
+      const scheduleType = day.scheduleType;
       const effectiveChildCount =
-        typeof scheduleDay?.enrollmentCount === "number" ? scheduleDay.enrollmentCount : block.childCount;
+        typeof day.enrollmentCount === "number"
+          ? day.enrollmentCount
+          : Math.max(
+              0,
+              ...context.segmentBlocks
+                .filter((block) => block.dayOfWeek === day.dayOfWeek)
+                .map((block) => block.childCount)
+            );
       const activeFieldTripEvent = context.fieldTripEvents.find((event) => {
-        if (event.dayOfWeek !== block.dayOfWeek) {
+        if (event.dayOfWeek !== day.dayOfWeek) {
           return false;
         }
-        if (event.scheduleDayId && scheduleDay?.id && event.scheduleDayId !== scheduleDay.id) {
+        if (event.scheduleDayId && event.scheduleDayId !== day.id) {
           return false;
         }
         return Boolean(event.fieldTripTypeId) && !event.isNoFieldTrip;
@@ -119,50 +137,114 @@ export const ratioSegmentRule: RuleDefinition = {
         (scheduleType ? context.scheduleTypeRatios?.[scheduleType] : undefined) ??
         1;
       const requiredFromRatio = Math.ceil(effectiveChildCount / childrenPerStaff);
-      const schoolRules = getSchoolRules(context);
-      let minStaff = 0;
-      if (block.segment === "open" && schoolRules.openerCount > 0) {
-        minStaff = schoolRules.openerCount;
-      } else if (block.segment === "close" && schoolRules.closerCount > 0) {
-        minStaff = schoolRules.closerCount;
+      const openMinutes = parseTimeToMinutes(hours.open);
+      const closeMinutes = parseTimeToMinutes(hours.close);
+      if (closeMinutes <= openMinutes) {
+        return;
       }
-      const requiredStaff = Math.max(minStaff, requiredFromRatio);
-      // Count unique staff overlapping the block window, regardless of which segment-block id they came from.
-      const blockStart = parseTimeToMinutes(block.startTime);
-      const blockEnd = parseTimeToMinutes(block.endTime);
-      const assigned = new Set(
-        context.staffAssignments
-          .filter((assignment) => assignment.status !== "completed")
-          .filter((assignment) => {
-            const employee = getEmployeeById(context, assignment.employeeId);
-            if (!employee) {
-              return false;
-            }
-            const assignmentDay = getDayOfWeekForAssignment(context, assignment);
-            if (assignmentDay !== block.dayOfWeek) {
-              return false;
-            }
-            const assignmentStart = parseTimeToMinutes(assignment.startTime);
-            const assignmentEnd = parseTimeToMinutes(assignment.endTime);
-            return assignmentStart < blockEnd && assignmentEnd > blockStart;
-          })
-          .map((assignment) => assignment.employeeId)
-      ).size;
-      if (assigned < requiredStaff) {
-        const citationId = getCitationId(
-          context,
-          "ratio-segment",
-          DEFAULT_POLICY_CITATIONS["ratio-segment"]
-        );
-        const message = `Segment ${block.dayOfWeek}/${block.segment} requires ${requiredStaff} staff (min ${minStaff}, ratio ${childrenPerStaff}, children ${effectiveChildCount}) but only ${assigned} assigned`;
+      const openerWindowEnd = openMinutes + schoolRules.openerWindowMinutes;
+      const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
+      const dayAssignments = context.staffAssignments
+        .filter((assignment) => assignment.status !== "completed")
+        .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
+        .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
+      const boundaries = new Set<number>([openMinutes, closeMinutes]);
+      dayAssignments.forEach((assignment) => {
+        const start = parseTimeToMinutes(assignment.startTime);
+        const end = parseTimeToMinutes(assignment.endTime);
+        if (end <= openMinutes || start >= closeMinutes) {
+          return;
+        }
+        boundaries.add(Math.max(openMinutes, start));
+        boundaries.add(Math.min(closeMinutes, end));
+      });
+      const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+      const failingIntervals: Array<{
+        start: number;
+        end: number;
+        required: number;
+        minStaff: number;
+        assigned: number;
+      }> = [];
+      for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
+        const start = sortedBoundaries[index];
+        const end = sortedBoundaries[index + 1];
+        if (end <= start) {
+          continue;
+        }
+        let minStaff = 0;
+        if (schoolRules.openerCount > 0 && start < openerWindowEnd && end > openMinutes) {
+          minStaff = Math.max(minStaff, schoolRules.openerCount);
+        }
+        if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
+          minStaff = Math.max(minStaff, schoolRules.closerCount);
+        }
+        const required = Math.max(minStaff, requiredFromRatio);
+        const assigned = new Set(
+          dayAssignments
+            .filter((assignment) => {
+              const assignmentStart = parseTimeToMinutes(assignment.startTime);
+              const assignmentEnd = parseTimeToMinutes(assignment.endTime);
+              return assignmentStart < end && assignmentEnd > start;
+            })
+            .map((assignment) => assignment.employeeId)
+        ).size;
+        if (assigned < required) {
+          failingIntervals.push({ start, end, required, minStaff, assigned });
+        }
+      }
+      if (failingIntervals.length === 0) {
+        return;
+      }
+      const mergedIntervals: typeof failingIntervals = [];
+      failingIntervals.forEach((interval) => {
+        const previous = mergedIntervals[mergedIntervals.length - 1];
+        if (
+          previous &&
+          previous.end === interval.start &&
+          previous.required === interval.required &&
+          previous.minStaff === interval.minStaff &&
+          previous.assigned === interval.assigned
+        ) {
+          previous.end = interval.end;
+          return;
+        }
+        mergedIntervals.push({ ...interval });
+      });
+      const citationId = getCitationId(context, "ratio-segment", DEFAULT_POLICY_CITATIONS["ratio-segment"]);
+      mergedIntervals.forEach((interval, intervalIndex) => {
+        const relatedBlocks = context.segmentBlocks.filter((block) => {
+          if (block.dayOfWeek !== day.dayOfWeek) {
+            return false;
+          }
+          const blockStart = parseTimeToMinutes(block.startTime);
+          const blockEnd = parseTimeToMinutes(block.endTime);
+          return blockStart < interval.end && blockEnd > interval.start;
+        });
+        const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
+        const message =
+          `${day.dayOfWeek.toUpperCase()} ${formatMinutesAsTime(interval.start)}-${formatMinutesAsTime(interval.end)} ` +
+          `requires ${interval.required} staff (min ${interval.minStaff}, ratio ${childrenPerStaff} from ${sourceLabel}, children ${effectiveChildCount}) ` +
+          `but only ${interval.assigned} assigned`;
         violations.push(
-          buildViolation("ratio-segment", message, "SegmentBlock", block.id, citationId, "error", {
-            dayOfWeek: block.dayOfWeek,
-            childCount: effectiveChildCount,
-            ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType"
-          })
+          buildViolation(
+            "ratio-segment",
+            message,
+            "ScheduleDay",
+            `${day.id}:${intervalIndex}`,
+            citationId,
+            "error",
+            {
+              dayOfWeek: day.dayOfWeek,
+              childCount: effectiveChildCount,
+              ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType",
+              startTime: formatMinutesAsTime(interval.start),
+              endTime: formatMinutesAsTime(interval.end),
+              relatedSegmentBlockIds: relatedBlocks.map((block) => block.id)
+            }
+          )
         );
-      }
+      });
     });
     return violations;
   }
@@ -393,7 +475,9 @@ export const segmentBlockTimelineRule: RuleDefinition = {
         return;
       }
 
-      const scheduleDay = getScheduleDayById(context, block.scheduleDayId);
+      const scheduleDay =
+        getScheduleDayById(context, block.scheduleDayId) ??
+        context.scheduleDays.find((day) => day.dayOfWeek === block.dayOfWeek);
       const operatingHours = getOperatingHoursForDay(
         context,
         block.dayOfWeek,

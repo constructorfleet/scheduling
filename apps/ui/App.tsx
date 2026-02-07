@@ -702,7 +702,8 @@ export default function App() {
       return undefined;
     }
     if (target.entity === "ScheduleDay") {
-      const day = scheduleDaysState.find((item) => item.id === target.id);
+      const scheduleDayId = target.id.includes(":") ? target.id.split(":")[0] : target.id;
+      const day = scheduleDaysState.find((item) => item.id === scheduleDayId);
       if (!day) {
         return undefined;
       }

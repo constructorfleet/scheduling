@@ -152,8 +152,8 @@ describe("RulesEngine", () => {
 
     const violations = engine.evaluate(context);
     const ratioViolations = violations.filter((violation) => violation.ruleId === "ratio-segment");
-    expect(ratioViolations).toHaveLength(1);
-    expect(ratioViolations[0].target.id).toBe(block.id);
+    expect(ratioViolations.length).toBeGreaterThan(0);
+    expect(ratioViolations.some((violation) => String(violation.message).includes("08:00-12:00"))).toBe(true);
   });
 
   test("does not count orphan assignments toward ratio coverage", () => {
@@ -210,7 +210,10 @@ describe("RulesEngine", () => {
       createEmployee("emp-ratio-clean-3")
     ];
     const assignments = employees.map((employee, index) =>
-      createAssignment(`assign-ratio-clean-${index + 1}`, block.id, employee.id)
+      createAssignment(`assign-ratio-clean-${index + 1}`, block.id, employee.id, {
+        startTime: "06:00",
+        endTime: "18:00"
+      })
     );
     const context: RulesContext = withDefaultScheduleInfo({
       segmentBlocks: [block],
