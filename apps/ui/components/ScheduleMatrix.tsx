@@ -611,8 +611,7 @@ export default function ScheduleMatrix({
                 {daySequence.map((day) => {
                   const blocks = (employeeAssignments[day] ?? [])
                     .slice()
-                    .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                    .slice(0, 2);
+                    .sort((a, b) => a.startTime.localeCompare(b.startTime));
                   const operatingWindow = operatingWindowByDay[day];
                   const dayHours = getHoursForDay(member.id, day);
                   const closedDay = isClosedDay(day);
