@@ -105,6 +105,17 @@ export default function ScheduleMatrix({
 }: ScheduleMatrixProps) {
   const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
   const primaryFocusedSegmentId = focusedSegmentIds?.[0] ?? null;
+  const segmentById = Object.fromEntries(segmentBlocks.map((segment) => [segment.id, segment]));
+  const primaryFocusedDay = useMemo<DayOfWeek | undefined>(() => {
+    if (!primaryFocusedSegmentId) {
+      return undefined;
+    }
+    if (primaryFocusedSegmentId.startsWith("day:")) {
+      const day = primaryFocusedSegmentId.slice(4);
+      return daySequence.includes(day as DayOfWeek) ? (day as DayOfWeek) : undefined;
+    }
+    return segmentById[primaryFocusedSegmentId]?.dayOfWeek;
+  }, [primaryFocusedSegmentId, daySequence, segmentById]);
   const [editing, setEditing] = useState<{
     assignmentId?: string;
     employeeId: string;
@@ -117,7 +128,6 @@ export default function ScheduleMatrix({
   const openerWindowMinutes = 15;
   const closerWindowMinutes = 15;
   const dayMetadataByDay = Object.fromEntries(days.map((day) => [day.dayOfWeek, day]));
-  const segmentById = Object.fromEntries(segmentBlocks.map((segment) => [segment.id, segment]));
   const isClosedDay = (day: DayOfWeek) => {
     const metadata = dayMetadataByDay[day];
     return metadata?.scheduleType === "closed" || metadata?.dayScheduleType === "closed";
@@ -257,13 +267,16 @@ export default function ScheduleMatrix({
         `[data-segment-id="${primaryFocusedSegmentId}"]:not([data-segment-anchor="true"])`
       ) ??
       document.querySelector<HTMLElement>(`[data-segment-anchor-id="${primaryFocusedSegmentId}"]`) ??
+      (primaryFocusedDay
+        ? document.querySelector<HTMLElement>(`[data-day-column-header="${primaryFocusedDay}"]`)
+        : null) ??
       (focusedSegment
         ? document.querySelector<HTMLElement>(`[data-day-column-header="${focusedSegment.dayOfWeek}"]`)
         : null);
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
     }
-  }, [primaryFocusedSegmentId, segmentById]);
+  }, [primaryFocusedSegmentId, primaryFocusedDay, segmentById]);
 
   return (
     <motion.section
@@ -321,8 +334,7 @@ export default function ScheduleMatrix({
             {daySequence.map((day) => {
               const dayMeta = dayMetadataByDay[day];
               const fieldTripEvent = fieldTripEventsByDay[day];
-              const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
-              const isFocusedDay = focusedDay === day;
+              const isFocusedDay = primaryFocusedDay === day;
               const closedDay = isClosedDay(day);
               const scheduleTypeOption = dayMeta?.scheduleType
                 ? scheduleTypeOptionByValue.get(dayMeta.scheduleType)
@@ -615,8 +627,7 @@ export default function ScheduleMatrix({
                   const canCreateAssignment = !closedDay && !hasRequestedDayOff && isAvailableDay;
                   const isOverDaily = dayHours > member.maxHoursPerDay;
                   const cellBorder = isOverDaily ? `2px solid ${colors.danger}` : `1px solid ${colors.borderStrong}`;
-                  const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
-                  const isFocusedDay = focusedDay === day;
+                  const isFocusedDay = primaryFocusedDay === day;
 
                   return (
                     <td
@@ -669,6 +680,7 @@ export default function ScheduleMatrix({
                       )}
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", minHeight: "100%" }}>
                         {blocks.map((block) => {
+                          const segmentId = block.segmentBlockId || block.id;
                           const overlapMessage =
                             editing && editing.assignmentId === block.id ? getOverlapMessage(editing) : null;
                           const availabilityMessage = getAvailabilityViolationMessage(
@@ -693,7 +705,7 @@ export default function ScheduleMatrix({
                                 ? "rgba(132, 0, 255, 0.25)"
                                 : "#ecfeff";
                           const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
-                          const isFocused = focusedSet.has(block.segmentBlockId);
+                          const isFocused = focusedSet.has(segmentId);
                           const hasAvailabilityViolation = Boolean(availabilityMessage);
 
                           return (
@@ -726,7 +738,7 @@ export default function ScheduleMatrix({
                                   : "none",
                                 transition: "box-shadow 180ms linear, background-color 180ms linear, border-color 180ms linear"
                               }}
-                              data-segment-id={block.segmentBlockId}
+                              data-segment-id={segmentId}
                               onClick={() => {
                                 if (closedDay) {
                                   return;

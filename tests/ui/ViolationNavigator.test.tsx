@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import ViolationNavigator from "../../apps/ui/components/ViolationNavigator";
 import type { RuleViolation } from "../../apps/ui/types";
 
@@ -32,6 +32,17 @@ const violations: RuleViolation[] = [
     recommendedAction: "Log the break or add support coverage."
   }
 ] as const;
+
+const dayOnlyViolation: RuleViolation = {
+  id: "viol-day-only",
+  title: "Metadata missing",
+  severity: "warning",
+  description: "Missing required day metadata",
+  segmentBlockId: "",
+  policyCitation,
+  recommendedAction: "Fill in day metadata",
+  metadata: { dayOfWeek: "mon" }
+};
 
 describe("ViolationNavigator", () => {
   it("returns null when closed", () => {
@@ -75,5 +86,39 @@ describe("ViolationNavigator", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: "Jump to block" })[0]);
     expect(focus).toHaveBeenCalledWith(["segment-mon-open"]);
+  });
+
+  it("falls back to day focus when no segment id is available", () => {
+    const focus = jest.fn();
+    render(
+      <ViolationNavigator violations={[dayOnlyViolation]} onFocusSegments={focus} isOpen={true} onClose={() => {}} />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Jump to block" }));
+    expect(focus).toHaveBeenCalledWith(["day:mon"]);
+  });
+
+  it("scrolls target into view when jumping to a block", () => {
+    jest.useFakeTimers();
+    const focus = jest.fn();
+    const scrollIntoView = jest.fn();
+    const original = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+
+    const target = document.createElement("div");
+    target.setAttribute("data-segment-id", "segment-mon-open");
+    document.body.appendChild(target);
+
+    render(<ViolationNavigator violations={violations} onFocusSegments={focus} isOpen={true} onClose={() => {}} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Jump to block" })[0]);
+    act(() => {
+      jest.advanceTimersByTime(400);
+    });
+
+    expect(scrollIntoView).toHaveBeenCalled();
+
+    document.body.removeChild(target);
+    HTMLElement.prototype.scrollIntoView = original;
+    jest.useRealTimers();
   });
 });

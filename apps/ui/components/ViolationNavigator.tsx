@@ -79,24 +79,29 @@ export default function ViolationNavigator({
   };
 
   const getTargetForSegment = (segmentId: string, dayOfWeek?: string) => {
-    const visibleBlock = document.querySelector<HTMLElement>(
-      `[data-segment-id="${segmentId}"]`
-    );
-    if (visibleBlock && visibleBlock.offsetParent !== null) {
-      return visibleBlock;
+    if (segmentId.startsWith("day:")) {
+      const dayKey = segmentId.slice(4);
+      const header = document.querySelector<HTMLElement>(`[data-day-column-header="${dayKey}"]`);
+      if (header) {
+        return header;
+      }
     }
-    const visibleTimeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
-    if (visibleTimeline && visibleTimeline.offsetParent !== null) {
-      return visibleTimeline;
+    const block = document.querySelector<HTMLElement>(`[data-segment-id="${segmentId}"]`);
+    if (block) {
+      return block;
+    }
+    const timeline = document.querySelector<HTMLElement>(`[data-timeline-segment-id="${segmentId}"]`);
+    if (timeline) {
+      return timeline;
     }
     if (dayOfWeek) {
       const header = document.querySelector<HTMLElement>(`[data-day-column-header="${dayOfWeek}"]`);
-      if (header && header.offsetParent !== null) {
+      if (header) {
         return header;
       }
     }
     const anchor = document.querySelector<HTMLElement>(`[data-segment-anchor-id="${segmentId}"]`);
-    if (anchor && anchor.offsetParent !== null) {
+    if (anchor) {
       return anchor;
     }
     return anchor;
@@ -141,6 +146,16 @@ export default function ViolationNavigator({
       nextX = Math.min(position.x, viewportWidth - overlayRect.width - padding);
     }
     setPosition(clampPosition(nextX, nextY));
+  };
+
+  const scrollToTarget = (segmentIds: string[], dayOfWeek?: string) => {
+    const targetFromSegments =
+      segmentIds.map((segmentId) => getTargetForSegment(segmentId, dayOfWeek)).find(Boolean) ?? null;
+    const targetFromDay =
+      dayOfWeek ? document.querySelector<HTMLElement>(`[data-day-column-header="${dayOfWeek}"]`) : null;
+    const target = targetFromSegments ?? targetFromDay;
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
   };
 
   if (!isOpen) {
@@ -298,6 +313,7 @@ export default function ViolationNavigator({
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.35rem" }}>
                 <button
                   onClick={() => {
+                    const dayOfWeek = String(violation.metadata?.dayOfWeek ?? "");
                     const segmentIds = [
                       violation.segmentBlockId,
                       ...(violation.relatedSegmentBlockIds ?? [])
@@ -305,19 +321,15 @@ export default function ViolationNavigator({
                     const uniqueSegmentIds = Array.from(new Set(segmentIds.filter(Boolean)));
                     if (uniqueSegmentIds.length > 0) {
                       onFocusSegments(uniqueSegmentIds);
+                    } else if (dayOfWeek) {
+                      onFocusSegments([`day:${dayOfWeek}`]);
                     } else {
-                      const dayOfWeek = String(violation.metadata?.dayOfWeek ?? "");
-                      if (dayOfWeek) {
-                        const dayHeader = document.querySelector<HTMLElement>(
-                          `[data-day-column-header="${dayOfWeek}"]`
-                        );
-                        dayHeader?.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-                      }
+                      scrollToTarget([], dayOfWeek);
                     }
-                    window.setTimeout(
-                      () => adjustForTarget(uniqueSegmentIds, String(violation.metadata?.dayOfWeek ?? "")),
-                      220
-                    );
+                    window.setTimeout(() => {
+                      scrollToTarget(uniqueSegmentIds, dayOfWeek);
+                      window.setTimeout(() => adjustForTarget(uniqueSegmentIds, dayOfWeek), 220);
+                    }, 80);
                   }}
                   style={{
                     borderRadius: 999,

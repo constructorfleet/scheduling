@@ -1399,6 +1399,10 @@ export default function App() {
         ? `${dayDisplayNames[dayOfWeek]}${formattedDate ? ` ${formattedDate}` : ""}`
         : undefined;
       const metadata = engineViolation.target.metadata as Record<string, unknown> | undefined;
+      const metadataWithDay: Record<string, unknown> = {
+        ...(metadata ?? {}),
+        ...(dayOfWeek ? { dayOfWeek } : {})
+      };
       let issue = engineViolation.message;
       let contextDetail: string | undefined;
       if (engineViolation.ruleId === "ratio-segment") {
@@ -1435,7 +1439,7 @@ export default function App() {
         relatedSegmentBlockIds,
         policyCitation: citation,
         recommendedAction: RECOMMENDED_ACTIONS[engineViolation.ruleId] ?? "Review the segment and adjust coverage.",
-        metadata: engineViolation.target.metadata
+        metadata: metadataWithDay
       } satisfies UiRuleViolation;
     });
   }, [ruleViolationsFromEngine, policyCitations, segmentBlocksState, staffAssignmentsState, scheduleDaysState]);
