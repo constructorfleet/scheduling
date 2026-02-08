@@ -247,7 +247,6 @@ export default function App() {
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [historyPast, setHistoryPast] = useState<ScheduleSnapshot[]>([]);
   const [historyFuture, setHistoryFuture] = useState<ScheduleSnapshot[]>([]);
-  const [publishMessage, setPublishMessage] = useState<string | null>(null);
   const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
   const [segmentBlocksState, setSegmentBlocksState] = useState(segmentBlocks);
   const [staffAssignmentsState, setStaffAssignmentsState] = useState(staffAssignments);
@@ -1446,22 +1445,37 @@ export default function App() {
     : scheduleStatusOverride ?? "draft";
   const weekLabel = currentWeekLabel;
 
+  const missingMetadataDays = daySequence.filter((day) => {
+    const dayMeta = scheduleDaysState.find((item) => item.dayOfWeek === day);
+    const fieldTripEvent = fieldTripEventsByDay[day];
+    return !dayMeta || !dayMeta.scheduleType || dayMeta.enrollmentCount === undefined || !fieldTripEvent?.id;
+  });
+  const setupComplete = missingMetadataDays.length === 0;
+  const hasAssignments = staffAssignmentsState.length > 0;
+  const schedulingComplete = hasAssignments && validationComplete;
+
   const guidedSteps: GuidedStep[] = [
-    { id: "draft", label: "Draft workspace", detail: "Add staff and break coverage before running validation.", status: "complete" },
     {
-      id: "validation",
-      label: "Validation",
-      detail: "Violations link directly to the timeline; fixes re-run the engine automatically.",
-      status: validationComplete ? "complete" : "in_progress",
-      actionLabel: validationComplete ? undefined : "Review violations"
+      id: "setup",
+      label: "Set up enrollment, schedules, and field trips",
+      detail: setupComplete
+        ? "All day metadata is complete."
+        : `Complete day setup for ${missingMetadataDays.length} day${missingMetadataDays.length === 1 ? "" : "s"}.`,
+      status: setupComplete ? "complete" : "in_progress"
     },
     {
-      id: "publish",
-      label: "Ready to publish",
-      detail: "Publish only when every validation step is clear.",
-      status: readyToPublish ? "in_progress" : "blocked",
-      actionLabel: "Publish schedule",
-      actionDisabled: !readyToPublish
+      id: "schedule",
+      label: "Schedule staff and resolve validations",
+      detail: !setupComplete
+        ? "Finish day setup before scheduling staff."
+        : schedulingComplete
+          ? "Staffing is complete and all validations are clear."
+          : hasAssignments
+            ? "Resolve remaining validation issues."
+            : "Assign staff to segments and resolve validations.",
+      status: !setupComplete ? "blocked" : schedulingComplete ? "complete" : "in_progress",
+      blockingReason: !setupComplete ? "Complete the day setup first." : undefined,
+      actionLabel: validationComplete ? undefined : "Review violations"
     }
   ];
 
@@ -1657,10 +1671,7 @@ export default function App() {
   };
 
   const handleStepAction = (stepId: string) => {
-    if (stepId === "publish") {
-      handlePublish();
-    }
-    if (stepId === "validation") {
+    if (stepId === "schedule") {
       setShowViolationNavigator(true);
     }
   };
@@ -1676,15 +1687,6 @@ export default function App() {
     focusResetRef.current = window.setTimeout(() => {
       setFocusedSegmentIds((prev) => (prev.length ? [] : prev));
     }, 6000);
-  };
-
-  const handlePublish = () => {
-    if (!canEditSchedule) {
-      setAuthMessage("You do not have permission to publish schedules.");
-      return;
-    }
-    if (!readyToPublish) return;
-    setPublishMessage(`Schedule published ${new Date().toLocaleString()}`);
   };
 
   const handleUndo = () => {
@@ -2111,9 +2113,6 @@ export default function App() {
       status={
         <>
           <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
-          {publishMessage && (
-            <p style={{ margin: "0.5rem 0 0", color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>
-          )}
           {scheduleSaveError && (
             <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
           )}
