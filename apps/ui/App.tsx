@@ -1437,6 +1437,34 @@ export default function App() {
     return `${dayLabel} ${block.startTime}-${block.endTime}`;
   };
 
+  const formatTimeLabel = (value?: unknown) => {
+    if (typeof value !== "string") {
+      return undefined;
+    }
+    const trimmed = value.trim();
+    const match = trimmed.match(/^(\d{1,2}):(\d{2})$/);
+    if (!match) {
+      return trimmed;
+    }
+    const rawHours = Number(match[1]);
+    const minutes = match[2];
+    if (Number.isNaN(rawHours) || rawHours < 0 || rawHours > 23) {
+      return trimmed;
+    }
+    const meridiem = rawHours >= 12 ? "pm" : "am";
+    const hours = rawHours % 12 === 0 ? 12 : rawHours % 12;
+    return `${hours}:${minutes}${meridiem}`;
+  };
+
+  const formatTimeRange = (start?: unknown, end?: unknown) => {
+    const formattedStart = formatTimeLabel(start);
+    const formattedEnd = formatTimeLabel(end);
+    if (!formattedStart || !formattedEnd) {
+      return undefined;
+    }
+    return `${formattedStart} - ${formattedEnd}`;
+  };
+
   const violationRecords = useMemo(() => {
     return ruleViolationsFromEngine.map((engineViolation) => {
       const citation: PolicyCitation =
@@ -1496,6 +1524,7 @@ export default function App() {
         ? `${dayDisplayNames[dayOfWeek]}${formattedDate ? ` ${formattedDate}` : ""}`
         : undefined;
       const metadata = engineViolation.target.metadata as Record<string, unknown> | undefined;
+      const timeRange = formatTimeRange(metadata?.startTime, metadata?.endTime);
       const metadataWithDay: Record<string, unknown> = {
         ...(metadata ?? {}),
         ...(dayOfWeek ? { dayOfWeek } : {})
@@ -1522,6 +1551,9 @@ export default function App() {
           ].filter(Boolean);
           contextDetail = pieces.join(", ");
         }
+      }
+      if (timeRange) {
+        issue = `${issue} for ${timeRange}`;
       }
 
       return {
@@ -2255,6 +2287,8 @@ export default function App() {
           fieldTripTypes={fieldTripTypesState}
           fieldTripEventsByDay={fieldTripEventsByDay}
           operatingHoursByDay={operatingHoursByDay}
+          fieldTripStartTime={schoolRulesState.fieldTripStartTime}
+          fieldTripEndTime={schoolRulesState.fieldTripEndTime}
           onEnrollmentChange={handleEnrollmentUpdate}
           onScheduleTypeChange={handleScheduleTypeUpdate}
           onFieldTripSelection={handleFieldTripSelection}
