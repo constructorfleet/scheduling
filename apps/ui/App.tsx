@@ -18,7 +18,6 @@ import { useUserManagement } from "./hooks/useUserManagement";
 import type { HelpTopicId } from "./components/helpContent";
 import {
   dayDisplayNames,
-  daySequence,
   fieldTripEvents,
   operatingHours,
   scheduleDays,
@@ -116,6 +115,7 @@ const POLICY_CITATION_LIST = Object.values(policyCitations);
 type WeekDirection = "prev" | "next";
 
 const DAY_OF_WEEK_VALUES: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const weekDaySequence: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const isDayOfWeek = (value: string): value is DayOfWeek =>
   DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
 const CLOSED_SCHEDULE_TYPE = "closed" as ScheduleType;
@@ -220,7 +220,7 @@ const USER_POLICY_CITATION: PolicyCitation = {
   section: "N/A"
 };
 const IS_TEST_ENV = typeof process !== "undefined" && process.env.NODE_ENV === "test";
-const fullDayAvailabilityTemplate = daySequence.map((dayOfWeek) => ({
+const fullDayAvailabilityTemplate = weekDaySequence.map((dayOfWeek) => ({
   dayOfWeek,
   blocks: [{ startTime: "00:00", endTime: "23:59" }]
 }));
@@ -462,7 +462,7 @@ export default function App() {
   };
 
   const buildDefaultScheduleDays = (weekId: string, weekStartIso: string): ScheduleDay[] =>
-    daySequence.map((day, index) => {
+    weekDaySequence.map((day, index) => {
       const isClosedDay = closedDaysState.includes(day);
       return {
         id: `${weekId}-day-${day}`,
@@ -493,7 +493,7 @@ export default function App() {
     weekStartIso: string
   ): { snapshot: ScheduleSnapshot; auditEvents: AuditEvent[] } => {
     const dayIdMap = new Map<string, string>();
-    const normalizedDays = daySequence.map((dayOfWeek, index) => {
+    const normalizedDays = weekDaySequence.map((dayOfWeek, index) => {
       const sourceDay = source.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
       const id = sourceDay?.id ? `${weekId}-day-${dayOfWeek}` : `${weekId}-day-${dayOfWeek}`;
       if (sourceDay?.id) dayIdMap.set(sourceDay.id, id);
@@ -507,7 +507,7 @@ export default function App() {
     });
 
     const fieldTripIdMap = new Map<string, string>();
-    const normalizedFieldTrips = daySequence.map((dayOfWeek) => {
+    const normalizedFieldTrips = weekDaySequence.map((dayOfWeek) => {
       const sourceEvent = source.fieldTripEvents.find((event) => event.dayOfWeek === dayOfWeek);
       const id = `${weekId}-field-trip-${dayOfWeek}`;
       if (sourceEvent?.id) fieldTripIdMap.set(sourceEvent.id, id);
@@ -699,7 +699,7 @@ export default function App() {
   }, [fieldTripEventsState]);
 
   const operatingHoursByDay = useMemo<Record<DayOfWeek, OperatingHours | undefined>>(() => {
-    return daySequence.reduce((map, day) => {
+    return weekDaySequence.reduce((map, day) => {
       if (closedDaysState.includes(day)) {
         map[day] = undefined;
         return map;
@@ -724,11 +724,11 @@ export default function App() {
       map[day] = undefined;
       return map;
     }, {} as Record<DayOfWeek, OperatingHours | undefined>);
-  }, [scheduleDaysState, operatingHoursConfigState, daySequence, selectedSchoolId, closedDaysState]);
+  }, [scheduleDaysState, operatingHoursConfigState, weekDaySequence, selectedSchoolId, closedDaysState]);
 
   const openDaySequence = useMemo(() => {
-    return daySequence.filter((day) => !closedDaysState.includes(day));
-  }, [daySequence, closedDaysState]);
+    return weekDaySequence.filter((day) => !closedDaysState.includes(day));
+  }, [weekDaySequence, closedDaysState]);
 
   useEffect(() => {
     const defaultOpenScheduleType =
@@ -770,7 +770,7 @@ export default function App() {
   }, [scheduleTypeOptionsState]);
 
   const derivedOperatingHours = useMemo<OperatingHours[]>(() => {
-    return daySequence
+    return weekDaySequence
       .map((day) => {
         const hours = operatingHoursByDay[day];
         if (!hours) {
@@ -783,7 +783,7 @@ export default function App() {
         };
       })
       .filter((entry): entry is OperatingHours => Boolean(entry));
-  }, [daySequence, operatingHoursByDay, scheduleDaysState]);
+  }, [weekDaySequence, operatingHoursByDay, scheduleDaysState]);
 
   const buildSettingsPayload = (overrides: Partial<{
     schoolName: string;
@@ -1131,7 +1131,7 @@ export default function App() {
           const loadedScheduleDaysByDow = new Map(
             loadedScheduleDaysRaw.map((day) => [day.dayOfWeek, day] as const)
           );
-          const loadedScheduleDays: ScheduleDay[] = daySequence.map((dayOfWeek, index) => {
+          const loadedScheduleDays: ScheduleDay[] = weekDaySequence.map((dayOfWeek, index) => {
             const existing = loadedScheduleDaysByDow.get(dayOfWeek);
             const defaultDate = addDays(currentWeekStartDateIso, index);
             const isClosed = closedDaysState.includes(dayOfWeek);
@@ -1172,7 +1172,7 @@ export default function App() {
           const loadedFieldTripByDay = new Map(
             (schedule.fieldTripEvents ?? []).map((event) => [event.dayOfWeek, event] as const)
           );
-          const loadedFieldTripEvents: FieldTripEvent[] = daySequence.map((dayOfWeek) => {
+          const loadedFieldTripEvents: FieldTripEvent[] = weekDaySequence.map((dayOfWeek) => {
             const event = loadedFieldTripByDay.get(dayOfWeek);
             if (event) {
               return {
@@ -1522,7 +1522,7 @@ export default function App() {
     : scheduleStatusOverride ?? "draft";
   const weekLabel = currentWeekLabel;
 
-  const missingMetadataDays = daySequence.filter((day) => {
+  const missingMetadataDays = weekDaySequence.filter((day) => {
     const dayMeta = scheduleDaysState.find((item) => item.dayOfWeek === day);
     const fieldTripEvent = fieldTripEventsByDay[day];
     return !dayMeta || !dayMeta.scheduleType || dayMeta.enrollmentCount === undefined || !fieldTripEvent?.id;
