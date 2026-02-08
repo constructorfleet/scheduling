@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import WeekNavigationBanner from "./components/WeekNavigationBanner";
 import { FieldTripSelection } from "./components/DayMetadataStrip";
 import ScheduleMatrix from "./components/ScheduleMatrix";
@@ -12,6 +12,7 @@ import UserManagementPanel from "./components/UserManagementPanel";
 import AuthGate from "./components/AuthGate";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
+import AppShell from "./components/AppShell";
 import { useUserManagement } from "./hooks/useUserManagement";
 import type { HelpTopicId } from "./components/helpContent";
 import {
@@ -2052,92 +2053,66 @@ export default function App() {
   }
 
   return (
-    <MotionConfig transition={{ type: "tween", ease: "linear", duration: 0.2 }}>
-      <motion.div
-        layout="position"
-        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
-        style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
-          padding: "clamp(0.75rem, 2.5vw, 2rem)",
-          fontFamily: "Inter, system-ui, sans-serif",
-          color: "#111827"
-        }}
-      >
-      <style>{`
-        * {
-          transition: background-color 0.2s linear, border-color 0.2s linear, color 0.2s linear,
-            box-shadow 0.2s linear, opacity 0.2s linear;
-        }
-        button, input, select, textarea {
-          transition: background-color 0.2s linear, border-color 0.2s linear, color 0.2s linear,
-            box-shadow 0.2s linear, opacity 0.2s linear;
-        }
-      `}</style>
-      <WeekNavigationBanner
-        schoolOptions={schoolOptions}
-        selectedSchoolId={selectedSchoolId}
-        onSchoolChange={(schoolId) => {
-          setSelectedSchoolId(schoolId);
-          setAuthMessage(null);
-        }}
-        weekLabel={weekLabel}
-        status={scheduleStatus}
-        complianceHighlights={complianceHighlights}
-        onShiftWeek={handleWeekShift}
-        onOpenViolations={() => setShowViolationNavigator((prev) => !prev)}
-        onOpenAuditTimeline={() => setShowAuditTimeline((prev) => !prev)}
-        hasViolations={violationRecords.length > 0}
-        isViolationsOpen={showViolationNavigator}
-        isAuditOpen={showAuditTimeline}
-        apiStatus={apiStatus}
-        onAutoSchedule={handleAutoSchedule}
-        canEditSchedule={canEditSchedule}
-        canManageSettings={canManageSettings}
-        canManageUsers={canManageUsers}
-        userDisplayName={authUser?.displayName}
-        userRoleLabel={roleLabel}
-        onLogout={() => {
-          void handleLogout();
-        }}
-        onOpenHelpTopic={openHelpTopic}
-        onOpenSettings={() => {
-          if (!canManageSettings) {
-            setAuthMessage("You do not have permission to edit settings for this school.");
-            return;
-          }
-          if (showSettings && settingsDirty) {
-            setSettingsCloseAttempt((prev) => prev + 1);
-            return;
-          }
-          setShowSettings((prev) => !prev);
-        }}
-        isSettingsOpen={showSettings}
-        onOpenUserManagement={toggleUserManagement}
-        isUserManagementOpen={showUserManagement}
-      />
-      <motion.div
-        layout="position"
-        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
-        style={{ marginTop: "1rem", marginBottom: "1.5rem" }}
-      >
-        <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
-        {publishMessage && (
-          <p style={{ margin: "0.5rem 0 0", color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>
-        )}
-        {scheduleSaveError && (
-          <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
-        )}
-        {authMessage && (
-          <p style={{ margin: "0.5rem 0 0", color: "#b45309", fontSize: "0.85rem" }}>{authMessage}</p>
-        )}
-      </motion.div>
-
-      <motion.div
-        layout="position"
-        transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
-        style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-      >
+    <AppShell
+      banner={
+        <WeekNavigationBanner
+          schoolOptions={schoolOptions}
+          selectedSchoolId={selectedSchoolId}
+          onSchoolChange={(schoolId) => {
+            setSelectedSchoolId(schoolId);
+            setAuthMessage(null);
+          }}
+          weekLabel={weekLabel}
+          status={scheduleStatus}
+          complianceHighlights={complianceHighlights}
+          onShiftWeek={handleWeekShift}
+          onOpenViolations={() => setShowViolationNavigator((prev) => !prev)}
+          onOpenAuditTimeline={() => setShowAuditTimeline((prev) => !prev)}
+          hasViolations={violationRecords.length > 0}
+          isViolationsOpen={showViolationNavigator}
+          isAuditOpen={showAuditTimeline}
+          apiStatus={apiStatus}
+          onAutoSchedule={handleAutoSchedule}
+          canEditSchedule={canEditSchedule}
+          canManageSettings={canManageSettings}
+          canManageUsers={canManageUsers}
+          userDisplayName={authUser?.displayName}
+          userRoleLabel={roleLabel}
+          onLogout={() => {
+            void handleLogout();
+          }}
+          onOpenHelpTopic={openHelpTopic}
+          onOpenSettings={() => {
+            if (!canManageSettings) {
+              setAuthMessage("You do not have permission to edit settings for this school.");
+              return;
+            }
+            if (showSettings && settingsDirty) {
+              setSettingsCloseAttempt((prev) => prev + 1);
+              return;
+            }
+            setShowSettings((prev) => !prev);
+          }}
+          isSettingsOpen={showSettings}
+          onOpenUserManagement={toggleUserManagement}
+          isUserManagementOpen={showUserManagement}
+        />
+      }
+      status={
+        <>
+          <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
+          {publishMessage && (
+            <p style={{ margin: "0.5rem 0 0", color: "#0f172a", fontSize: "0.85rem" }}>{publishMessage}</p>
+          )}
+          {scheduleSaveError && (
+            <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
+          )}
+          {authMessage && (
+            <p style={{ margin: "0.5rem 0 0", color: "#b45309", fontSize: "0.85rem" }}>{authMessage}</p>
+          )}
+        </>
+      }
+      content={
         <ScheduleMatrix
           staff={scheduleStaff}
           employeeOptions={employeesDerived}
@@ -2219,125 +2194,127 @@ export default function App() {
           focusedSegmentIds={focusedSegmentIds}
           onOpenHelpTopic={openHelpTopic}
         />
-      </motion.div>
-
-      <AnimatePresence>
-        {showViolationNavigator && (
-          <ViolationNavigator
-            violations={violationRecords}
-            onFocusSegments={handleFocusSegments}
-            isOpen={showViolationNavigator}
-            onClose={() => setShowViolationNavigator(false)}
-            onOpenHelpTopic={openHelpTopic}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showAuditTimeline && (
-          <AuditTimeline
-            events={displayAuditEvents}
-            onUndo={handleUndo}
-            onRedo={handleRedo}
-            canUndo={historyPast.length > 0}
-            canRedo={historyFuture.length > 0}
-            isOpen={showAuditTimeline}
-            onClose={() => setShowAuditTimeline(false)}
-            onOpenHelpTopic={openHelpTopic}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showSettings && (
-      <SettingsPanel
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        schoolName={schoolName}
-        schoolRules={schoolRulesState}
-        scheduleTypes={scheduleTypeOptionsState}
-        jobTitles={jobTitlesState}
-        operatingHoursConfig={operatingHoursConfigState}
-        closedDays={closedDaysState}
-        fieldTripTypes={fieldTripTypesState}
-        employees={employeesState}
-        onUpdateScheduleTypes={handleUpdateScheduleTypes}
-        onUpdateJobTitles={handleUpdateJobTitles}
-        onUpdateOperatingHoursConfig={handleUpdateOperatingHours}
-        onUpdateClosedDays={handleUpdateClosedDays}
-        onUpdateSchoolName={handleUpdateSchoolName}
-        onUpdateSchoolRules={handleUpdateSchoolRules}
-        onUpdateFieldTrips={handleUpdateFieldTrips}
-        onUpdateEmployees={handleUpdateEmployees}
-        onDirtyChange={setSettingsDirty}
-        closeAttempt={settingsCloseAttempt}
-        onOpenHelpTopic={openHelpTopic}
-      />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showUserManagement && (
-          <UserManagementPanel
-            isOpen={showUserManagement}
-            scope={userManagementScope}
-            onScopeChange={setUserManagementScope}
-            canUseDistrictScope={canUseDistrictScope}
-            canUseSchoolScope={canUseSchoolScope}
-            districtOptions={districtMemberships}
-            selectedDistrictId={selectedDistrictId}
-            onSelectDistrict={setSelectedDistrictId}
-            selectedSchoolName={selectedSchoolName}
-            isLoading={userManagementLoading}
-            error={userManagementError}
-            users={managedUsers}
-            invites={managedInvites}
-            inviteDraft={inviteDraft}
-            roleOptions={inviteRoleOptions}
-            inviteSubmitting={inviteSubmitting}
-            inviteFeedback={inviteFeedback}
-            onInviteDraftChange={setInviteDraft}
-            onSendInvite={() => {
-              void handleSendUserInvite();
-            }}
-            onRefresh={() => {
-              void refreshUserManagement();
-            }}
-            onClose={() => setShowUserManagement(false)}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {activeHelpTopic && (
-          <HelpCenterModal
-            isOpen={Boolean(activeHelpTopic)}
-            topicId={activeHelpTopic}
-            onClose={() => setActiveHelpTopic(null)}
-            onSelectTopic={setActiveHelpTopic}
-          />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        <WeekInitializationModal
-          isOpen={Boolean(pendingWeekInitialization)}
-          weekLabel={pendingWeekInitialization?.weekLabel ?? ""}
-          onCancel={handleCancelWeekInitialization}
-          onInitializeBlank={() => {
-            void handleInitializeWeek("blank");
-          }}
-          onInitializeCopy={() => {
-            void handleInitializeWeek("copy");
-          }}
-        />
-      </AnimatePresence>
-      <AnimatePresence>
-        <AutoScheduleModal
-          isOpen={showAutoScheduleModal}
-          state={autoScheduleState}
-          dayDisplayNames={dayDisplayNames}
-          onClose={closeAutoScheduleModal}
-          onKeepExisting={() => executeAutoSchedule(true)}
-          onStartFromScratch={() => executeAutoSchedule(false)}
-        />
-      </AnimatePresence>
-      </motion.div>
-    </MotionConfig>
+      }
+      overlays={
+        <>
+          <AnimatePresence>
+            {showViolationNavigator && (
+              <ViolationNavigator
+                violations={violationRecords}
+                onFocusSegments={handleFocusSegments}
+                isOpen={showViolationNavigator}
+                onClose={() => setShowViolationNavigator(false)}
+                onOpenHelpTopic={openHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showAuditTimeline && (
+              <AuditTimeline
+                events={displayAuditEvents}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
+                canUndo={historyPast.length > 0}
+                canRedo={historyFuture.length > 0}
+                isOpen={showAuditTimeline}
+                onClose={() => setShowAuditTimeline(false)}
+                onOpenHelpTopic={openHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showSettings && (
+              <SettingsPanel
+                isOpen={showSettings}
+                onClose={() => setShowSettings(false)}
+                schoolName={schoolName}
+                schoolRules={schoolRulesState}
+                scheduleTypes={scheduleTypeOptionsState}
+                jobTitles={jobTitlesState}
+                operatingHoursConfig={operatingHoursConfigState}
+                closedDays={closedDaysState}
+                fieldTripTypes={fieldTripTypesState}
+                employees={employeesState}
+                onUpdateScheduleTypes={handleUpdateScheduleTypes}
+                onUpdateJobTitles={handleUpdateJobTitles}
+                onUpdateOperatingHoursConfig={handleUpdateOperatingHours}
+                onUpdateClosedDays={handleUpdateClosedDays}
+                onUpdateSchoolName={handleUpdateSchoolName}
+                onUpdateSchoolRules={handleUpdateSchoolRules}
+                onUpdateFieldTrips={handleUpdateFieldTrips}
+                onUpdateEmployees={handleUpdateEmployees}
+                onDirtyChange={setSettingsDirty}
+                closeAttempt={settingsCloseAttempt}
+                onOpenHelpTopic={openHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showUserManagement && (
+              <UserManagementPanel
+                isOpen={showUserManagement}
+                scope={userManagementScope}
+                onScopeChange={setUserManagementScope}
+                canUseDistrictScope={canUseDistrictScope}
+                canUseSchoolScope={canUseSchoolScope}
+                districtOptions={districtMemberships}
+                selectedDistrictId={selectedDistrictId}
+                onSelectDistrict={setSelectedDistrictId}
+                selectedSchoolName={selectedSchoolName}
+                isLoading={userManagementLoading}
+                error={userManagementError}
+                users={managedUsers}
+                invites={managedInvites}
+                inviteDraft={inviteDraft}
+                roleOptions={inviteRoleOptions}
+                inviteSubmitting={inviteSubmitting}
+                inviteFeedback={inviteFeedback}
+                onInviteDraftChange={setInviteDraft}
+                onSendInvite={() => {
+                  void handleSendUserInvite();
+                }}
+                onRefresh={() => {
+                  void refreshUserManagement();
+                }}
+                onClose={() => setShowUserManagement(false)}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {activeHelpTopic && (
+              <HelpCenterModal
+                isOpen={Boolean(activeHelpTopic)}
+                topicId={activeHelpTopic}
+                onClose={() => setActiveHelpTopic(null)}
+                onSelectTopic={setActiveHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            <WeekInitializationModal
+              isOpen={Boolean(pendingWeekInitialization)}
+              weekLabel={pendingWeekInitialization?.weekLabel ?? ""}
+              onCancel={handleCancelWeekInitialization}
+              onInitializeBlank={() => {
+                void handleInitializeWeek("blank");
+              }}
+              onInitializeCopy={() => {
+                void handleInitializeWeek("copy");
+              }}
+            />
+          </AnimatePresence>
+          <AnimatePresence>
+            <AutoScheduleModal
+              isOpen={showAutoScheduleModal}
+              state={autoScheduleState}
+              dayDisplayNames={dayDisplayNames}
+              onClose={closeAutoScheduleModal}
+              onKeepExisting={() => executeAutoSchedule(true)}
+              onStartFromScratch={() => executeAutoSchedule(false)}
+            />
+          </AnimatePresence>
+        </>
+      }
+    />
   );
 }
