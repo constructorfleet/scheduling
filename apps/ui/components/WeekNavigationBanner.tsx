@@ -26,6 +26,9 @@ interface WeekNavigationBannerProps {
   isAuditOpen: boolean;
   onOpenSettings: () => void;
   isSettingsOpen: boolean;
+  onOpenUserManagement: () => void;
+  isUserManagementOpen: boolean;
+  canManageUsers: boolean;
   onAutoSchedule: () => void;
   canManageSettings: boolean;
   canEditSchedule: boolean;
@@ -54,6 +57,9 @@ export default function WeekNavigationBanner({
   isAuditOpen,
   onOpenSettings,
   isSettingsOpen,
+  onOpenUserManagement,
+  isUserManagementOpen,
+  canManageUsers,
   onAutoSchedule,
   canManageSettings,
   canEditSchedule,
@@ -278,6 +284,25 @@ export default function WeekNavigationBanner({
                 )}
               </span>
               {isSettingsOpen ? "Close Settings" : "Open Settings"}
+            </button>
+            <button
+              type="button"
+              onClick={onOpenUserManagement}
+              disabled={!canManageUsers}
+              style={{
+                borderRadius: 999,
+                border: "1px solid rgba(255,255,255,0.35)",
+                background: !canManageUsers
+                  ? "rgba(255,255,255,0.05)"
+                  : isUserManagementOpen
+                    ? "rgba(14,116,144,0.35)"
+                    : "rgba(255,255,255,0.12)",
+                color: canManageUsers ? "#f9fafb" : "#9ca3af",
+                padding: "0.35rem 0.8rem",
+                cursor: canManageUsers ? "pointer" : "not-allowed"
+              }}
+            >
+              {isUserManagementOpen ? "Close Users" : "Manage Users"}
             </button>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
