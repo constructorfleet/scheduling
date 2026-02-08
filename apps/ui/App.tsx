@@ -1445,10 +1445,6 @@ export default function App() {
   const scheduleStatus: ScheduleStatus = readyToPublish
     ? "ready_for_review"
     : scheduleStatusOverride ?? "draft";
-  const complianceHighlights = [
-    `${violationRecords.length} violation${violationRecords.length === 1 ? "" : "s"} outstanding`,
-    readyToPublish ? "Ready for publish" : "Resolve blockers before publishing"
-  ];
   const weekLabel = currentWeekLabel;
 
   const missingMetadataDays = daySequence.filter((day) => {
@@ -2082,7 +2078,6 @@ export default function App() {
           }}
           weekLabel={weekLabel}
           status={scheduleStatus}
-          complianceHighlights={complianceHighlights}
           onShiftWeek={handleWeekShift}
           onOpenViolations={() => setShowViolationNavigator((prev) => !prev)}
           onOpenAuditTimeline={() => setShowAuditTimeline((prev) => !prev)}

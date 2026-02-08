@@ -23,7 +23,6 @@ interface WeekNavigationBannerProps {
   onSchoolChange: (schoolId: string) => void;
   weekLabel: string;
   status: ScheduleStatus;
-  complianceHighlights?: string[];
   onShiftWeek: (direction: "prev" | "next") => void;
   onOpenViolations: () => void;
   onOpenAuditTimeline: () => void;

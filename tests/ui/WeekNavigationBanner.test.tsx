@@ -12,7 +12,6 @@ describe("WeekNavigationBanner", () => {
     onSchoolChange: jest.fn(),
     weekLabel: "Feb 2–Feb 8",
     status: "draft" as const,
-    complianceHighlights: [],
     onShiftWeek: jest.fn(),
     onOpenViolations: jest.fn(),
     onOpenAuditTimeline: jest.fn(),
