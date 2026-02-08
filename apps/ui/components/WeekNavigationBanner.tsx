@@ -375,7 +375,12 @@ export default function WeekNavigationBanner({
               aria-label={isUserManagementOpen ? "Close Users" : "Manage Users"}
               style={iconPill(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}
             >
-              <span style={{ fontSize: "1.2rem" }} aria-hidden="true">👥</span>
+              <span style={{ display: "inline-flex", color: colors.textInverse }} aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21a8 8 0 0 0-16 0" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
               <div className="banner-icon-pill__label-container">
                 <span className="banner-icon-pill__label">{isUserManagementOpen ? "Close Users" : "Manage Users"}</span>
               </div>
