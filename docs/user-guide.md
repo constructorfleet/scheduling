@@ -16,6 +16,7 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 - **Invite links**: open the invite link to set a display name and password before signing in for the first time.
 - **Copying invites**: administrators can use the **Copy link** button in User Management if email delivery fails.
 - **Update your display name**: use **Edit name** in the top banner to change how your name appears in the scheduler.
+- **School Viewer role**: view schedules in any week without editing schedules, settings, or violations.
 
 ## Step 1: Configure employees, certifications, and ratio requirements
 Every configuration change reruns validations immediately. Once a record satisfies the corresponding rule, its violation disappears—there are no “addressed” flags to toggle. Follow the sections below so the system can enforce guardrails before you build the schedule.

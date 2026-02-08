@@ -29,6 +29,7 @@ interface WeekNavigationBannerProps {
   onOpenAuditTimeline: () => void;
   hasViolations: boolean;
   isViolationsOpen: boolean;
+  hideViolations?: boolean;
   isAuditOpen: boolean;
   onOpenSettings: () => void;
   isSettingsOpen: boolean;
@@ -108,6 +109,7 @@ export default function WeekNavigationBanner({
   onOpenAuditTimeline,
   hasViolations,
   isViolationsOpen,
+  hideViolations,
   isAuditOpen,
   onOpenSettings,
   isSettingsOpen,
@@ -373,27 +375,31 @@ export default function WeekNavigationBanner({
           }}
         >
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-start", alignItems: "center" }}>
-            <button
-              type="button"
-              className="banner-icon-pill"
-              data-active={isViolationsOpen}
-              onClick={onOpenViolations}
-              disabled={!hasViolations}
-              aria-label={isViolationsOpen ? "Close Violations" : "Open Violations"}
-              style={iconPill(isViolationsOpen ? "danger" : "neutral", !hasViolations)}
-            >
-              <span aria-hidden="true" style={{ fontSize: "1.1rem", fontWeight: 800 }}>!</span>
-              <div className={`banner-icon-pill__label-container ${hasViolations ? 'is-permanent' : ''}`}>
-                <span className="banner-icon-pill__label hide-on-hover">{hasViolations ? `${violationCount} Violations Outstanding` : ''}</span>
-                <span className="banner-icon-pill__label hover-only">{isViolationsOpen ? "Close Violations" : "Open Violations"}</span>
-              </div>
-            </button>
-            <HelpIconButton
-              label="Violation navigator"
-              tone="dark"
-              onClick={() => onOpenHelpTopic?.("violations")}
-              style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start" }}
-            />
+            {!hideViolations && (
+              <>
+                <button
+                  type="button"
+                  className="banner-icon-pill"
+                  data-active={isViolationsOpen}
+                  onClick={onOpenViolations}
+                  disabled={!hasViolations}
+                  aria-label={isViolationsOpen ? "Close Violations" : "Open Violations"}
+                  style={iconPill(isViolationsOpen ? "danger" : "neutral", !hasViolations)}
+                >
+                  <span aria-hidden="true" style={{ fontSize: "1.1rem", fontWeight: 800 }}>!</span>
+                  <div className={`banner-icon-pill__label-container ${hasViolations ? 'is-permanent' : ''}`}>
+                    <span className="banner-icon-pill__label hide-on-hover">{hasViolations ? `${violationCount} Violations Outstanding` : ''}</span>
+                    <span className="banner-icon-pill__label hover-only">{isViolationsOpen ? "Close Violations" : "Open Violations"}</span>
+                  </div>
+                </button>
+                <HelpIconButton
+                  label="Violation navigator"
+                  tone="dark"
+                  onClick={() => onOpenHelpTopic?.("violations")}
+                  style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start" }}
+                />
+              </>
+            )}
 
             <button type="button" onClick={onAutoSchedule} disabled={!canEditSchedule} style={pillStyle("active", !canEditSchedule)}>
               ⚡ Auto

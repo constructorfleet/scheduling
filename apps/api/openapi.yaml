@@ -217,7 +217,7 @@ components:
       required: [status]
     Role:
       type: string
-      enum: [super_user, district_admin, district_user, school_admin, school_user]
+      enum: [super_user, district_admin, district_user, school_admin, school_user, school_viewer]
     LoginPayload:
       type: object
       properties:

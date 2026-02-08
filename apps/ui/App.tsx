@@ -332,6 +332,7 @@ export default function App() {
   const canManageSettings = canManageSettingsForRole(currentRole);
   const canManageUsers = canManageUsersForRole(currentRole);
   const canManageDistricts = canManageDistrictsForRole(currentRole);
+  const isViewer = currentRole === "school_viewer";
   const canUseDistrictScope =
     currentRole !== null && ["super_user", "district_admin"].includes(currentRole);
   const canUseSchoolScope =
@@ -1330,6 +1331,9 @@ export default function App() {
 
   const engine = useMemo(() => createRulesEngine(), []);
   const ruleViolationsFromEngine = useMemo(() => {
+    if (isViewer) {
+      return [];
+    }
     const context: RulesContext = {
       segmentBlocks: segmentBlocksState,
       staffAssignments: staffAssignmentsState,
@@ -1357,7 +1361,8 @@ export default function App() {
     derivedOperatingHours,
     schoolRulesState,
     jobTitleRules,
-    ratioByScheduleType
+    ratioByScheduleType,
+    isViewer
   ]);
 
   const resolveSegmentBlockId = (target: EngineRuleViolation["target"]) => {
@@ -2164,6 +2169,7 @@ export default function App() {
           violationCount={violationRecords.length}
           hasViolations={violationRecords.length > 0}
           isViolationsOpen={showViolationNavigator}
+          hideViolations={isViewer}
           isAuditOpen={showAuditTimeline}
           apiStatus={apiStatus}
           onAutoSchedule={handleAutoSchedule}
@@ -2292,7 +2298,7 @@ export default function App() {
       overlays={
         <>
           <AnimatePresence>
-            {showViolationNavigator && (
+            {showViolationNavigator && !isViewer && (
               <ViolationNavigator
                 violations={violationRecords}
                 onFocusSegments={handleFocusSegments}

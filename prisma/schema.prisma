@@ -20,6 +20,7 @@ enum Role {
   district_user
   school_admin
   school_user
+  school_viewer
 }
 
 model District {

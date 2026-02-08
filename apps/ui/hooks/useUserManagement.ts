@@ -104,7 +104,8 @@ export const useUserManagement = ({
   ];
   const schoolRoleOptions: { value: Role; label: string }[] = [
     { value: "school_admin", label: "School Admin" },
-    { value: "school_user", label: "School User" }
+    { value: "school_user", label: "School User" },
+    { value: "school_viewer", label: "School Viewer" }
   ];
   const inviteRoleOptions = useMemo(
     () => (userManagementScope === "district" ? districtRoleOptions : schoolRoleOptions),

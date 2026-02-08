@@ -45,7 +45,7 @@ export const canReadSchoolSchedule = (auth: AuthLike, schoolId: string, district
     return true;
   }
   const schoolMembership = getSchoolMembership(auth, schoolId);
-  if (schoolMembership && hasRoleIn(schoolMembership.role, ["school_admin", "school_user"])) {
+  if (schoolMembership && hasRoleIn(schoolMembership.role, ["school_admin", "school_user", "school_viewer"])) {
     return true;
   }
   const districtMembership = getDistrictMembership(auth, districtId);
@@ -53,8 +53,15 @@ export const canReadSchoolSchedule = (auth: AuthLike, schoolId: string, district
 };
 
 export const canWriteSchoolSchedule = (auth: AuthLike, schoolId: string, districtId: string) => {
-  // All school and district roles can write schedules by product policy.
-  return canReadSchoolSchedule(auth, schoolId, districtId);
+  if (auth.isSuperUser) {
+    return true;
+  }
+  const schoolMembership = getSchoolMembership(auth, schoolId);
+  if (schoolMembership && hasRoleIn(schoolMembership.role, ["school_admin", "school_user"])) {
+    return true;
+  }
+  const districtMembership = getDistrictMembership(auth, districtId);
+  return Boolean(districtMembership && hasRoleIn(districtMembership.role, ["district_admin", "district_user"]));
 };
 
 export const canManageSchoolUsers = (auth: AuthLike, schoolId: string, districtId: string) => {

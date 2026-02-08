@@ -21,6 +21,11 @@ export default function InviteAccept({ token, onReturnToLogin }: InviteAcceptPro
   const [submitting, setSubmitting] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
+  const formatRoleLabel = (role: string) =>
+    role
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+
   useEffect(() => {
     if (!token) {
       setInviteState({ status: "error", message: "Invite token is missing." });
@@ -103,6 +108,19 @@ export default function InviteAccept({ token, onReturnToLogin }: InviteAcceptPro
           <p style={{ margin: 0, color: "#b91c1c", fontSize: "0.95rem" }}>{inviteState.message}</p>
         ) : (
           <>
+            {(() => {
+              const roleLabel = formatRoleLabel(inviteState.invite.role);
+              const districtName = inviteState.invite.districtName ?? "";
+              const schoolName = inviteState.invite.schoolName ?? "";
+              const scopeLabel = schoolName
+                ? `${districtName ? `${districtName} ` : ""}${schoolName}`
+                : districtName;
+              return (
+                <p style={{ margin: "0 0 1rem", color: "#475569", fontSize: "0.9rem" }}>
+                  You have been invited to use the {scopeLabel || "district"} scheduling tool as a {roleLabel}.
+                </p>
+              );
+            })()}
             <p style={{ margin: "0 0 1rem", color: "#475569", fontSize: "0.9rem" }}>
               You have been invited to join the scheduler. Set your display name and password to activate the account.
             </p>

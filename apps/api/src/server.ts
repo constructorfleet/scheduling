@@ -257,6 +257,7 @@ const buildServer = async () => {
       return null;
     }
     const rolePriority: Record<Role, number> = {
+      school_viewer: 0,
       school_user: 1,
       school_admin: 2,
       district_user: 3,
@@ -518,6 +519,7 @@ const buildServer = async () => {
     }
 
     const rolePriority: Record<Role, number> = {
+      school_viewer: 0,
       school_user: 1,
       school_admin: 2,
       district_user: 3,
@@ -785,7 +787,7 @@ const buildServer = async () => {
           role: invite.role
         }
       });
-    } else if (invite.role === "school_admin" || invite.role === "school_user") {
+    } else if (invite.role === "school_admin" || invite.role === "school_user" || invite.role === "school_viewer") {
       if (!invite.schoolId) {
         return reply.code(400).send({ message: "Invite missing school scope." });
       }
@@ -1032,7 +1034,7 @@ const buildServer = async () => {
     };
     const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
     const role = body.role;
-    if (!email || !role || !["school_admin", "school_user"].includes(role)) {
+    if (!email || !role || !["school_admin", "school_user", "school_viewer"].includes(role)) {
       return reply.code(400).send({ message: "email and school role are required." });
     }
     const auth = await resolveAuth(request);

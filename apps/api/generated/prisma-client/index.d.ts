@@ -121,7 +121,8 @@ export const Role: {
   district_admin: 'district_admin',
   district_user: 'district_user',
   school_admin: 'school_admin',
-  school_user: 'school_user'
+  school_user: 'school_user',
+  school_viewer: 'school_viewer'
 };
 
 export type Role = (typeof Role)[keyof typeof Role]
