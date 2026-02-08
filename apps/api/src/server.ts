@@ -1114,6 +1114,8 @@ const start = async () => {
       console.log(`API listening on http://${host}:${port}`);
     }
   } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to start API server:", err);
     server.log.error(err);
     process.exit(1);
   }

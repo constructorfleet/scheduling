@@ -12,7 +12,7 @@
         "dev:setup": "npm run api:generate && npm run api:migrate:deploy",
         "dev:run": "concurrently -k -n API,UI -c cyan,magenta \"npm run api:dev\" \"npm run ui:dev\"",
         "ui:dev": "vite",
-        "api:dev": "tsx apps/api/src/server.ts",
+        "api:dev": "PORT=${PORT:-4001} tsx apps/api/src/server.ts",
         "api:build": "tsc -p apps/api/tsconfig.json",
         "api:generate": "prisma generate --schema prisma/schema.prisma",
         "api:migrate": "prisma migrate dev --name dev --schema prisma/schema.prisma",
