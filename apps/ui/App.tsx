@@ -287,6 +287,7 @@ export default function App() {
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [historyPast, setHistoryPast] = useState<ScheduleSnapshot[]>([]);
   const [historyFuture, setHistoryFuture] = useState<ScheduleSnapshot[]>([]);
+  const historyRestoredRef = useRef<string | null>(null);
   const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
   const [segmentBlocksState, setSegmentBlocksState] = useState(segmentBlocks);
   const [staffAssignmentsState, setStaffAssignmentsState] = useState(staffAssignments);
@@ -435,6 +436,47 @@ export default function App() {
       suspendHistoryRef.current = false;
     });
   };
+
+  const getHistoryStorageKey = (weekId: string) => `schedule-history:${weekId}`;
+
+  useEffect(() => {
+    if (!hasLoadedRemote || !isWeekInitialized || loadedWeekId !== currentWeekId) {
+      return;
+    }
+    if (historyRestoredRef.current === currentWeekId) {
+      return;
+    }
+    historyRestoredRef.current = currentWeekId;
+    if (typeof window === "undefined") {
+      return;
+    }
+    const stored = window.localStorage.getItem(getHistoryStorageKey(currentWeekId));
+    if (!stored) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(stored) as { past?: ScheduleSnapshot[]; future?: ScheduleSnapshot[]; };
+      if (Array.isArray(parsed.past)) {
+        setHistoryPast(parsed.past);
+      }
+      if (Array.isArray(parsed.future)) {
+        setHistoryFuture(parsed.future);
+      }
+    } catch {
+      // ignore invalid history
+    }
+  }, [hasLoadedRemote, isWeekInitialized, loadedWeekId, currentWeekId]);
+
+  useEffect(() => {
+    if (!hasLoadedRemote || !isWeekInitialized || loadedWeekId !== currentWeekId) {
+      return;
+    }
+    if (typeof window === "undefined") {
+      return;
+    }
+    const payload = JSON.stringify({ past: historyPast, future: historyFuture });
+    window.localStorage.setItem(getHistoryStorageKey(currentWeekId), payload);
+  }, [historyPast, historyFuture, hasLoadedRemote, isWeekInitialized, loadedWeekId, currentWeekId]);
 
   const appendAuditEvent = (action: string, notes?: string) => {
     setAuditEvents((prev) => [

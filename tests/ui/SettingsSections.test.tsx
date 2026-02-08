@@ -186,6 +186,8 @@ describe("Settings section components", () => {
     const rules: SchoolRules = {
       openerCount: 2,
       closerCount: 2,
+      fieldTripStartTime: "09:00",
+      fieldTripEndTime: "15:00",
       minimumMedicalDelegated: 1,
       requireCurrentCpr: false
     };
