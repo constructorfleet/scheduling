@@ -256,6 +256,7 @@ export default function ScheduleMatrix({
       document.querySelector<HTMLElement>(
         `[data-segment-id="${primaryFocusedSegmentId}"]:not([data-segment-anchor="true"])`
       ) ??
+      document.querySelector<HTMLElement>(`[data-segment-anchor-id="${primaryFocusedSegmentId}"]`) ??
       (focusedSegment
         ? document.querySelector<HTMLElement>(`[data-day-column-header="${focusedSegment.dayOfWeek}"]`)
         : null);
