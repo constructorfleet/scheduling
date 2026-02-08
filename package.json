@@ -27,7 +27,8 @@
         "test:unit": "jest",
         "test": "npm run test:unit",
         "test:watch": "jest --watch",
-        "lint": "eslint packages apps tests",
+        "lint": "eslint packages apps tests && npm run check:single-component",
+        "check:single-component": "tsx scripts/check-single-component-per-file.ts",
         "type-check": "tsc --noEmit",
         "clean": "rm -rf dist coverage"
     },
