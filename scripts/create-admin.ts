@@ -82,12 +82,12 @@ const createAdmin = async () => {
             }
         },
         update: {
-            role: "district_admin"
+            role: "super_user"
         },
         create: {
             userId: user.id,
             districtId: district.id,
-            role: "district_admin"
+            role: "super_user"
         }
     });
 
@@ -99,17 +99,17 @@ const createAdmin = async () => {
             }
         },
         update: {
-            role: "school_admin"
+            role: "super_user"
         },
         create: {
             userId: user.id,
             schoolId: school.id,
-            role: "school_admin"
+            role: "super_user"
         }
     });
 
     // eslint-disable-next-line no-console
-    console.log(`Admin user ready: ${ email } (school: ${ school.id })`);
+    console.log(`Super user ready: ${ email } (school: ${ school.id })`);
 };
 
 createAdmin()
