@@ -221,9 +221,9 @@ export default function ViolationNavigator({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: "#e2e8f0",
-              color: "#0f172a",
-              padding: "0.2rem 0.6rem",
+              background: colors.surfaceRaised,
+              color: colors.textPrimary,
+              padding: "0.3rem 0.7rem",
               fontSize: "0.8rem"
             }}
           >
