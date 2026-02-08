@@ -146,6 +146,10 @@ const formatWeekRange = (startDate: Date) => {
   const endLabel = endDate.toLocaleDateString(undefined, options);
   return `${startLabel} – ${endLabel}, ${endDate.getFullYear()}`;
 };
+const parseIsoDate = (value: string) => {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, (month ?? 1) - 1, day ?? 1);
+};
 const toIsoDate = (date: Date) => {
   const year = date.getFullYear();
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
@@ -153,7 +157,7 @@ const toIsoDate = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 const addDays = (isoDate: string, offset: number) => {
-  const base = new Date(`${isoDate}T00:00:00`);
+  const base = parseIsoDate(isoDate);
   base.setDate(base.getDate() + offset);
   return toIsoDate(base);
 };
@@ -235,7 +239,7 @@ const ensureEmployeeAvailability = (employee: Employee) => {
 };
 
 export default function App() {
-  const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
+  const [weekStartDate, setWeekStartDate] = useState(() => parseIsoDate(weekMeta.startDate));
   const currentWeekStartDateIso = useMemo(() => toIsoDate(weekStartDate), [weekStartDate]);
   const currentWeekId = useMemo(() => `week-${currentWeekStartDateIso}`, [currentWeekStartDateIso]);
   const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);

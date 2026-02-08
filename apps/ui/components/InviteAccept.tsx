@@ -110,14 +110,11 @@ export default function InviteAccept({ token, onReturnToLogin }: InviteAcceptPro
           <>
             {(() => {
               const roleLabel = formatRoleLabel(inviteState.invite.role);
-              const districtName = inviteState.invite.districtName ?? "";
-              const schoolName = inviteState.invite.schoolName ?? "";
-              const scopeLabel = schoolName
-                ? `${districtName ? `${districtName} ` : ""}${schoolName}`
-                : districtName;
+              const districtName = inviteState.invite.districtName ?? "district";
+              const schoolName = inviteState.invite.schoolName ? ` ${inviteState.invite.schoolName}` : "";
               return (
                 <p style={{ margin: "0 0 1rem", color: "#475569", fontSize: "0.9rem" }}>
-                  You have been invited to use the {scopeLabel || "district"} scheduling tool as a {roleLabel}.
+                  You have been invited to use the {districtName}{schoolName} scheduling tool as a {roleLabel}.
                 </p>
               );
             })()}
