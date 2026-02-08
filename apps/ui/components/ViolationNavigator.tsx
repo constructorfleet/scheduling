@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { RuleViolation } from "../types";
+import HelpIconButton from "./HelpIconButton";
+import type { HelpTopicId } from "./helpContent";
 
 interface ViolationNavigatorProps {
   violations: RuleViolation[];
   onFocusSegments: (segmentIds: string[]) => void;
   isOpen: boolean;
   onClose: () => void;
+  onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
 
 const severityStyles: Record<RuleViolation["severity"], { label: string; color: string }> = {
@@ -19,7 +22,8 @@ export default function ViolationNavigator({
   violations,
   onFocusSegments,
   isOpen,
-  onClose
+  onClose,
+  onOpenHelpTopic
 }: ViolationNavigatorProps) {
   const [position, setPosition] = useState({ x: 16, y: 120 });
   const [isDragging, setIsDragging] = useState(false);
@@ -188,6 +192,10 @@ export default function ViolationNavigator({
             }}
           />
           <h3 style={{ margin: 0 }}>Violation navigator</h3>
+          <HelpIconButton
+            label="Violation navigator"
+            onClick={() => onOpenHelpTopic?.("violations")}
+          />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <span style={{ fontSize: "0.85rem", color: "#6b7280" }}>{violations.length} active</span>

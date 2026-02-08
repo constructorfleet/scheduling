@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AuditEvent } from "../types";
+import HelpIconButton from "./HelpIconButton";
+import type { HelpTopicId } from "./helpContent";
 
 interface AuditTimelineProps {
   events: AuditEvent[];
@@ -10,6 +12,7 @@ interface AuditTimelineProps {
   canRedo: boolean;
   isOpen: boolean;
   onClose: () => void;
+  onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
 
 export default function AuditTimeline({
@@ -19,7 +22,8 @@ export default function AuditTimeline({
   canUndo,
   canRedo,
   isOpen,
-  onClose
+  onClose,
+  onOpenHelpTopic
 }: AuditTimelineProps) {
   const [position, setPosition] = useState({ x: 16, y: 120 });
   const [isDragging, setIsDragging] = useState(false);
@@ -123,6 +127,10 @@ export default function AuditTimeline({
             }}
           />
           <h3 style={{ margin: 0 }}>Audit timeline</h3>
+          <HelpIconButton
+            label="Audit timeline"
+            onClick={() => onOpenHelpTopic?.("audit")}
+          />
         </div>
         <div style={{ display: "flex", gap: "0.35rem", alignItems: "center" }}>
           <button

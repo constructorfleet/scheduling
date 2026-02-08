@@ -13,6 +13,8 @@ import {
 } from "@core/domain/types";
 import { ScheduleTypeOption, FieldTripSelection } from "./DayMetadataStrip";
 import { parseTimeToMinutes } from "@core/rules/utils";
+import HelpIconButton from "./HelpIconButton";
+import type { HelpTopicId } from "./helpContent";
 
 interface ScheduleMatrixProps {
   staff: Employee[];
@@ -34,6 +36,7 @@ interface ScheduleMatrixProps {
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
   focusedSegmentIds?: string[] | null;
+  onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
 
 const formatTime = (value: string) => {
@@ -96,7 +99,8 @@ export default function ScheduleMatrix({
   onDeleteAssignment,
   onCreateAssignment,
   onReassignUnlinkedStaff,
-  focusedSegmentIds
+  focusedSegmentIds,
+  onOpenHelpTopic
 }: ScheduleMatrixProps) {
   const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
   const primaryFocusedSegmentId = focusedSegmentIds?.[0] ?? null;
@@ -274,11 +278,18 @@ export default function ScheduleMatrix({
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
-        <div>
+        <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "0.45rem" }}>
+          <div>
           <h3 style={{ margin: 0 }}>Schedule grid</h3>
           <p style={{ margin: 0, color: "#6b7280" }}>
             Staff rows combine day metadata and clock-in/out blocks in one matrix.
           </p>
+          </div>
+          <HelpIconButton
+            label="Schedule grid"
+            onClick={() => onOpenHelpTopic?.("schedule-grid")}
+            style={{ marginTop: "0.1rem" }}
+          />
         </div>
       </div>
 

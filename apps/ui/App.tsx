@@ -7,6 +7,8 @@ import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
 import AuditTimeline from "./components/AuditTimeline";
 import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
+import HelpCenterModal from "./components/HelpCenterModal";
+import type { HelpTopicId } from "./components/helpContent";
 import {
   dayDisplayNames,
   daySequence,
@@ -269,6 +271,7 @@ export default function App() {
   const suspendHistoryRef = useRef(false);
   
   const [showAutoScheduleModal, setShowAutoScheduleModal] = useState(false);
+  const [activeHelpTopic, setActiveHelpTopic] = useState<HelpTopicId | null>(null);
   const [autoScheduleState, setAutoScheduleState] = useState<
     | { type: "idle" }
     | { type: "validating" }
@@ -1985,6 +1988,7 @@ export default function App() {
   };
 
   const roleLabel = currentRole ? currentRole.replace("_", " ").toUpperCase() : undefined;
+  const openHelpTopic = (topicId: HelpTopicId) => setActiveHelpTopic(topicId);
 
   if (authStatus === "loading") {
     return (
@@ -2142,6 +2146,7 @@ export default function App() {
         onLogout={() => {
           void handleLogout();
         }}
+        onOpenHelpTopic={openHelpTopic}
         onOpenSettings={() => {
           if (!canManageSettings) {
             setAuthMessage("You do not have permission to edit settings for this school.");
@@ -2256,6 +2261,7 @@ export default function App() {
             );
           }}
           focusedSegmentIds={focusedSegmentIds}
+          onOpenHelpTopic={openHelpTopic}
         />
       </motion.div>
 
@@ -2266,6 +2272,7 @@ export default function App() {
             onFocusSegments={handleFocusSegments}
             isOpen={showViolationNavigator}
             onClose={() => setShowViolationNavigator(false)}
+            onOpenHelpTopic={openHelpTopic}
           />
         )}
       </AnimatePresence>
@@ -2279,6 +2286,7 @@ export default function App() {
             canRedo={historyFuture.length > 0}
             isOpen={showAuditTimeline}
             onClose={() => setShowAuditTimeline(false)}
+            onOpenHelpTopic={openHelpTopic}
           />
         )}
       </AnimatePresence>
@@ -2305,7 +2313,18 @@ export default function App() {
         onUpdateEmployees={handleUpdateEmployees}
         onDirtyChange={setSettingsDirty}
         closeAttempt={settingsCloseAttempt}
+        onOpenHelpTopic={openHelpTopic}
       />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activeHelpTopic && (
+          <HelpCenterModal
+            isOpen={Boolean(activeHelpTopic)}
+            topicId={activeHelpTopic}
+            onClose={() => setActiveHelpTopic(null)}
+            onSelectTopic={setActiveHelpTopic}
+          />
         )}
       </AnimatePresence>
       <AnimatePresence>

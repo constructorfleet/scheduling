@@ -10,6 +10,8 @@ import {
   SchoolSettingsSection
 } from "./settings";
 import type { ScheduleTypeOption } from "./DayMetadataStrip";
+import HelpIconButton from "./HelpIconButton";
+import type { HelpTopicId } from "./helpContent";
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ interface SettingsPanelProps {
   onUpdateEmployees: (next: Employee[]) => void;
   onDirtyChange?: (dirty: boolean) => void;
   closeAttempt?: number;
+  onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
 
 export interface JobTitleSetting {
@@ -126,7 +129,8 @@ export default function SettingsPanel({
   onUpdateFieldTrips,
   onUpdateEmployees,
   onDirtyChange,
-  closeAttempt
+  closeAttempt,
+  onOpenHelpTopic
 }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("school");
   const jobTitleOptions = useMemo(() => jobTitles.map((title) => title.title), [jobTitles]);
@@ -272,6 +276,14 @@ export default function SettingsPanel({
 
   const canSaveActiveTab =
     activeTab === "operatingHours" ? canSaveOperatingHours : dirtyTabs[activeTab];
+  const helpTopicByTab: Record<SettingsTab, HelpTopicId> = {
+    school: "settings-school",
+    scheduleTypes: "settings-schedule-types",
+    operatingHours: "settings-operating-hours",
+    fieldTrips: "settings-field-trips",
+    jobTitles: "settings-job-titles",
+    employees: "settings-employees"
+  };
 
   if (!isOpen) {
     return null;
@@ -323,9 +335,16 @@ export default function SettingsPanel({
             background: "#f8fafc"
           }}
         >
-          <div>
+          <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "0.45rem" }}>
+            <div>
             <h3 style={{ margin: 0 }}>Settings</h3>
             <p style={{ margin: 0, color: "#6b7280" }}>Manage schedule types, field trips, and staff.</p>
+            </div>
+            <HelpIconButton
+              label="Settings overview"
+              onClick={() => onOpenHelpTopic?.("settings-overview")}
+              style={{ marginTop: "0.1rem" }}
+            />
           </div>
           <button
             type="button"
@@ -347,7 +366,15 @@ export default function SettingsPanel({
           </button>
         </div>
 
-        <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", background: "#ffffff", overflowX: "auto" }}>
+        <div
+          style={{
+            display: "flex",
+            borderBottom: "1px solid #e5e7eb",
+            background: "#ffffff",
+            overflowX: "auto",
+            alignItems: "center"
+          }}
+        >
           {([
             { id: "school", label: "School" },
             { id: "scheduleTypes", label: "Schedule types" },
@@ -374,6 +401,12 @@ export default function SettingsPanel({
               {tab.label}
             </button>
           ))}
+          <div style={{ marginLeft: "auto", paddingRight: "0.75rem", display: "inline-flex", alignItems: "center" }}>
+            <HelpIconButton
+              label={`${activeTab} settings`}
+              onClick={() => onOpenHelpTopic?.(helpTopicByTab[activeTab])}
+            />
+          </div>
         </div>
 
         <div

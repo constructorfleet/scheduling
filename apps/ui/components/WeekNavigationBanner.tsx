@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 import { ScheduleStatus } from "@core/domain/types";
+import HelpIconButton from "./HelpIconButton";
+import type { HelpTopicId } from "./helpContent";
 
 const statusBadges: Record<ScheduleStatus, { label: string; color: string }> = {
   draft: { label: "Draft", color: "#f59e0b" },
@@ -30,6 +32,7 @@ interface WeekNavigationBannerProps {
   userDisplayName?: string;
   userRoleLabel?: string;
   onLogout: () => void;
+  onOpenHelpTopic?: (topicId: HelpTopicId) => void;
   apiStatus: {
     state: "loading" | "saving" | "saved" | "error" | "idle";
     message: string;
@@ -57,6 +60,7 @@ export default function WeekNavigationBanner({
   userDisplayName,
   userRoleLabel,
   onLogout,
+  onOpenHelpTopic,
   apiStatus
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
@@ -84,6 +88,11 @@ export default function WeekNavigationBanner({
             <h1 style={{ margin: "0.25rem 0", fontSize: "clamp(1.25rem, 4vw, 2rem)", lineHeight: 1.2 }}>
               {selectedSchool?.name ?? "Select a school"}
             </h1>
+            <HelpIconButton
+              label="Scheduler overview"
+              tone="dark"
+              onClick={() => onOpenHelpTopic?.("overview")}
+            />
             <select
               value={selectedSchoolId}
               onChange={(event) => onSchoolChange(event.target.value)}
@@ -142,78 +151,92 @@ export default function WeekNavigationBanner({
             {apiStatus.message}
           </span>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-start" }}>
-            <button
-              type="button"
-              onClick={onOpenViolations}
-              disabled={!hasViolations}
-              style={{
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.35)",
-                background: isViolationsOpen ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.12)",
-                color: hasViolations ? "#f9fafb" : "#9ca3af",
-                padding: "0.35rem 0.8rem",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.4rem",
-                cursor: hasViolations ? "pointer" : "not-allowed"
-              }}
-            >
-              <span
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <button
+                type="button"
+                onClick={onOpenViolations}
+                disabled={!hasViolations}
                 style={{
-                  width: 16,
-                  height: 16,
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.35)",
+                  background: isViolationsOpen ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.12)",
+                  color: hasViolations ? "#f9fafb" : "#9ca3af",
+                  padding: "0.35rem 0.8rem",
                   display: "inline-flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  gap: "0.4rem",
+                  cursor: hasViolations ? "pointer" : "not-allowed"
                 }}
               >
-                {isViolationsOpen ? (
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
-                    <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
-                    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                )}
-              </span>
-              {isViolationsOpen ? "Close Violations" : "Open Violations"}
-            </button>
-            <button
-              type="button"
-              onClick={onOpenAuditTimeline}
-              style={{
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.35)",
-                background: isAuditOpen ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.12)",
-                color: "#f9fafb",
-                padding: "0.35rem 0.8rem",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.4rem"
-              }}
-            >
-              <span
+                <span
+                  style={{
+                    width: 16,
+                    height: 16,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  {isViolationsOpen ? (
+                    <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+                      <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                      <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </span>
+                {isViolationsOpen ? "Close Violations" : "Open Violations"}
+              </button>
+              <HelpIconButton
+                label="Violation navigator"
+                tone="dark"
+                onClick={() => onOpenHelpTopic?.("violations")}
+              />
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <button
+                type="button"
+                onClick={onOpenAuditTimeline}
                 style={{
-                  width: 16,
-                  height: 16,
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.35)",
+                  background: isAuditOpen ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.12)",
+                  color: "#f9fafb",
+                  padding: "0.35rem 0.8rem",
                   display: "inline-flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  gap: "0.4rem"
                 }}
               >
-                {isAuditOpen ? (
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
-                    <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
-                    <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                )}
-              </span>
-              {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
-            </button>
+                <span
+                  style={{
+                    width: 16,
+                    height: 16,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  {isAuditOpen ? (
+                    <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
+                      <path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true">
+                      <path d="M10 4v12M4 10h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </span>
+                {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
+              </button>
+              <HelpIconButton
+                label="Audit timeline"
+                tone="dark"
+                onClick={() => onOpenHelpTopic?.("audit")}
+              />
+            </div>
             <button
               type="button"
               onClick={onOpenSettings}
@@ -258,21 +281,28 @@ export default function WeekNavigationBanner({
             </button>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-            <button
-              onClick={onAutoSchedule}
-              disabled={!canEditSchedule}
-              style={{
-                borderRadius: 999,
-                border: "1px solid rgba(255,255,255,0.4)",
-                background: canEditSchedule ? "#10b981" : "rgba(255,255,255,0.12)",
-                color: canEditSchedule ? "#fff" : "#9ca3af",
-                padding: "0.4rem 0.9rem",
-                fontWeight: 600,
-                cursor: canEditSchedule ? "pointer" : "not-allowed"
-              }}
-            >
-              ⚡ Auto
-            </button>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+              <button
+                onClick={onAutoSchedule}
+                disabled={!canEditSchedule}
+                style={{
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.4)",
+                  background: canEditSchedule ? "#10b981" : "rgba(255,255,255,0.12)",
+                  color: canEditSchedule ? "#fff" : "#9ca3af",
+                  padding: "0.4rem 0.9rem",
+                  fontWeight: 600,
+                  cursor: canEditSchedule ? "pointer" : "not-allowed"
+                }}
+              >
+                ⚡ Auto
+              </button>
+              <HelpIconButton
+                label="Auto schedule"
+                tone="dark"
+                onClick={() => onOpenHelpTopic?.("auto-schedule")}
+              />
+            </div>
             <button
               onClick={() => onShiftWeek("prev")}
               style={{
