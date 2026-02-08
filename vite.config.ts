@@ -17,8 +17,11 @@ export default defineConfig({
   },
   server: {
     port: 4173,
+    // Match package.json `api:dev` default port.
+    // Override with VITE_API_PROXY_TARGET when needed.
+    host: "127.0.0.1",
     proxy: {
-      "/api": "http://localhost:4000"
+      "/api": process.env.VITE_API_PROXY_TARGET ?? "http://127.0.0.1:4001"
     }
   }
 });
