@@ -161,7 +161,7 @@ export default function ViolationNavigator({
         width: "min(360px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
-        background: colors.surface,
+        background: colors.surfaceAlt,
         borderRadius: 18,
         padding: "0.75rem",
         boxShadow: shadows.card,
@@ -241,7 +241,7 @@ export default function ViolationNavigator({
               borderRadius: 12,
               border: "1px solid #e5e7eb",
               padding: "0.75rem",
-              background: colors.surface,
+              background: colors.surfaceRaised,
               display: "flex",
               flexDirection: "column",
               gap: "0.35rem"

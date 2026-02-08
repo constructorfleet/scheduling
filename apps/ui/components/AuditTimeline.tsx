@@ -96,7 +96,7 @@ export default function AuditTimeline({
         width: "min(380px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
-        background: colors.surface,
+        background: colors.surfaceAlt,
         borderRadius: 18,
         padding: "0.75rem",
         boxShadow: shadows.card,
@@ -140,7 +140,7 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e5e7eb",
-              background: canUndo ? colors.surfaceAccent : colors.surface,
+              background: canUndo ? colors.surfaceAccent : colors.surfaceRaised,
               color: canUndo ? colors.brandBlue : "#94a3b8",
               padding: "0.3rem 0.7rem"
             }}
@@ -153,7 +153,7 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e5e7eb",
-              background: canRedo ? colors.surfaceAccent : colors.surface,
+              background: canRedo ? colors.surfaceAccent : colors.surfaceRaised,
               color: canRedo ? colors.brandBlue : "#94a3b8",
               padding: "0.3rem 0.7rem"
             }}
@@ -166,7 +166,7 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: colors.surfaceAlt,
+              background: colors.surfaceRaised,
               color: colors.textPrimary,
               padding: "0.3rem 0.7rem",
               fontSize: "0.8rem"

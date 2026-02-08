@@ -117,7 +117,7 @@ export default function UserManagementPanel({
           width: "min(980px, 100%)",
           maxHeight: "92vh",
           overflow: "auto",
-          background: colors.surface,
+          background: colors.surfaceAlt,
           borderRadius: 14,
           border: `1px solid ${colors.borderSubtle}`,
           boxShadow: shadows.card,
@@ -230,7 +230,7 @@ export default function UserManagementPanel({
               border: "1px solid #e2e8f0",
               borderRadius: 12,
               padding: "0.8rem",
-              background: colors.surfaceAlt
+              background: colors.surfaceRaised
             }}
           >
             <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>District management</h3>
@@ -295,7 +295,7 @@ export default function UserManagementPanel({
               border: "1px solid #e2e8f0",
               borderRadius: 12,
               padding: "0.8rem",
-              background: colors.surfaceAlt
+              background: colors.surfaceRaised
             }}
           >
             <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>School management</h3>
@@ -357,7 +357,7 @@ export default function UserManagementPanel({
             border: "1px solid #e2e8f0",
             borderRadius: 12,
             padding: "0.8rem",
-            background: colors.surfaceAlt
+            background: colors.surfaceRaised
           }}
         >
           <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>Send invite</h3>

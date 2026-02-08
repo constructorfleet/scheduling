@@ -495,7 +495,7 @@ export default function ScheduleMatrix({
                     border: `1px solid ${colors.borderStrong}`,
                     padding: "0.75rem",
                     verticalAlign: "top",
-                    background: overscheduled ? colors.dangerSurface : colors.surfaceAlt,
+                    background: overscheduled ? colors.dangerSurface : colors.surfaceRaised,
                     position: "relative"
                   }}
                 >
@@ -613,7 +613,7 @@ export default function ScheduleMatrix({
                   const isAvailableDay = !hasAvailabilityEntry || (availabilityForDay?.blocks?.length ?? 0) > 0;
                   const canCreateAssignment = !closedDay && !hasRequestedDayOff && isAvailableDay;
                   const isOverDaily = dayHours > member.maxHoursPerDay;
-                  const cellBorder = isOverDaily ? "2px solid #dc2626" : "1px solid #e5e7eb";
+                  const cellBorder = isOverDaily ? `2px solid ${colors.danger}` : `1px solid ${colors.borderStrong}`;
                   const focusedDay = primaryFocusedSegmentId ? segmentById[primaryFocusedSegmentId]?.dayOfWeek : undefined;
                   const isFocusedDay = focusedDay === day;
 
@@ -624,7 +624,7 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: closedDay ? colors.surfaceAlt : isFocusedDay ? colors.surfaceAccent : overscheduled ? colors.dangerSurface : colors.surfaceAlt,
+                        background: closedDay ? colors.surfaceAlt : isFocusedDay ? colors.surfaceAccent : overscheduled ? colors.dangerSurface : colors.surfaceRaised,
                         position: "relative"
                       }}
                     >
