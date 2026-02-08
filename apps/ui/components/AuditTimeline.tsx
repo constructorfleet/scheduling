@@ -196,7 +196,8 @@ export default function AuditTimeline({
             <article
               key={event.id}
               style={{
-                borderBottom: "1px solid #e5e7eb",
+                borderBottom: "2px solid #e5e7eb",
+                borderBottomColor: colors.borderStrong,
                 paddingBottom: "0.5rem",
                 display: "flex",
                 justifyContent: "space-between",
