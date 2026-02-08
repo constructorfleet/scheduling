@@ -3,7 +3,12 @@ import { ScheduleStatus } from "@core/domain/types";
 import HelpIconButton from "./HelpIconButton";
 import type { HelpTopicId } from "./helpContent";
 
-const statusBadges: Record<ScheduleStatus, { label: string; color: string }> = {
+type LabelColor = {
+    label: string;
+    color: string;
+};
+
+const statusBadges: Record<ScheduleStatus, LabelColor> = {
   draft: { label: "Draft", color: "#f59e0b" },
   ready_for_review: { label: "In review", color: "#60a5fa" },
   submitted: { label: "Submitted", color: "#34d399" },
@@ -17,7 +22,7 @@ interface WeekNavigationBannerProps {
   onSchoolChange: (schoolId: string) => void;
   weekLabel: string;
   status: ScheduleStatus;
-  complianceHighlights: string[];
+  complianceHighlights?: string[];
   onShiftWeek: (direction: "prev" | "next") => void;
   onOpenViolations: () => void;
   onOpenAuditTimeline: () => void;
@@ -40,40 +45,40 @@ interface WeekNavigationBannerProps {
     state: "loading" | "saving" | "saved" | "error" | "idle";
     message: string;
   };
+  violationCount: number;
 }
 
 type PillTone = "neutral" | "active" | "warn" | "danger";
 
-const pillStyle = (tone: PillTone, disabled = false) => {
+const pillStyle = (tone: PillTone | LabelColor, disabled = false) => {
   const palette: Record<PillTone, { background: string; border: string; color: string }> = {
     neutral: {
-      background: "rgba(15, 23, 42, 0.35)",
-      border: "1px solid rgba(148, 163, 184, 0.45)",
-      color: "#e2e8f0"
+      background: "rgba(30, 41, 59, 0.45)",
+      border: "1px solid rgba(148, 163, 184, 0.55)",
+      color: "#f1f5f9"
     },
     active: {
-      background: "rgba(14, 165, 233, 0.22)",
-      border: "1px solid rgba(56, 189, 248, 0.55)",
-      color: "#e0f2fe"
+      background: "rgba(14, 165, 233, 0.28)",
+      border: "1px solid rgba(56, 189, 248, 0.65)",
+      color: "#f0f9ff"
     },
     warn: {
-      background: "rgba(245, 158, 11, 0.2)",
-      border: "1px solid rgba(251, 191, 36, 0.5)",
-      color: "#fef3c7"
+      background: "rgba(245, 158, 11, 0.25)",
+      border: "1px solid rgba(251, 191, 36, 0.6)",
+      color: "#fef9c7"
     },
     danger: {
-      background: "rgba(239, 68, 68, 0.22)",
-      border: "1px solid rgba(248, 113, 113, 0.5)",
-      color: "#fee2e2"
+      background: "rgba(239, 68, 68, 0.28)",
+      border: "1px solid rgba(248, 113, 113, 0.6)",
+      color: "#fef2f2"
     }
   };
   return {
     borderRadius: 999,
-    ...palette[tone],
+    ...(typeof tone === "string" ? palette[tone] : { background: tone.color, border: `1px solid ${tone.color}`, color: "#fff" }),
     padding: "0.42rem 0.88rem",
     display: "inline-flex",
     alignItems: "center",
-    gap: "0.42rem",
     fontWeight: 600,
     fontSize: "0.84rem",
     cursor: disabled ? "not-allowed" : "pointer",
@@ -85,7 +90,7 @@ const iconPill = (tone: PillTone, disabled = false) => ({
   ...pillStyle(tone, disabled),
   padding: "0.36rem 0.56rem",
   minWidth: 42,
-  justifyContent: "flex-start"
+  justifyContent: "center"
 });
 
 export default function WeekNavigationBanner({
@@ -94,7 +99,6 @@ export default function WeekNavigationBanner({
   onSchoolChange,
   weekLabel,
   status,
-  complianceHighlights,
   onShiftWeek,
   onOpenViolations,
   onOpenAuditTimeline,
@@ -113,7 +117,8 @@ export default function WeekNavigationBanner({
   userRoleLabel,
   onLogout,
   onOpenHelpTopic,
-  apiStatus
+  apiStatus,
+  violationCount
 }: WeekNavigationBannerProps) {
   const badge = statusBadges[status] ?? statusBadges.draft;
   const selectedSchool = schoolOptions.find((school) => school.id === selectedSchoolId) ?? schoolOptions[0];
@@ -138,9 +143,9 @@ export default function WeekNavigationBanner({
         padding: "clamp(1rem, 2.8vw, 1.7rem)",
         marginBottom: "1.5rem",
         background:
-          "radial-gradient(circle at 80% -20%, rgba(56,189,248,0.28), transparent 45%), radial-gradient(circle at 10% 110%, rgba(16,185,129,0.2), transparent 40%), linear-gradient(150deg, #0f172a 0%, #111827 45%, #172554 100%)",
-        border: "1px solid rgba(148,163,184,0.32)",
-        boxShadow: "0 30px 60px rgba(2, 8, 23, 0.35)",
+          "radial-gradient(circle at 80% -20%, rgba(56,189,248,0.35), transparent 50%), radial-gradient(circle at 10% 110%, rgba(16,185,129,0.25), transparent 45%), linear-gradient(150deg, #1e293b 0%, #334155 45%, #475569 100%)",
+        border: "1px solid rgba(148,163,184,0.45)",
+        boxShadow: "0 25px 50px rgba(2, 8, 23, 0.25)",
         color: "#f8fafc",
         position: "relative",
         overflow: "hidden"
@@ -150,20 +155,41 @@ export default function WeekNavigationBanner({
         .banner-icon-pill {
           transition: background-color 0.2s linear, border-color 0.2s linear, opacity 0.2s linear;
         }
-        .banner-icon-pill__label {
+        .banner-icon-pill__label-container {
+          display: inline-grid;
+          grid-template-columns: 1fr;
+          align-items: center;
+          overflow: hidden;
           max-width: 0;
           opacity: 0;
-          overflow: hidden;
-          white-space: nowrap;
-          transition: max-width 0.2s ease, opacity 0.2s ease, margin-left 0.2s ease;
+          transition: max-width 0.24s ease-out, opacity 0.24s ease-out, margin-left 0.24s ease-out;
           margin-left: 0;
         }
-        .banner-icon-pill:hover .banner-icon-pill__label,
-        .banner-icon-pill:focus-visible .banner-icon-pill__label,
-        .banner-icon-pill[data-active="true"] .banner-icon-pill__label {
-          max-width: 180px;
+        .banner-icon-pill:hover .banner-icon-pill__label-container,
+        .banner-icon-pill:focus-visible .banner-icon-pill__label-container,
+        .banner-icon-pill[data-active="true"] .banner-icon-pill__label-container,
+        .banner-icon-pill__label-container.is-permanent {
+          max-width: 240px;
           opacity: 1;
-          margin-left: 0.35rem;
+          margin-left: 0.4rem;
+        }
+        .banner-icon-pill__label {
+          grid-area: 1 / 1;
+          white-space: nowrap;
+          transition: opacity 0.2s linear;
+        }
+        .banner-icon-pill__label.hover-only {
+          opacity: 0;
+        }
+        .banner-icon-pill:hover .banner-icon-pill__label.hover-only,
+        .banner-icon-pill:focus-visible .banner-icon-pill__label.hover-only,
+        .banner-icon-pill[data-active="true"] .banner-icon-pill__label.hover-only {
+          opacity: 1;
+        }
+        .banner-icon-pill:hover .banner-icon-pill__label.hide-on-hover,
+        .banner-icon-pill:focus-visible .banner-icon-pill__label.hide-on-hover,
+        .banner-icon-pill[data-active="true"] .banner-icon-pill__label.hide-on-hover {
+          opacity: 0;
         }
       `}</style>
       <div
@@ -171,9 +197,9 @@ export default function WeekNavigationBanner({
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px)",
+            "linear-gradient(rgba(148,163,184,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.12) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
-          maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.5), transparent 80%)",
+          maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.4), transparent 80%)",
           pointerEvents: "none"
         }}
       />
@@ -190,28 +216,10 @@ export default function WeekNavigationBanner({
             <p style={{ margin: 0, fontSize: "0.75rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "#cbd5e1" }}>
               Scheduling Workspace
             </p>
-            <h1 style={{ margin: "0.4rem 0 0", fontSize: "clamp(1.3rem, 3.6vw, 2.2rem)", lineHeight: 1.1 }}>
-              {selectedSchool?.name ?? "Select a school"}
-            </h1>
-            <div style={{ marginTop: "0.35rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
-              <p style={{ margin: 0, color: "#bfdbfe", fontWeight: 500 }}>Week of {weekLabel}</p>
-              <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
-                ← Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => onShiftWeek("next")}
-                style={{
-                  ...pillStyle("active"),
-                  background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
-                  border: "1px solid rgba(125,211,252,0.5)",
-                  color: "#eff6ff"
-                }}
-              >
-                Next →
-              </button>
-            </div>
-            <div style={{ display: "flex", gap: "0.55rem", alignItems: "center", flexWrap: "wrap", marginTop: "0.75rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.4rem" }}>
+              <h1 style={{ margin: 0, fontSize: "clamp(1.3rem, 3.6vw, 2.2rem)", lineHeight: 1.1 }}>
+                {selectedSchool?.name ?? "Select a school"}
+              </h1>
               <select
                 value={selectedSchoolId}
                 onChange={(event) => onSchoolChange(event.target.value)}
@@ -222,7 +230,7 @@ export default function WeekNavigationBanner({
                   color: "#f8fafc",
                   padding: "0.37rem 0.9rem",
                   fontSize: "0.84rem",
-                  minWidth: "min(260px, 100%)"
+                  minWidth: "min(100px, 100%)"
                 }}
               >
                 {schoolOptions.map((school) => (
@@ -231,22 +239,37 @@ export default function WeekNavigationBanner({
                   </option>
                 ))}
               </select>
-              <HelpIconButton label="Scheduler overview" tone="dark" onClick={() => onOpenHelpTopic?.("overview")} />
+              <HelpIconButton
+                label="Scheduler overview"
+                tone="dark"
+                onClick={() => onOpenHelpTopic?.("overview")}
+                style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start", marginTop: "0.4rem" }}
+              />
+            </div>
+            <div style={{ marginTop: "0.35rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+              <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
+                ←
+              </button>
+              <p style={{ margin: 0, color: "#bfdbfe", fontWeight: 500 }}>Week of {weekLabel}</p>
+              <button
+                type="button"
+                onClick={() => onShiftWeek("next")}
+                style={{
+                  ...pillStyle("active"),
+                  background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
+                  border: "1px solid rgba(125,211,252,0.5)",
+                  color: "#eff6ff"
+                }}
+              >
+                →
+              </button>
             </div>
           </div>
 
           <div style={{ display: "grid", gap: "0.6rem", justifyItems: "end", alignContent: "start" }}>
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
               <span
-                style={{
-                  borderRadius: 999,
-                  background: badge.color,
-                  color: "#0f172a",
-                  fontWeight: 700,
-                  fontSize: "0.78rem",
-                  letterSpacing: "0.02em",
-                  padding: "0.28rem 0.78rem"
-                }}
+                style={pillStyle(badge)}
               >
                 {badge.label}
               </span>
@@ -259,10 +282,10 @@ export default function WeekNavigationBanner({
                   {userRoleLabel ? ` (${userRoleLabel})` : ""}
                 </p>
               )}
-              <button type="button" onClick={onLogout} style={pillStyle("danger")}>
+            </div>
+            <button type="button" onClick={onLogout} style={pillStyle("danger")}>
                 Log out
               </button>
-            </div>
           </div>
         </div>
 
@@ -284,11 +307,31 @@ export default function WeekNavigationBanner({
               aria-label={isViolationsOpen ? "Close Violations" : "Open Violations"}
               style={iconPill(isViolationsOpen ? "danger" : "neutral", !hasViolations)}
             >
-              <span aria-hidden="true">!</span>
-              <span className="banner-icon-pill__label">{isViolationsOpen ? "Close Violations" : "Open Violations"}</span>
+              <span aria-hidden="true" style={{ fontSize: "1.1rem", fontWeight: 800 }}>!</span>
+              <div className={`banner-icon-pill__label-container ${hasViolations ? 'is-permanent' : ''}`}>
+                <span className="banner-icon-pill__label hide-on-hover">{hasViolations ? `${violationCount} Violations Outstanding` : ''}</span>
+                <span className="banner-icon-pill__label hover-only">Open Violations</span>
+              </div>
             </button>
-            <HelpIconButton label="Violation navigator" tone="dark" onClick={() => onOpenHelpTopic?.("violations")} />
+            <HelpIconButton
+              label="Violation navigator"
+              tone="dark"
+              onClick={() => onOpenHelpTopic?.("violations")}
+              style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start" }}
+            />
 
+            <button type="button" onClick={onAutoSchedule} disabled={!canEditSchedule} style={pillStyle("active", !canEditSchedule)}>
+              ⚡ Auto
+            </button>
+            <HelpIconButton
+              label="Auto schedule"
+              tone="dark"
+              onClick={() => onOpenHelpTopic?.("auto-schedule")}
+              style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-end", alignItems: "center" }}>
             <button
               type="button"
               className="banner-icon-pill"
@@ -297,10 +340,17 @@ export default function WeekNavigationBanner({
               aria-label={isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
               style={iconPill(isAuditOpen ? "active" : "neutral")}
             >
-              <span aria-hidden="true">↺</span>
-              <span className="banner-icon-pill__label">{isAuditOpen ? "Close Audit Log" : "Open Audit Log"}</span>
+              <span style={{ fontSize: "1.2rem" }} aria-hidden="true">↺</span>
+              <div className="banner-icon-pill__label-container">
+                <span className="banner-icon-pill__label">{isAuditOpen ? "Close Audit Log" : "Open Audit Log"}</span>
+              </div>
             </button>
-            <HelpIconButton label="Audit timeline" tone="dark" onClick={() => onOpenHelpTopic?.("audit")} />
+            <HelpIconButton
+              label="Audit timeline"
+              tone="dark"
+              onClick={() => onOpenHelpTopic?.("audit")}
+              style={{ width: 14, height: 14, fontSize: "0.6rem", alignSelf: "start" }}
+            />
 
             <button
               type="button"
@@ -311,8 +361,10 @@ export default function WeekNavigationBanner({
               aria-label={isSettingsOpen ? "Close Settings" : "Open Settings"}
               style={iconPill(isSettingsOpen ? "active" : "neutral", !canManageSettings)}
             >
-              <span aria-hidden="true">⚙</span>
-              <span className="banner-icon-pill__label">{isSettingsOpen ? "Close Settings" : "Open Settings"}</span>
+              <span style={{ fontSize: "1.2rem" }} aria-hidden="true">⚙</span>
+              <div className="banner-icon-pill__label-container">
+                <span className="banner-icon-pill__label">{isSettingsOpen ? "Close Settings" : "Open Settings"}</span>
+              </div>
             </button>
 
             <button
@@ -324,35 +376,12 @@ export default function WeekNavigationBanner({
               aria-label={isUserManagementOpen ? "Close Users" : "Manage Users"}
               style={iconPill(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}
             >
-              <span aria-hidden="true">👥</span>
-              <span className="banner-icon-pill__label">{isUserManagementOpen ? "Close Users" : "Manage Users"}</span>
+              <span style={{ fontSize: "1.2rem" }} aria-hidden="true">👥</span>
+              <div className="banner-icon-pill__label-container">
+                <span className="banner-icon-pill__label">{isUserManagementOpen ? "Close Users" : "Manage Users"}</span>
+              </div>
             </button>
           </div>
-
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-end", alignItems: "center" }}>
-            <button type="button" onClick={onAutoSchedule} disabled={!canEditSchedule} style={pillStyle("active", !canEditSchedule)}>
-              ⚡ Auto
-            </button>
-            <HelpIconButton label="Auto schedule" tone="dark" onClick={() => onOpenHelpTopic?.("auto-schedule")} />
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-end" }}>
-          {complianceHighlights.map((highlight) => (
-            <span
-              key={highlight}
-              style={{
-                borderRadius: 999,
-                border: "1px solid rgba(148,163,184,0.4)",
-                background: "rgba(15,23,42,0.38)",
-                padding: "0.4rem 0.78rem",
-                color: "#e2e8f0",
-                fontSize: "0.81rem"
-              }}
-            >
-              {highlight}
-            </span>
-          ))}
         </div>
       </div>
     </motion.section>

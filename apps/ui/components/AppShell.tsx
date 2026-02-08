@@ -16,10 +16,10 @@ export default function AppShell({ banner, status, content, overlays }: AppShell
         transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
+          background: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
           padding: "clamp(0.75rem, 2.5vw, 2rem)",
           fontFamily: "Inter, system-ui, sans-serif",
-          color: "#111827"
+          color: "#0f172a"
         }}
       >
         <style>{`

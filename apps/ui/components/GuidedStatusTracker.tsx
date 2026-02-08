@@ -33,7 +33,7 @@ export default function GuidedStatusTracker({ steps, onStepAction }: GuidedStatu
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "linear", layout: { type: "tween", duration: 0.2, ease: "linear" } }}
       style={{
-        background: "#ffffff",
+        background: "#f1f5f9",
         borderRadius: 18,
         padding: "1rem",
         boxShadow: "0 20px 40px rgba(15, 23, 42, 0.1)"

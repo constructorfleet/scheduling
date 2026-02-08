@@ -61,7 +61,7 @@ export default function DayMetadataStrip({
   return (
     <section
       style={{
-        background: "#ffffff",
+        background: "#f1f5f9",
         borderRadius: 18,
         padding: "1rem",
         boxShadow: "0 15px 35px rgba(15, 23, 42, 0.08)"

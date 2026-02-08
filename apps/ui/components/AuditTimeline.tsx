@@ -95,7 +95,7 @@ export default function AuditTimeline({
         width: "min(380px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
-        background: "#ffffff",
+        background: "#f1f5f9",
         borderRadius: 18,
         padding: "0.75rem",
         boxShadow: "0 25px 50px rgba(15, 23, 42, 0.25)",
@@ -123,7 +123,7 @@ export default function AuditTimeline({
               height: 16,
               borderRadius: 6,
               border: "1px solid #cbd5f5",
-              background: "repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 2px, #f8fafc 2px, #f8fafc 4px)"
+              background: "repeating-linear-gradient(45deg, #cbd5e1, #cbd5e1 2px, #e2e8f0 2px, #e2e8f0 4px)"
             }}
           />
           <h3 style={{ margin: 0 }}>Audit timeline</h3>
@@ -165,7 +165,7 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: "#f8fafc",
+              background: "#e2e8f0",
               color: "#0f172a",
               padding: "0.3rem 0.7rem",
               fontSize: "0.8rem"

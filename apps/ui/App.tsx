@@ -1445,10 +1445,6 @@ export default function App() {
     ? "ready_for_review"
     : scheduleStatusOverride ?? "draft";
   const weekLabel = currentWeekLabel;
-  const complianceHighlights = [
-    `${violationRecords.length} violation${violationRecords.length === 1 ? "" : "s"} outstanding`,
-    readyToPublish ? "Ready for publish" : "Resolve blockers before publishing"
-  ];
 
   const guidedSteps: GuidedStep[] = [
     { id: "draft", label: "Draft workspace", detail: "Add staff and break coverage before running validation.", status: "complete" },
@@ -2078,7 +2074,7 @@ export default function App() {
           }}
           weekLabel={weekLabel}
           status={scheduleStatus}
-          complianceHighlights={complianceHighlights}
+          violationCount={violationRecords.length}
           onShiftWeek={handleWeekShift}
           onOpenViolations={() => setShowViolationNavigator((prev) => !prev)}
           onOpenAuditTimeline={() => setShowAuditTimeline((prev) => !prev)}

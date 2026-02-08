@@ -180,7 +180,7 @@ export default function EmployeesSection({
                   style={{
                     borderRadius: 999,
                     border: "1px solid #cbd5e1",
-                    background: "#f8fafc",
+                    background: "#e2e8f0",
                     color: "#0f172a",
                     padding: "0.3rem 0.75rem"
                   }}
@@ -230,7 +230,7 @@ export default function EmployeesSection({
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.75rem",
-                  background: "#f8fafc"
+                  background: "#e2e8f0"
                 }}
               >
                 <h4 style={{ margin: 0, fontSize: "0.9rem" }}>Availability (up to 3 blocks/day)</h4>

@@ -66,7 +66,7 @@ export default function HelpCenterModal({
         style={{
           width: "min(980px, 100%)",
           maxHeight: "min(90vh, 880px)",
-          background: "#ffffff",
+          background: "#f1f5f9",
           borderRadius: 18,
           border: "1px solid #e2e8f0",
           boxShadow: "0 30px 60px rgba(15, 23, 42, 0.35)",
@@ -78,7 +78,7 @@ export default function HelpCenterModal({
         <aside
           style={{
             borderRight: "1px solid #e5e7eb",
-            background: "#f8fafc",
+            background: "#e2e8f0",
             display: "flex",
             flexDirection: "column",
             overflow: "auto"
@@ -100,7 +100,7 @@ export default function HelpCenterModal({
                   textAlign: "left",
                   borderRadius: 10,
                   border: "1px solid transparent",
-                  background: entry.id === topic.id ? "#e0e7ff" : "transparent",
+                  background: entry.id === topic.id ? "#bfdbfe" : "transparent",
                   color: entry.id === topic.id ? "#1d4ed8" : "#334155",
                   padding: "0.45rem 0.6rem",
                   fontSize: "0.84rem",
@@ -135,7 +135,7 @@ export default function HelpCenterModal({
               style={{
                 borderRadius: 999,
                 border: "1px solid #cbd5e1",
-                background: "#ffffff",
+                background: "#e2e8f0",
                 color: "#0f172a",
                 padding: "0.35rem 0.8rem",
                 whiteSpace: "nowrap"
@@ -176,7 +176,7 @@ export default function HelpCenterModal({
                         style={{
                           borderRadius: 999,
                           border: "1px solid #cbd5e1",
-                          background: "#f8fafc",
+                          background: "#e2e8f0",
                           color: "#1e293b",
                           padding: "0.28rem 0.7rem",
                           fontSize: "0.8rem"

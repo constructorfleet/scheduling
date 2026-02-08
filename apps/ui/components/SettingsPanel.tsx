@@ -313,7 +313,7 @@ export default function SettingsPanel({
         transition={{ duration: 0.2, ease: "linear" }}
         style={{
           width: "min(1080px, 100%)",
-          background: "#ffffff",
+          background: "#f1f5f9",
           borderRadius: 18,
           boxShadow: "0 30px 60px rgba(15, 23, 42, 0.2)",
           border: "1px solid #e2e8f0",
@@ -332,7 +332,7 @@ export default function SettingsPanel({
             alignItems: "center",
             gap: "0.75rem",
             flexWrap: "wrap",
-            background: "#f8fafc"
+            background: "#e2e8f0"
           }}
         >
           <div style={{ display: "inline-flex", alignItems: "flex-start", gap: "0.45rem" }}>
@@ -358,7 +358,7 @@ export default function SettingsPanel({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: "#fff",
+              background: "#e2e8f0",
               padding: "0.35rem 0.9rem"
             }}
           >
@@ -370,7 +370,7 @@ export default function SettingsPanel({
           style={{
             display: "flex",
             borderBottom: "1px solid #e5e7eb",
-            background: "#ffffff",
+            background: "#e2e8f0",
             overflowX: "auto",
             alignItems: "center"
           }}
@@ -390,7 +390,7 @@ export default function SettingsPanel({
               style={{
                 padding: "0.75rem 1.25rem",
                 border: "none",
-                background: activeTab === tab.id ? "#eef2ff" : "transparent",
+                background: activeTab === tab.id ? "#bfdbfe" : "transparent",
                 color: activeTab === tab.id ? "#1d4ed8" : "#475569",
                 fontWeight: 600,
                 cursor: "pointer",
@@ -420,7 +420,7 @@ export default function SettingsPanel({
           }}
         >
           {tabWarning && (
-            <div style={{ border: "1px solid #fecaca", background: "#fee2e2", color: "#b91c1c", padding: "0.5rem 0.75rem", borderRadius: 10 }}>
+            <div style={{ border: "1px solid #fca5a5", background: "#fecaca", color: "#991b1b", padding: "0.5rem 0.75rem", borderRadius: 10 }}>
               {tabWarning}
             </div>
           )}
@@ -586,7 +586,7 @@ export default function SettingsPanel({
         <div
           style={{
             borderTop: "1px solid #e5e7eb",
-            background: "#ffffff",
+            background: "#e2e8f0",
             padding: "0.75rem 1.5rem",
             display: "flex",
             justifyContent: "flex-end",

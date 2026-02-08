@@ -43,7 +43,7 @@ export default function WeekInitializationModal({
         transition={{ duration: 0.2, ease: "linear" }}
         style={{
           width: "min(520px, 100%)",
-          background: "#fff",
+          background: "#f1f5f9",
           borderRadius: 14,
           border: "1px solid #e2e8f0",
           boxShadow: "0 24px 48px rgba(15, 23, 42, 0.24)",
@@ -64,7 +64,7 @@ export default function WeekInitializationModal({
             style={{
               borderRadius: 999,
               border: "1px solid #cbd5e1",
-              background: "#f8fafc",
+              background: "#e2e8f0",
               color: "#0f172a",
               padding: "0.35rem 0.85rem"
             }}

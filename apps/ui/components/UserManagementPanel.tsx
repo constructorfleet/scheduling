@@ -116,7 +116,7 @@ export default function UserManagementPanel({
           width: "min(980px, 100%)",
           maxHeight: "92vh",
           overflow: "auto",
-          background: "#fff",
+          background: "#f1f5f9",
           borderRadius: 14,
           border: "1px solid #e2e8f0",
           boxShadow: "0 28px 50px rgba(15, 23, 42, 0.25)",
@@ -137,7 +137,7 @@ export default function UserManagementPanel({
               style={{
                 borderRadius: 999,
                 border: "1px solid #cbd5e1",
-                background: "#fff",
+                background: "#f1f5f9",
                 color: "#0f172a",
                 padding: "0.35rem 0.85rem"
               }}
@@ -150,7 +150,7 @@ export default function UserManagementPanel({
               style={{
                 borderRadius: 999,
                 border: "1px solid #cbd5e1",
-                background: "#f8fafc",
+                background: "#e2e8f0",
                 color: "#0f172a",
                 padding: "0.35rem 0.85rem"
               }}
@@ -168,7 +168,7 @@ export default function UserManagementPanel({
             style={{
               borderRadius: 999,
               border: "1px solid #cbd5e1",
-              background: scope === "school" ? "#0f172a" : "#fff",
+              background: scope === "school" ? "#0f172a" : "#f1f5f9",
               color: scope === "school" ? "#fff" : "#0f172a",
               padding: "0.32rem 0.8rem",
               cursor: canUseSchoolScope ? "pointer" : "not-allowed",
@@ -184,7 +184,7 @@ export default function UserManagementPanel({
             style={{
               borderRadius: 999,
               border: "1px solid #cbd5e1",
-              background: scope === "district" ? "#0f172a" : "#fff",
+              background: scope === "district" ? "#0f172a" : "#f1f5f9",
               color: scope === "district" ? "#fff" : "#0f172a",
               padding: "0.32rem 0.8rem",
               cursor: canUseDistrictScope ? "pointer" : "not-allowed",
@@ -229,7 +229,7 @@ export default function UserManagementPanel({
               border: "1px solid #e2e8f0",
               borderRadius: 12,
               padding: "0.8rem",
-              background: "#f8fafc"
+              background: "#e2e8f0"
             }}
           >
             <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>District management</h3>
@@ -274,7 +274,7 @@ export default function UserManagementPanel({
                   style={{
                     borderRadius: 999,
                     border: "1px solid #cbd5e1",
-                    background: "#fff",
+                    background: "#f1f5f9",
                     color: "#334155",
                     padding: "0.22rem 0.62rem",
                     fontSize: "0.78rem"
@@ -294,7 +294,7 @@ export default function UserManagementPanel({
               border: "1px solid #e2e8f0",
               borderRadius: 12,
               padding: "0.8rem",
-              background: "#f8fafc"
+              background: "#e2e8f0"
             }}
           >
             <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>School management</h3>
@@ -337,7 +337,7 @@ export default function UserManagementPanel({
                   style={{
                     borderRadius: 999,
                     border: "1px solid #cbd5e1",
-                    background: "#fff",
+                    background: "#f1f5f9",
                     color: "#334155",
                     padding: "0.22rem 0.62rem",
                     fontSize: "0.78rem"
@@ -356,7 +356,7 @@ export default function UserManagementPanel({
             border: "1px solid #e2e8f0",
             borderRadius: 12,
             padding: "0.8rem",
-            background: "#f8fafc"
+            background: "#e2e8f0"
           }}
         >
           <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>Send invite</h3>
@@ -493,7 +493,7 @@ export default function UserManagementPanel({
                             style={{
                               borderRadius: 8,
                               border: "1px solid #cbd5e1",
-                              background: "#fff",
+                              background: "#f1f5f9",
                               color: "#0f172a",
                               padding: "0.25rem 0.55rem",
                               fontSize: "0.78rem"

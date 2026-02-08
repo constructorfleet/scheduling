@@ -270,10 +270,10 @@ export default function ScheduleMatrix({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "linear", layout: { type: "tween", duration: 0.2, ease: "linear" } }}
       style={{
-        background: "#ffffff",
+        background: "#f1f5f9",
         borderRadius: 18,
         padding: "clamp(0.75rem, 2vw, 1rem)",
-        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.08)",
+        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
         overflowX: "auto"
       }}
     >
@@ -310,7 +310,7 @@ export default function ScheduleMatrix({
                 textAlign: "left",
                 padding: "0.75rem",
                 border: "1px solid #e5e7eb",
-                background: "#f8fafc",
+                background: "#e2e8f0",
                 minWidth: 170
               }}
             >
@@ -344,7 +344,7 @@ export default function ScheduleMatrix({
                   style={{
                     padding: "0.5rem",
                     border: "1px solid #e5e7eb",
-                    background: isFocusedDay ? "#e0ecff" : "#f8fafc",
+                    background: isFocusedDay ? "#bfdbfe" : "#e2e8f0",
                     minWidth: 160,
                     verticalAlign: "top",
                     boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
@@ -486,7 +486,7 @@ export default function ScheduleMatrix({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
-                  background: overscheduled ? "#fff1f2" : undefined
+                  background: overscheduled ? "#fecdd3" : undefined
                 }}
               >
                 <td
@@ -494,7 +494,7 @@ export default function ScheduleMatrix({
                     border: "1px solid #e5e7eb",
                     padding: "0.75rem",
                     verticalAlign: "top",
-                    background: overscheduled ? "#fff1f2" : "#fff",
+                    background: overscheduled ? "#fecdd3" : "#f8fafc",
                     position: "relative"
                   }}
                 >
@@ -564,7 +564,7 @@ export default function ScheduleMatrix({
                         style={{
                           borderRadius: 999,
                           border: "1px solid #bfdbfe",
-                          background: reassignmentTarget ? "#eff6ff" : "#f1f5f9",
+                          background: reassignmentTarget ? "#dbeafe" : "#e2e8f0",
                           color: reassignmentTarget ? "#1d4ed8" : "#94a3b8",
                           padding: "0.25rem 0.65rem",
                           fontSize: "0.75rem"
@@ -583,7 +583,7 @@ export default function ScheduleMatrix({
                           padding: "0.1rem 0.45rem",
                           borderRadius: 999,
                           border: "1px solid #e5e7eb",
-                          background: "#f8fafc"
+                          background: "#e2e8f0"
                         }}
                       >
                         {badge}
@@ -623,7 +623,7 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: closedDay ? "#f8fafc" : isFocusedDay ? "#f6faff" : overscheduled ? "#fff7f8" : "#fff",
+                        background: closedDay ? "#e2e8f0" : isFocusedDay ? "#dbeafe" : overscheduled ? "#fecdd3" : "#f8fafc",
                         position: "relative"
                       }}
                     >
@@ -750,7 +750,7 @@ export default function ScheduleMatrix({
                                     height: 16,
                                     borderRadius: "50%",
                                     border: "1px solid #dc2626",
-                                    background: "#fff",
+                                    background: "#f1f5f9",
                                     color: "#b91c1c",
                                     fontSize: "0.65rem",
                                     fontWeight: 700,
@@ -887,7 +887,7 @@ export default function ScheduleMatrix({
                               height: 30,
                               borderRadius: 8,
                               border: "1px dashed #cbd5f5",
-                              background: "#f8fafc",
+                              background: "#e2e8f0",
                               fontSize: "0.7rem",
                               color: "#64748b",
                               textAlign: "left",
@@ -920,7 +920,7 @@ export default function ScheduleMatrix({
                               gap: "0.25rem",
                               padding: "0.25rem 0.4rem",
                               borderRadius: 8,
-                              background: "#fff7ed",
+                              background: "#fed7aa",
                               border: "1px solid #fed7aa"
                             }}
                           >
