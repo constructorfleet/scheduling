@@ -26,6 +26,25 @@ export default function GuidedStatusTracker({ steps, onStepAction }: GuidedStatu
   }, [steps]);
 
   const activeIndicator = activeStep ? statusIndicators[activeStep.status] : null;
+  const summary = useMemo(() => {
+    const total = steps.length;
+    const completeCount = steps.filter((step) => step.status === "complete").length;
+    const blockedCount = steps.filter((step) => step.status === "blocked").length;
+    const inProgressCount = steps.filter((step) => step.status === "in_progress").length;
+    const remainingCount = Math.max(0, total - completeCount);
+    const progressPercent = total > 0 ? Math.round((completeCount / total) * 100) : 0;
+    const nextStep = steps.find((step) => step.status !== "complete");
+
+    return {
+      total,
+      completeCount,
+      blockedCount,
+      inProgressCount,
+      remainingCount,
+      progressPercent,
+      nextStep
+    };
+  }, [steps]);
 
   return (
     <motion.section
@@ -63,6 +82,31 @@ export default function GuidedStatusTracker({ steps, onStepAction }: GuidedStatu
         >
           {isCollapsed ? "Expand" : "Collapse"}
         </button>
+      </div>
+
+      <div style={{ marginTop: "0.75rem", display: "grid", gap: "0.6rem" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem", alignItems: "center" }}>
+          <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.6rem", borderRadius: 999, background: colors.surfaceAlt, color: colors.textPrimary }}>
+            Complete {summary.completeCount}/{summary.total}
+          </span>
+          <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.6rem", borderRadius: 999, background: colors.surfaceAlt, color: colors.textPrimary }}>
+            In progress {summary.inProgressCount}
+          </span>
+          <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.6rem", borderRadius: 999, background: colors.dangerSurface, color: colors.dangerText }}>
+            Blocked {summary.blockedCount}
+          </span>
+          <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.6rem", borderRadius: 999, background: colors.surfaceAlt, color: colors.textPrimary }}>
+            Remaining {summary.remainingCount}
+          </span>
+          {summary.nextStep && (
+            <span style={{ fontSize: "0.78rem", padding: "0.2rem 0.6rem", borderRadius: 999, background: colors.surfaceAccent, color: colors.textPrimary }}>
+              Next: {summary.nextStep.label}
+            </span>
+          )}
+        </div>
+        <div style={{ height: 8, borderRadius: 999, background: colors.surfaceAlt, overflow: "hidden" }}>
+          <div style={{ width: `${summary.progressPercent}%`, height: "100%", background: colors.brandBlue }} />
+        </div>
       </div>
 
       {!isCollapsed && (
