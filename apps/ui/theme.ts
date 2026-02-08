@@ -24,7 +24,7 @@ export const colors = {
 export const gradients = {
     appBackground: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
     bannerBackground:
-        "radial-gradient(circle at 80% -20%, rgba(56,189,248,0.35), transparent 50%), radial-gradient(circle at 10% 110%, rgba(16,185,129,0.25), transparent 45%), linear-gradient(150deg, #1e293b 0%, #334155 45%, #475569 100%)",
+        "radial-gradient(circle at 80% -20%, rgba(56,189,248,0.35), transparent 50%), radial-gradient(circle at 10% 110%, rgba(59,130,246,0.18), transparent 45%), linear-gradient(150deg, #1e293b 0%, #334155 45%, #475569 100%)",
     bannerGrid:
         "linear-gradient(rgba(148,163,184,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.12) 1px, transparent 1px)"
 } as const;
