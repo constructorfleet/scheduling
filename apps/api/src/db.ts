@@ -1,21 +1,21 @@
 import { applyDbEnv } from "./config";
 import { PrismaClient } from "../generated/prisma-client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 let prismaClient: PrismaClient | null = null;
 
 export const getPrisma = (): PrismaClient => {
-  if (!prismaClient) {
-    const { url } = applyDbEnv();
-    const adapter = new PrismaBetterSqlite3({ url });
-    prismaClient = new PrismaClient({ adapter });
-  }
-  return prismaClient;
+    if (!prismaClient) {
+        const { url } = applyDbEnv();
+        const adapter = new PrismaPg({ connectionString: url });
+        prismaClient = new PrismaClient({ adapter });
+    }
+    return prismaClient;
 };
 
 export const resetPrisma = async () => {
-  if (prismaClient) {
-    await prismaClient.$disconnect();
-    prismaClient = null;
-  }
+    if (prismaClient) {
+        await prismaClient.$disconnect();
+        prismaClient = null;
+    }
 };
