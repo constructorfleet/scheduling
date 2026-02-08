@@ -34,4 +34,39 @@ describe("access controls", () => {
     expect(canManageSchoolConfiguration(auth, "school-a", "district-a")).toBe(true);
     expect(canManageDistrict(auth, "district-a")).toBe(false);
   });
+
+  test("allows super user everywhere", () => {
+    const superAuth = {
+      isSuperUser: true,
+      schoolMemberships: [],
+      districtMemberships: []
+    };
+    expect(canReadSchoolSchedule(superAuth, "school-x", "district-x")).toBe(true);
+    expect(canWriteSchoolSchedule(superAuth, "school-x", "district-x")).toBe(true);
+    expect(canManageSchoolUsers(superAuth, "school-x", "district-x")).toBe(true);
+    expect(canManageSchoolConfiguration(superAuth, "school-x", "district-x")).toBe(true);
+    expect(canManageDistrict(superAuth, "district-x")).toBe(true);
+  });
+
+  test("district user can manage school users but not school config", () => {
+    const districtUser = {
+      isSuperUser: false,
+      schoolMemberships: [],
+      districtMemberships: [{ districtId: "district-a", role: "district_user" as const }]
+    };
+    expect(canManageSchoolUsers(districtUser, "school-z", "district-a")).toBe(true);
+    expect(canManageSchoolConfiguration(districtUser, "school-z", "district-a")).toBe(false);
+  });
+
+  test("school user can schedule but cannot manage users/config", () => {
+    const schoolUser = {
+      isSuperUser: false,
+      schoolMemberships: [{ schoolId: "school-a", role: "school_user" as const }],
+      districtMemberships: []
+    };
+    expect(canReadSchoolSchedule(schoolUser, "school-a", "district-a")).toBe(true);
+    expect(canWriteSchoolSchedule(schoolUser, "school-a", "district-a")).toBe(true);
+    expect(canManageSchoolUsers(schoolUser, "school-a", "district-a")).toBe(false);
+    expect(canManageSchoolConfiguration(schoolUser, "school-a", "district-a")).toBe(false);
+  });
 });
