@@ -900,7 +900,7 @@ export default function ScheduleMatrix({
                             style={{
                               borderRadius: 999,
                               border: `1px solid ${colors.borderDefault}`,
-                              background: colors.surfaceRaised,
+                              background: colors.brandBlueLight,
                               fontSize: "0.75rem",
                               fontWeight: 600,
                               color: colors.textPrimary,
