@@ -21,6 +21,9 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 ## Step 1: Configure employees, certifications, and ratio requirements
 Every configuration change reruns validations immediately. Once a record satisfies the corresponding rule, its violation disappears—there are no “addressed” flags to toggle. Follow the sections below so the system can enforce guardrails before you build the schedule.
 
+### Set the field trip ratio window
+In the **School** tab of Settings, set the **Field trip start time** and **Field trip end time**. On field trip days, the ratio engine applies the field trip ratio only during this window and uses the normal schedule-type ratio before and after the trip.
+
 ### Manage employees
 1. Open the gear icon and select **People & Certifications**.
 2. Create or update employees with job title, contact info, employment status (full time, part time, substitute), and working limits (`max_hours_per_day`, `max_hours_per_week`). These caps feed overtime and break checks, so keep them accurate for every payroll-eligible staff member.

@@ -56,6 +56,8 @@ export interface OperatingHoursConfig {
 export interface SchoolRules {
   openerCount: number;
   closerCount: number;
+  fieldTripStartTime: string;
+  fieldTripEndTime: string;
   minimumMedicalDelegated: number;
   requireCurrentCpr: boolean;
 }

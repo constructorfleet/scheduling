@@ -841,6 +841,8 @@ const buildServer = async () => {
                 closedDays: [],
                 openerCount: 0,
                 closerCount: 0,
+                fieldTripStartTime: "09:00",
+                fieldTripEndTime: "15:00",
                 minimumMedicalDelegated: 0,
                 requireCurrentCpr: false
             },
@@ -958,6 +960,8 @@ const buildServer = async () => {
                 closedDays: [],
                 openerCount: 0,
                 closerCount: 0,
+                fieldTripStartTime: "09:00",
+                fieldTripEndTime: "15:00",
                 minimumMedicalDelegated: 0,
                 requireCurrentCpr: false
             },
@@ -1258,6 +1262,8 @@ const buildServer = async () => {
                 closedDays: string[];
                 openerCount: number;
                 closerCount: number;
+                fieldTripStartTime: string;
+                fieldTripEndTime: string;
                 minimumMedicalDelegated: number;
                 requireCurrentCpr: boolean;
             };
@@ -1329,6 +1335,8 @@ const buildServer = async () => {
                         closedDays: payload.school.closedDays,
                         openerCount: payload.school.openerCount,
                         closerCount: payload.school.closerCount,
+                        fieldTripStartTime: payload.school.fieldTripStartTime,
+                        fieldTripEndTime: payload.school.fieldTripEndTime,
                         minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
                         requireCurrentCpr: payload.school.requireCurrentCpr
                     },
@@ -1337,6 +1345,8 @@ const buildServer = async () => {
                         closedDays: payload.school.closedDays,
                         openerCount: payload.school.openerCount,
                         closerCount: payload.school.closerCount,
+                        fieldTripStartTime: payload.school.fieldTripStartTime,
+                        fieldTripEndTime: payload.school.fieldTripEndTime,
                         minimumMedicalDelegated: payload.school.minimumMedicalDelegated,
                         requireCurrentCpr: payload.school.requireCurrentCpr
                     }
@@ -1351,6 +1361,8 @@ const buildServer = async () => {
                         closedDays: [],
                         openerCount: 0,
                         closerCount: 0,
+                        fieldTripStartTime: "09:00",
+                        fieldTripEndTime: "15:00",
                         minimumMedicalDelegated: 0,
                         requireCurrentCpr: false
                     }

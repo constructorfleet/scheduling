@@ -52,6 +52,8 @@ const getSchoolRules = (context: RulesContext) => {
     return {
         openerCount: context.schoolRules?.openerCount ?? 0,
         closerCount: context.schoolRules?.closerCount ?? 0,
+        fieldTripStartTime: context.schoolRules?.fieldTripStartTime ?? "09:00",
+        fieldTripEndTime: context.schoolRules?.fieldTripEndTime ?? "15:00",
         minimumMedicalDelegated: context.schoolRules?.minimumMedicalDelegated ?? 0,
         requireCurrentCpr: context.schoolRules?.requireCurrentCpr ?? false,
         openerWindowMinutes: context.schoolRules?.openerWindowMinutes ?? 15,
@@ -320,17 +322,23 @@ export const ratioSegmentRule: RuleDefinition = {
                 activeFieldTripType && activeFieldTripType.adultRatioStudents > 0
                     ? activeFieldTripType.adultRatioStudents / activeFieldTripType.adultRatioAdults
                     : undefined;
-            const childrenPerStaff =
-                fieldTripChildrenPerStaff ??
-                (scheduleType ? context.scheduleTypeRatios?.[ scheduleType ] : undefined) ??
-                1;
-            const normalizedChildrenPerStaff = normalizeChildrenPerStaff(childrenPerStaff);
-            const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
+            const scheduleChildrenPerStaff = scheduleType ? context.scheduleTypeRatios?.[ scheduleType ] : undefined;
+            const normalizedScheduleChildrenPerStaff = normalizeChildrenPerStaff(scheduleChildrenPerStaff ?? 1);
+            const normalizedFieldTripChildrenPerStaff = fieldTripChildrenPerStaff
+                ? normalizeChildrenPerStaff(fieldTripChildrenPerStaff)
+                : normalizedScheduleChildrenPerStaff;
             const openMinutes = parseTimeToMinutes(hours.open);
             const closeMinutes = parseTimeToMinutes(hours.close);
             if (closeMinutes <= openMinutes) {
                 return;
             }
+            const fieldTripWindowStartRaw = parseTimeToMinutes(schoolRules.fieldTripStartTime);
+            const fieldTripWindowEndRaw = parseTimeToMinutes(schoolRules.fieldTripEndTime);
+            const fieldTripWindowStart = Math.max(openMinutes, fieldTripWindowStartRaw);
+            const fieldTripWindowEnd = Math.min(closeMinutes, fieldTripWindowEndRaw);
+            const hasFieldTripWindow =
+                Boolean(activeFieldTripType) &&
+                fieldTripWindowEnd > fieldTripWindowStart;
             const openerWindowEnd = openMinutes + schoolRules.openerWindowMinutes;
             const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
             const dayAssignments = context.staffAssignments
@@ -338,6 +346,10 @@ export const ratioSegmentRule: RuleDefinition = {
                 .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
                 .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
             const boundaries = new Set<number>([ openMinutes, closeMinutes ]);
+            if (hasFieldTripWindow) {
+                boundaries.add(fieldTripWindowStart);
+                boundaries.add(fieldTripWindowEnd);
+            }
             dayAssignments.forEach((assignment) => {
                 const start = parseTimeToMinutes(assignment.startTime);
                 const end = parseTimeToMinutes(assignment.endTime);
@@ -368,6 +380,11 @@ export const ratioSegmentRule: RuleDefinition = {
                 if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
                     minStaff = Math.max(minStaff, schoolRules.closerCount);
                 }
+                const useFieldTripRatio = hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd;
+                const normalizedChildrenPerStaff = useFieldTripRatio
+                    ? normalizedFieldTripChildrenPerStaff
+                    : normalizedScheduleChildrenPerStaff;
+                const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
                 const required = Math.max(minStaff, requiredFromRatio);
                 const assigned = new Set(
                     dayAssignments
@@ -414,7 +431,13 @@ export const ratioSegmentRule: RuleDefinition = {
                             .filter((segmentBlockId) => Boolean(segmentBlockId))
                     )
                 );
-                const sourceLabel = activeFieldTripType ? "field trip override" : "schedule type";
+                const useFieldTripRatio = hasFieldTripWindow &&
+                    interval.start >= fieldTripWindowStart &&
+                    interval.end <= fieldTripWindowEnd;
+                const normalizedChildrenPerStaff = useFieldTripRatio
+                    ? normalizedFieldTripChildrenPerStaff
+                    : normalizedScheduleChildrenPerStaff;
+                const sourceLabel = useFieldTripRatio ? "field trip override" : "schedule type";
                 const message =
                     `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
                     `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ effectiveChildCount }) ` +
@@ -430,7 +453,7 @@ export const ratioSegmentRule: RuleDefinition = {
                         {
                             dayOfWeek: day.dayOfWeek,
                             childCount: effectiveChildCount,
-                            ratioSource: activeFieldTripType ? "fieldTrip" : "scheduleType",
+                            ratioSource: useFieldTripRatio ? "fieldTrip" : "scheduleType",
                             required: interval.required,
                             actual: interval.assigned,
                             minStaff: interval.minStaff,

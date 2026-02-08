@@ -134,6 +134,8 @@ exports.Prisma.SchoolScalarFieldEnum = {
   closedDays: 'closedDays',
   openerCount: 'openerCount',
   closerCount: 'closerCount',
+  fieldTripStartTime: 'fieldTripStartTime',
+  fieldTripEndTime: 'fieldTripEndTime',
   minimumMedicalDelegated: 'minimumMedicalDelegated',
   requireCurrentCpr: 'requireCurrentCpr',
   createdAt: 'createdAt',

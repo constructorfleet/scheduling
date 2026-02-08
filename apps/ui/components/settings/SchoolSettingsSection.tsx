@@ -103,6 +103,36 @@ export default function SchoolSettingsSection({
           </label>
         </label>
       </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem", maxWidth: 360 }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.8rem" }}>
+          Field trip start time
+          <input
+            type="time"
+            value={draftSchoolRules.fieldTripStartTime}
+            onChange={(event) =>
+              onSchoolRulesChange({
+                ...draftSchoolRules,
+                fieldTripStartTime: event.target.value
+              })
+            }
+            style={{ borderRadius: 10, border: "1px solid #d1d5db", padding: "0.45rem 0.6rem" }}
+          />
+        </label>
+        <label style={{ display: "flex", flexDirection: "column", gap: "0.35rem", fontSize: "0.8rem" }}>
+          Field trip end time
+          <input
+            type="time"
+            value={draftSchoolRules.fieldTripEndTime}
+            onChange={(event) =>
+              onSchoolRulesChange({
+                ...draftSchoolRules,
+                fieldTripEndTime: event.target.value
+              })
+            }
+            style={{ borderRadius: 10, border: "1px solid #d1d5db", padding: "0.45rem 0.6rem" }}
+          />
+        </label>
+      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
         <span style={{ fontSize: "0.8rem", color: "#475569", fontWeight: 600 }}>Closed days</span>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>

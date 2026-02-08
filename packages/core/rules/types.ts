@@ -27,6 +27,8 @@ export interface RulesContext {
 export interface SchoolRules {
   openerCount: number;
   closerCount: number;
+  fieldTripStartTime?: string;
+  fieldTripEndTime?: string;
   minimumMedicalDelegated: number;
   requireCurrentCpr: boolean;
   openerWindowMinutes?: number;

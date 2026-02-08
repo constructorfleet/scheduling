@@ -41,6 +41,8 @@ model School {
   closedDays              Json
   openerCount             Int
   closerCount             Int
+  fieldTripStartTime      String             @default("09:00")
+  fieldTripEndTime        String             @default("15:00")
   minimumMedicalDelegated Int
   requireCurrentCpr       Boolean
   createdAt               DateTime           @default(now())

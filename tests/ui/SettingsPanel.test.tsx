@@ -73,6 +73,8 @@ const employees: Employee[] = [
 const schoolRules: SchoolRules = {
   openerCount: 1,
   closerCount: 1,
+  fieldTripStartTime: "09:00",
+  fieldTripEndTime: "15:00",
   minimumMedicalDelegated: 0,
   requireCurrentCpr: false
 };

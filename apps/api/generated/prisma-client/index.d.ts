@@ -3883,6 +3883,8 @@ export namespace Prisma {
     name: string | null
     openerCount: number | null
     closerCount: number | null
+    fieldTripStartTime: string | null
+    fieldTripEndTime: string | null
     minimumMedicalDelegated: number | null
     requireCurrentCpr: boolean | null
     createdAt: Date | null
@@ -3895,6 +3897,8 @@ export namespace Prisma {
     name: string | null
     openerCount: number | null
     closerCount: number | null
+    fieldTripStartTime: string | null
+    fieldTripEndTime: string | null
     minimumMedicalDelegated: number | null
     requireCurrentCpr: boolean | null
     createdAt: Date | null
@@ -3908,6 +3912,8 @@ export namespace Prisma {
     closedDays: number
     openerCount: number
     closerCount: number
+    fieldTripStartTime: number
+    fieldTripEndTime: number
     minimumMedicalDelegated: number
     requireCurrentCpr: number
     createdAt: number
@@ -3934,6 +3940,8 @@ export namespace Prisma {
     name?: true
     openerCount?: true
     closerCount?: true
+    fieldTripStartTime?: true
+    fieldTripEndTime?: true
     minimumMedicalDelegated?: true
     requireCurrentCpr?: true
     createdAt?: true
@@ -3946,6 +3954,8 @@ export namespace Prisma {
     name?: true
     openerCount?: true
     closerCount?: true
+    fieldTripStartTime?: true
+    fieldTripEndTime?: true
     minimumMedicalDelegated?: true
     requireCurrentCpr?: true
     createdAt?: true
@@ -3959,6 +3969,8 @@ export namespace Prisma {
     closedDays?: true
     openerCount?: true
     closerCount?: true
+    fieldTripStartTime?: true
+    fieldTripEndTime?: true
     minimumMedicalDelegated?: true
     requireCurrentCpr?: true
     createdAt?: true
@@ -4059,6 +4071,8 @@ export namespace Prisma {
     closedDays: JsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime: string
+    fieldTripEndTime: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt: Date
@@ -4091,6 +4105,8 @@ export namespace Prisma {
     closedDays?: boolean
     openerCount?: boolean
     closerCount?: boolean
+    fieldTripStartTime?: boolean
+    fieldTripEndTime?: boolean
     minimumMedicalDelegated?: boolean
     requireCurrentCpr?: boolean
     createdAt?: boolean
@@ -4114,6 +4130,8 @@ export namespace Prisma {
     closedDays?: boolean
     openerCount?: boolean
     closerCount?: boolean
+    fieldTripStartTime?: boolean
+    fieldTripEndTime?: boolean
     minimumMedicalDelegated?: boolean
     requireCurrentCpr?: boolean
     createdAt?: boolean
@@ -4128,6 +4146,8 @@ export namespace Prisma {
     closedDays?: boolean
     openerCount?: boolean
     closerCount?: boolean
+    fieldTripStartTime?: boolean
+    fieldTripEndTime?: boolean
     minimumMedicalDelegated?: boolean
     requireCurrentCpr?: boolean
     createdAt?: boolean
@@ -4142,13 +4162,15 @@ export namespace Prisma {
     closedDays?: boolean
     openerCount?: boolean
     closerCount?: boolean
+    fieldTripStartTime?: boolean
+    fieldTripEndTime?: boolean
     minimumMedicalDelegated?: boolean
     requireCurrentCpr?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SchoolOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "districtId" | "name" | "closedDays" | "openerCount" | "closerCount" | "minimumMedicalDelegated" | "requireCurrentCpr" | "createdAt" | "updatedAt", ExtArgs["result"]["school"]>
+  export type SchoolOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "districtId" | "name" | "closedDays" | "openerCount" | "closerCount" | "fieldTripStartTime" | "fieldTripEndTime" | "minimumMedicalDelegated" | "requireCurrentCpr" | "createdAt" | "updatedAt", ExtArgs["result"]["school"]>
   export type SchoolInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
     jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
@@ -4188,6 +4210,8 @@ export namespace Prisma {
       closedDays: Prisma.JsonValue
       openerCount: number
       closerCount: number
+      fieldTripStartTime: string
+      fieldTripEndTime: string
       minimumMedicalDelegated: number
       requireCurrentCpr: boolean
       createdAt: Date
@@ -4630,6 +4654,8 @@ export namespace Prisma {
     readonly closedDays: FieldRef<"School", 'Json'>
     readonly openerCount: FieldRef<"School", 'Int'>
     readonly closerCount: FieldRef<"School", 'Int'>
+    readonly fieldTripStartTime: FieldRef<"School", 'String'>
+    readonly fieldTripEndTime: FieldRef<"School", 'String'>
     readonly minimumMedicalDelegated: FieldRef<"School", 'Int'>
     readonly requireCurrentCpr: FieldRef<"School", 'Boolean'>
     readonly createdAt: FieldRef<"School", 'DateTime'>
@@ -23554,6 +23580,8 @@ export namespace Prisma {
     closedDays: 'closedDays',
     openerCount: 'openerCount',
     closerCount: 'closerCount',
+    fieldTripStartTime: 'fieldTripStartTime',
+    fieldTripEndTime: 'fieldTripEndTime',
     minimumMedicalDelegated: 'minimumMedicalDelegated',
     requireCurrentCpr: 'requireCurrentCpr',
     createdAt: 'createdAt',
@@ -24027,6 +24055,8 @@ export namespace Prisma {
     closedDays?: JsonFilter<"School">
     openerCount?: IntFilter<"School"> | number
     closerCount?: IntFilter<"School"> | number
+    fieldTripStartTime?: StringFilter<"School"> | string
+    fieldTripEndTime?: StringFilter<"School"> | string
     minimumMedicalDelegated?: IntFilter<"School"> | number
     requireCurrentCpr?: BoolFilter<"School"> | boolean
     createdAt?: DateTimeFilter<"School"> | Date | string
@@ -24049,6 +24079,8 @@ export namespace Prisma {
     closedDays?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
+    fieldTripStartTime?: SortOrder
+    fieldTripEndTime?: SortOrder
     minimumMedicalDelegated?: SortOrder
     requireCurrentCpr?: SortOrder
     createdAt?: SortOrder
@@ -24074,6 +24106,8 @@ export namespace Prisma {
     closedDays?: JsonFilter<"School">
     openerCount?: IntFilter<"School"> | number
     closerCount?: IntFilter<"School"> | number
+    fieldTripStartTime?: StringFilter<"School"> | string
+    fieldTripEndTime?: StringFilter<"School"> | string
     minimumMedicalDelegated?: IntFilter<"School"> | number
     requireCurrentCpr?: BoolFilter<"School"> | boolean
     createdAt?: DateTimeFilter<"School"> | Date | string
@@ -24096,6 +24130,8 @@ export namespace Prisma {
     closedDays?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
+    fieldTripStartTime?: SortOrder
+    fieldTripEndTime?: SortOrder
     minimumMedicalDelegated?: SortOrder
     requireCurrentCpr?: SortOrder
     createdAt?: SortOrder
@@ -24117,6 +24153,8 @@ export namespace Prisma {
     closedDays?: JsonWithAggregatesFilter<"School">
     openerCount?: IntWithAggregatesFilter<"School"> | number
     closerCount?: IntWithAggregatesFilter<"School"> | number
+    fieldTripStartTime?: StringWithAggregatesFilter<"School"> | string
+    fieldTripEndTime?: StringWithAggregatesFilter<"School"> | string
     minimumMedicalDelegated?: IntWithAggregatesFilter<"School"> | number
     requireCurrentCpr?: BoolWithAggregatesFilter<"School"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"School"> | Date | string
@@ -25432,6 +25470,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -25454,6 +25494,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -25474,6 +25516,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25496,6 +25540,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25517,6 +25563,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -25529,6 +25577,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25542,6 +25592,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27121,6 +27173,8 @@ export namespace Prisma {
     closedDays?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
+    fieldTripStartTime?: SortOrder
+    fieldTripEndTime?: SortOrder
     minimumMedicalDelegated?: SortOrder
     requireCurrentCpr?: SortOrder
     createdAt?: SortOrder
@@ -27139,6 +27193,8 @@ export namespace Prisma {
     name?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
+    fieldTripStartTime?: SortOrder
+    fieldTripEndTime?: SortOrder
     minimumMedicalDelegated?: SortOrder
     requireCurrentCpr?: SortOrder
     createdAt?: SortOrder
@@ -27151,6 +27207,8 @@ export namespace Prisma {
     name?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
+    fieldTripStartTime?: SortOrder
+    fieldTripEndTime?: SortOrder
     minimumMedicalDelegated?: SortOrder
     requireCurrentCpr?: SortOrder
     createdAt?: SortOrder
@@ -29623,6 +29681,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -29643,6 +29703,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -29761,6 +29823,8 @@ export namespace Prisma {
     closedDays?: JsonFilter<"School">
     openerCount?: IntFilter<"School"> | number
     closerCount?: IntFilter<"School"> | number
+    fieldTripStartTime?: StringFilter<"School"> | string
+    fieldTripEndTime?: StringFilter<"School"> | string
     minimumMedicalDelegated?: IntFilter<"School"> | number
     requireCurrentCpr?: BoolFilter<"School"> | boolean
     createdAt?: DateTimeFilter<"School"> | Date | string
@@ -30365,6 +30429,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30386,6 +30452,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30421,6 +30489,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30442,6 +30512,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30461,6 +30533,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30482,6 +30556,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30517,6 +30593,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30538,6 +30616,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30557,6 +30637,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30578,6 +30660,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30613,6 +30697,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30634,6 +30720,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30653,6 +30741,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30674,6 +30764,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30709,6 +30801,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30730,6 +30824,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30749,6 +30845,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30770,6 +30868,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30805,6 +30905,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30826,6 +30928,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30845,6 +30949,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -30866,6 +30972,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -31071,6 +31179,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31092,6 +31202,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32009,6 +32121,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -32030,6 +32144,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -32139,6 +32255,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32160,6 +32278,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32354,6 +32474,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -32375,6 +32497,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -32455,6 +32579,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32476,6 +32602,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32579,6 +32707,8 @@ export namespace Prisma {
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
     closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
     minimumMedicalDelegated: number
     requireCurrentCpr: boolean
     createdAt?: Date | string
@@ -32615,6 +32745,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32635,6 +32767,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32655,6 +32789,8 @@ export namespace Prisma {
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
     closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

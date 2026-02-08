@@ -342,6 +342,10 @@ components:
           type: integer
         closerCount:
           type: integer
+        fieldTripStartTime:
+          type: string
+        fieldTripEndTime:
+          type: string
         minimumMedicalDelegated:
           type: integer
         requireCurrentCpr:
@@ -351,6 +355,8 @@ components:
         - closedDays
         - openerCount
         - closerCount
+        - fieldTripStartTime
+        - fieldTripEndTime
         - minimumMedicalDelegated
         - requireCurrentCpr
     SchoolRecord:
@@ -368,6 +374,10 @@ components:
           type: integer
         closerCount:
           type: integer
+        fieldTripStartTime:
+          type: string
+        fieldTripEndTime:
+          type: string
         minimumMedicalDelegated:
           type: integer
         requireCurrentCpr:
@@ -378,6 +388,8 @@ components:
         - closedDays
         - openerCount
         - closerCount
+        - fieldTripStartTime
+        - fieldTripEndTime
         - minimumMedicalDelegated
         - requireCurrentCpr
     ScheduleTypePayload:

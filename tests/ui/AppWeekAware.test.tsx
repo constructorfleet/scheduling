@@ -77,6 +77,8 @@ describe("App week-aware navigation", () => {
         closedDays: [],
         openerCount: 2,
         closerCount: 2,
+        fieldTripStartTime: "09:00",
+        fieldTripEndTime: "15:00",
         minimumMedicalDelegated: 1,
         requireCurrentCpr: false
       },

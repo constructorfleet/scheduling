@@ -299,6 +299,8 @@ export default function App() {
   const [schoolRulesState, setSchoolRulesState] = useState<SchoolRules>({
     openerCount: 0,
     closerCount: 0,
+    fieldTripStartTime: "09:00",
+    fieldTripEndTime: "15:00",
     minimumMedicalDelegated: 0,
     requireCurrentCpr: false
   });
@@ -819,6 +821,8 @@ export default function App() {
         closedDays: overrides.closedDays ?? closedDaysState,
         openerCount: schoolRules.openerCount,
         closerCount: schoolRules.closerCount,
+        fieldTripStartTime: schoolRules.fieldTripStartTime,
+        fieldTripEndTime: schoolRules.fieldTripEndTime,
         minimumMedicalDelegated: schoolRules.minimumMedicalDelegated,
         requireCurrentCpr: schoolRules.requireCurrentCpr
       };
@@ -1033,6 +1037,8 @@ export default function App() {
           setSchoolRulesState({
             openerCount: settings.school.openerCount ?? schoolRulesState.openerCount,
             closerCount: settings.school.closerCount ?? schoolRulesState.closerCount,
+            fieldTripStartTime: settings.school.fieldTripStartTime ?? schoolRulesState.fieldTripStartTime,
+            fieldTripEndTime: settings.school.fieldTripEndTime ?? schoolRulesState.fieldTripEndTime,
             minimumMedicalDelegated:
               settings.school.minimumMedicalDelegated ?? schoolRulesState.minimumMedicalDelegated,
             requireCurrentCpr: settings.school.requireCurrentCpr ?? schoolRulesState.requireCurrentCpr
