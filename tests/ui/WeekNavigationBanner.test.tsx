@@ -37,14 +37,14 @@ describe("WeekNavigationBanner", () => {
   };
 
   it("disables the violations button when there are no violations", () => {
-    render(<WeekNavigationBanner {...baseProps} hasViolations={false} />);
+    render(<WeekNavigationBanner {...baseProps} violationCount={0} hasViolations={false} />);
     const button = screen.getByRole("button", { name: "Open Violations" });
     expect(button).toBeDisabled();
   });
 
   it("toggles labels for violations and audit buttons based on open state", async () => {
     const user = userEvent.setup();
-    render(<WeekNavigationBanner {...baseProps} isViolationsOpen={true} isAuditOpen={true} />);
+    render(<WeekNavigationBanner {...baseProps} violationCount={1} isViolationsOpen={true} isAuditOpen={true} />);
 
     const violationsButton = screen.getByRole("button", { name: "Close Violations" });
     const auditButton = screen.getByRole("button", { name: "Close Audit Log" });

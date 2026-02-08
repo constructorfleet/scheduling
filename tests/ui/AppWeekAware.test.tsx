@@ -109,7 +109,7 @@ describe("App week-aware navigation", () => {
     saveScheduleMock.mockClear();
 
     await act(async () => {
-      await user.click(screen.getByRole("button", { name: /Next/i }));
+      await user.click(screen.getByRole("button", { name: /→/i }));
     });
 
     await waitFor(
