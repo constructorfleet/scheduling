@@ -7,8 +7,8 @@ CREATE TABLE "School" (
     "closerCount" INTEGER NOT NULL,
     "minimumMedicalDelegated" INTEGER NOT NULL,
     "requireCurrentCpr" BOOLEAN NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -77,9 +77,9 @@ CREATE TABLE "ScheduleWeek" (
     "schoolId" TEXT NOT NULL,
     "label" TEXT,
     "status" TEXT NOT NULL,
-    "startDate" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "startDate" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "ScheduleWeek_schoolId_fkey" FOREIGN KEY ("schoolId") REFERENCES "School" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE "ScheduleWeek" (
 CREATE TABLE "ScheduleDay" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "scheduleWeekId" TEXT NOT NULL,
-    "date" DATETIME,
+    "date" TIMESTAMP(3),
     "dayOfWeek" TEXT NOT NULL,
     "scheduleType" TEXT,
     "enrollmentCount" INTEGER,
@@ -109,7 +109,7 @@ CREATE TABLE "FieldTripEvent" (
     "fieldTripTypeId" TEXT,
     "isNoFieldTrip" BOOLEAN NOT NULL,
     "approverId" TEXT,
-    "signedOffAt" DATETIME,
+    "signedOffAt" TIMESTAMP(3),
     "notes" TEXT,
     CONSTRAINT "FieldTripEvent_scheduleWeekId_fkey" FOREIGN KEY ("scheduleWeekId") REFERENCES "ScheduleWeek" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

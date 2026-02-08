@@ -2,7 +2,7 @@
 CREATE TABLE "AuditEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "scheduleWeekId" TEXT NOT NULL,
-    "timestamp" DATETIME NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL,
     "user" TEXT NOT NULL,
     "action" TEXT NOT NULL,
     "citationId" TEXT,
