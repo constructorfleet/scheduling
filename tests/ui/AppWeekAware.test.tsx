@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as apiClient from "../../apps/ui/data/apiClient";
 import { daySequence, weekMeta } from "../../apps/ui/data/runtimeDefaults";
@@ -8,8 +8,13 @@ jest.mock("../../apps/ui/data/apiClient");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const App = require("../../apps/ui/App").default as typeof import("../../apps/ui/App").default;
 
+const parseIsoDate = (value: string) => {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, (month ?? 1) - 1, day ?? 1);
+};
+
 const addDays = (isoDate: string, offset: number) => {
-  const base = new Date(`${isoDate}T00:00:00`);
+  const base = parseIsoDate(isoDate);
   base.setDate(base.getDate() + offset);
   return base.toISOString().slice(0, 10);
 };
@@ -118,5 +123,15 @@ describe("App week-aware navigation", () => {
       },
       { timeout: 700 }
     );
+  });
+
+  it("renders Monday as Feb 16 for week of Feb 15", async () => {
+    render(<App />);
+
+    await screen.findByText(/Week of/i);
+
+    const mondayHeader = screen.getByText("Mon").closest("th");
+    expect(mondayHeader).not.toBeNull();
+    expect(within(mondayHeader as HTMLElement).getByText(/Feb\s+16/i)).toBeInTheDocument();
   });
 });

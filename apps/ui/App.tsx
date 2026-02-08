@@ -116,6 +116,15 @@ type WeekDirection = "prev" | "next";
 
 const DAY_OF_WEEK_VALUES: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const weekDaySequence: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+const DAY_OF_WEEK_INDEX: Record<DayOfWeek, number> = {
+  sun: 0,
+  mon: 1,
+  tue: 2,
+  wed: 3,
+  thu: 4,
+  fri: 5,
+  sat: 6
+};
 const isDayOfWeek = (value: string): value is DayOfWeek =>
   DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
 const CLOSED_SCHEDULE_TYPE = "closed" as ScheduleType;
@@ -162,6 +171,10 @@ const addDays = (isoDate: string, offset: number) => {
   return toIsoDate(base);
 };
 const normalizeDateOnly = (value: string) => value.split("T")[0];
+const doesDateMatchDayOfWeek = (dateValue: string, dayOfWeek: DayOfWeek) => {
+  const parsed = parseIsoDate(dateValue);
+  return parsed.getDay() === DAY_OF_WEEK_INDEX[dayOfWeek];
+};
 const formatShortDate = (value?: string) => {
   if (!value) return "";
   const parsed = value.includes("T") ? new Date(value) : parseIsoDate(value);
@@ -1141,11 +1154,17 @@ export default function App() {
             const defaultEnrollment = isClosed ? 0 : undefined;
             if (existing) {
               const normalizedScheduleType = existing.scheduleType ?? defaultScheduleType;
+              const normalizedDate = existing.date
+                ? normalizeDateOnly(existing.date)
+                : defaultDate;
+              const resolvedDate = doesDateMatchDayOfWeek(normalizedDate, dayOfWeek)
+                ? normalizedDate
+                : defaultDate;
               return {
                 ...existing,
                 scheduleWeekId: currentWeekId,
                 dayOfWeek,
-                date: existing.date ?? defaultDate,
+                date: resolvedDate,
                 scheduleType: normalizedScheduleType,
                 dayScheduleType:
                   existing.dayScheduleType ??

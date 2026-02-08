@@ -151,7 +151,9 @@ describe("ScheduleMatrix", () => {
       ]
     });
 
-    expect(screen.getByText(/Feb\s+16/i)).toBeInTheDocument();
+    const mondayHeader = screen.getByText("Mon").closest("th");
+    expect(mondayHeader).not.toBeNull();
+    expect(within(mondayHeader as HTMLElement).getByText(/Feb\s+16/i)).toBeInTheDocument();
   });
   it("highlights and scrolls to the focused segment block", () => {
     const scrollIntoView = jest.fn();
