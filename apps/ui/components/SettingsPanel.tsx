@@ -80,6 +80,12 @@ const emptyFieldTrip = (): FieldTripType => ({
   notes: ""
 });
 
+const fullDayAvailability = (): Employee["availability"] =>
+  (["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as DayOfWeek[]).map((dayOfWeek) => ({
+    dayOfWeek,
+    blocks: [{ startTime: "00:00", endTime: "23:59" }]
+  }));
+
 const emptyEmployee = (): Employee => ({
   id: `emp-${Date.now()}`,
   name: "New employee",
@@ -91,7 +97,7 @@ const emptyEmployee = (): Employee => ({
   medicallyDelegated: false,
   cprCurrent: false,
   notes: "",
-  availability: [],
+  availability: fullDayAvailability(),
   requestedDaysOff: []
 });
 

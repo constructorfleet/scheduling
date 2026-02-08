@@ -214,6 +214,23 @@ const USER_POLICY_CITATION: PolicyCitation = {
   section: "N/A"
 };
 const IS_TEST_ENV = typeof process !== "undefined" && process.env.NODE_ENV === "test";
+const fullDayAvailabilityTemplate = daySequence.map((dayOfWeek) => ({
+  dayOfWeek,
+  blocks: [{ startTime: "00:00", endTime: "23:59" }]
+}));
+const buildFullDayAvailability = () =>
+  fullDayAvailabilityTemplate.map((day) => ({
+    dayOfWeek: day.dayOfWeek,
+    blocks: day.blocks.map((block) => ({ ...block }))
+  }));
+const ensureEmployeeAvailability = (employee: Employee) => {
+  const availability = employee.availability ?? [];
+  const hasBlocks = availability.some((day) => (day.blocks ?? []).length > 0);
+  if (hasBlocks) {
+    return { ...employee, availability };
+  }
+  return { ...employee, availability: buildFullDayAvailability() };
+};
 
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => new Date(weekMeta.startDate));
@@ -242,7 +259,7 @@ export default function App() {
     ensureClosedScheduleType(scheduleTypeOptions)
   );
   const [fieldTripTypesState, setFieldTripTypesState] = useState(fieldTripTypes);
-  const [employeesState, setEmployeesState] = useState(employees);
+  const [employeesState, setEmployeesState] = useState<Employee[]>(() => employees.map(ensureEmployeeAvailability));
   const [fieldTripEventsState, setFieldTripEventsState] = useState(fieldTripEvents);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [historyPast, setHistoryPast] = useState<ScheduleSnapshot[]>([]);
@@ -628,7 +645,7 @@ export default function App() {
       if (byId.has(assignment.employeeId)) {
         return;
       }
-      byId.set(assignment.employeeId, {
+      byId.set(assignment.employeeId, ensureEmployeeAvailability({
         id: assignment.employeeId,
         name: `Unlinked staff (${assignment.employeeId})`,
         jobTitle: "Unknown",
@@ -641,7 +658,7 @@ export default function App() {
         notes: "This assignment references a missing employee record. Re-link in Settings.",
         availability: [],
         requestedDaysOff: []
-      });
+      }));
     });
     return Array.from(byId.values());
   }, [employeesDerived, staffAssignmentsState]);
@@ -988,13 +1005,15 @@ export default function App() {
               (settings.jobTitles ?? []).map((title) => [title.title, title.leaderQualified])
             );
             setEmployeesState(
-              settings.employees.map((employee) => ({
-                ...employee,
-                leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
-                employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
-                availability: employee.availability ?? [],
-                requestedDaysOff: employee.requestedDaysOff ?? []
-              }))
+              settings.employees.map((employee) =>
+                ensureEmployeeAvailability({
+                  ...employee,
+                  leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
+                  employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
+                  availability: employee.availability ?? [],
+                  requestedDaysOff: employee.requestedDaysOff ?? []
+                })
+              )
             );
           }
           if (settings.operatingHours?.length) {
@@ -1943,8 +1962,9 @@ export default function App() {
       setAuthMessage("You do not have permission to update settings.");
       return;
     }
-    setEmployeesState(next);
-    void persistSettings({ employees: next });
+    const normalized = next.map(ensureEmployeeAvailability);
+    setEmployeesState(normalized);
+    void persistSettings({ employees: normalized });
   };
 
   const handleAutoSchedule = () => {
