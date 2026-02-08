@@ -1674,8 +1674,14 @@ const buildServer = async () => {
                     : null
                 : existingWeek?.startDate ?? null;
         const scheduleDaysPayload = Array.isArray(payload.scheduleDays) ? payload.scheduleDays : [];
-        const segmentBlocksPayload = Array.isArray(payload.segmentBlocks) ? payload.segmentBlocks : [];
-        const staffAssignmentsPayload = Array.isArray(payload.staffAssignments) ? payload.staffAssignments : [];
+        const segmentBlocksProvided = Array.isArray(payload.segmentBlocks);
+        const staffAssignmentsProvided = Array.isArray(payload.staffAssignments);
+        const segmentBlocksPayload: SegmentBlockPayload[] = Array.isArray(payload.segmentBlocks)
+            ? payload.segmentBlocks
+            : [];
+        const staffAssignmentsPayload: StaffAssignmentPayload[] = Array.isArray(payload.staffAssignments)
+            ? payload.staffAssignments
+            : [];
         const fieldTripEventsPayload = Array.isArray(payload.fieldTripEvents) ? payload.fieldTripEvents : [];
         const auditEventsPayload = Array.isArray(payload.auditEvents) ? payload.auditEvents : [];
 
@@ -1784,33 +1790,16 @@ const buildServer = async () => {
                 }
             }
 
-            if (segmentBlocksPayload.length) {
-                for (const block of segmentBlocksPayload) {
-                    await tx.segmentBlock.upsert({
-                        where: { id: block.id },
-                        create: {
-                            id: block.id,
-                            scheduleWeekId: weekId,
-                            scheduleDayId: block.scheduleDayId ?? null,
-                            dayOfWeek: block.dayOfWeek,
-                            segment: block.segment,
-                            startTime: block.startTime,
-                            endTime: block.endTime,
-                            childCount: block.childCount,
-                            status: block.status
-                        },
-                        update: {
-                            scheduleWeekId: weekId,
-                            scheduleDayId: block.scheduleDayId ?? null,
-                            dayOfWeek: block.dayOfWeek,
-                            segment: block.segment,
-                            startTime: block.startTime,
-                            endTime: block.endTime,
-                            childCount: block.childCount,
-                            status: block.status
-                        }
-                    });
-                }
+            if (staffAssignmentsProvided) {
+                const assignmentIds = new Set(staffAssignmentsPayload.map((assignment) => assignment.id));
+                await tx.staffAssignment.deleteMany({
+                    where: {
+                        scheduleWeekId: weekId,
+                        ...(assignmentIds.size
+                            ? { id: { notIn: Array.from(assignmentIds) } }
+                            : {})
+                    }
+                });
             }
 
             if (staffAssignmentsPayload.length) {
@@ -1841,6 +1830,47 @@ const buildServer = async () => {
                             endTime: assignment.endTime,
                             status: assignment.status,
                             notes: assignment.notes ?? null
+                        }
+                    });
+                }
+            }
+
+            if (segmentBlocksProvided) {
+                const segmentBlockIds = new Set(segmentBlocksPayload.map((block) => block.id));
+                await tx.segmentBlock.deleteMany({
+                    where: {
+                        scheduleWeekId: weekId,
+                        ...(segmentBlockIds.size
+                            ? { id: { notIn: Array.from(segmentBlockIds) } }
+                            : {})
+                    }
+                });
+            }
+
+            if (segmentBlocksPayload.length) {
+                for (const block of segmentBlocksPayload) {
+                    await tx.segmentBlock.upsert({
+                        where: { id: block.id },
+                        create: {
+                            id: block.id,
+                            scheduleWeekId: weekId,
+                            scheduleDayId: block.scheduleDayId ?? null,
+                            dayOfWeek: block.dayOfWeek,
+                            segment: block.segment,
+                            startTime: block.startTime,
+                            endTime: block.endTime,
+                            childCount: block.childCount,
+                            status: block.status
+                        },
+                        update: {
+                            scheduleWeekId: weekId,
+                            scheduleDayId: block.scheduleDayId ?? null,
+                            dayOfWeek: block.dayOfWeek,
+                            segment: block.segment,
+                            startTime: block.startTime,
+                            endTime: block.endTime,
+                            childCount: block.childCount,
+                            status: block.status
                         }
                     });
                 }
