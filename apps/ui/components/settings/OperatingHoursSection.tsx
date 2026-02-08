@@ -32,18 +32,28 @@ export default function OperatingHoursSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "160px 1.5fr 1fr 1fr auto",
+          gridTemplateColumns: "1fr 96px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
           paddingLeft: "0.75rem",
-          paddingRight: "0.75rem"
+          paddingRight: "0.75rem",
+          alignItems: "center"
         }}
       >
-        <span>Schedule type</span>
-        <span>Days of week</span>
-        <span>Open</span>
-        <span>Close</span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "160px 1.5fr 1fr 1fr",
+            gap: "0.75rem",
+            alignItems: "center"
+          }}
+        >
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Schedule type</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Days of week</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Open</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Close</span>
+        </div>
         <span />
       </div>
       {draftOperatingHours.map((entry, index) => {
@@ -63,7 +73,7 @@ export default function OperatingHoursSection({
               padding: "0.75rem",
               display: "grid",
               gap: "0.75rem",
-              gridTemplateColumns: "160px 1.5fr 1fr 1fr auto"
+              gridTemplateColumns: "160px 1.5fr 1fr 1fr 96px"
             }}
           >
             <select

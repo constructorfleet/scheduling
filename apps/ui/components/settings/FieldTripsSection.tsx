@@ -34,7 +34,7 @@ export default function FieldTripsSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 200px 200px 88px",
+          gridTemplateColumns: "1fr 88px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
@@ -43,9 +43,18 @@ export default function FieldTripsSection({
           alignItems: "center"
         }}
       >
-        <span>Field trip</span>
-        <span style={{ textAlign: "center", justifySelf: "center" }}>Adult ratio</span>
-        <span style={{ textAlign: "center", justifySelf: "center" }}>Leader ratio</span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.2fr 200px 200px",
+            gap: "0.75rem",
+            alignItems: "center"
+          }}
+        >
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Field trip</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Adult ratio</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Leader ratio</span>
+        </div>
         <span />
       </div>
       {draftFieldTrips.map((trip, index) => {

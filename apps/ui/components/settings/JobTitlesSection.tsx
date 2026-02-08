@@ -22,7 +22,7 @@ export default function JobTitlesSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 180px 220px 88px",
+          gridTemplateColumns: "1fr 88px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
@@ -31,9 +31,18 @@ export default function JobTitlesSection({
           alignItems: "center"
         }}
       >
-        <span>Job title</span>
-        <span style={{ textAlign: "center", justifySelf: "center" }}>Leader qualified</span>
-        <span style={{ textAlign: "center", justifySelf: "center" }}>Requires leader to open/close</span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 180px 220px",
+            gap: "0.75rem",
+            alignItems: "center"
+          }}
+        >
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Job title</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Leader qualified</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Requires leader to open/close</span>
+        </div>
         <span />
       </div>
       {draftJobTitles.map((title, index) => (

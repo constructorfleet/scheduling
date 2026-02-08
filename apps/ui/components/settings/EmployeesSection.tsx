@@ -87,17 +87,28 @@ export default function EmployeesSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 1fr 1fr 1fr auto",
+          gridTemplateColumns: "1fr 200px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
-          paddingLeft: "0.25rem"
+          paddingLeft: "0.25rem",
+          paddingRight: "0.75rem",
+          alignItems: "center"
         }}
       >
-        <span>Employee</span>
-        <span>Job title</span>
-        <span>Max hours/day</span>
-        <span>Max hours/week</span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.2fr 1fr 1fr 1fr",
+            gap: "0.75rem",
+            alignItems: "center"
+          }}
+        >
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Employee</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Job title</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/day</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/week</span>
+        </div>
         <span />
       </div>
       {draftEmployees.map((employee, index) => {
@@ -116,7 +127,7 @@ export default function EmployeesSection({
               gap: "0.75rem"
             }}
           >
-            <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "1.2fr 1fr 1fr 1fr auto" }}>
+            <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "1.2fr 1fr 1fr 1fr 200px" }}>
               <input
                 value={employee.name}
                 onChange={(event) => {

@@ -22,7 +22,7 @@ export default function ScheduleTypesSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "160px 200px 1fr auto",
+          gridTemplateColumns: "1fr 96px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
@@ -31,9 +31,18 @@ export default function ScheduleTypesSection({
           alignItems: "center"
         }}
       >
-        <span>Schedule type</span>
-        <span style={{ textAlign: "center" }}>Adult:Student Ratio</span>
-        <span>Description</span>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "160px 200px 1fr",
+            gap: "0.75rem",
+            alignItems: "center"
+          }}
+        >
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Schedule type</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Adult:Student Ratio</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Description</span>
+        </div>
         <span />
       </div>
       {draftScheduleTypes.map((type, index) => (
@@ -45,7 +54,7 @@ export default function ScheduleTypesSection({
             padding: "0.75rem",
             display: "grid",
             gap: "0.75rem",
-            gridTemplateColumns: "160px 200px 1fr auto",
+            gridTemplateColumns: "160px 200px 1fr 96px",
             alignItems: "center"
           }}
         >
