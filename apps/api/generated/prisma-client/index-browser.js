@@ -120,8 +120,16 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.DistrictScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SchoolScalarFieldEnum = {
   id: 'id',
+  districtId: 'districtId',
   name: 'name',
   closedDays: 'closedDays',
   openerCount: 'openerCount',
@@ -265,10 +273,20 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash',
   displayName: 'displayName',
+  isSuperUser: 'isSuperUser',
   status: 'status',
   failedLoginAttempts: 'failedLoginAttempts',
   lockoutUntil: 'lockoutUntil',
   lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DistrictMembershipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  districtId: 'districtId',
+  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -329,13 +347,15 @@ exports.UserStatus = exports.$Enums.UserStatus = {
 };
 
 exports.Role = exports.$Enums.Role = {
-  owner: 'owner',
-  director: 'director',
-  scheduler: 'scheduler',
-  viewer: 'viewer'
+  super_user: 'super_user',
+  district_admin: 'district_admin',
+  district_user: 'district_user',
+  school_admin: 'school_admin',
+  school_user: 'school_user'
 };
 
 exports.Prisma.ModelName = {
+  District: 'District',
   School: 'School',
   ScheduleType: 'ScheduleType',
   JobTitle: 'JobTitle',
@@ -349,6 +369,7 @@ exports.Prisma.ModelName = {
   StaffAssignment: 'StaffAssignment',
   AuditEvent: 'AuditEvent',
   User: 'User',
+  DistrictMembership: 'DistrictMembership',
   SchoolMembership: 'SchoolMembership',
   Session: 'Session'
 };

@@ -15,14 +15,26 @@ enum UserStatus {
 }
 
 enum Role {
-  owner
-  director
-  scheduler
-  viewer
+  super_user
+  district_admin
+  district_user
+  school_admin
+  school_user
+}
+
+model District {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schools     School[]
+  memberships DistrictMembership[]
 }
 
 model School {
   id                      String   @id @default(cuid())
+  districtId              String
   name                    String
   closedDays              Json
   openerCount             Int
@@ -39,6 +51,7 @@ model School {
   fieldTripTypes FieldTripType[]
   scheduleWeeks  ScheduleWeek[]
   memberships    SchoolMembership[]
+  district       District           @relation(fields: [districtId], references: [id], onDelete: Cascade)
 }
 
 model ScheduleType {
@@ -205,6 +218,7 @@ model User {
   email               String     @unique
   passwordHash        String
   displayName         String
+  isSuperUser         Boolean    @default(false)
   status              UserStatus @default(active)
   failedLoginAttempts Int        @default(0)
   lockoutUntil        DateTime?
@@ -212,8 +226,23 @@ model User {
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
-  memberships SchoolMembership[]
-  sessions    Session[]
+  districtMemberships DistrictMembership[]
+  memberships         SchoolMembership[]
+  sessions            Session[]
+}
+
+model DistrictMembership {
+  id         String   @id @default(cuid())
+  userId     String
+  districtId String
+  role       Role
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, districtId])
 }
 
 model SchoolMembership {

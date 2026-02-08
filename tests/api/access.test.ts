@@ -1,36 +1,37 @@
 /** @jest-environment node */
 
-import { canAccessSchoolWithRole, getSchoolMembership, hasRequiredRole } from "../../apps/api/src/access";
+import {
+  canManageDistrict,
+  canManageSchoolConfiguration,
+  canManageSchoolUsers,
+  canReadSchoolSchedule,
+  canWriteSchoolSchedule,
+  getDistrictMembership,
+  getSchoolMembership
+} from "../../apps/api/src/access";
 
 describe("access controls", () => {
-  test("enforces role hierarchy", () => {
-    expect(hasRequiredRole("owner", "viewer")).toBe(true);
-    expect(hasRequiredRole("director", "scheduler")).toBe(true);
-    expect(hasRequiredRole("scheduler", "director")).toBe(false);
-    expect(hasRequiredRole("viewer", "viewer")).toBe(true);
-  });
+  const auth = {
+    isSuperUser: false,
+    schoolMemberships: [{ schoolId: "school-a", role: "school_admin" as const }],
+    districtMemberships: [{ districtId: "district-a", role: "district_user" as const }]
+  };
 
   test("resolves membership per school", () => {
-    const auth = {
-      memberships: [
-        { schoolId: "school-a", role: "viewer" as const },
-        { schoolId: "school-b", role: "director" as const }
-      ]
-    };
-    expect(getSchoolMembership(auth, "school-b")).toEqual({ schoolId: "school-b", role: "director" });
+    expect(getSchoolMembership(auth, "school-a")).toEqual({ schoolId: "school-a", role: "school_admin" });
     expect(getSchoolMembership(auth, "school-c")).toBeNull();
   });
 
-  test("checks school scope and role together", () => {
-    const auth = {
-      memberships: [
-        { schoolId: "school-a", role: "scheduler" as const },
-        { schoolId: "school-b", role: "viewer" as const }
-      ]
-    };
-    expect(canAccessSchoolWithRole(auth, "school-a", "viewer")).toBe(true);
-    expect(canAccessSchoolWithRole(auth, "school-a", "scheduler")).toBe(true);
-    expect(canAccessSchoolWithRole(auth, "school-a", "director")).toBe(false);
-    expect(canAccessSchoolWithRole(auth, "school-c", "viewer")).toBe(false);
+  test("resolves membership per district", () => {
+    expect(getDistrictMembership(auth, "district-a")).toEqual({ districtId: "district-a", role: "district_user" });
+    expect(getDistrictMembership(auth, "district-b")).toBeNull();
+  });
+
+  test("checks school and district access", () => {
+    expect(canReadSchoolSchedule(auth, "school-a", "district-a")).toBe(true);
+    expect(canWriteSchoolSchedule(auth, "school-a", "district-a")).toBe(true);
+    expect(canManageSchoolUsers(auth, "school-a", "district-a")).toBe(true);
+    expect(canManageSchoolConfiguration(auth, "school-a", "district-a")).toBe(true);
+    expect(canManageDistrict(auth, "district-a")).toBe(false);
   });
 });

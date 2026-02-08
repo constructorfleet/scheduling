@@ -217,7 +217,7 @@ components:
       required: [status]
     Role:
       type: string
-      enum: [owner, director, scheduler, viewer]
+      enum: [super_user, district_admin, district_user, school_admin, school_user]
     LoginPayload:
       type: object
       properties:
@@ -237,7 +237,9 @@ components:
           type: string
         displayName:
           type: string
-      required: [id, email, displayName]
+        isSuperUser:
+          type: boolean
+      required: [id, email, displayName, isSuperUser]
     SchoolMembership:
       type: object
       properties:
@@ -246,6 +248,14 @@ components:
         role:
           $ref: '#/components/schemas/Role'
       required: [schoolId, role]
+    DistrictMembership:
+      type: object
+      properties:
+        districtId:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+      required: [districtId, role]
     SessionInfo:
       type: object
       properties:
@@ -262,15 +272,24 @@ components:
           $ref: '#/components/schemas/AuthUser'
         currentSchoolId:
           type: string
+          nullable: true
         memberships:
           type: array
           items:
             $ref: '#/components/schemas/SchoolMembership'
+        schoolMemberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+        districtMemberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistrictMembership'
         session:
           $ref: '#/components/schemas/SessionInfo'
         csrfToken:
           type: string
-      required: [user, currentSchoolId, memberships, session, csrfToken]
+      required: [user, memberships, schoolMemberships, districtMemberships, session, csrfToken]
     MeResponse:
       type: object
       properties:
@@ -280,7 +299,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SchoolMembership'
-      required: [user, memberships]
+        schoolMemberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchoolMembership'
+        districtMemberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/DistrictMembership'
+      required: [user, memberships, schoolMemberships, districtMemberships]
     DayOfWeek:
       type: string
       enum: [mon, tue, wed, thu, fri, sat, sun]

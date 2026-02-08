@@ -55,9 +55,12 @@ describe("App settings flow", () => {
       user: {
         id: "user-1",
         email: "director@example.com",
-        displayName: "Director"
+        displayName: "Director",
+        isSuperUser: false
       },
-      memberships: [{ schoolId: "school-evergreen", role: "director" }]
+      memberships: [{ schoolId: "school-evergreen", role: "school_admin" }],
+      schoolMemberships: [{ schoolId: "school-evergreen", role: "school_admin" }],
+      districtMemberships: []
     });
     fetchSettingsMock.mockResolvedValue({
       school: {

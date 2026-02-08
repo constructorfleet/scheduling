@@ -1,30 +1,82 @@
 import type { Role } from "../generated/prisma-client";
 
-type Membership = {
+type SchoolMembership = {
   schoolId: string;
   role: Role;
 };
 
+type DistrictMembership = {
+  districtId: string;
+  role: Role;
+};
+
 type AuthLike = {
-  memberships: Membership[];
+  isSuperUser: boolean;
+  schoolMemberships: SchoolMembership[];
+  districtMemberships: DistrictMembership[];
 };
 
-const ROLE_RANK: Record<Role, number> = {
-  viewer: 1,
-  scheduler: 2,
-  director: 3,
-  owner: 4
-};
-
-export const hasRequiredRole = (role: Role, required: Role) => ROLE_RANK[role] >= ROLE_RANK[required];
+const hasRoleIn = (role: Role, allowed: Role[]) => allowed.includes(role);
 
 export const getSchoolMembership = (auth: AuthLike, schoolId: string) =>
-  auth.memberships.find((membership) => membership.schoolId === schoolId) ?? null;
+  auth.schoolMemberships.find((membership) => membership.schoolId === schoolId) ?? null;
 
-export const canAccessSchoolWithRole = (auth: AuthLike, schoolId: string, requiredRole: Role) => {
-  const membership = getSchoolMembership(auth, schoolId);
-  if (!membership) {
-    return false;
+export const getDistrictMembership = (auth: AuthLike, districtId: string) =>
+  auth.districtMemberships.find((membership) => membership.districtId === districtId) ?? null;
+
+export const canReadDistrict = (auth: AuthLike, districtId: string) => {
+  if (auth.isSuperUser) {
+    return true;
   }
-  return hasRequiredRole(membership.role, requiredRole);
+  const membership = getDistrictMembership(auth, districtId);
+  return Boolean(membership && hasRoleIn(membership.role, ["district_admin", "district_user"]));
+};
+
+export const canManageDistrict = (auth: AuthLike, districtId: string) => {
+  if (auth.isSuperUser) {
+    return true;
+  }
+  const membership = getDistrictMembership(auth, districtId);
+  return Boolean(membership && membership.role === "district_admin");
+};
+
+export const canReadSchoolSchedule = (auth: AuthLike, schoolId: string, districtId: string) => {
+  if (auth.isSuperUser) {
+    return true;
+  }
+  const schoolMembership = getSchoolMembership(auth, schoolId);
+  if (schoolMembership && hasRoleIn(schoolMembership.role, ["school_admin", "school_user"])) {
+    return true;
+  }
+  const districtMembership = getDistrictMembership(auth, districtId);
+  return Boolean(districtMembership && hasRoleIn(districtMembership.role, ["district_admin", "district_user"]));
+};
+
+export const canWriteSchoolSchedule = (auth: AuthLike, schoolId: string, districtId: string) => {
+  // All school and district roles can write schedules by product policy.
+  return canReadSchoolSchedule(auth, schoolId, districtId);
+};
+
+export const canManageSchoolUsers = (auth: AuthLike, schoolId: string, districtId: string) => {
+  if (auth.isSuperUser) {
+    return true;
+  }
+  const schoolMembership = getSchoolMembership(auth, schoolId);
+  if (schoolMembership?.role === "school_admin") {
+    return true;
+  }
+  const districtMembership = getDistrictMembership(auth, districtId);
+  return Boolean(districtMembership && hasRoleIn(districtMembership.role, ["district_admin", "district_user"]));
+};
+
+export const canManageSchoolConfiguration = (auth: AuthLike, schoolId: string, districtId: string) => {
+  if (auth.isSuperUser) {
+    return true;
+  }
+  const schoolMembership = getSchoolMembership(auth, schoolId);
+  if (schoolMembership?.role === "school_admin") {
+    return true;
+  }
+  const districtMembership = getDistrictMembership(auth, districtId);
+  return Boolean(districtMembership && districtMembership.role === "district_admin");
 };

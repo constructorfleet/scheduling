@@ -14,6 +14,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
+ * Model District
+ * 
+ */
+export type District = $Result.DefaultSelection<Prisma.$DistrictPayload>
+/**
  * Model School
  * 
  */
@@ -79,6 +84,11 @@ export type AuditEvent = $Result.DefaultSelection<Prisma.$AuditEventPayload>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model DistrictMembership
+ * 
+ */
+export type DistrictMembership = $Result.DefaultSelection<Prisma.$DistrictMembershipPayload>
+/**
  * Model SchoolMembership
  * 
  */
@@ -102,10 +112,11 @@ export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus]
 
 
 export const Role: {
-  owner: 'owner',
-  director: 'director',
-  scheduler: 'scheduler',
-  viewer: 'viewer'
+  super_user: 'super_user',
+  district_admin: 'district_admin',
+  district_user: 'district_user',
+  school_admin: 'school_admin',
+  school_user: 'school_user'
 };
 
 export type Role = (typeof Role)[keyof typeof Role]
@@ -127,8 +138,8 @@ export const Role: typeof $Enums.Role
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more Schools
- * const schools = await prisma.school.findMany()
+ * // Fetch zero or more Districts
+ * const districts = await prisma.district.findMany()
  * ```
  *
  *
@@ -148,8 +159,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more Schools
-   * const schools = await prisma.school.findMany()
+   * // Fetch zero or more Districts
+   * const districts = await prisma.district.findMany()
    * ```
    *
    *
@@ -238,6 +249,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.district`: Exposes CRUD operations for the **District** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Districts
+    * const districts = await prisma.district.findMany()
+    * ```
+    */
+  get district(): Prisma.DistrictDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.school`: Exposes CRUD operations for the **School** model.
     * Example usage:
     * ```ts
@@ -366,6 +387,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.districtMembership`: Exposes CRUD operations for the **DistrictMembership** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DistrictMemberships
+    * const districtMemberships = await prisma.districtMembership.findMany()
+    * ```
+    */
+  get districtMembership(): Prisma.DistrictMembershipDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.schoolMembership`: Exposes CRUD operations for the **SchoolMembership** model.
@@ -820,6 +851,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    District: 'District',
     School: 'School',
     ScheduleType: 'ScheduleType',
     JobTitle: 'JobTitle',
@@ -833,6 +865,7 @@ export namespace Prisma {
     StaffAssignment: 'StaffAssignment',
     AuditEvent: 'AuditEvent',
     User: 'User',
+    DistrictMembership: 'DistrictMembership',
     SchoolMembership: 'SchoolMembership',
     Session: 'Session'
   };
@@ -850,10 +883,84 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "schoolMembership" | "session"
+      modelProps: "district" | "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "districtMembership" | "schoolMembership" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      District: {
+        payload: Prisma.$DistrictPayload<ExtArgs>
+        fields: Prisma.DistrictFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DistrictFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DistrictFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          findFirst: {
+            args: Prisma.DistrictFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DistrictFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          findMany: {
+            args: Prisma.DistrictFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>[]
+          }
+          create: {
+            args: Prisma.DistrictCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          createMany: {
+            args: Prisma.DistrictCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DistrictCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>[]
+          }
+          delete: {
+            args: Prisma.DistrictDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          update: {
+            args: Prisma.DistrictUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          deleteMany: {
+            args: Prisma.DistrictDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DistrictUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DistrictUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>[]
+          }
+          upsert: {
+            args: Prisma.DistrictUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictPayload>
+          }
+          aggregate: {
+            args: Prisma.DistrictAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDistrict>
+          }
+          groupBy: {
+            args: Prisma.DistrictGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DistrictGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DistrictCountArgs<ExtArgs>
+            result: $Utils.Optional<DistrictCountAggregateOutputType> | number
+          }
+        }
+      }
       School: {
         payload: Prisma.$SchoolPayload<ExtArgs>
         fields: Prisma.SchoolFieldRefs
@@ -1816,6 +1923,80 @@ export namespace Prisma {
           }
         }
       }
+      DistrictMembership: {
+        payload: Prisma.$DistrictMembershipPayload<ExtArgs>
+        fields: Prisma.DistrictMembershipFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DistrictMembershipFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DistrictMembershipFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          findFirst: {
+            args: Prisma.DistrictMembershipFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DistrictMembershipFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          findMany: {
+            args: Prisma.DistrictMembershipFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>[]
+          }
+          create: {
+            args: Prisma.DistrictMembershipCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          createMany: {
+            args: Prisma.DistrictMembershipCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DistrictMembershipCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>[]
+          }
+          delete: {
+            args: Prisma.DistrictMembershipDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          update: {
+            args: Prisma.DistrictMembershipUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          deleteMany: {
+            args: Prisma.DistrictMembershipDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DistrictMembershipUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DistrictMembershipUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>[]
+          }
+          upsert: {
+            args: Prisma.DistrictMembershipUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DistrictMembershipPayload>
+          }
+          aggregate: {
+            args: Prisma.DistrictMembershipAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDistrictMembership>
+          }
+          groupBy: {
+            args: Prisma.DistrictMembershipGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DistrictMembershipGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DistrictMembershipCountArgs<ExtArgs>
+            result: $Utils.Optional<DistrictMembershipCountAggregateOutputType> | number
+          }
+        }
+      }
       SchoolMembership: {
         payload: Prisma.$SchoolMembershipPayload<ExtArgs>
         fields: Prisma.SchoolMembershipFieldRefs
@@ -2072,6 +2253,7 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    district?: DistrictOmit
     school?: SchoolOmit
     scheduleType?: ScheduleTypeOmit
     jobTitle?: JobTitleOmit
@@ -2085,6 +2267,7 @@ export namespace Prisma {
     staffAssignment?: StaffAssignmentOmit
     auditEvent?: AuditEventOmit
     user?: UserOmit
+    districtMembership?: DistrictMembershipOmit
     schoolMembership?: SchoolMembershipOmit
     session?: SessionOmit
   }
@@ -2160,6 +2343,46 @@ export namespace Prisma {
   /**
    * Count Types
    */
+
+
+  /**
+   * Count Type DistrictCountOutputType
+   */
+
+  export type DistrictCountOutputType = {
+    schools: number
+    memberships: number
+  }
+
+  export type DistrictCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    schools?: boolean | DistrictCountOutputTypeCountSchoolsArgs
+    memberships?: boolean | DistrictCountOutputTypeCountMembershipsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DistrictCountOutputType without action
+   */
+  export type DistrictCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictCountOutputType
+     */
+    select?: DistrictCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DistrictCountOutputType without action
+   */
+  export type DistrictCountOutputTypeCountSchoolsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SchoolWhereInput
+  }
+
+  /**
+   * DistrictCountOutputType without action
+   */
+  export type DistrictCountOutputTypeCountMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DistrictMembershipWhereInput
+  }
 
 
   /**
@@ -2350,11 +2573,13 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
+    districtMemberships: number
     memberships: number
     sessions: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    districtMemberships?: boolean | UserCountOutputTypeCountDistrictMembershipsArgs
     memberships?: boolean | UserCountOutputTypeCountMembershipsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   }
@@ -2368,6 +2593,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDistrictMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DistrictMembershipWhereInput
   }
 
   /**
@@ -2388,6 +2620,1091 @@ export namespace Prisma {
   /**
    * Models
    */
+
+  /**
+   * Model District
+   */
+
+  export type AggregateDistrict = {
+    _count: DistrictCountAggregateOutputType | null
+    _min: DistrictMinAggregateOutputType | null
+    _max: DistrictMaxAggregateOutputType | null
+  }
+
+  export type DistrictMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DistrictMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DistrictCountAggregateOutputType = {
+    id: number
+    name: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DistrictMinAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DistrictMaxAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DistrictCountAggregateInputType = {
+    id?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DistrictAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which District to aggregate.
+     */
+    where?: DistrictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Districts to fetch.
+     */
+    orderBy?: DistrictOrderByWithRelationInput | DistrictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DistrictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Districts
+    **/
+    _count?: true | DistrictCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DistrictMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DistrictMaxAggregateInputType
+  }
+
+  export type GetDistrictAggregateType<T extends DistrictAggregateArgs> = {
+        [P in keyof T & keyof AggregateDistrict]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDistrict[P]>
+      : GetScalarType<T[P], AggregateDistrict[P]>
+  }
+
+
+
+
+  export type DistrictGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DistrictWhereInput
+    orderBy?: DistrictOrderByWithAggregationInput | DistrictOrderByWithAggregationInput[]
+    by: DistrictScalarFieldEnum[] | DistrictScalarFieldEnum
+    having?: DistrictScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DistrictCountAggregateInputType | true
+    _min?: DistrictMinAggregateInputType
+    _max?: DistrictMaxAggregateInputType
+  }
+
+  export type DistrictGroupByOutputType = {
+    id: string
+    name: string
+    createdAt: Date
+    updatedAt: Date
+    _count: DistrictCountAggregateOutputType | null
+    _min: DistrictMinAggregateOutputType | null
+    _max: DistrictMaxAggregateOutputType | null
+  }
+
+  type GetDistrictGroupByPayload<T extends DistrictGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DistrictGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DistrictGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DistrictGroupByOutputType[P]>
+            : GetScalarType<T[P], DistrictGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DistrictSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    schools?: boolean | District$schoolsArgs<ExtArgs>
+    memberships?: boolean | District$membershipsArgs<ExtArgs>
+    _count?: boolean | DistrictCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["district"]>
+
+  export type DistrictSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["district"]>
+
+  export type DistrictSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["district"]>
+
+  export type DistrictSelectScalar = {
+    id?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DistrictOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["district"]>
+  export type DistrictInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    schools?: boolean | District$schoolsArgs<ExtArgs>
+    memberships?: boolean | District$membershipsArgs<ExtArgs>
+    _count?: boolean | DistrictCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DistrictIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DistrictIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $DistrictPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "District"
+    objects: {
+      schools: Prisma.$SchoolPayload<ExtArgs>[]
+      memberships: Prisma.$DistrictMembershipPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["district"]>
+    composites: {}
+  }
+
+  type DistrictGetPayload<S extends boolean | null | undefined | DistrictDefaultArgs> = $Result.GetResult<Prisma.$DistrictPayload, S>
+
+  type DistrictCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DistrictFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DistrictCountAggregateInputType | true
+    }
+
+  export interface DistrictDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['District'], meta: { name: 'District' } }
+    /**
+     * Find zero or one District that matches the filter.
+     * @param {DistrictFindUniqueArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DistrictFindUniqueArgs>(args: SelectSubset<T, DistrictFindUniqueArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one District that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DistrictFindUniqueOrThrowArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DistrictFindUniqueOrThrowArgs>(args: SelectSubset<T, DistrictFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first District that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictFindFirstArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DistrictFindFirstArgs>(args?: SelectSubset<T, DistrictFindFirstArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first District that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictFindFirstOrThrowArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DistrictFindFirstOrThrowArgs>(args?: SelectSubset<T, DistrictFindFirstOrThrowArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Districts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Districts
+     * const districts = await prisma.district.findMany()
+     * 
+     * // Get first 10 Districts
+     * const districts = await prisma.district.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const districtWithIdOnly = await prisma.district.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DistrictFindManyArgs>(args?: SelectSubset<T, DistrictFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a District.
+     * @param {DistrictCreateArgs} args - Arguments to create a District.
+     * @example
+     * // Create one District
+     * const District = await prisma.district.create({
+     *   data: {
+     *     // ... data to create a District
+     *   }
+     * })
+     * 
+     */
+    create<T extends DistrictCreateArgs>(args: SelectSubset<T, DistrictCreateArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Districts.
+     * @param {DistrictCreateManyArgs} args - Arguments to create many Districts.
+     * @example
+     * // Create many Districts
+     * const district = await prisma.district.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DistrictCreateManyArgs>(args?: SelectSubset<T, DistrictCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Districts and returns the data saved in the database.
+     * @param {DistrictCreateManyAndReturnArgs} args - Arguments to create many Districts.
+     * @example
+     * // Create many Districts
+     * const district = await prisma.district.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Districts and only return the `id`
+     * const districtWithIdOnly = await prisma.district.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DistrictCreateManyAndReturnArgs>(args?: SelectSubset<T, DistrictCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a District.
+     * @param {DistrictDeleteArgs} args - Arguments to delete one District.
+     * @example
+     * // Delete one District
+     * const District = await prisma.district.delete({
+     *   where: {
+     *     // ... filter to delete one District
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DistrictDeleteArgs>(args: SelectSubset<T, DistrictDeleteArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one District.
+     * @param {DistrictUpdateArgs} args - Arguments to update one District.
+     * @example
+     * // Update one District
+     * const district = await prisma.district.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DistrictUpdateArgs>(args: SelectSubset<T, DistrictUpdateArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Districts.
+     * @param {DistrictDeleteManyArgs} args - Arguments to filter Districts to delete.
+     * @example
+     * // Delete a few Districts
+     * const { count } = await prisma.district.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DistrictDeleteManyArgs>(args?: SelectSubset<T, DistrictDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Districts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Districts
+     * const district = await prisma.district.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DistrictUpdateManyArgs>(args: SelectSubset<T, DistrictUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Districts and returns the data updated in the database.
+     * @param {DistrictUpdateManyAndReturnArgs} args - Arguments to update many Districts.
+     * @example
+     * // Update many Districts
+     * const district = await prisma.district.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Districts and only return the `id`
+     * const districtWithIdOnly = await prisma.district.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DistrictUpdateManyAndReturnArgs>(args: SelectSubset<T, DistrictUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one District.
+     * @param {DistrictUpsertArgs} args - Arguments to update or create a District.
+     * @example
+     * // Update or create a District
+     * const district = await prisma.district.upsert({
+     *   create: {
+     *     // ... data to create a District
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the District we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DistrictUpsertArgs>(args: SelectSubset<T, DistrictUpsertArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Districts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictCountArgs} args - Arguments to filter Districts to count.
+     * @example
+     * // Count the number of Districts
+     * const count = await prisma.district.count({
+     *   where: {
+     *     // ... the filter for the Districts we want to count
+     *   }
+     * })
+    **/
+    count<T extends DistrictCountArgs>(
+      args?: Subset<T, DistrictCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DistrictCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a District.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DistrictAggregateArgs>(args: Subset<T, DistrictAggregateArgs>): Prisma.PrismaPromise<GetDistrictAggregateType<T>>
+
+    /**
+     * Group by District.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DistrictGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DistrictGroupByArgs['orderBy'] }
+        : { orderBy?: DistrictGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DistrictGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDistrictGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the District model
+   */
+  readonly fields: DistrictFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for District.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DistrictClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    schools<T extends District$schoolsArgs<ExtArgs> = {}>(args?: Subset<T, District$schoolsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    memberships<T extends District$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, District$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the District model
+   */
+  interface DistrictFieldRefs {
+    readonly id: FieldRef<"District", 'String'>
+    readonly name: FieldRef<"District", 'String'>
+    readonly createdAt: FieldRef<"District", 'DateTime'>
+    readonly updatedAt: FieldRef<"District", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * District findUnique
+   */
+  export type DistrictFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter, which District to fetch.
+     */
+    where: DistrictWhereUniqueInput
+  }
+
+  /**
+   * District findUniqueOrThrow
+   */
+  export type DistrictFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter, which District to fetch.
+     */
+    where: DistrictWhereUniqueInput
+  }
+
+  /**
+   * District findFirst
+   */
+  export type DistrictFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter, which District to fetch.
+     */
+    where?: DistrictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Districts to fetch.
+     */
+    orderBy?: DistrictOrderByWithRelationInput | DistrictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Districts.
+     */
+    cursor?: DistrictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Districts.
+     */
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * District findFirstOrThrow
+   */
+  export type DistrictFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter, which District to fetch.
+     */
+    where?: DistrictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Districts to fetch.
+     */
+    orderBy?: DistrictOrderByWithRelationInput | DistrictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Districts.
+     */
+    cursor?: DistrictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Districts.
+     */
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * District findMany
+   */
+  export type DistrictFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter, which Districts to fetch.
+     */
+    where?: DistrictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Districts to fetch.
+     */
+    orderBy?: DistrictOrderByWithRelationInput | DistrictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Districts.
+     */
+    cursor?: DistrictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Districts.
+     */
+    skip?: number
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * District create
+   */
+  export type DistrictCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * The data needed to create a District.
+     */
+    data: XOR<DistrictCreateInput, DistrictUncheckedCreateInput>
+  }
+
+  /**
+   * District createMany
+   */
+  export type DistrictCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Districts.
+     */
+    data: DistrictCreateManyInput | DistrictCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * District createManyAndReturn
+   */
+  export type DistrictCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * The data used to create many Districts.
+     */
+    data: DistrictCreateManyInput | DistrictCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * District update
+   */
+  export type DistrictUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * The data needed to update a District.
+     */
+    data: XOR<DistrictUpdateInput, DistrictUncheckedUpdateInput>
+    /**
+     * Choose, which District to update.
+     */
+    where: DistrictWhereUniqueInput
+  }
+
+  /**
+   * District updateMany
+   */
+  export type DistrictUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Districts.
+     */
+    data: XOR<DistrictUpdateManyMutationInput, DistrictUncheckedUpdateManyInput>
+    /**
+     * Filter which Districts to update
+     */
+    where?: DistrictWhereInput
+    /**
+     * Limit how many Districts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * District updateManyAndReturn
+   */
+  export type DistrictUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * The data used to update Districts.
+     */
+    data: XOR<DistrictUpdateManyMutationInput, DistrictUncheckedUpdateManyInput>
+    /**
+     * Filter which Districts to update
+     */
+    where?: DistrictWhereInput
+    /**
+     * Limit how many Districts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * District upsert
+   */
+  export type DistrictUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * The filter to search for the District to update in case it exists.
+     */
+    where: DistrictWhereUniqueInput
+    /**
+     * In case the District found by the `where` argument doesn't exist, create a new District with this data.
+     */
+    create: XOR<DistrictCreateInput, DistrictUncheckedCreateInput>
+    /**
+     * In case the District was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DistrictUpdateInput, DistrictUncheckedUpdateInput>
+  }
+
+  /**
+   * District delete
+   */
+  export type DistrictDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+    /**
+     * Filter which District to delete.
+     */
+    where: DistrictWhereUniqueInput
+  }
+
+  /**
+   * District deleteMany
+   */
+  export type DistrictDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Districts to delete
+     */
+    where?: DistrictWhereInput
+    /**
+     * Limit how many Districts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * District.schools
+   */
+  export type District$schoolsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the School
+     */
+    select?: SchoolSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the School
+     */
+    omit?: SchoolOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolInclude<ExtArgs> | null
+    where?: SchoolWhereInput
+    orderBy?: SchoolOrderByWithRelationInput | SchoolOrderByWithRelationInput[]
+    cursor?: SchoolWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SchoolScalarFieldEnum | SchoolScalarFieldEnum[]
+  }
+
+  /**
+   * District.memberships
+   */
+  export type District$membershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    where?: DistrictMembershipWhereInput
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    cursor?: DistrictMembershipWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DistrictMembershipScalarFieldEnum | DistrictMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * District without action
+   */
+  export type DistrictDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the District
+     */
+    select?: DistrictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the District
+     */
+    omit?: DistrictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictInclude<ExtArgs> | null
+  }
+
 
   /**
    * Model School
@@ -2415,6 +3732,7 @@ export namespace Prisma {
 
   export type SchoolMinAggregateOutputType = {
     id: string | null
+    districtId: string | null
     name: string | null
     openerCount: number | null
     closerCount: number | null
@@ -2426,6 +3744,7 @@ export namespace Prisma {
 
   export type SchoolMaxAggregateOutputType = {
     id: string | null
+    districtId: string | null
     name: string | null
     openerCount: number | null
     closerCount: number | null
@@ -2437,6 +3756,7 @@ export namespace Prisma {
 
   export type SchoolCountAggregateOutputType = {
     id: number
+    districtId: number
     name: number
     closedDays: number
     openerCount: number
@@ -2463,6 +3783,7 @@ export namespace Prisma {
 
   export type SchoolMinAggregateInputType = {
     id?: true
+    districtId?: true
     name?: true
     openerCount?: true
     closerCount?: true
@@ -2474,6 +3795,7 @@ export namespace Prisma {
 
   export type SchoolMaxAggregateInputType = {
     id?: true
+    districtId?: true
     name?: true
     openerCount?: true
     closerCount?: true
@@ -2485,6 +3807,7 @@ export namespace Prisma {
 
   export type SchoolCountAggregateInputType = {
     id?: true
+    districtId?: true
     name?: true
     closedDays?: true
     openerCount?: true
@@ -2584,6 +3907,7 @@ export namespace Prisma {
 
   export type SchoolGroupByOutputType = {
     id: string
+    districtId: string
     name: string
     closedDays: JsonValue
     openerCount: number
@@ -2615,6 +3939,7 @@ export namespace Prisma {
 
   export type SchoolSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    districtId?: boolean
     name?: boolean
     closedDays?: boolean
     openerCount?: boolean
@@ -2630,11 +3955,13 @@ export namespace Prisma {
     fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
     scheduleWeeks?: boolean | School$scheduleWeeksArgs<ExtArgs>
     memberships?: boolean | School$membershipsArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
     _count?: boolean | SchoolCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["school"]>
 
   export type SchoolSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    districtId?: boolean
     name?: boolean
     closedDays?: boolean
     openerCount?: boolean
@@ -2643,10 +3970,12 @@ export namespace Prisma {
     requireCurrentCpr?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["school"]>
 
   export type SchoolSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    districtId?: boolean
     name?: boolean
     closedDays?: boolean
     openerCount?: boolean
@@ -2655,10 +3984,12 @@ export namespace Prisma {
     requireCurrentCpr?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["school"]>
 
   export type SchoolSelectScalar = {
     id?: boolean
+    districtId?: boolean
     name?: boolean
     closedDays?: boolean
     openerCount?: boolean
@@ -2669,7 +4000,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SchoolOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "closedDays" | "openerCount" | "closerCount" | "minimumMedicalDelegated" | "requireCurrentCpr" | "createdAt" | "updatedAt", ExtArgs["result"]["school"]>
+  export type SchoolOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "districtId" | "name" | "closedDays" | "openerCount" | "closerCount" | "minimumMedicalDelegated" | "requireCurrentCpr" | "createdAt" | "updatedAt", ExtArgs["result"]["school"]>
   export type SchoolInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
     jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
@@ -2678,10 +4009,15 @@ export namespace Prisma {
     fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
     scheduleWeeks?: boolean | School$scheduleWeeksArgs<ExtArgs>
     memberships?: boolean | School$membershipsArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
     _count?: boolean | SchoolCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type SchoolIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type SchoolIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type SchoolIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }
+  export type SchoolIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }
 
   export type $SchoolPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "School"
@@ -2693,9 +4029,11 @@ export namespace Prisma {
       fieldTripTypes: Prisma.$FieldTripTypePayload<ExtArgs>[]
       scheduleWeeks: Prisma.$ScheduleWeekPayload<ExtArgs>[]
       memberships: Prisma.$SchoolMembershipPayload<ExtArgs>[]
+      district: Prisma.$DistrictPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      districtId: string
       name: string
       closedDays: Prisma.JsonValue
       openerCount: number
@@ -3105,6 +4443,7 @@ export namespace Prisma {
     fieldTripTypes<T extends School$fieldTripTypesArgs<ExtArgs> = {}>(args?: Subset<T, School$fieldTripTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     scheduleWeeks<T extends School$scheduleWeeksArgs<ExtArgs> = {}>(args?: Subset<T, School$scheduleWeeksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleWeekPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberships<T extends School$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, School$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    district<T extends DistrictDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DistrictDefaultArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3135,6 +4474,7 @@ export namespace Prisma {
    */
   interface SchoolFieldRefs {
     readonly id: FieldRef<"School", 'String'>
+    readonly districtId: FieldRef<"School", 'String'>
     readonly name: FieldRef<"School", 'String'>
     readonly closedDays: FieldRef<"School", 'Json'>
     readonly openerCount: FieldRef<"School", 'Int'>
@@ -3392,6 +4732,10 @@ export namespace Prisma {
      */
     data: SchoolCreateManyInput | SchoolCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -3462,6 +4806,10 @@ export namespace Prisma {
      * Limit how many Schools to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SchoolIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -16262,6 +17610,7 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     displayName: string | null
+    isSuperUser: boolean | null
     status: $Enums.UserStatus | null
     failedLoginAttempts: number | null
     lockoutUntil: Date | null
@@ -16275,6 +17624,7 @@ export namespace Prisma {
     email: string | null
     passwordHash: string | null
     displayName: string | null
+    isSuperUser: boolean | null
     status: $Enums.UserStatus | null
     failedLoginAttempts: number | null
     lockoutUntil: Date | null
@@ -16288,6 +17638,7 @@ export namespace Prisma {
     email: number
     passwordHash: number
     displayName: number
+    isSuperUser: number
     status: number
     failedLoginAttempts: number
     lockoutUntil: number
@@ -16311,6 +17662,7 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     displayName?: true
+    isSuperUser?: true
     status?: true
     failedLoginAttempts?: true
     lockoutUntil?: true
@@ -16324,6 +17676,7 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     displayName?: true
+    isSuperUser?: true
     status?: true
     failedLoginAttempts?: true
     lockoutUntil?: true
@@ -16337,6 +17690,7 @@ export namespace Prisma {
     email?: true
     passwordHash?: true
     displayName?: true
+    isSuperUser?: true
     status?: true
     failedLoginAttempts?: true
     lockoutUntil?: true
@@ -16437,6 +17791,7 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser: boolean
     status: $Enums.UserStatus
     failedLoginAttempts: number
     lockoutUntil: Date | null
@@ -16469,12 +17824,14 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     displayName?: boolean
+    isSuperUser?: boolean
     status?: boolean
     failedLoginAttempts?: boolean
     lockoutUntil?: boolean
     lastLoginAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    districtMemberships?: boolean | User$districtMembershipsArgs<ExtArgs>
     memberships?: boolean | User$membershipsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -16485,6 +17842,7 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     displayName?: boolean
+    isSuperUser?: boolean
     status?: boolean
     failedLoginAttempts?: boolean
     lockoutUntil?: boolean
@@ -16498,6 +17856,7 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     displayName?: boolean
+    isSuperUser?: boolean
     status?: boolean
     failedLoginAttempts?: boolean
     lockoutUntil?: boolean
@@ -16511,6 +17870,7 @@ export namespace Prisma {
     email?: boolean
     passwordHash?: boolean
     displayName?: boolean
+    isSuperUser?: boolean
     status?: boolean
     failedLoginAttempts?: boolean
     lockoutUntil?: boolean
@@ -16519,8 +17879,9 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "status" | "failedLoginAttempts" | "lockoutUntil" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "isSuperUser" | "status" | "failedLoginAttempts" | "lockoutUntil" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    districtMemberships?: boolean | User$districtMembershipsArgs<ExtArgs>
     memberships?: boolean | User$membershipsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -16531,6 +17892,7 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
+      districtMemberships: Prisma.$DistrictMembershipPayload<ExtArgs>[]
       memberships: Prisma.$SchoolMembershipPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
     }
@@ -16539,6 +17901,7 @@ export namespace Prisma {
       email: string
       passwordHash: string
       displayName: string
+      isSuperUser: boolean
       status: $Enums.UserStatus
       failedLoginAttempts: number
       lockoutUntil: Date | null
@@ -16939,6 +18302,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    districtMemberships<T extends User$districtMembershipsArgs<ExtArgs> = {}>(args?: Subset<T, User$districtMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberships<T extends User$membershipsArgs<ExtArgs> = {}>(args?: Subset<T, User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SchoolMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -16974,6 +18338,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly displayName: FieldRef<"User", 'String'>
+    readonly isSuperUser: FieldRef<"User", 'Boolean'>
     readonly status: FieldRef<"User", 'UserStatus'>
     readonly failedLoginAttempts: FieldRef<"User", 'Int'>
     readonly lockoutUntil: FieldRef<"User", 'DateTime'>
@@ -17368,6 +18733,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.districtMemberships
+   */
+  export type User$districtMembershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    where?: DistrictMembershipWhereInput
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    cursor?: DistrictMembershipWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DistrictMembershipScalarFieldEnum | DistrictMembershipScalarFieldEnum[]
+  }
+
+  /**
    * User.memberships
    */
   export type User$membershipsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17431,6 +18820,1085 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DistrictMembership
+   */
+
+  export type AggregateDistrictMembership = {
+    _count: DistrictMembershipCountAggregateOutputType | null
+    _min: DistrictMembershipMinAggregateOutputType | null
+    _max: DistrictMembershipMaxAggregateOutputType | null
+  }
+
+  export type DistrictMembershipMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    districtId: string | null
+    role: $Enums.Role | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DistrictMembershipMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    districtId: string | null
+    role: $Enums.Role | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DistrictMembershipCountAggregateOutputType = {
+    id: number
+    userId: number
+    districtId: number
+    role: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DistrictMembershipMinAggregateInputType = {
+    id?: true
+    userId?: true
+    districtId?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DistrictMembershipMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    districtId?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DistrictMembershipCountAggregateInputType = {
+    id?: true
+    userId?: true
+    districtId?: true
+    role?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DistrictMembershipAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DistrictMembership to aggregate.
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DistrictMemberships to fetch.
+     */
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DistrictMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DistrictMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DistrictMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DistrictMemberships
+    **/
+    _count?: true | DistrictMembershipCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DistrictMembershipMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DistrictMembershipMaxAggregateInputType
+  }
+
+  export type GetDistrictMembershipAggregateType<T extends DistrictMembershipAggregateArgs> = {
+        [P in keyof T & keyof AggregateDistrictMembership]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDistrictMembership[P]>
+      : GetScalarType<T[P], AggregateDistrictMembership[P]>
+  }
+
+
+
+
+  export type DistrictMembershipGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DistrictMembershipWhereInput
+    orderBy?: DistrictMembershipOrderByWithAggregationInput | DistrictMembershipOrderByWithAggregationInput[]
+    by: DistrictMembershipScalarFieldEnum[] | DistrictMembershipScalarFieldEnum
+    having?: DistrictMembershipScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DistrictMembershipCountAggregateInputType | true
+    _min?: DistrictMembershipMinAggregateInputType
+    _max?: DistrictMembershipMaxAggregateInputType
+  }
+
+  export type DistrictMembershipGroupByOutputType = {
+    id: string
+    userId: string
+    districtId: string
+    role: $Enums.Role
+    createdAt: Date
+    updatedAt: Date
+    _count: DistrictMembershipCountAggregateOutputType | null
+    _min: DistrictMembershipMinAggregateOutputType | null
+    _max: DistrictMembershipMaxAggregateOutputType | null
+  }
+
+  type GetDistrictMembershipGroupByPayload<T extends DistrictMembershipGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DistrictMembershipGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DistrictMembershipGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DistrictMembershipGroupByOutputType[P]>
+            : GetScalarType<T[P], DistrictMembershipGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DistrictMembershipSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    districtId?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["districtMembership"]>
+
+  export type DistrictMembershipSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    districtId?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["districtMembership"]>
+
+  export type DistrictMembershipSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    districtId?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["districtMembership"]>
+
+  export type DistrictMembershipSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    districtId?: boolean
+    role?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DistrictMembershipOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "districtId" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["districtMembership"]>
+  export type DistrictMembershipInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }
+  export type DistrictMembershipIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }
+  export type DistrictMembershipIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    district?: boolean | DistrictDefaultArgs<ExtArgs>
+  }
+
+  export type $DistrictMembershipPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DistrictMembership"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      district: Prisma.$DistrictPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      districtId: string
+      role: $Enums.Role
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["districtMembership"]>
+    composites: {}
+  }
+
+  type DistrictMembershipGetPayload<S extends boolean | null | undefined | DistrictMembershipDefaultArgs> = $Result.GetResult<Prisma.$DistrictMembershipPayload, S>
+
+  type DistrictMembershipCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DistrictMembershipFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DistrictMembershipCountAggregateInputType | true
+    }
+
+  export interface DistrictMembershipDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DistrictMembership'], meta: { name: 'DistrictMembership' } }
+    /**
+     * Find zero or one DistrictMembership that matches the filter.
+     * @param {DistrictMembershipFindUniqueArgs} args - Arguments to find a DistrictMembership
+     * @example
+     * // Get one DistrictMembership
+     * const districtMembership = await prisma.districtMembership.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DistrictMembershipFindUniqueArgs>(args: SelectSubset<T, DistrictMembershipFindUniqueArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DistrictMembership that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DistrictMembershipFindUniqueOrThrowArgs} args - Arguments to find a DistrictMembership
+     * @example
+     * // Get one DistrictMembership
+     * const districtMembership = await prisma.districtMembership.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DistrictMembershipFindUniqueOrThrowArgs>(args: SelectSubset<T, DistrictMembershipFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DistrictMembership that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipFindFirstArgs} args - Arguments to find a DistrictMembership
+     * @example
+     * // Get one DistrictMembership
+     * const districtMembership = await prisma.districtMembership.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DistrictMembershipFindFirstArgs>(args?: SelectSubset<T, DistrictMembershipFindFirstArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DistrictMembership that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipFindFirstOrThrowArgs} args - Arguments to find a DistrictMembership
+     * @example
+     * // Get one DistrictMembership
+     * const districtMembership = await prisma.districtMembership.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DistrictMembershipFindFirstOrThrowArgs>(args?: SelectSubset<T, DistrictMembershipFindFirstOrThrowArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DistrictMemberships that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DistrictMemberships
+     * const districtMemberships = await prisma.districtMembership.findMany()
+     * 
+     * // Get first 10 DistrictMemberships
+     * const districtMemberships = await prisma.districtMembership.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const districtMembershipWithIdOnly = await prisma.districtMembership.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DistrictMembershipFindManyArgs>(args?: SelectSubset<T, DistrictMembershipFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DistrictMembership.
+     * @param {DistrictMembershipCreateArgs} args - Arguments to create a DistrictMembership.
+     * @example
+     * // Create one DistrictMembership
+     * const DistrictMembership = await prisma.districtMembership.create({
+     *   data: {
+     *     // ... data to create a DistrictMembership
+     *   }
+     * })
+     * 
+     */
+    create<T extends DistrictMembershipCreateArgs>(args: SelectSubset<T, DistrictMembershipCreateArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DistrictMemberships.
+     * @param {DistrictMembershipCreateManyArgs} args - Arguments to create many DistrictMemberships.
+     * @example
+     * // Create many DistrictMemberships
+     * const districtMembership = await prisma.districtMembership.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DistrictMembershipCreateManyArgs>(args?: SelectSubset<T, DistrictMembershipCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DistrictMemberships and returns the data saved in the database.
+     * @param {DistrictMembershipCreateManyAndReturnArgs} args - Arguments to create many DistrictMemberships.
+     * @example
+     * // Create many DistrictMemberships
+     * const districtMembership = await prisma.districtMembership.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DistrictMemberships and only return the `id`
+     * const districtMembershipWithIdOnly = await prisma.districtMembership.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DistrictMembershipCreateManyAndReturnArgs>(args?: SelectSubset<T, DistrictMembershipCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DistrictMembership.
+     * @param {DistrictMembershipDeleteArgs} args - Arguments to delete one DistrictMembership.
+     * @example
+     * // Delete one DistrictMembership
+     * const DistrictMembership = await prisma.districtMembership.delete({
+     *   where: {
+     *     // ... filter to delete one DistrictMembership
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DistrictMembershipDeleteArgs>(args: SelectSubset<T, DistrictMembershipDeleteArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DistrictMembership.
+     * @param {DistrictMembershipUpdateArgs} args - Arguments to update one DistrictMembership.
+     * @example
+     * // Update one DistrictMembership
+     * const districtMembership = await prisma.districtMembership.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DistrictMembershipUpdateArgs>(args: SelectSubset<T, DistrictMembershipUpdateArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DistrictMemberships.
+     * @param {DistrictMembershipDeleteManyArgs} args - Arguments to filter DistrictMemberships to delete.
+     * @example
+     * // Delete a few DistrictMemberships
+     * const { count } = await prisma.districtMembership.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DistrictMembershipDeleteManyArgs>(args?: SelectSubset<T, DistrictMembershipDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DistrictMemberships.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DistrictMemberships
+     * const districtMembership = await prisma.districtMembership.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DistrictMembershipUpdateManyArgs>(args: SelectSubset<T, DistrictMembershipUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DistrictMemberships and returns the data updated in the database.
+     * @param {DistrictMembershipUpdateManyAndReturnArgs} args - Arguments to update many DistrictMemberships.
+     * @example
+     * // Update many DistrictMemberships
+     * const districtMembership = await prisma.districtMembership.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DistrictMemberships and only return the `id`
+     * const districtMembershipWithIdOnly = await prisma.districtMembership.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DistrictMembershipUpdateManyAndReturnArgs>(args: SelectSubset<T, DistrictMembershipUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DistrictMembership.
+     * @param {DistrictMembershipUpsertArgs} args - Arguments to update or create a DistrictMembership.
+     * @example
+     * // Update or create a DistrictMembership
+     * const districtMembership = await prisma.districtMembership.upsert({
+     *   create: {
+     *     // ... data to create a DistrictMembership
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DistrictMembership we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DistrictMembershipUpsertArgs>(args: SelectSubset<T, DistrictMembershipUpsertArgs<ExtArgs>>): Prisma__DistrictMembershipClient<$Result.GetResult<Prisma.$DistrictMembershipPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DistrictMemberships.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipCountArgs} args - Arguments to filter DistrictMemberships to count.
+     * @example
+     * // Count the number of DistrictMemberships
+     * const count = await prisma.districtMembership.count({
+     *   where: {
+     *     // ... the filter for the DistrictMemberships we want to count
+     *   }
+     * })
+    **/
+    count<T extends DistrictMembershipCountArgs>(
+      args?: Subset<T, DistrictMembershipCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DistrictMembershipCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DistrictMembership.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DistrictMembershipAggregateArgs>(args: Subset<T, DistrictMembershipAggregateArgs>): Prisma.PrismaPromise<GetDistrictMembershipAggregateType<T>>
+
+    /**
+     * Group by DistrictMembership.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictMembershipGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DistrictMembershipGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DistrictMembershipGroupByArgs['orderBy'] }
+        : { orderBy?: DistrictMembershipGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DistrictMembershipGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDistrictMembershipGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DistrictMembership model
+   */
+  readonly fields: DistrictMembershipFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DistrictMembership.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DistrictMembershipClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    district<T extends DistrictDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DistrictDefaultArgs<ExtArgs>>): Prisma__DistrictClient<$Result.GetResult<Prisma.$DistrictPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DistrictMembership model
+   */
+  interface DistrictMembershipFieldRefs {
+    readonly id: FieldRef<"DistrictMembership", 'String'>
+    readonly userId: FieldRef<"DistrictMembership", 'String'>
+    readonly districtId: FieldRef<"DistrictMembership", 'String'>
+    readonly role: FieldRef<"DistrictMembership", 'Role'>
+    readonly createdAt: FieldRef<"DistrictMembership", 'DateTime'>
+    readonly updatedAt: FieldRef<"DistrictMembership", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DistrictMembership findUnique
+   */
+  export type DistrictMembershipFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which DistrictMembership to fetch.
+     */
+    where: DistrictMembershipWhereUniqueInput
+  }
+
+  /**
+   * DistrictMembership findUniqueOrThrow
+   */
+  export type DistrictMembershipFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which DistrictMembership to fetch.
+     */
+    where: DistrictMembershipWhereUniqueInput
+  }
+
+  /**
+   * DistrictMembership findFirst
+   */
+  export type DistrictMembershipFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which DistrictMembership to fetch.
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DistrictMemberships to fetch.
+     */
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DistrictMemberships.
+     */
+    cursor?: DistrictMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DistrictMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DistrictMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DistrictMemberships.
+     */
+    distinct?: DistrictMembershipScalarFieldEnum | DistrictMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * DistrictMembership findFirstOrThrow
+   */
+  export type DistrictMembershipFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which DistrictMembership to fetch.
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DistrictMemberships to fetch.
+     */
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DistrictMemberships.
+     */
+    cursor?: DistrictMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DistrictMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DistrictMemberships.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DistrictMemberships.
+     */
+    distinct?: DistrictMembershipScalarFieldEnum | DistrictMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * DistrictMembership findMany
+   */
+  export type DistrictMembershipFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter, which DistrictMemberships to fetch.
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DistrictMemberships to fetch.
+     */
+    orderBy?: DistrictMembershipOrderByWithRelationInput | DistrictMembershipOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DistrictMemberships.
+     */
+    cursor?: DistrictMembershipWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DistrictMemberships from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DistrictMemberships.
+     */
+    skip?: number
+    distinct?: DistrictMembershipScalarFieldEnum | DistrictMembershipScalarFieldEnum[]
+  }
+
+  /**
+   * DistrictMembership create
+   */
+  export type DistrictMembershipCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DistrictMembership.
+     */
+    data: XOR<DistrictMembershipCreateInput, DistrictMembershipUncheckedCreateInput>
+  }
+
+  /**
+   * DistrictMembership createMany
+   */
+  export type DistrictMembershipCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DistrictMemberships.
+     */
+    data: DistrictMembershipCreateManyInput | DistrictMembershipCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DistrictMembership createManyAndReturn
+   */
+  export type DistrictMembershipCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * The data used to create many DistrictMemberships.
+     */
+    data: DistrictMembershipCreateManyInput | DistrictMembershipCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DistrictMembership update
+   */
+  export type DistrictMembershipUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DistrictMembership.
+     */
+    data: XOR<DistrictMembershipUpdateInput, DistrictMembershipUncheckedUpdateInput>
+    /**
+     * Choose, which DistrictMembership to update.
+     */
+    where: DistrictMembershipWhereUniqueInput
+  }
+
+  /**
+   * DistrictMembership updateMany
+   */
+  export type DistrictMembershipUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DistrictMemberships.
+     */
+    data: XOR<DistrictMembershipUpdateManyMutationInput, DistrictMembershipUncheckedUpdateManyInput>
+    /**
+     * Filter which DistrictMemberships to update
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * Limit how many DistrictMemberships to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DistrictMembership updateManyAndReturn
+   */
+  export type DistrictMembershipUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * The data used to update DistrictMemberships.
+     */
+    data: XOR<DistrictMembershipUpdateManyMutationInput, DistrictMembershipUncheckedUpdateManyInput>
+    /**
+     * Filter which DistrictMemberships to update
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * Limit how many DistrictMemberships to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DistrictMembership upsert
+   */
+  export type DistrictMembershipUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DistrictMembership to update in case it exists.
+     */
+    where: DistrictMembershipWhereUniqueInput
+    /**
+     * In case the DistrictMembership found by the `where` argument doesn't exist, create a new DistrictMembership with this data.
+     */
+    create: XOR<DistrictMembershipCreateInput, DistrictMembershipUncheckedCreateInput>
+    /**
+     * In case the DistrictMembership was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DistrictMembershipUpdateInput, DistrictMembershipUncheckedUpdateInput>
+  }
+
+  /**
+   * DistrictMembership delete
+   */
+  export type DistrictMembershipDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
+    /**
+     * Filter which DistrictMembership to delete.
+     */
+    where: DistrictMembershipWhereUniqueInput
+  }
+
+  /**
+   * DistrictMembership deleteMany
+   */
+  export type DistrictMembershipDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DistrictMemberships to delete
+     */
+    where?: DistrictMembershipWhereInput
+    /**
+     * Limit how many DistrictMemberships to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DistrictMembership without action
+   */
+  export type DistrictMembershipDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictMembership
+     */
+    select?: DistrictMembershipSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DistrictMembership
+     */
+    omit?: DistrictMembershipOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DistrictMembershipInclude<ExtArgs> | null
   }
 
 
@@ -19637,8 +22105,19 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const DistrictScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DistrictScalarFieldEnum = (typeof DistrictScalarFieldEnum)[keyof typeof DistrictScalarFieldEnum]
+
+
   export const SchoolScalarFieldEnum: {
     id: 'id',
+    districtId: 'districtId',
     name: 'name',
     closedDays: 'closedDays',
     openerCount: 'openerCount',
@@ -19818,6 +22297,7 @@ export namespace Prisma {
     email: 'email',
     passwordHash: 'passwordHash',
     displayName: 'displayName',
+    isSuperUser: 'isSuperUser',
     status: 'status',
     failedLoginAttempts: 'failedLoginAttempts',
     lockoutUntil: 'lockoutUntil',
@@ -19827,6 +22307,18 @@ export namespace Prisma {
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const DistrictMembershipScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    districtId: 'districtId',
+    role: 'role',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DistrictMembershipScalarFieldEnum = (typeof DistrictMembershipScalarFieldEnum)[keyof typeof DistrictMembershipScalarFieldEnum]
 
 
   export const SchoolMembershipScalarFieldEnum: {
@@ -19924,6 +22416,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -19955,20 +22461,6 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime[]'
-   */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -20017,11 +22509,65 @@ export namespace Prisma {
    */
 
 
+  export type DistrictWhereInput = {
+    AND?: DistrictWhereInput | DistrictWhereInput[]
+    OR?: DistrictWhereInput[]
+    NOT?: DistrictWhereInput | DistrictWhereInput[]
+    id?: StringFilter<"District"> | string
+    name?: StringFilter<"District"> | string
+    createdAt?: DateTimeFilter<"District"> | Date | string
+    updatedAt?: DateTimeFilter<"District"> | Date | string
+    schools?: SchoolListRelationFilter
+    memberships?: DistrictMembershipListRelationFilter
+  }
+
+  export type DistrictOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    schools?: SchoolOrderByRelationAggregateInput
+    memberships?: DistrictMembershipOrderByRelationAggregateInput
+  }
+
+  export type DistrictWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DistrictWhereInput | DistrictWhereInput[]
+    OR?: DistrictWhereInput[]
+    NOT?: DistrictWhereInput | DistrictWhereInput[]
+    name?: StringFilter<"District"> | string
+    createdAt?: DateTimeFilter<"District"> | Date | string
+    updatedAt?: DateTimeFilter<"District"> | Date | string
+    schools?: SchoolListRelationFilter
+    memberships?: DistrictMembershipListRelationFilter
+  }, "id">
+
+  export type DistrictOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DistrictCountOrderByAggregateInput
+    _max?: DistrictMaxOrderByAggregateInput
+    _min?: DistrictMinOrderByAggregateInput
+  }
+
+  export type DistrictScalarWhereWithAggregatesInput = {
+    AND?: DistrictScalarWhereWithAggregatesInput | DistrictScalarWhereWithAggregatesInput[]
+    OR?: DistrictScalarWhereWithAggregatesInput[]
+    NOT?: DistrictScalarWhereWithAggregatesInput | DistrictScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"District"> | string
+    name?: StringWithAggregatesFilter<"District"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"District"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"District"> | Date | string
+  }
+
   export type SchoolWhereInput = {
     AND?: SchoolWhereInput | SchoolWhereInput[]
     OR?: SchoolWhereInput[]
     NOT?: SchoolWhereInput | SchoolWhereInput[]
     id?: StringFilter<"School"> | string
+    districtId?: StringFilter<"School"> | string
     name?: StringFilter<"School"> | string
     closedDays?: JsonFilter<"School">
     openerCount?: IntFilter<"School"> | number
@@ -20037,10 +22583,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeListRelationFilter
     scheduleWeeks?: ScheduleWeekListRelationFilter
     memberships?: SchoolMembershipListRelationFilter
+    district?: XOR<DistrictScalarRelationFilter, DistrictWhereInput>
   }
 
   export type SchoolOrderByWithRelationInput = {
     id?: SortOrder
+    districtId?: SortOrder
     name?: SortOrder
     closedDays?: SortOrder
     openerCount?: SortOrder
@@ -20056,6 +22604,7 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeOrderByRelationAggregateInput
     scheduleWeeks?: ScheduleWeekOrderByRelationAggregateInput
     memberships?: SchoolMembershipOrderByRelationAggregateInput
+    district?: DistrictOrderByWithRelationInput
   }
 
   export type SchoolWhereUniqueInput = Prisma.AtLeast<{
@@ -20063,6 +22612,7 @@ export namespace Prisma {
     AND?: SchoolWhereInput | SchoolWhereInput[]
     OR?: SchoolWhereInput[]
     NOT?: SchoolWhereInput | SchoolWhereInput[]
+    districtId?: StringFilter<"School"> | string
     name?: StringFilter<"School"> | string
     closedDays?: JsonFilter<"School">
     openerCount?: IntFilter<"School"> | number
@@ -20078,10 +22628,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeListRelationFilter
     scheduleWeeks?: ScheduleWeekListRelationFilter
     memberships?: SchoolMembershipListRelationFilter
+    district?: XOR<DistrictScalarRelationFilter, DistrictWhereInput>
   }, "id">
 
   export type SchoolOrderByWithAggregationInput = {
     id?: SortOrder
+    districtId?: SortOrder
     name?: SortOrder
     closedDays?: SortOrder
     openerCount?: SortOrder
@@ -20102,6 +22654,7 @@ export namespace Prisma {
     OR?: SchoolScalarWhereWithAggregatesInput[]
     NOT?: SchoolScalarWhereWithAggregatesInput | SchoolScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"School"> | string
+    districtId?: StringWithAggregatesFilter<"School"> | string
     name?: StringWithAggregatesFilter<"School"> | string
     closedDays?: JsonWithAggregatesFilter<"School">
     openerCount?: IntWithAggregatesFilter<"School"> | number
@@ -20957,12 +23510,14 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
     displayName?: StringFilter<"User"> | string
+    isSuperUser?: BoolFilter<"User"> | boolean
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     failedLoginAttempts?: IntFilter<"User"> | number
     lockoutUntil?: DateTimeNullableFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    districtMemberships?: DistrictMembershipListRelationFilter
     memberships?: SchoolMembershipListRelationFilter
     sessions?: SessionListRelationFilter
   }
@@ -20972,12 +23527,14 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     displayName?: SortOrder
+    isSuperUser?: SortOrder
     status?: SortOrder
     failedLoginAttempts?: SortOrder
     lockoutUntil?: SortOrderInput | SortOrder
     lastLoginAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    districtMemberships?: DistrictMembershipOrderByRelationAggregateInput
     memberships?: SchoolMembershipOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
   }
@@ -20990,12 +23547,14 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     displayName?: StringFilter<"User"> | string
+    isSuperUser?: BoolFilter<"User"> | boolean
     status?: EnumUserStatusFilter<"User"> | $Enums.UserStatus
     failedLoginAttempts?: IntFilter<"User"> | number
     lockoutUntil?: DateTimeNullableFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    districtMemberships?: DistrictMembershipListRelationFilter
     memberships?: SchoolMembershipListRelationFilter
     sessions?: SessionListRelationFilter
   }, "id" | "email">
@@ -21005,6 +23564,7 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     displayName?: SortOrder
+    isSuperUser?: SortOrder
     status?: SortOrder
     failedLoginAttempts?: SortOrder
     lockoutUntil?: SortOrderInput | SortOrder
@@ -21026,12 +23586,77 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     displayName?: StringWithAggregatesFilter<"User"> | string
+    isSuperUser?: BoolWithAggregatesFilter<"User"> | boolean
     status?: EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
     failedLoginAttempts?: IntWithAggregatesFilter<"User"> | number
     lockoutUntil?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     lastLoginAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type DistrictMembershipWhereInput = {
+    AND?: DistrictMembershipWhereInput | DistrictMembershipWhereInput[]
+    OR?: DistrictMembershipWhereInput[]
+    NOT?: DistrictMembershipWhereInput | DistrictMembershipWhereInput[]
+    id?: StringFilter<"DistrictMembership"> | string
+    userId?: StringFilter<"DistrictMembership"> | string
+    districtId?: StringFilter<"DistrictMembership"> | string
+    role?: EnumRoleFilter<"DistrictMembership"> | $Enums.Role
+    createdAt?: DateTimeFilter<"DistrictMembership"> | Date | string
+    updatedAt?: DateTimeFilter<"DistrictMembership"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    district?: XOR<DistrictScalarRelationFilter, DistrictWhereInput>
+  }
+
+  export type DistrictMembershipOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    districtId?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    district?: DistrictOrderByWithRelationInput
+  }
+
+  export type DistrictMembershipWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_districtId?: DistrictMembershipUserIdDistrictIdCompoundUniqueInput
+    AND?: DistrictMembershipWhereInput | DistrictMembershipWhereInput[]
+    OR?: DistrictMembershipWhereInput[]
+    NOT?: DistrictMembershipWhereInput | DistrictMembershipWhereInput[]
+    userId?: StringFilter<"DistrictMembership"> | string
+    districtId?: StringFilter<"DistrictMembership"> | string
+    role?: EnumRoleFilter<"DistrictMembership"> | $Enums.Role
+    createdAt?: DateTimeFilter<"DistrictMembership"> | Date | string
+    updatedAt?: DateTimeFilter<"DistrictMembership"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    district?: XOR<DistrictScalarRelationFilter, DistrictWhereInput>
+  }, "id" | "userId_districtId">
+
+  export type DistrictMembershipOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    districtId?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DistrictMembershipCountOrderByAggregateInput
+    _max?: DistrictMembershipMaxOrderByAggregateInput
+    _min?: DistrictMembershipMinOrderByAggregateInput
+  }
+
+  export type DistrictMembershipScalarWhereWithAggregatesInput = {
+    AND?: DistrictMembershipScalarWhereWithAggregatesInput | DistrictMembershipScalarWhereWithAggregatesInput[]
+    OR?: DistrictMembershipScalarWhereWithAggregatesInput[]
+    NOT?: DistrictMembershipScalarWhereWithAggregatesInput | DistrictMembershipScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DistrictMembership"> | string
+    userId?: StringWithAggregatesFilter<"DistrictMembership"> | string
+    districtId?: StringWithAggregatesFilter<"DistrictMembership"> | string
+    role?: EnumRoleWithAggregatesFilter<"DistrictMembership"> | $Enums.Role
+    createdAt?: DateTimeWithAggregatesFilter<"DistrictMembership"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DistrictMembership"> | Date | string
   }
 
   export type SchoolMembershipWhereInput = {
@@ -21173,6 +23798,63 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
   }
 
+  export type DistrictCreateInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    schools?: SchoolCreateNestedManyWithoutDistrictInput
+    memberships?: DistrictMembershipCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictUncheckedCreateInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    schools?: SchoolUncheckedCreateNestedManyWithoutDistrictInput
+    memberships?: DistrictMembershipUncheckedCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    schools?: SchoolUpdateManyWithoutDistrictNestedInput
+    memberships?: DistrictMembershipUpdateManyWithoutDistrictNestedInput
+  }
+
+  export type DistrictUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    schools?: SchoolUncheckedUpdateManyWithoutDistrictNestedInput
+    memberships?: DistrictMembershipUncheckedUpdateManyWithoutDistrictNestedInput
+  }
+
+  export type DistrictCreateManyInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SchoolCreateInput = {
     id?: string
     name: string
@@ -21190,10 +23872,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -21228,10 +23912,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -21251,6 +23937,7 @@ export namespace Prisma {
 
   export type SchoolCreateManyInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -21275,6 +23962,7 @@ export namespace Prisma {
 
   export type SchoolUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -22198,12 +24886,14 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipCreateNestedManyWithoutUserInput
     memberships?: SchoolMembershipCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
@@ -22213,12 +24903,14 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipUncheckedCreateNestedManyWithoutUserInput
     memberships?: SchoolMembershipUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -22228,12 +24920,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUpdateManyWithoutUserNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
@@ -22243,12 +24937,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUncheckedUpdateManyWithoutUserNestedInput
     memberships?: SchoolMembershipUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -22258,6 +24954,7 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
@@ -22271,6 +24968,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22284,10 +24982,72 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipCreateInput = {
+    id?: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDistrictMembershipsInput
+    district: DistrictCreateNestedOneWithoutMembershipsInput
+  }
+
+  export type DistrictMembershipUncheckedCreateInput = {
+    id?: string
+    userId: string
+    districtId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDistrictMembershipsNestedInput
+    district?: DistrictUpdateOneRequiredWithoutMembershipsNestedInput
+  }
+
+  export type DistrictMembershipUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipCreateManyInput = {
+    id?: string
+    userId: string
+    districtId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22450,6 +25210,90 @@ export namespace Prisma {
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type SchoolListRelationFilter = {
+    every?: SchoolWhereInput
+    some?: SchoolWhereInput
+    none?: SchoolWhereInput
+  }
+
+  export type DistrictMembershipListRelationFilter = {
+    every?: DistrictMembershipWhereInput
+    some?: DistrictMembershipWhereInput
+    none?: DistrictMembershipWhereInput
+  }
+
+  export type SchoolOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DistrictMembershipOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DistrictCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DistrictMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DistrictMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -22488,17 +25332,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type ScheduleTypeListRelationFilter = {
@@ -22543,6 +25376,11 @@ export namespace Prisma {
     none?: SchoolMembershipWhereInput
   }
 
+  export type DistrictScalarRelationFilter = {
+    is?: DistrictWhereInput
+    isNot?: DistrictWhereInput
+  }
+
   export type ScheduleTypeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -22573,6 +25411,7 @@ export namespace Prisma {
 
   export type SchoolCountOrderByAggregateInput = {
     id?: SortOrder
+    districtId?: SortOrder
     name?: SortOrder
     closedDays?: SortOrder
     openerCount?: SortOrder
@@ -22591,6 +25430,7 @@ export namespace Prisma {
 
   export type SchoolMaxOrderByAggregateInput = {
     id?: SortOrder
+    districtId?: SortOrder
     name?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
@@ -22602,6 +25442,7 @@ export namespace Prisma {
 
   export type SchoolMinOrderByAggregateInput = {
     id?: SortOrder
+    districtId?: SortOrder
     name?: SortOrder
     openerCount?: SortOrder
     closerCount?: SortOrder
@@ -22615,24 +25456,6 @@ export namespace Prisma {
     openerCount?: SortOrder
     closerCount?: SortOrder
     minimumMedicalDelegated?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[] | ListStringFieldRefInput<$PrismaModel>
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22683,20 +25506,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type StringNullableFilter<$PrismaModel = never> = {
@@ -23360,6 +26169,7 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     displayName?: SortOrder
+    isSuperUser?: SortOrder
     status?: SortOrder
     failedLoginAttempts?: SortOrder
     lockoutUntil?: SortOrder
@@ -23377,6 +26187,7 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     displayName?: SortOrder
+    isSuperUser?: SortOrder
     status?: SortOrder
     failedLoginAttempts?: SortOrder
     lockoutUntil?: SortOrder
@@ -23390,6 +26201,7 @@ export namespace Prisma {
     email?: SortOrder
     passwordHash?: SortOrder
     displayName?: SortOrder
+    isSuperUser?: SortOrder
     status?: SortOrder
     failedLoginAttempts?: SortOrder
     lockoutUntil?: SortOrder
@@ -23424,6 +26236,48 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type DistrictMembershipUserIdDistrictIdCompoundUniqueInput = {
+    userId: string
+    districtId: string
+  }
+
+  export type DistrictMembershipCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    districtId?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DistrictMembershipMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    districtId?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DistrictMembershipMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    districtId?: SortOrder
+    role?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRoleFilter<$PrismaModel>
+    _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
   export type SchoolMembershipUserIdSchoolIdCompoundUniqueInput = {
     userId: string
     schoolId: string
@@ -23454,16 +26308,6 @@ export namespace Prisma {
     role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-  }
-
-  export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRoleFilter<$PrismaModel>
-    _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
   export type SessionCountOrderByAggregateInput = {
@@ -23500,6 +26344,98 @@ export namespace Prisma {
     userAgent?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SchoolCreateNestedManyWithoutDistrictInput = {
+    create?: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput> | SchoolCreateWithoutDistrictInput[] | SchoolUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: SchoolCreateOrConnectWithoutDistrictInput | SchoolCreateOrConnectWithoutDistrictInput[]
+    createMany?: SchoolCreateManyDistrictInputEnvelope
+    connect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+  }
+
+  export type DistrictMembershipCreateNestedManyWithoutDistrictInput = {
+    create?: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput> | DistrictMembershipCreateWithoutDistrictInput[] | DistrictMembershipUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutDistrictInput | DistrictMembershipCreateOrConnectWithoutDistrictInput[]
+    createMany?: DistrictMembershipCreateManyDistrictInputEnvelope
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+  }
+
+  export type SchoolUncheckedCreateNestedManyWithoutDistrictInput = {
+    create?: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput> | SchoolCreateWithoutDistrictInput[] | SchoolUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: SchoolCreateOrConnectWithoutDistrictInput | SchoolCreateOrConnectWithoutDistrictInput[]
+    createMany?: SchoolCreateManyDistrictInputEnvelope
+    connect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+  }
+
+  export type DistrictMembershipUncheckedCreateNestedManyWithoutDistrictInput = {
+    create?: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput> | DistrictMembershipCreateWithoutDistrictInput[] | DistrictMembershipUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutDistrictInput | DistrictMembershipCreateOrConnectWithoutDistrictInput[]
+    createMany?: DistrictMembershipCreateManyDistrictInputEnvelope
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type SchoolUpdateManyWithoutDistrictNestedInput = {
+    create?: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput> | SchoolCreateWithoutDistrictInput[] | SchoolUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: SchoolCreateOrConnectWithoutDistrictInput | SchoolCreateOrConnectWithoutDistrictInput[]
+    upsert?: SchoolUpsertWithWhereUniqueWithoutDistrictInput | SchoolUpsertWithWhereUniqueWithoutDistrictInput[]
+    createMany?: SchoolCreateManyDistrictInputEnvelope
+    set?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    disconnect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    delete?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    connect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    update?: SchoolUpdateWithWhereUniqueWithoutDistrictInput | SchoolUpdateWithWhereUniqueWithoutDistrictInput[]
+    updateMany?: SchoolUpdateManyWithWhereWithoutDistrictInput | SchoolUpdateManyWithWhereWithoutDistrictInput[]
+    deleteMany?: SchoolScalarWhereInput | SchoolScalarWhereInput[]
+  }
+
+  export type DistrictMembershipUpdateManyWithoutDistrictNestedInput = {
+    create?: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput> | DistrictMembershipCreateWithoutDistrictInput[] | DistrictMembershipUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutDistrictInput | DistrictMembershipCreateOrConnectWithoutDistrictInput[]
+    upsert?: DistrictMembershipUpsertWithWhereUniqueWithoutDistrictInput | DistrictMembershipUpsertWithWhereUniqueWithoutDistrictInput[]
+    createMany?: DistrictMembershipCreateManyDistrictInputEnvelope
+    set?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    disconnect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    delete?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    update?: DistrictMembershipUpdateWithWhereUniqueWithoutDistrictInput | DistrictMembershipUpdateWithWhereUniqueWithoutDistrictInput[]
+    updateMany?: DistrictMembershipUpdateManyWithWhereWithoutDistrictInput | DistrictMembershipUpdateManyWithWhereWithoutDistrictInput[]
+    deleteMany?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
+  }
+
+  export type SchoolUncheckedUpdateManyWithoutDistrictNestedInput = {
+    create?: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput> | SchoolCreateWithoutDistrictInput[] | SchoolUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: SchoolCreateOrConnectWithoutDistrictInput | SchoolCreateOrConnectWithoutDistrictInput[]
+    upsert?: SchoolUpsertWithWhereUniqueWithoutDistrictInput | SchoolUpsertWithWhereUniqueWithoutDistrictInput[]
+    createMany?: SchoolCreateManyDistrictInputEnvelope
+    set?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    disconnect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    delete?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    connect?: SchoolWhereUniqueInput | SchoolWhereUniqueInput[]
+    update?: SchoolUpdateWithWhereUniqueWithoutDistrictInput | SchoolUpdateWithWhereUniqueWithoutDistrictInput[]
+    updateMany?: SchoolUpdateManyWithWhereWithoutDistrictInput | SchoolUpdateManyWithWhereWithoutDistrictInput[]
+    deleteMany?: SchoolScalarWhereInput | SchoolScalarWhereInput[]
+  }
+
+  export type DistrictMembershipUncheckedUpdateManyWithoutDistrictNestedInput = {
+    create?: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput> | DistrictMembershipCreateWithoutDistrictInput[] | DistrictMembershipUncheckedCreateWithoutDistrictInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutDistrictInput | DistrictMembershipCreateOrConnectWithoutDistrictInput[]
+    upsert?: DistrictMembershipUpsertWithWhereUniqueWithoutDistrictInput | DistrictMembershipUpsertWithWhereUniqueWithoutDistrictInput[]
+    createMany?: DistrictMembershipCreateManyDistrictInputEnvelope
+    set?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    disconnect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    delete?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    update?: DistrictMembershipUpdateWithWhereUniqueWithoutDistrictInput | DistrictMembershipUpdateWithWhereUniqueWithoutDistrictInput[]
+    updateMany?: DistrictMembershipUpdateManyWithWhereWithoutDistrictInput | DistrictMembershipUpdateManyWithWhereWithoutDistrictInput[]
+    deleteMany?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
   }
 
   export type ScheduleTypeCreateNestedManyWithoutSchoolInput = {
@@ -23551,6 +26487,12 @@ export namespace Prisma {
     connect?: SchoolMembershipWhereUniqueInput | SchoolMembershipWhereUniqueInput[]
   }
 
+  export type DistrictCreateNestedOneWithoutSchoolsInput = {
+    create?: XOR<DistrictCreateWithoutSchoolsInput, DistrictUncheckedCreateWithoutSchoolsInput>
+    connectOrCreate?: DistrictCreateOrConnectWithoutSchoolsInput
+    connect?: DistrictWhereUniqueInput
+  }
+
   export type ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput = {
     create?: XOR<ScheduleTypeCreateWithoutSchoolInput, ScheduleTypeUncheckedCreateWithoutSchoolInput> | ScheduleTypeCreateWithoutSchoolInput[] | ScheduleTypeUncheckedCreateWithoutSchoolInput[]
     connectOrCreate?: ScheduleTypeCreateOrConnectWithoutSchoolInput | ScheduleTypeCreateOrConnectWithoutSchoolInput[]
@@ -23600,10 +26542,6 @@ export namespace Prisma {
     connect?: SchoolMembershipWhereUniqueInput | SchoolMembershipWhereUniqueInput[]
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -23614,10 +26552,6 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type ScheduleTypeUpdateManyWithoutSchoolNestedInput = {
@@ -23716,6 +26650,14 @@ export namespace Prisma {
     update?: SchoolMembershipUpdateWithWhereUniqueWithoutSchoolInput | SchoolMembershipUpdateWithWhereUniqueWithoutSchoolInput[]
     updateMany?: SchoolMembershipUpdateManyWithWhereWithoutSchoolInput | SchoolMembershipUpdateManyWithWhereWithoutSchoolInput[]
     deleteMany?: SchoolMembershipScalarWhereInput | SchoolMembershipScalarWhereInput[]
+  }
+
+  export type DistrictUpdateOneRequiredWithoutSchoolsNestedInput = {
+    create?: XOR<DistrictCreateWithoutSchoolsInput, DistrictUncheckedCreateWithoutSchoolsInput>
+    connectOrCreate?: DistrictCreateOrConnectWithoutSchoolsInput
+    upsert?: DistrictUpsertWithoutSchoolsInput
+    connect?: DistrictWhereUniqueInput
+    update?: XOR<XOR<DistrictUpdateToOneWithWhereWithoutSchoolsInput, DistrictUpdateWithoutSchoolsInput>, DistrictUncheckedUpdateWithoutSchoolsInput>
   }
 
   export type ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput = {
@@ -24252,6 +27194,13 @@ export namespace Prisma {
     update?: XOR<XOR<ScheduleWeekUpdateToOneWithWhereWithoutAuditEventsInput, ScheduleWeekUpdateWithoutAuditEventsInput>, ScheduleWeekUncheckedUpdateWithoutAuditEventsInput>
   }
 
+  export type DistrictMembershipCreateNestedManyWithoutUserInput = {
+    create?: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput> | DistrictMembershipCreateWithoutUserInput[] | DistrictMembershipUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutUserInput | DistrictMembershipCreateOrConnectWithoutUserInput[]
+    createMany?: DistrictMembershipCreateManyUserInputEnvelope
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+  }
+
   export type SchoolMembershipCreateNestedManyWithoutUserInput = {
     create?: XOR<SchoolMembershipCreateWithoutUserInput, SchoolMembershipUncheckedCreateWithoutUserInput> | SchoolMembershipCreateWithoutUserInput[] | SchoolMembershipUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SchoolMembershipCreateOrConnectWithoutUserInput | SchoolMembershipCreateOrConnectWithoutUserInput[]
@@ -24264,6 +27213,13 @@ export namespace Prisma {
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
     createMany?: SessionCreateManyUserInputEnvelope
     connect?: SessionWhereUniqueInput | SessionWhereUniqueInput[]
+  }
+
+  export type DistrictMembershipUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput> | DistrictMembershipCreateWithoutUserInput[] | DistrictMembershipUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutUserInput | DistrictMembershipCreateOrConnectWithoutUserInput[]
+    createMany?: DistrictMembershipCreateManyUserInputEnvelope
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
   }
 
   export type SchoolMembershipUncheckedCreateNestedManyWithoutUserInput = {
@@ -24282,6 +27238,20 @@ export namespace Prisma {
 
   export type EnumUserStatusFieldUpdateOperationsInput = {
     set?: $Enums.UserStatus
+  }
+
+  export type DistrictMembershipUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput> | DistrictMembershipCreateWithoutUserInput[] | DistrictMembershipUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutUserInput | DistrictMembershipCreateOrConnectWithoutUserInput[]
+    upsert?: DistrictMembershipUpsertWithWhereUniqueWithoutUserInput | DistrictMembershipUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DistrictMembershipCreateManyUserInputEnvelope
+    set?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    disconnect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    delete?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    update?: DistrictMembershipUpdateWithWhereUniqueWithoutUserInput | DistrictMembershipUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DistrictMembershipUpdateManyWithWhereWithoutUserInput | DistrictMembershipUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
   }
 
   export type SchoolMembershipUpdateManyWithoutUserNestedInput = {
@@ -24312,6 +27282,20 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
+  export type DistrictMembershipUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput> | DistrictMembershipCreateWithoutUserInput[] | DistrictMembershipUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DistrictMembershipCreateOrConnectWithoutUserInput | DistrictMembershipCreateOrConnectWithoutUserInput[]
+    upsert?: DistrictMembershipUpsertWithWhereUniqueWithoutUserInput | DistrictMembershipUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DistrictMembershipCreateManyUserInputEnvelope
+    set?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    disconnect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    delete?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    connect?: DistrictMembershipWhereUniqueInput | DistrictMembershipWhereUniqueInput[]
+    update?: DistrictMembershipUpdateWithWhereUniqueWithoutUserInput | DistrictMembershipUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DistrictMembershipUpdateManyWithWhereWithoutUserInput | DistrictMembershipUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
+  }
+
   export type SchoolMembershipUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SchoolMembershipCreateWithoutUserInput, SchoolMembershipUncheckedCreateWithoutUserInput> | SchoolMembershipCreateWithoutUserInput[] | SchoolMembershipUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SchoolMembershipCreateOrConnectWithoutUserInput | SchoolMembershipCreateOrConnectWithoutUserInput[]
@@ -24340,6 +27324,38 @@ export namespace Prisma {
     deleteMany?: SessionScalarWhereInput | SessionScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutDistrictMembershipsInput = {
+    create?: XOR<UserCreateWithoutDistrictMembershipsInput, UserUncheckedCreateWithoutDistrictMembershipsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDistrictMembershipsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type DistrictCreateNestedOneWithoutMembershipsInput = {
+    create?: XOR<DistrictCreateWithoutMembershipsInput, DistrictUncheckedCreateWithoutMembershipsInput>
+    connectOrCreate?: DistrictCreateOrConnectWithoutMembershipsInput
+    connect?: DistrictWhereUniqueInput
+  }
+
+  export type EnumRoleFieldUpdateOperationsInput = {
+    set?: $Enums.Role
+  }
+
+  export type UserUpdateOneRequiredWithoutDistrictMembershipsNestedInput = {
+    create?: XOR<UserCreateWithoutDistrictMembershipsInput, UserUncheckedCreateWithoutDistrictMembershipsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDistrictMembershipsInput
+    upsert?: UserUpsertWithoutDistrictMembershipsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDistrictMembershipsInput, UserUpdateWithoutDistrictMembershipsInput>, UserUncheckedUpdateWithoutDistrictMembershipsInput>
+  }
+
+  export type DistrictUpdateOneRequiredWithoutMembershipsNestedInput = {
+    create?: XOR<DistrictCreateWithoutMembershipsInput, DistrictUncheckedCreateWithoutMembershipsInput>
+    connectOrCreate?: DistrictCreateOrConnectWithoutMembershipsInput
+    upsert?: DistrictUpsertWithoutMembershipsInput
+    connect?: DistrictWhereUniqueInput
+    update?: XOR<XOR<DistrictUpdateToOneWithWhereWithoutMembershipsInput, DistrictUpdateWithoutMembershipsInput>, DistrictUncheckedUpdateWithoutMembershipsInput>
+  }
+
   export type UserCreateNestedOneWithoutMembershipsInput = {
     create?: XOR<UserCreateWithoutMembershipsInput, UserUncheckedCreateWithoutMembershipsInput>
     connectOrCreate?: UserCreateOrConnectWithoutMembershipsInput
@@ -24350,10 +27366,6 @@ export namespace Prisma {
     create?: XOR<SchoolCreateWithoutMembershipsInput, SchoolUncheckedCreateWithoutMembershipsInput>
     connectOrCreate?: SchoolCreateOrConnectWithoutMembershipsInput
     connect?: SchoolWhereUniqueInput
-  }
-
-  export type EnumRoleFieldUpdateOperationsInput = {
-    set?: $Enums.Role
   }
 
   export type UserUpdateOneRequiredWithoutMembershipsNestedInput = {
@@ -24400,22 +27412,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -24442,6 +27438,36 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -24500,20 +27526,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -24665,6 +27677,140 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type SchoolCreateWithoutDistrictInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+    memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolUncheckedCreateWithoutDistrictInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+    memberships?: SchoolMembershipUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutDistrictInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput>
+  }
+
+  export type SchoolCreateManyDistrictInputEnvelope = {
+    data: SchoolCreateManyDistrictInput | SchoolCreateManyDistrictInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DistrictMembershipCreateWithoutDistrictInput = {
+    id?: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutDistrictMembershipsInput
+  }
+
+  export type DistrictMembershipUncheckedCreateWithoutDistrictInput = {
+    id?: string
+    userId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipCreateOrConnectWithoutDistrictInput = {
+    where: DistrictMembershipWhereUniqueInput
+    create: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput>
+  }
+
+  export type DistrictMembershipCreateManyDistrictInputEnvelope = {
+    data: DistrictMembershipCreateManyDistrictInput | DistrictMembershipCreateManyDistrictInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SchoolUpsertWithWhereUniqueWithoutDistrictInput = {
+    where: SchoolWhereUniqueInput
+    update: XOR<SchoolUpdateWithoutDistrictInput, SchoolUncheckedUpdateWithoutDistrictInput>
+    create: XOR<SchoolCreateWithoutDistrictInput, SchoolUncheckedCreateWithoutDistrictInput>
+  }
+
+  export type SchoolUpdateWithWhereUniqueWithoutDistrictInput = {
+    where: SchoolWhereUniqueInput
+    data: XOR<SchoolUpdateWithoutDistrictInput, SchoolUncheckedUpdateWithoutDistrictInput>
+  }
+
+  export type SchoolUpdateManyWithWhereWithoutDistrictInput = {
+    where: SchoolScalarWhereInput
+    data: XOR<SchoolUpdateManyMutationInput, SchoolUncheckedUpdateManyWithoutDistrictInput>
+  }
+
+  export type SchoolScalarWhereInput = {
+    AND?: SchoolScalarWhereInput | SchoolScalarWhereInput[]
+    OR?: SchoolScalarWhereInput[]
+    NOT?: SchoolScalarWhereInput | SchoolScalarWhereInput[]
+    id?: StringFilter<"School"> | string
+    districtId?: StringFilter<"School"> | string
+    name?: StringFilter<"School"> | string
+    closedDays?: JsonFilter<"School">
+    openerCount?: IntFilter<"School"> | number
+    closerCount?: IntFilter<"School"> | number
+    minimumMedicalDelegated?: IntFilter<"School"> | number
+    requireCurrentCpr?: BoolFilter<"School"> | boolean
+    createdAt?: DateTimeFilter<"School"> | Date | string
+    updatedAt?: DateTimeFilter<"School"> | Date | string
+  }
+
+  export type DistrictMembershipUpsertWithWhereUniqueWithoutDistrictInput = {
+    where: DistrictMembershipWhereUniqueInput
+    update: XOR<DistrictMembershipUpdateWithoutDistrictInput, DistrictMembershipUncheckedUpdateWithoutDistrictInput>
+    create: XOR<DistrictMembershipCreateWithoutDistrictInput, DistrictMembershipUncheckedCreateWithoutDistrictInput>
+  }
+
+  export type DistrictMembershipUpdateWithWhereUniqueWithoutDistrictInput = {
+    where: DistrictMembershipWhereUniqueInput
+    data: XOR<DistrictMembershipUpdateWithoutDistrictInput, DistrictMembershipUncheckedUpdateWithoutDistrictInput>
+  }
+
+  export type DistrictMembershipUpdateManyWithWhereWithoutDistrictInput = {
+    where: DistrictMembershipScalarWhereInput
+    data: XOR<DistrictMembershipUpdateManyMutationInput, DistrictMembershipUncheckedUpdateManyWithoutDistrictInput>
+  }
+
+  export type DistrictMembershipScalarWhereInput = {
+    AND?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
+    OR?: DistrictMembershipScalarWhereInput[]
+    NOT?: DistrictMembershipScalarWhereInput | DistrictMembershipScalarWhereInput[]
+    id?: StringFilter<"DistrictMembership"> | string
+    userId?: StringFilter<"DistrictMembership"> | string
+    districtId?: StringFilter<"DistrictMembership"> | string
+    role?: EnumRoleFilter<"DistrictMembership"> | $Enums.Role
+    createdAt?: DateTimeFilter<"DistrictMembership"> | Date | string
+    updatedAt?: DateTimeFilter<"DistrictMembership"> | Date | string
   }
 
   export type ScheduleTypeCreateWithoutSchoolInput = {
@@ -24879,6 +28025,27 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DistrictCreateWithoutSchoolsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    memberships?: DistrictMembershipCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictUncheckedCreateWithoutSchoolsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    memberships?: DistrictMembershipUncheckedCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictCreateOrConnectWithoutSchoolsInput = {
+    where: DistrictWhereUniqueInput
+    create: XOR<DistrictCreateWithoutSchoolsInput, DistrictUncheckedCreateWithoutSchoolsInput>
+  }
+
   export type ScheduleTypeUpsertWithWhereUniqueWithoutSchoolInput = {
     where: ScheduleTypeWhereUniqueInput
     update: XOR<ScheduleTypeUpdateWithoutSchoolInput, ScheduleTypeUncheckedUpdateWithoutSchoolInput>
@@ -25085,6 +28252,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"SchoolMembership"> | Date | string
   }
 
+  export type DistrictUpsertWithoutSchoolsInput = {
+    update: XOR<DistrictUpdateWithoutSchoolsInput, DistrictUncheckedUpdateWithoutSchoolsInput>
+    create: XOR<DistrictCreateWithoutSchoolsInput, DistrictUncheckedCreateWithoutSchoolsInput>
+    where?: DistrictWhereInput
+  }
+
+  export type DistrictUpdateToOneWithWhereWithoutSchoolsInput = {
+    where?: DistrictWhereInput
+    data: XOR<DistrictUpdateWithoutSchoolsInput, DistrictUncheckedUpdateWithoutSchoolsInput>
+  }
+
+  export type DistrictUpdateWithoutSchoolsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: DistrictMembershipUpdateManyWithoutDistrictNestedInput
+  }
+
+  export type DistrictUncheckedUpdateWithoutSchoolsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: DistrictMembershipUncheckedUpdateManyWithoutDistrictNestedInput
+  }
+
   export type SchoolCreateWithoutScheduleTypesInput = {
     id?: string
     name: string
@@ -25101,10 +28295,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutScheduleTypesInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25153,10 +28349,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutScheduleTypesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -25189,10 +28387,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutJobTitlesInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25241,10 +28441,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutJobTitlesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -25277,10 +28479,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutEmployeesInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25329,10 +28533,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutEmployeesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -25365,10 +28571,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutOperatingHoursInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25417,10 +28625,12 @@ export namespace Prisma {
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutOperatingHoursInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -25453,10 +28663,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutFieldTripTypesInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25505,10 +28717,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutFieldTripTypesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -25541,10 +28755,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutScheduleWeeksInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -25763,10 +28979,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutScheduleWeeksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -26414,6 +29632,32 @@ export namespace Prisma {
     fieldTripEvents?: FieldTripEventUncheckedUpdateManyWithoutScheduleWeekNestedInput
   }
 
+  export type DistrictMembershipCreateWithoutUserInput = {
+    id?: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    district: DistrictCreateNestedOneWithoutMembershipsInput
+  }
+
+  export type DistrictMembershipUncheckedCreateWithoutUserInput = {
+    id?: string
+    districtId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipCreateOrConnectWithoutUserInput = {
+    where: DistrictMembershipWhereUniqueInput
+    create: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput>
+  }
+
+  export type DistrictMembershipCreateManyUserInputEnvelope = {
+    data: DistrictMembershipCreateManyUserInput | DistrictMembershipCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SchoolMembershipCreateWithoutUserInput = {
     id?: string
     role: $Enums.Role
@@ -26472,6 +29716,22 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DistrictMembershipUpsertWithWhereUniqueWithoutUserInput = {
+    where: DistrictMembershipWhereUniqueInput
+    update: XOR<DistrictMembershipUpdateWithoutUserInput, DistrictMembershipUncheckedUpdateWithoutUserInput>
+    create: XOR<DistrictMembershipCreateWithoutUserInput, DistrictMembershipUncheckedCreateWithoutUserInput>
+  }
+
+  export type DistrictMembershipUpdateWithWhereUniqueWithoutUserInput = {
+    where: DistrictMembershipWhereUniqueInput
+    data: XOR<DistrictMembershipUpdateWithoutUserInput, DistrictMembershipUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DistrictMembershipUpdateManyWithWhereWithoutUserInput = {
+    where: DistrictMembershipScalarWhereInput
+    data: XOR<DistrictMembershipUpdateManyMutationInput, DistrictMembershipUncheckedUpdateManyWithoutUserInput>
+  }
+
   export type SchoolMembershipUpsertWithWhereUniqueWithoutUserInput = {
     where: SchoolMembershipWhereUniqueInput
     update: XOR<SchoolMembershipUpdateWithoutUserInput, SchoolMembershipUncheckedUpdateWithoutUserInput>
@@ -26519,17 +29779,147 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Session"> | Date | string
   }
 
-  export type UserCreateWithoutMembershipsInput = {
+  export type UserCreateWithoutDistrictMembershipsInput = {
     id?: string
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    memberships?: SchoolMembershipCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDistrictMembershipsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    displayName: string
+    isSuperUser?: boolean
+    status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    memberships?: SchoolMembershipUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDistrictMembershipsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDistrictMembershipsInput, UserUncheckedCreateWithoutDistrictMembershipsInput>
+  }
+
+  export type DistrictCreateWithoutMembershipsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    schools?: SchoolCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictUncheckedCreateWithoutMembershipsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    schools?: SchoolUncheckedCreateNestedManyWithoutDistrictInput
+  }
+
+  export type DistrictCreateOrConnectWithoutMembershipsInput = {
+    where: DistrictWhereUniqueInput
+    create: XOR<DistrictCreateWithoutMembershipsInput, DistrictUncheckedCreateWithoutMembershipsInput>
+  }
+
+  export type UserUpsertWithoutDistrictMembershipsInput = {
+    update: XOR<UserUpdateWithoutDistrictMembershipsInput, UserUncheckedUpdateWithoutDistrictMembershipsInput>
+    create: XOR<UserCreateWithoutDistrictMembershipsInput, UserUncheckedCreateWithoutDistrictMembershipsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDistrictMembershipsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDistrictMembershipsInput, UserUncheckedUpdateWithoutDistrictMembershipsInput>
+  }
+
+  export type UserUpdateWithoutDistrictMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: SchoolMembershipUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDistrictMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    failedLoginAttempts?: IntFieldUpdateOperationsInput | number
+    lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    memberships?: SchoolMembershipUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type DistrictUpsertWithoutMembershipsInput = {
+    update: XOR<DistrictUpdateWithoutMembershipsInput, DistrictUncheckedUpdateWithoutMembershipsInput>
+    create: XOR<DistrictCreateWithoutMembershipsInput, DistrictUncheckedCreateWithoutMembershipsInput>
+    where?: DistrictWhereInput
+  }
+
+  export type DistrictUpdateToOneWithWhereWithoutMembershipsInput = {
+    where?: DistrictWhereInput
+    data: XOR<DistrictUpdateWithoutMembershipsInput, DistrictUncheckedUpdateWithoutMembershipsInput>
+  }
+
+  export type DistrictUpdateWithoutMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    schools?: SchoolUpdateManyWithoutDistrictNestedInput
+  }
+
+  export type DistrictUncheckedUpdateWithoutMembershipsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    schools?: SchoolUncheckedUpdateManyWithoutDistrictNestedInput
+  }
+
+  export type UserCreateWithoutMembershipsInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    displayName: string
+    isSuperUser?: boolean
+    status?: $Enums.UserStatus
+    failedLoginAttempts?: number
+    lockoutUntil?: Date | string | null
+    lastLoginAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -26538,12 +29928,14 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -26568,10 +29960,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
   }
 
   export type SchoolUncheckedCreateWithoutMembershipsInput = {
     id?: string
+    districtId: string
     name: string
     closedDays: JsonNullValueInput | InputJsonValue
     openerCount: number
@@ -26609,12 +30003,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -26623,12 +30019,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -26659,10 +30057,12 @@ export namespace Prisma {
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
   }
 
   export type SchoolUncheckedUpdateWithoutMembershipsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     closedDays?: JsonNullValueInput | InputJsonValue
     openerCount?: IntFieldUpdateOperationsInput | number
@@ -26684,12 +30084,14 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipCreateNestedManyWithoutUserInput
     memberships?: SchoolMembershipCreateNestedManyWithoutUserInput
   }
 
@@ -26698,12 +30100,14 @@ export namespace Prisma {
     email: string
     passwordHash: string
     displayName: string
+    isSuperUser?: boolean
     status?: $Enums.UserStatus
     failedLoginAttempts?: number
     lockoutUntil?: Date | string | null
     lastLoginAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    districtMemberships?: DistrictMembershipUncheckedCreateNestedManyWithoutUserInput
     memberships?: SchoolMembershipUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -26728,12 +30132,14 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUpdateManyWithoutUserNestedInput
     memberships?: SchoolMembershipUpdateManyWithoutUserNestedInput
   }
 
@@ -26742,13 +30148,109 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
     displayName?: StringFieldUpdateOperationsInput | string
+    isSuperUser?: BoolFieldUpdateOperationsInput | boolean
     status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
     failedLoginAttempts?: IntFieldUpdateOperationsInput | number
     lockoutUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastLoginAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    districtMemberships?: DistrictMembershipUncheckedUpdateManyWithoutUserNestedInput
     memberships?: SchoolMembershipUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SchoolCreateManyDistrictInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipCreateManyDistrictInput = {
+    id?: string
+    userId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SchoolUpdateWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+    memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+    memberships?: SchoolMembershipUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type SchoolUncheckedUpdateManyWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipUpdateWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDistrictMembershipsNestedInput
+  }
+
+  export type DistrictMembershipUncheckedUpdateWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipUncheckedUpdateManyWithoutDistrictInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ScheduleTypeCreateManySchoolInput = {
@@ -27307,6 +30809,14 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type DistrictMembershipCreateManyUserInput = {
+    id?: string
+    districtId: string
+    role: $Enums.Role
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type SchoolMembershipCreateManyUserInput = {
     id?: string
     schoolId: string
@@ -27324,6 +30834,30 @@ export namespace Prisma {
     userAgent?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type DistrictMembershipUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    district?: DistrictUpdateOneRequiredWithoutMembershipsNestedInput
+  }
+
+  export type DistrictMembershipUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DistrictMembershipUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SchoolMembershipUpdateWithoutUserInput = {

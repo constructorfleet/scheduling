@@ -187,15 +187,12 @@ type AuthUserState = {
   displayName: string;
 };
 
-const ROLE_ORDER: Record<Role, number> = {
-  viewer: 1,
-  scheduler: 2,
-  director: 3,
-  owner: 4
-};
+const canEditScheduleForRole = (role: Role | null) =>
+  role !== null &&
+  ["super_user", "district_admin", "district_user", "school_admin", "school_user"].includes(role);
 
-const hasRole = (role: Role | null, required: Role) =>
-  role !== null && ROLE_ORDER[role] >= ROLE_ORDER[required];
+const canManageSettingsForRole = (role: Role | null) =>
+  role !== null && ["super_user", "district_admin", "school_admin"].includes(role);
 
 const USER_POLICY_CITATION: PolicyCitation = {
   id: "ui-audit",
@@ -218,7 +215,7 @@ export default function App() {
     IS_TEST_ENV ? { id: "test-user", email: "test@example.com", displayName: "Test User" } : null
   );
   const [memberships, setMemberships] = useState<SchoolMembership[]>(
-    IS_TEST_ENV ? [{ schoolId: schools[0].id, role: "owner" }] : []
+    IS_TEST_ENV ? [{ schoolId: schools[0].id, role: "super_user" }] : []
   );
   const [loginForm, setLoginForm] = useState<LoginPayload>({ email: "", password: "", schoolId: undefined });
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -301,8 +298,8 @@ export default function App() {
   );
   const currentRole = membershipBySchool.get(selectedSchoolId) ?? null;
   const canViewSchool = currentRole !== null;
-  const canEditSchedule = hasRole(currentRole, "scheduler");
-  const canManageSettings = hasRole(currentRole, "director");
+  const canEditSchedule = canEditScheduleForRole(currentRole);
+  const canManageSettings = canManageSettingsForRole(currentRole);
 
   const makeSnapshot = (
     next: Partial<ScheduleSnapshot> = {},
@@ -840,7 +837,7 @@ export default function App() {
       const response = await login(loginForm);
       setAuthUser(response.user);
       setMemberships(response.memberships ?? []);
-      setSelectedSchoolId(response.currentSchoolId);
+      setSelectedSchoolId(response.currentSchoolId ?? (response.memberships?.[0]?.schoolId ?? schools[0].id));
       setAuthStatus("authenticated");
       setAuthMessage(null);
       setLoginForm((prev) => ({ ...prev, password: "" }));

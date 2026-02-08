@@ -18,9 +18,12 @@ describe("App violation navigator integration", () => {
       user: {
         id: "user-1",
         email: "viewer@example.com",
-        displayName: "Viewer"
+        displayName: "Viewer",
+        isSuperUser: false
       },
-      memberships: [{ schoolId: "school-evergreen", role: "viewer" }]
+      memberships: [{ schoolId: "school-evergreen", role: "school_user" }],
+      schoolMemberships: [{ schoolId: "school-evergreen", role: "school_user" }],
+      districtMemberships: []
     });
     fetchSettingsMock.mockResolvedValue({
       school: {

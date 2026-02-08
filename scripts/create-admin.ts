@@ -18,22 +18,36 @@ const getRequiredArg = (name: string) => {
 
 const createAdmin = async () => {
     applyDbEnv();
-    console.dir(process.argv);
     const email = normalizeEmail(getRequiredArg("email"));
     const password = getRequiredArg("password");
     const displayName = getArgValue("display-name") || "Administrator";
+    const districtId = getArgValue("district-id") || "district-default";
+    const districtName = getArgValue("district-name") || "Default District";
     const schoolId = getArgValue("school-id") || "school-default";
     const schoolName = getArgValue("school-name") || "Default School";
 
     const prisma = getPrisma();
 
+    const district = await prisma.district.upsert({
+        where: { id: districtId },
+        update: {
+            name: districtName
+        },
+        create: {
+            id: districtId,
+            name: districtName
+        }
+    });
+
     const school = await prisma.school.upsert({
         where: { id: schoolId },
         update: {
-            name: schoolName
+            name: schoolName,
+            districtId: district.id
         },
         create: {
             id: schoolId,
+            districtId: district.id,
             name: schoolName,
             closedDays: [],
             openerCount: 0,
@@ -48,13 +62,32 @@ const createAdmin = async () => {
         update: {
             displayName,
             passwordHash: hashPassword(password),
+            isSuperUser: true,
             status: "active"
         },
         create: {
             email,
             displayName,
             passwordHash: hashPassword(password),
+            isSuperUser: true,
             status: "active"
+        }
+    });
+
+    await prisma.districtMembership.upsert({
+        where: {
+            userId_districtId: {
+                userId: user.id,
+                districtId: district.id
+            }
+        },
+        update: {
+            role: "district_admin"
+        },
+        create: {
+            userId: user.id,
+            districtId: district.id,
+            role: "district_admin"
         }
     });
 
@@ -66,12 +99,12 @@ const createAdmin = async () => {
             }
         },
         update: {
-            role: "owner"
+            role: "school_admin"
         },
         create: {
             userId: user.id,
             schoolId: school.id,
-            role: "owner"
+            role: "school_admin"
         }
     });
 

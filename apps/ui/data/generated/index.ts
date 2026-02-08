@@ -15,6 +15,7 @@ export type { CsrfHeader } from './models/CsrfHeader';
 export type { DayOfWeek } from './models/DayOfWeek';
 export type { DayScheduleType } from './models/DayScheduleType';
 export type { DaySegment } from './models/DaySegment';
+export type { DistrictMembership } from './models/DistrictMembership';
 export type { EmployeeAvailabilityBlock } from './models/EmployeeAvailabilityBlock';
 export type { EmployeeAvailabilityDay } from './models/EmployeeAvailabilityDay';
 export type { EmployeePayload } from './models/EmployeePayload';

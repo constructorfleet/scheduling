@@ -58,9 +58,12 @@ describe("App week-aware navigation", () => {
       user: {
         id: "user-1",
         email: "scheduler@example.com",
-        displayName: "Scheduler"
+        displayName: "Scheduler",
+        isSuperUser: false
       },
-      memberships: [{ schoolId: "school-evergreen", role: "scheduler" }]
+      memberships: [{ schoolId: "school-evergreen", role: "school_user" }],
+      schoolMemberships: [{ schoolId: "school-evergreen", role: "school_user" }],
+      districtMemberships: []
     });
     fetchSettingsMock.mockResolvedValue({
       school: {

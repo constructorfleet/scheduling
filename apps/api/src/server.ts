@@ -13,12 +13,19 @@ import {
   createSessionExpiry,
   createSessionToken,
   CSRF_COOKIE_NAME,
+  hashPassword,
   hashSessionToken,
   normalizeEmail,
   SESSION_COOKIE_NAME,
   verifyPassword
 } from "./auth";
-import { canAccessSchoolWithRole } from "./access";
+import {
+  canManageDistrict,
+  canManageSchoolConfiguration,
+  canManageSchoolUsers,
+  canReadSchoolSchedule,
+  canWriteSchoolSchedule
+} from "./access";
 import type { Prisma as CorePrisma } from "../generated/prisma-client";
 import type {
   DayOfWeek,
@@ -27,7 +34,7 @@ import type {
   EmployeeTimeOffRequest,
   PolicyCitation
 } from "@core/domain/types";
-import type { Role } from "../generated/prisma-client";
+import type { Role, UserStatus } from "../generated/prisma-client";
 
 type DbTransaction = CorePrisma.TransactionClient;
 const toJsonValue = (value: unknown): CorePrisma.InputJsonValue => value as CorePrisma.InputJsonValue;
@@ -155,8 +162,13 @@ type AuthContext = {
   userId: string;
   displayName: string;
   email: string;
-  memberships: Array<{
+  isSuperUser: boolean;
+  schoolMemberships: Array<{
     schoolId: string;
+    role: Role;
+  }>;
+  districtMemberships: Array<{
+    districtId: string;
     role: Role;
   }>;
 };
@@ -211,7 +223,25 @@ const buildServer = async () => {
       include: {
         user: {
           include: {
-            memberships: true
+            memberships: {
+              include: {
+                school: {
+                  select: { districtId: true }
+                }
+              }
+            },
+            districtMemberships: {
+              include: {
+                district: {
+                  select: {
+                    id: true,
+                    schools: {
+                      select: { id: true }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -222,31 +252,101 @@ const buildServer = async () => {
     if (session.user.status !== "active") {
       return null;
     }
+    const rolePriority: Record<Role, number> = {
+      school_user: 1,
+      school_admin: 2,
+      district_user: 3,
+      district_admin: 4,
+      super_user: 5
+    };
+    const effectiveSchoolRoles = new Map<string, { schoolId: string; role: Role }>();
+    session.user.memberships.forEach((membership) => {
+      effectiveSchoolRoles.set(membership.schoolId, {
+        schoolId: membership.schoolId,
+        role: membership.role
+      });
+    });
+    session.user.districtMemberships.forEach((membership) => {
+      membership.district.schools.forEach((school) => {
+        const current = effectiveSchoolRoles.get(school.id);
+        if (!current || rolePriority[membership.role] > rolePriority[current.role]) {
+          effectiveSchoolRoles.set(school.id, {
+            schoolId: school.id,
+            role: membership.role
+          });
+        }
+      });
+    });
+
     return {
       sessionId: session.id,
       userId: session.user.id,
       displayName: session.user.displayName,
       email: session.user.email,
-      memberships: session.user.memberships.map((membership) => ({
-        schoolId: membership.schoolId,
+      isSuperUser: session.user.isSuperUser,
+      schoolMemberships: Array.from(effectiveSchoolRoles.values()),
+      districtMemberships: session.user.districtMemberships.map((membership) => ({
+        districtId: membership.districtId,
         role: membership.role
       }))
     };
   };
 
-  const requireRoleForSchool = async (
+  const getSchoolDistrictId = async (schoolId: string) => {
+    const prisma = getPrisma();
+    const school = await prisma.school.findUnique({
+      where: { id: schoolId },
+      select: { districtId: true }
+    });
+    return school?.districtId ?? null;
+  };
+
+  const requireSchoolAccess = async (
     request: FastifyRequest,
     reply: FastifyReply,
     schoolId: string,
-    requiredRole: Role
+    access: "read_schedule" | "write_schedule" | "manage_users" | "manage_configuration"
   ) => {
     const auth = await resolveAuth(request);
     if (!auth) {
       reply.code(401).send({ message: "Authentication required." });
       return null;
     }
-    if (!canAccessSchoolWithRole(auth, schoolId, requiredRole)) {
+
+    const districtId = await getSchoolDistrictId(schoolId);
+    if (!districtId) {
+      reply.code(404).send({ message: "School not found." });
+      return null;
+    }
+
+    const allowed =
+      access === "read_schedule"
+        ? canReadSchoolSchedule(auth, schoolId, districtId)
+        : access === "write_schedule"
+          ? canWriteSchoolSchedule(auth, schoolId, districtId)
+          : access === "manage_users"
+            ? canManageSchoolUsers(auth, schoolId, districtId)
+            : canManageSchoolConfiguration(auth, schoolId, districtId);
+
+    if (!allowed) {
       reply.code(403).send({ message: "Insufficient access for this school." });
+      return null;
+    }
+    return auth;
+  };
+
+  const requireDistrictAdmin = async (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    districtId: string
+  ) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      reply.code(401).send({ message: "Authentication required." });
+      return null;
+    }
+    if (!canManageDistrict(auth, districtId)) {
+      reply.code(403).send({ message: "Insufficient access for this district." });
       return null;
     }
     return auth;
@@ -315,7 +415,26 @@ const buildServer = async () => {
     const prisma = getPrisma();
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { memberships: true }
+      include: {
+        memberships: {
+          include: {
+            school: {
+              select: { districtId: true }
+            }
+          }
+        },
+        districtMemberships: {
+          include: {
+            district: {
+              select: {
+                schools: {
+                  select: { id: true }
+                }
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!user || user.status !== "active") {
@@ -337,11 +456,45 @@ const buildServer = async () => {
       return reply.code(401).send({ message: "Invalid credentials." });
     }
 
+    const rolePriority: Record<Role, number> = {
+      school_user: 1,
+      school_admin: 2,
+      district_user: 3,
+      district_admin: 4,
+      super_user: 5
+    };
+    const effectiveSchoolRoles = new Map<string, { schoolId: string; role: Role }>();
+    user.memberships.forEach((membership) => {
+      effectiveSchoolRoles.set(membership.schoolId, {
+        schoolId: membership.schoolId,
+        role: membership.role
+      });
+    });
+    user.districtMemberships.forEach((membership) => {
+      membership.district.schools.forEach((school) => {
+        const current = effectiveSchoolRoles.get(school.id);
+        if (!current || rolePriority[membership.role] > rolePriority[current.role]) {
+          effectiveSchoolRoles.set(school.id, {
+            schoolId: school.id,
+            role: membership.role
+          });
+        }
+      });
+    });
+    if (user.isSuperUser) {
+      const allSchools = await prisma.school.findMany({
+        select: { id: true }
+      });
+      allSchools.forEach((school) => {
+        effectiveSchoolRoles.set(school.id, { schoolId: school.id, role: "super_user" });
+      });
+    }
+    const memberships = Array.from(effectiveSchoolRoles.values());
     const targetMembership = requestedSchoolId
-      ? user.memberships.find((membership) => membership.schoolId === requestedSchoolId)
-      : user.memberships[0];
+      ? memberships.find((membership) => membership.schoolId === requestedSchoolId)
+      : memberships[0];
 
-    if (!targetMembership) {
+    if (!targetMembership && !user.isSuperUser) {
       return reply.code(403).send({ message: "No school access assigned for this user." });
     }
 
@@ -394,11 +547,14 @@ const buildServer = async () => {
       user: {
         id: user.id,
         email: user.email,
-        displayName: user.displayName
+        displayName: user.displayName,
+        isSuperUser: user.isSuperUser
       },
-      currentSchoolId: targetMembership.schoolId,
-      memberships: user.memberships.map((membership) => ({
-        schoolId: membership.schoolId,
+      currentSchoolId: targetMembership?.schoolId ?? null,
+      memberships,
+      schoolMemberships: memberships,
+      districtMemberships: user.districtMemberships.map((membership) => ({
+        districtId: membership.districtId,
         role: membership.role
       })),
       session: {
@@ -436,10 +592,244 @@ const buildServer = async () => {
       user: {
         id: auth.userId,
         email: auth.email,
-        displayName: auth.displayName
+        displayName: auth.displayName,
+        isSuperUser: auth.isSuperUser
       },
-      memberships: auth.memberships
+      memberships: auth.schoolMemberships,
+      schoolMemberships: auth.schoolMemberships,
+      districtMemberships: auth.districtMemberships
     });
+  });
+
+  fastify.post("/api/admin/districts/:districtId/schools", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      id?: string;
+      name?: string;
+    };
+    const schoolId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : `school-${Date.now()}`;
+    const schoolName = typeof body.name === "string" && body.name.trim() ? body.name.trim() : schoolId;
+    const prisma = getPrisma();
+    const school = await prisma.school.upsert({
+      where: { id: schoolId },
+      create: {
+        id: schoolId,
+        districtId,
+        name: schoolName,
+        closedDays: [],
+        openerCount: 0,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      },
+      update: {
+        districtId,
+        name: schoolName
+      }
+    });
+    return reply.send({ school });
+  });
+
+  fastify.put("/api/admin/districts/:districtId/memberships", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      email?: string;
+      displayName?: string;
+      password?: string;
+      status?: UserStatus;
+      role?: Role;
+      isSuperUser?: boolean;
+    };
+    const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+    const role = body.role;
+    if (!email || !role || !["district_admin", "district_user"].includes(role)) {
+      return reply.code(400).send({ message: "email and district role are required." });
+    }
+    const prisma = getPrisma();
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    let user = existingUser;
+    if (!user) {
+      if (!body.password) {
+        return reply.code(400).send({ message: "password is required when creating a new user." });
+      }
+      user = await prisma.user.create({
+        data: {
+          email,
+          displayName: body.displayName?.trim() || email,
+          passwordHash: hashPassword(body.password),
+          status: body.status ?? "active",
+          isSuperUser: Boolean(body.isSuperUser)
+        }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          displayName: body.displayName?.trim() || user.displayName,
+          status: body.status ?? user.status,
+          ...(body.password ? { passwordHash: hashPassword(body.password) } : {}),
+          ...(typeof body.isSuperUser === "boolean" ? { isSuperUser: body.isSuperUser } : {})
+        }
+      });
+    }
+    const membership = await prisma.districtMembership.upsert({
+      where: {
+        userId_districtId: {
+          userId: user.id,
+          districtId
+        }
+      },
+      create: {
+        userId: user.id,
+        districtId,
+        role
+      },
+      update: {
+        role
+      }
+    });
+    return reply.send({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        status: user.status,
+        isSuperUser: user.isSuperUser
+      },
+      membership
+    });
+  });
+
+  fastify.put("/api/admin/schools/:schoolId/memberships", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireSchoolAccess(request, reply, schoolId, "manage_users"))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      email?: string;
+      displayName?: string;
+      password?: string;
+      status?: UserStatus;
+      role?: Role;
+      isSuperUser?: boolean;
+    };
+    const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+    const role = body.role;
+    if (!email || !role || !["school_admin", "school_user"].includes(role)) {
+      return reply.code(400).send({ message: "email and school role are required." });
+    }
+    const prisma = getPrisma();
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    let user = existingUser;
+    if (!user) {
+      if (!body.password) {
+        return reply.code(400).send({ message: "password is required when creating a new user." });
+      }
+      user = await prisma.user.create({
+        data: {
+          email,
+          displayName: body.displayName?.trim() || email,
+          passwordHash: hashPassword(body.password),
+          status: body.status ?? "active",
+          isSuperUser: Boolean(body.isSuperUser)
+        }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          displayName: body.displayName?.trim() || user.displayName,
+          status: body.status ?? user.status,
+          ...(body.password ? { passwordHash: hashPassword(body.password) } : {}),
+          ...(typeof body.isSuperUser === "boolean" ? { isSuperUser: body.isSuperUser } : {})
+        }
+      });
+    }
+    const membership = await prisma.schoolMembership.upsert({
+      where: {
+        userId_schoolId: {
+          userId: user.id,
+          schoolId
+        }
+      },
+      create: {
+        userId: user.id,
+        schoolId,
+        role
+      },
+      update: {
+        role
+      }
+    });
+    return reply.send({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        status: user.status,
+        isSuperUser: user.isSuperUser
+      },
+      membership
+    });
+  });
+
+  fastify.get("/api/admin/districts/:districtId/users", async (request, reply) => {
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const prisma = getPrisma();
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { districtMemberships: { some: { districtId } } },
+          { memberships: { some: { school: { districtId } } } }
+        ]
+      },
+      include: {
+        districtMemberships: true,
+        memberships: true
+      },
+      orderBy: { email: "asc" }
+    });
+    return reply.send({ users });
+  });
+
+  fastify.get("/api/admin/schools/:schoolId/users", async (request, reply) => {
+    const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireSchoolAccess(request, reply, schoolId, "manage_users"))) {
+      return;
+    }
+    const prisma = getPrisma();
+    const users = await prisma.user.findMany({
+      where: {
+        memberships: {
+          some: { schoolId }
+        }
+      },
+      include: {
+        memberships: {
+          where: { schoolId }
+        }
+      },
+      orderBy: { email: "asc" }
+    });
+    return reply.send({ users });
   });
 
   fastify.get("/", async (_, reply) => {
@@ -460,7 +850,7 @@ const buildServer = async () => {
 
   fastify.get("/api/settings/:schoolId", async (request, reply) => {
     const { schoolId } = request.params as { schoolId: string };
-    if (!(await requireRoleForSchool(request, reply, schoolId, "viewer"))) {
+    if (!(await requireSchoolAccess(request, reply, schoolId, "read_schedule"))) {
       return;
     }
     const prisma = getPrisma();
@@ -496,7 +886,7 @@ const buildServer = async () => {
       return;
     }
     const { schoolId } = request.params as { schoolId: string };
-    if (!(await requireRoleForSchool(request, reply, schoolId, "director"))) {
+    if (!(await requireSchoolAccess(request, reply, schoolId, "manage_configuration"))) {
       return;
     }
     const payload = request.body as {
@@ -557,12 +947,21 @@ const buildServer = async () => {
     }
 
     const school = await prisma.$transaction(async (tx: DbTransaction) => {
+      await tx.district.upsert({
+        where: { id: "district-default" },
+        create: {
+          id: "district-default",
+          name: "Default District"
+        },
+        update: {}
+      });
       let upsertedSchool = await tx.school.findUnique({ where: { id: schoolId } });
       if (payload.school) {
         upsertedSchool = await tx.school.upsert({
           where: { id: schoolId },
           create: {
             id: schoolId,
+            districtId: upsertedSchool?.districtId ?? "district-default",
             name: payload.school.name,
             closedDays: payload.school.closedDays,
             openerCount: payload.school.openerCount,
@@ -584,6 +983,7 @@ const buildServer = async () => {
         upsertedSchool = await tx.school.create({
           data: {
             id: schoolId,
+            districtId: "district-default",
             name: schoolId,
             closedDays: [],
             openerCount: 0,
@@ -799,7 +1199,7 @@ const buildServer = async () => {
     if (!scheduleWeek) {
       return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
     }
-    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "viewer"))) {
+    if (!(await requireSchoolAccess(request, reply, scheduleWeek.schoolId, "read_schedule"))) {
       return;
     }
     return {
@@ -833,7 +1233,7 @@ const buildServer = async () => {
     if (!scheduleWeek) {
       return reply.code(404).send({ message: `Schedule week ${weekId} not found` });
     }
-    if (!(await requireRoleForSchool(request, reply, scheduleWeek.schoolId, "scheduler"))) {
+    if (!(await requireSchoolAccess(request, reply, scheduleWeek.schoolId, "write_schedule"))) {
       return;
     }
     try {
@@ -882,7 +1282,7 @@ const buildServer = async () => {
         message: "Cannot save schedule chunk before scheduleWeek exists. Include scheduleWeek in the first save."
       });
     }
-    const auth = await requireRoleForSchool(request, reply, targetSchoolId, "scheduler");
+    const auth = await requireSchoolAccess(request, reply, targetSchoolId, "write_schedule");
     if (!auth) {
       return;
     }
@@ -905,10 +1305,19 @@ const buildServer = async () => {
     const auditEventsPayload = Array.isArray(payload.auditEvents) ? payload.auditEvents : [];
 
     await prisma.$transaction(async (tx: DbTransaction) => {
+      await tx.district.upsert({
+        where: { id: "district-default" },
+        create: {
+          id: "district-default",
+          name: "Default District"
+        },
+        update: {}
+      });
       await tx.school.upsert({
         where: { id: resolvedSchoolId },
         create: {
           id: resolvedSchoolId,
+          districtId: "district-default",
           name: resolvedSchoolId,
           closedDays: [],
           openerCount: 0,
