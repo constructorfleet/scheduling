@@ -8,6 +8,9 @@ THERE IS NO AGE PROFILES IN THIS PROJECT! DO NOT ADD THEM! REMOVE ANY REFERENCES
 - Assign tasks by referencing the agent name and expected artifact.
 - Each agent should produce concrete outputs (documents, code, tests, or UI artifacts).
 - The project manager validates outputs against acceptance criteria before moving on.
+- Always gather needed context (files, requirements, prior decisions) before implementation.
+- Always add or update tests for any code changes, run the relevant tests, and run linting.
+- Always commit changes using conventional commit format.
 
 ## Agent List
 
