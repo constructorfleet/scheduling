@@ -268,12 +268,12 @@ export default function ScheduleMatrix({
       style={{
         background: "#ffffff",
         borderRadius: 18,
-        padding: "1rem",
+        padding: "clamp(0.75rem, 2vw, 1rem)",
         boxShadow: "0 20px 40px rgba(15, 23, 42, 0.08)",
         overflowX: "auto"
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
         <div>
           <h3 style={{ margin: 0 }}>Schedule grid</h3>
           <p style={{ margin: 0, color: "#6b7280" }}>
@@ -289,7 +289,7 @@ export default function ScheduleMatrix({
           width: "100%",
           borderCollapse: "collapse",
           marginTop: "1rem",
-          minWidth: 960
+          minWidth: 820
         }}
       >
         <thead>
@@ -300,7 +300,7 @@ export default function ScheduleMatrix({
                 padding: "0.75rem",
                 border: "1px solid #e5e7eb",
                 background: "#f8fafc",
-                minWidth: 220
+                minWidth: 170
               }}
             >
               Employee
@@ -334,7 +334,7 @@ export default function ScheduleMatrix({
                     padding: "0.5rem",
                     border: "1px solid #e5e7eb",
                     background: isFocusedDay ? "#e0ecff" : "#f8fafc",
-                    minWidth: 200,
+                    minWidth: 160,
                     verticalAlign: "top",
                     boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
                   }}

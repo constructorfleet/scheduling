@@ -21,7 +21,7 @@ export default function ViolationNavigator({
   isOpen,
   onClose
 }: ViolationNavigatorProps) {
-  const [position, setPosition] = useState({ x: 24, y: 140 });
+  const [position, setPosition] = useState({ x: 16, y: 120 });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLElement | null>(null);
@@ -63,6 +63,11 @@ export default function ViolationNavigator({
       window.removeEventListener("pointerup", handlePointerUp);
     };
   }, [isDragging]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setPosition((prev) => clampPosition(prev.x, prev.y));
+  }, [isOpen]);
 
   const handlePointerUp = () => {
     setIsDragging(false);
@@ -148,7 +153,7 @@ export default function ViolationNavigator({
         position: "fixed",
         top: position.y,
         left: position.x,
-        width: 360,
+        width: "min(360px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
         background: "#ffffff",

@@ -72,16 +72,18 @@ export default function WeekNavigationBanner({
         borderRadius: 18,
         background: "#1f2937",
         color: "#f9fafb",
-        padding: "1.5rem",
+        padding: "clamp(0.9rem, 2.5vw, 1.5rem)",
         boxShadow: "0 30px 60px rgba(15, 23, 42, 0.25)",
         marginBottom: "1.5rem"
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem" }}>
-        <div>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 260px", minWidth: 0 }}>
           <p style={{ margin: 0, fontSize: "0.9rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>School</p>
-          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-            <h1 style={{ margin: "0.25rem 0", fontSize: "2rem" }}>{selectedSchool?.name ?? "Select a school"}</h1>
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+            <h1 style={{ margin: "0.25rem 0", fontSize: "clamp(1.25rem, 4vw, 2rem)", lineHeight: 1.2 }}>
+              {selectedSchool?.name ?? "Select a school"}
+            </h1>
             <select
               value={selectedSchoolId}
               onChange={(event) => onSchoolChange(event.target.value)}
@@ -103,7 +105,7 @@ export default function WeekNavigationBanner({
           </div>
           <p style={{ margin: 0, color: "#cbd5f5" }}>Week of {weekLabel}</p>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.5rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.5rem", flex: "1 1 320px", minWidth: 0 }}>
           <span
             style={{
               padding: "0.25rem 0.9rem",
@@ -139,7 +141,7 @@ export default function WeekNavigationBanner({
           >
             {apiStatus.message}
           </span>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-start" }}>
             <button
               type="button"
               onClick={onOpenViolations}
@@ -255,7 +257,7 @@ export default function WeekNavigationBanner({
               {isSettingsOpen ? "Close Settings" : "Open Settings"}
             </button>
           </div>
-          <div style={{ display: "flex", gap: "0.5rem" }}>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             <button
               onClick={onAutoSchedule}
               disabled={!canEditSchedule}

@@ -290,7 +290,7 @@ export default function SettingsPanel({
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
-        padding: "3rem 2rem",
+        padding: "clamp(0.5rem, 2.5vw, 3rem) clamp(0.5rem, 2vw, 2rem)",
         zIndex: 50
       }}
     >
@@ -306,7 +306,7 @@ export default function SettingsPanel({
           boxShadow: "0 30px 60px rgba(15, 23, 42, 0.2)",
           border: "1px solid #e2e8f0",
           overflow: "hidden",
-          maxHeight: "calc(100vh - 6rem)",
+          maxHeight: "calc(100vh - 1.25rem)",
           display: "flex",
           flexDirection: "column"
         }}
@@ -318,6 +318,8 @@ export default function SettingsPanel({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: "0.75rem",
+            flexWrap: "wrap",
             background: "#f8fafc"
           }}
         >
@@ -345,7 +347,7 @@ export default function SettingsPanel({
           </button>
         </div>
 
-        <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", background: "#ffffff" }}>
+        <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", background: "#ffffff", overflowX: "auto" }}>
           {([
             { id: "school", label: "School" },
             { id: "scheduleTypes", label: "Schedule types" },
@@ -364,7 +366,9 @@ export default function SettingsPanel({
                 background: activeTab === tab.id ? "#eef2ff" : "transparent",
                 color: activeTab === tab.id ? "#1d4ed8" : "#475569",
                 fontWeight: 600,
-                cursor: "pointer"
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                flex: "0 0 auto"
               }}
             >
               {tab.label}
@@ -374,7 +378,7 @@ export default function SettingsPanel({
 
         <div
           style={{
-            padding: "1.5rem",
+            padding: "clamp(0.85rem, 2.5vw, 1.5rem)",
             display: "flex",
             flexDirection: "column",
             gap: "1rem",

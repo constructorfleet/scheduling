@@ -2105,7 +2105,7 @@ export default function App() {
         style={{
           minHeight: "100vh",
           background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
-          padding: "2rem",
+          padding: "clamp(0.75rem, 2.5vw, 2rem)",
           fontFamily: "Inter, system-ui, sans-serif",
           color: "#111827"
         }}

@@ -21,7 +21,7 @@ export default function AuditTimeline({
   isOpen,
   onClose
 }: AuditTimelineProps) {
-  const [position, setPosition] = useState({ x: 420, y: 140 });
+  const [position, setPosition] = useState({ x: 16, y: 120 });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLElement | null>(null);
@@ -64,6 +64,11 @@ export default function AuditTimeline({
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setPosition((prev) => clampPosition(prev.x, prev.y));
+  }, [isOpen]);
+
   const handlePointerUp = () => {
     setIsDragging(false);
   };
@@ -83,7 +88,7 @@ export default function AuditTimeline({
         position: "fixed",
         top: position.y,
         left: position.x,
-        width: 380,
+        width: "min(380px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
         background: "#ffffff",
