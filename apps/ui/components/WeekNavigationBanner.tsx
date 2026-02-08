@@ -81,6 +81,13 @@ const pillStyle = (tone: PillTone, disabled = false) => {
   } as const;
 };
 
+const iconPill = (tone: PillTone, disabled = false) => ({
+  ...pillStyle(tone, disabled),
+  padding: "0.36rem 0.56rem",
+  minWidth: 42,
+  justifyContent: "flex-start"
+});
+
 export default function WeekNavigationBanner({
   schoolOptions,
   selectedSchoolId,
@@ -139,6 +146,26 @@ export default function WeekNavigationBanner({
         overflow: "hidden"
       }}
     >
+      <style>{`
+        .banner-icon-pill {
+          transition: background-color 0.2s linear, border-color 0.2s linear, opacity 0.2s linear;
+        }
+        .banner-icon-pill__label {
+          max-width: 0;
+          opacity: 0;
+          overflow: hidden;
+          white-space: nowrap;
+          transition: max-width 0.2s ease, opacity 0.2s ease, margin-left 0.2s ease;
+          margin-left: 0;
+        }
+        .banner-icon-pill:hover .banner-icon-pill__label,
+        .banner-icon-pill:focus-visible .banner-icon-pill__label,
+        .banner-icon-pill[data-active="true"] .banner-icon-pill__label {
+          max-width: 180px;
+          opacity: 1;
+          margin-left: 0.35rem;
+        }
+      `}</style>
       <div
         style={{
           position: "absolute",
@@ -166,7 +193,24 @@ export default function WeekNavigationBanner({
             <h1 style={{ margin: "0.4rem 0 0", fontSize: "clamp(1.3rem, 3.6vw, 2.2rem)", lineHeight: 1.1 }}>
               {selectedSchool?.name ?? "Select a school"}
             </h1>
-            <p style={{ margin: "0.35rem 0 0", color: "#bfdbfe", fontWeight: 500 }}>Week of {weekLabel}</p>
+            <div style={{ marginTop: "0.35rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+              <p style={{ margin: 0, color: "#bfdbfe", fontWeight: 500 }}>Week of {weekLabel}</p>
+              <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
+                ← Previous
+              </button>
+              <button
+                type="button"
+                onClick={() => onShiftWeek("next")}
+                style={{
+                  ...pillStyle("active"),
+                  background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
+                  border: "1px solid rgba(125,211,252,0.5)",
+                  color: "#eff6ff"
+                }}
+              >
+                Next →
+              </button>
+            </div>
             <div style={{ display: "flex", gap: "0.55rem", alignItems: "center", flexWrap: "wrap", marginTop: "0.75rem" }}>
               <select
                 value={selectedSchoolId}
@@ -208,12 +252,17 @@ export default function WeekNavigationBanner({
               </span>
               <span style={pillStyle(apiTone)}>{apiStatus.message}</span>
             </div>
-            {userDisplayName && (
-              <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
-                Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
-                {userRoleLabel ? ` (${userRoleLabel})` : ""}
-              </p>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.55rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {userDisplayName && (
+                <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
+                  Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
+                  {userRoleLabel ? ` (${userRoleLabel})` : ""}
+                </p>
+              )}
+              <button type="button" onClick={onLogout} style={pillStyle("danger")}>
+                Log out
+              </button>
+            </div>
           </div>
         </div>
 
@@ -226,22 +275,57 @@ export default function WeekNavigationBanner({
           }}
         >
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-start", alignItems: "center" }}>
-            <button type="button" onClick={onOpenViolations} disabled={!hasViolations} style={pillStyle(isViolationsOpen ? "danger" : "neutral", !hasViolations)}>
-              {isViolationsOpen ? "Close Violations" : "Open Violations"}
+            <button
+              type="button"
+              className="banner-icon-pill"
+              data-active={isViolationsOpen}
+              onClick={onOpenViolations}
+              disabled={!hasViolations}
+              aria-label={isViolationsOpen ? "Close Violations" : "Open Violations"}
+              style={iconPill(isViolationsOpen ? "danger" : "neutral", !hasViolations)}
+            >
+              <span aria-hidden="true">!</span>
+              <span className="banner-icon-pill__label">{isViolationsOpen ? "Close Violations" : "Open Violations"}</span>
             </button>
             <HelpIconButton label="Violation navigator" tone="dark" onClick={() => onOpenHelpTopic?.("violations")} />
 
-            <button type="button" onClick={onOpenAuditTimeline} style={pillStyle(isAuditOpen ? "active" : "neutral")}>
-              {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
+            <button
+              type="button"
+              className="banner-icon-pill"
+              data-active={isAuditOpen}
+              onClick={onOpenAuditTimeline}
+              aria-label={isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
+              style={iconPill(isAuditOpen ? "active" : "neutral")}
+            >
+              <span aria-hidden="true">↺</span>
+              <span className="banner-icon-pill__label">{isAuditOpen ? "Close Audit Log" : "Open Audit Log"}</span>
             </button>
             <HelpIconButton label="Audit timeline" tone="dark" onClick={() => onOpenHelpTopic?.("audit")} />
 
-            <button type="button" onClick={onOpenSettings} disabled={!canManageSettings} style={pillStyle(isSettingsOpen ? "active" : "neutral", !canManageSettings)}>
-              {isSettingsOpen ? "Close Settings" : "Open Settings"}
+            <button
+              type="button"
+              className="banner-icon-pill"
+              data-active={isSettingsOpen}
+              onClick={onOpenSettings}
+              disabled={!canManageSettings}
+              aria-label={isSettingsOpen ? "Close Settings" : "Open Settings"}
+              style={iconPill(isSettingsOpen ? "active" : "neutral", !canManageSettings)}
+            >
+              <span aria-hidden="true">⚙</span>
+              <span className="banner-icon-pill__label">{isSettingsOpen ? "Close Settings" : "Open Settings"}</span>
             </button>
 
-            <button type="button" onClick={onOpenUserManagement} disabled={!canManageUsers} style={pillStyle(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}>
-              {isUserManagementOpen ? "Close Users" : "Manage Users"}
+            <button
+              type="button"
+              className="banner-icon-pill"
+              data-active={isUserManagementOpen}
+              onClick={onOpenUserManagement}
+              disabled={!canManageUsers}
+              aria-label={isUserManagementOpen ? "Close Users" : "Manage Users"}
+              style={iconPill(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}
+            >
+              <span aria-hidden="true">👥</span>
+              <span className="banner-icon-pill__label">{isUserManagementOpen ? "Close Users" : "Manage Users"}</span>
             </button>
           </div>
 
@@ -250,25 +334,6 @@ export default function WeekNavigationBanner({
               ⚡ Auto
             </button>
             <HelpIconButton label="Auto schedule" tone="dark" onClick={() => onOpenHelpTopic?.("auto-schedule")} />
-
-            <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
-              ← Previous
-            </button>
-            <button
-              type="button"
-              onClick={() => onShiftWeek("next")}
-              style={{
-                ...pillStyle("active"),
-                background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
-                border: "1px solid rgba(125,211,252,0.5)",
-                color: "#eff6ff"
-              }}
-            >
-              Next →
-            </button>
-            <button type="button" onClick={onLogout} style={pillStyle("danger")}>
-              Log out
-            </button>
           </div>
         </div>
 
