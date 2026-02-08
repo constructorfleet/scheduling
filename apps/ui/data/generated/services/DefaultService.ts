@@ -210,4 +210,36 @@ export class DefaultService {
             },
         });
     }
+    /**
+     * Delete a staff assignment
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param weekId
+     * @param assignmentId
+     * @returns any Delete result
+     * @throws ApiError
+     */
+    public static deleteApiScheduleStaffAssignments1(
+        xCsrfToken: string,
+        weekId: string,
+        assignmentId: string,
+    ): CancelablePromise<{
+        ok: boolean;
+        deleted: number;
+    }> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/schedule/{weekId}/staff-assignments/{assignmentId}',
+            path: {
+                'weekId': weekId,
+                'assignmentId': assignmentId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
+        });
+    }
 }

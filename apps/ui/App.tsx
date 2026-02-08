@@ -56,6 +56,7 @@ import { createRulesEngine } from "@core/rules/engine";
 import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
 import {
   deleteScheduleAssignments,
+  deleteScheduleAssignment,
   fetchAuthMe,
   fetchSchedule,
   fetchSettings,
@@ -1946,6 +1947,10 @@ export default function App() {
         notes: `${employeeName}${dayName ? ` (${dayName})` : ""}${timeRange ? ` ${timeRange}` : ""}`
       }
     );
+    void deleteScheduleAssignment(currentWeekId, assignmentId).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete assignment", error);
+    });
   };
 
   const handleReassignUnlinkedStaff = (fromEmployeeId: string, toEmployeeId: string) => {

@@ -194,6 +194,40 @@ paths:
           description: Authentication required
         '403':
           description: Insufficient access
+  /api/schedule/{weekId}/staff-assignments/{assignmentId}:
+    delete:
+      summary: Delete a staff assignment
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: assignmentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  deleted:
+                    type: integer
+                required: [ok, deleted]
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
 components:
   securitySchemes:
     cookieAuth:

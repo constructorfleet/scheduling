@@ -170,6 +170,10 @@ export const deleteScheduleAssignments = async (weekId: string) => {
     return DefaultService.deleteApiScheduleStaffAssignments(getCsrfToken(), weekId);
 };
 
+export const deleteScheduleAssignment = async (weekId: string, assignmentId: string) => {
+    return DefaultService.deleteApiScheduleStaffAssignments1(getCsrfToken(), weekId, assignmentId);
+};
+
 export const fetchAuthMe = async () => DefaultService.getApiAuthMe();
 
 export const login = async (payload: LoginPayload) => DefaultService.postApiAuthLogin(payload);

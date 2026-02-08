@@ -1622,6 +1622,43 @@ const buildServer = async () => {
         return reply.send({ ok: true, deleted: result.count });
     });
 
+    fastify.delete("/api/schedule/:weekId/staff-assignments/:assignmentId", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const { weekId, assignmentId } = request.params as { weekId: string; assignmentId: string; };
+        const prisma = getPrisma();
+        const assignment = await prisma.staffAssignment.findUnique({
+            where: { id: assignmentId },
+            select: { id: true, scheduleWeekId: true, segmentBlockId: true }
+        });
+        if (!assignment || assignment.scheduleWeekId !== weekId) {
+            return reply.send({ ok: true, deleted: 0 });
+        }
+        const scheduleWeek = await prisma.scheduleWeek.findUnique({
+            where: { id: weekId },
+            select: { schoolId: true }
+        });
+        if (!scheduleWeek) {
+            return reply.send({ ok: true, deleted: 0 });
+        }
+        const auth = await requireSchoolAccess(request, reply, scheduleWeek.schoolId, "write_schedule");
+        if (!auth) {
+            return;
+        }
+        const deleted = await prisma.$transaction(async (tx: DbTransaction) => {
+            const result = await tx.staffAssignment.delete({ where: { id: assignmentId } });
+            const remaining = await tx.staffAssignment.count({
+                where: { segmentBlockId: assignment.segmentBlockId }
+            });
+            if (remaining === 0) {
+                await tx.segmentBlock.deleteMany({ where: { id: assignment.segmentBlockId } });
+            }
+            return result;
+        });
+        return reply.send({ ok: true, deleted: deleted ? 1 : 0 });
+    });
+
     fastify.put("/api/schedule/:weekId", async (request, reply) => {
         if (!requireCsrf(request, reply)) {
             return;
