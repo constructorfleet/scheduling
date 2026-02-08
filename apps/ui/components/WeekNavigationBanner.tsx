@@ -309,7 +309,7 @@ export default function WeekNavigationBanner({
               <span aria-hidden="true" style={{ fontSize: "1.1rem", fontWeight: 800 }}>!</span>
               <div className={`banner-icon-pill__label-container ${hasViolations ? 'is-permanent' : ''}`}>
                 <span className="banner-icon-pill__label hide-on-hover">{hasViolations ? `${violationCount} Violations Outstanding` : ''}</span>
-                <span className="banner-icon-pill__label hover-only">Open Violations</span>
+                <span className="banner-icon-pill__label hover-only">{isViolationsOpen ? "Close Violations" : "Open Violations"}</span>
               </div>
             </button>
             <HelpIconButton
