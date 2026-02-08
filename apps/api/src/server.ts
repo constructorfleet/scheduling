@@ -662,6 +662,33 @@ const buildServer = async () => {
     });
   });
 
+  fastify.patch("/api/auth/profile", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      return reply.code(401).send({ message: "Authentication required." });
+    }
+    const body = (request.body ?? {}) as { displayName?: string };
+    const displayName = typeof body.displayName === "string" ? body.displayName.trim() : "";
+    if (!displayName) {
+      return reply.code(400).send({ message: "Display name is required." });
+    }
+    const prisma = getPrisma();
+    const user = await prisma.user.update({
+      where: { id: auth.userId },
+      data: { displayName }
+    });
+    return reply.send({
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      }
+    });
+  });
+
   fastify.get("/api/auth/invites/:token", async (request, reply) => {
     const { token } = request.params as { token: string };
     const prisma = getPrisma();

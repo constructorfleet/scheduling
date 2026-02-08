@@ -10,6 +10,7 @@ import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } fro
 import HelpCenterModal from "./components/HelpCenterModal";
 import UserManagementPanel from "./components/UserManagementPanel";
 import AuthGate from "./components/AuthGate";
+import InviteAccept from "./components/InviteAccept";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
 import AppShell from "./components/AppShell";
@@ -64,6 +65,7 @@ import {
   logout,
   saveSchedule,
   saveSettings,
+  updateDisplayName,
   type ScheduleSavePayload
 } from "./data/apiClient";
 import { autoSchedule, validateDayMetadata } from "@core/scheduler";
@@ -254,6 +256,8 @@ export default function App() {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [displayNameSaving, setDisplayNameSaving] = useState(false);
+  const [displayNameError, setDisplayNameError] = useState<string | null>(null);
   const [schoolName, setSchoolName] = useState(schools[0].name);
   const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(
     ensureClosedScheduleType(scheduleTypeOptions)
@@ -635,9 +639,9 @@ export default function App() {
     return employeesState.map((employee) => ({
       ...employee,
       leaderQualified: jobTitleLeaderMap.get(employee.jobTitle) ?? employee.leaderQualified,
-      cprCurrent: schoolRulesState.requireCurrentCpr ? employee.cprCurrent : true
+      cprCurrent: employee.cprCurrent
     }));
-  }, [employeesState, jobTitleLeaderMap, schoolRulesState.requireCurrentCpr]);
+  }, [employeesState, jobTitleLeaderMap]);
 
   const scheduleStaff = useMemo(() => {
     const byId = new Map(employeesDerived.map((employee) => [employee.id, employee]));
@@ -654,7 +658,7 @@ export default function App() {
         employmentStatus: "active",
         leaderQualified: false,
         medicallyDelegated: false,
-        cprCurrent: true,
+        cprCurrent: false,
         notes: "This assignment references a missing employee record. Re-link in Settings.",
         availability: [],
         requestedDaysOff: []
@@ -948,6 +952,45 @@ export default function App() {
     setShowAuditTimeline(false);
     setShowViolationNavigator(false);
   };
+
+  const handleDisplayNameUpdate = async (nextName: string) => {
+    if (!nextName.trim()) {
+      setDisplayNameError("Display name cannot be empty.");
+      return;
+    }
+    setDisplayNameSaving(true);
+    setDisplayNameError(null);
+    try {
+      const response = await updateDisplayName(nextName.trim());
+      setAuthUser((current) =>
+        current
+          ? {
+              ...current,
+              displayName: response.user.displayName
+            }
+          : current
+      );
+    } catch (error) {
+      if (isApiErrorStatus(error, 401)) {
+        setDisplayNameError("You must be signed in to update your display name.");
+      } else {
+        setDisplayNameError("Could not update display name.");
+      }
+    } finally {
+      setDisplayNameSaving(false);
+    }
+  };
+
+  const isInviteRoute = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.location.pathname.startsWith("/invite");
+  }, []);
+
+  const inviteToken = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    const params = new URLSearchParams(window.location.search);
+    return params.get("token")?.trim() ?? "";
+  }, []);
 
   useEffect(() => {
     if (authStatus !== "authenticated") {
@@ -2076,6 +2119,19 @@ export default function App() {
   const openHelpTopic = (topicId: HelpTopicId) => setActiveHelpTopic(topicId);
 
   if (authStatus !== "authenticated") {
+    if (isInviteRoute) {
+      return (
+        <InviteAccept
+          token={inviteToken}
+          onReturnToLogin={() => {
+            if (typeof window !== "undefined") {
+              window.history.replaceState({}, "", "/");
+            }
+            setAuthStatus("unauthenticated");
+          }}
+        />
+      );
+    }
     return (
       <AuthGate
         authStatus={authStatus}
@@ -2116,6 +2172,9 @@ export default function App() {
           canManageUsers={canManageUsers}
           userDisplayName={authUser?.displayName}
           userRoleLabel={roleLabel}
+          isDisplayNameSaving={displayNameSaving}
+          displayNameError={displayNameError}
+          onUpdateDisplayName={handleDisplayNameUpdate}
           onLogout={() => {
             void handleLogout();
           }}

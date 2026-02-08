@@ -67,6 +67,17 @@ export type AdminSchoolRecord = {
   name: string;
 };
 
+export type InviteDetails = {
+  email: string;
+  displayName: string | null;
+  role: Role;
+  districtId: string | null;
+  districtName: string | null;
+  schoolId: string | null;
+  schoolName: string | null;
+  expiresAt: string;
+};
+
 type AdminUsersResponse = { users: AdminUserRecord[] };
 type AdminInvitesResponse = { invites: AdminInviteRecord[] };
 type AdminDistrictsResponse = { districts: AdminDistrictRecord[] };
@@ -164,6 +175,24 @@ export const fetchAuthMe = async () => DefaultService.getApiAuthMe();
 export const login = async (payload: LoginPayload) => DefaultService.postApiAuthLogin(payload);
 
 export const logout = async () => DefaultService.postApiAuthLogout(getCsrfToken());
+
+export const fetchInviteByToken = async (token: string) =>
+  requestJson<InviteDetails>(`/api/auth/invites/${encodeURIComponent(token)}`);
+
+export const acceptInvite = async (payload: { token: string; displayName?: string; password: string }) =>
+  requestJson<{ ok: true }>("/api/auth/invites/accept", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
+export const updateDisplayName = async (displayName: string) =>
+  requestJson<{ user: { id: string; email: string; displayName: string } }>("/api/auth/profile", {
+    method: "PATCH",
+    headers: {
+      "x-csrf-token": getCsrfToken()
+    },
+    body: JSON.stringify({ displayName })
+  });
 
 export const fetchDistrictUsers = async (districtId: string) =>
   requestJson<AdminUsersResponse>(`/api/admin/districts/${encodeURIComponent(districtId)}/users`);

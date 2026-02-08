@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ScheduleStatus } from "@core/domain/types";
 import HelpIconButton from "./HelpIconButton";
@@ -39,6 +40,9 @@ interface WeekNavigationBannerProps {
   canEditSchedule: boolean;
   userDisplayName?: string;
   userRoleLabel?: string;
+  onUpdateDisplayName?: (nextName: string) => void;
+  isDisplayNameSaving?: boolean;
+  displayNameError?: string | null;
   onLogout: () => void;
   onOpenHelpTopic?: (topicId: HelpTopicId) => void;
   apiStatus: {
@@ -115,11 +119,20 @@ export default function WeekNavigationBanner({
   canEditSchedule,
   userDisplayName,
   userRoleLabel,
+  onUpdateDisplayName,
+  isDisplayNameSaving,
+  displayNameError,
   onLogout,
   onOpenHelpTopic,
   apiStatus,
   violationCount
 }: WeekNavigationBannerProps) {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(userDisplayName ?? "");
+
+  useEffect(() => {
+    setDraftName(userDisplayName ?? "");
+  }, [userDisplayName]);
   const badge = statusBadges[status] ?? statusBadges.draft;
   const selectedSchool = schoolOptions.find((school) => school.id === selectedSchoolId) ?? schoolOptions[0];
 
@@ -275,10 +288,74 @@ export default function WeekNavigationBanner({
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.55rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
               {userDisplayName && (
-                <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
-                  Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
-                  {userRoleLabel ? ` (${userRoleLabel})` : ""}
-                </p>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.35rem" }}>
+                  <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
+                    Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
+                    {userRoleLabel ? ` (${userRoleLabel})` : ""}
+                  </p>
+                  {onUpdateDisplayName && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        flexWrap: "wrap",
+                        justifyContent: "flex-end"
+                      }}
+                    >
+                      {isEditingName ? (
+                        <>
+                          <input
+                            value={draftName}
+                            onChange={(event) => setDraftName(event.target.value)}
+                            placeholder="Update display name"
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(148, 163, 184, 0.6)",
+                              background: "rgba(15, 23, 42, 0.65)",
+                              color: "#f8fafc",
+                              padding: "0.25rem 0.65rem",
+                              fontSize: "0.78rem",
+                              minWidth: 160
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              onUpdateDisplayName(draftName.trim());
+                              setIsEditingName(false);
+                            }}
+                            disabled={Boolean(isDisplayNameSaving)}
+                            style={pillStyle("active", Boolean(isDisplayNameSaving))}
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDraftName(userDisplayName);
+                              setIsEditingName(false);
+                            }}
+                            style={pillStyle("neutral")}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingName(true)}
+                          style={pillStyle("neutral")}
+                        >
+                          Edit name
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {displayNameError && (
+                    <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>{displayNameError}</span>
+                  )}
+                </div>
               )}
             </div>
             <button type="button" onClick={onLogout} style={pillStyle("danger")}>

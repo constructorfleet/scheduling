@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { colors, shadows } from "../theme";
 import type { Role } from "../data/generated";
@@ -87,6 +88,8 @@ export default function UserManagementPanel({
   onRefresh,
   onClose
 }: UserManagementPanelProps) {
+  const [copiedInviteId, setCopiedInviteId] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
   if (!isOpen) {
     return null;
   }
@@ -487,8 +490,46 @@ export default function UserManagementPanel({
                             type="button"
                             onClick={() => {
                               const inviteUrl = invite.inviteUrl;
-                              if (inviteUrl && navigator?.clipboard?.writeText) {
-                                void navigator.clipboard.writeText(inviteUrl);
+                              if (!inviteUrl) {
+                                return;
+                              }
+                              setCopyError(null);
+                              const fallbackCopy = () => {
+                                const textarea = document.createElement("textarea");
+                                textarea.value = inviteUrl;
+                                textarea.style.position = "fixed";
+                                textarea.style.opacity = "0";
+                                document.body.appendChild(textarea);
+                                textarea.focus();
+                                textarea.select();
+                                const success = document.execCommand("copy");
+                                document.body.removeChild(textarea);
+                                return success;
+                              };
+                              if (navigator?.clipboard?.writeText) {
+                                navigator.clipboard
+                                  .writeText(inviteUrl)
+                                  .then(() => {
+                                    setCopiedInviteId(invite.id);
+                                    setTimeout(() => setCopiedInviteId(null), 2000);
+                                  })
+                                  .catch(() => {
+                                    const success = fallbackCopy();
+                                    if (success) {
+                                      setCopiedInviteId(invite.id);
+                                      setTimeout(() => setCopiedInviteId(null), 2000);
+                                    } else {
+                                      setCopyError("Copy failed. Please copy manually.");
+                                    }
+                                  });
+                              } else {
+                                const success = fallbackCopy();
+                                if (success) {
+                                  setCopiedInviteId(invite.id);
+                                  setTimeout(() => setCopiedInviteId(null), 2000);
+                                } else {
+                                  setCopyError("Copy failed. Please copy manually.");
+                                }
                               }
                             }}
                             style={{
@@ -500,8 +541,11 @@ export default function UserManagementPanel({
                               fontSize: "0.78rem"
                             }}
                           >
-                            Copy link
+                            {copiedInviteId === invite.id ? "Copied" : "Copy link"}
                           </button>
+                        )}
+                        {copyError && (
+                          <span style={{ fontSize: "0.75rem", color: "#b91c1c" }}>{copyError}</span>
                         )}
                       </div>
                     </div>
