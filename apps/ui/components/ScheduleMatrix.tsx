@@ -898,14 +898,13 @@ export default function ScheduleMatrix({
                               });
                             }}
                             style={{
-                              height: 30,
-                              borderRadius: 8,
-                              border: "1px dashed #cbd5f5",
-                              background: "#e2e8f0",
-                              fontSize: "0.7rem",
-                              color: "#64748b",
-                              textAlign: "left",
-                              paddingLeft: "0.5rem",
+                              borderRadius: 999,
+                              border: `1px solid ${colors.borderDefault}`,
+                              background: colors.surfaceRaised,
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: colors.textPrimary,
+                              padding: "0.3rem 0.7rem",
                               cursor: "pointer"
                             }}
                           >
