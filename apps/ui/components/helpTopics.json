@@ -1,0 +1,195 @@
+[
+  {
+    "id": "overview",
+    "title": "Scheduler overview",
+    "summary": "Build each week by setting day metadata first, then assigning staff blocks and clearing violations.",
+    "howTo": [
+      "Pick the school and week in the top banner.",
+      "Set enrollment, schedule type, and field trip details for each open day.",
+      "Enter clock-in and clock-out blocks per staff member. Multiple non-contiguous blocks are allowed.",
+      "Open Violation Navigator and resolve all critical items before publishing."
+    ],
+    "examples": [
+      "Example: If Monday enrollment is 32 with ratio 1:10, schedule at least 4 adults during active segments.",
+      "Example: A split shift can be entered as 7:00 AM-10:30 AM and 2:00 PM-5:00 PM for the same person."
+    ],
+    "related": ["schedule-grid", "violations", "settings-overview"]
+  },
+  {
+    "id": "schedule-grid",
+    "title": "Schedule grid",
+    "summary": "The grid combines day metadata and employee time blocks in one place.",
+    "howTo": [
+      "For each day column, confirm schedule type, enrollment, and field trip values.",
+      "Use Add block in a staff row to create a new clock-in/clock-out block.",
+      "Click an existing block to edit or delete it.",
+      "If a red warning appears, adjust times or staffing until the warning clears."
+    ],
+    "examples": [
+      "Example: Add two blocks for one employee on Tuesday: 8:00 AM-11:00 AM and 1:00 PM-4:30 PM.",
+      "Example: Closed days lock metadata and block creation for that day."
+    ],
+    "related": ["auto-schedule", "violations"]
+  },
+  {
+    "id": "auto-schedule",
+    "title": "Auto-schedule",
+    "summary": "Auto-schedule can generate a full schedule or improve the existing one.",
+    "howTo": [
+      "Click Auto in the top banner.",
+      "If metadata is missing, fill the required day fields first.",
+      "Choose whether to replace existing assignments or keep and improve them.",
+      "Review remaining violations after the run."
+    ],
+    "examples": [
+      "Example: Use replace mode at the start of a week for a fresh draft.",
+      "Example: Use keep mode mid-week to patch gaps without losing manual edits."
+    ],
+    "related": ["schedule-grid", "violations"]
+  },
+  {
+    "id": "violations",
+    "title": "Violation navigator",
+    "summary": "Violations show compliance gaps and link directly to affected schedule blocks.",
+    "howTo": [
+      "Open Violation Navigator from the top banner.",
+      "Sort through critical items first.",
+      "Use Focus Segment to jump to the exact block or day column.",
+      "Make edits in the grid and confirm the violation count decreases automatically."
+    ],
+    "examples": [
+      "Example: Ratio staffing gap usually needs added staff or corrected enrollment.",
+      "Example: Timeline overlap violations require shifting one of the overlapping blocks."
+    ],
+    "related": ["schedule-grid", "audit"]
+  },
+  {
+    "id": "audit",
+    "title": "Audit timeline",
+    "summary": "Audit timeline records key scheduling actions and supports undo/redo.",
+    "howTo": [
+      "Open Audit Log from the top banner.",
+      "Review entries to understand what changed and when.",
+      "Use Undo/Redo to move through recent schedule edits.",
+      "Use note details to verify school/day context."
+    ],
+    "examples": [
+      "Example: If an assignment was removed by mistake, press Undo from the audit panel.",
+      "Example: After a correction, use Redo to compare two staffing options quickly."
+    ],
+    "related": ["violations", "schedule-grid"]
+  },
+  {
+    "id": "settings-overview",
+    "title": "Settings overview",
+    "summary": "Settings control ratios, operating windows, and staff data used by validations and scheduling.",
+    "howTo": [
+      "Open Settings from the top banner.",
+      "Use tabs to edit one area at a time.",
+      "Save each tab before switching or closing.",
+      "Return to the schedule grid to apply the updated rules."
+    ],
+    "examples": [
+      "Example: Add a new schedule type before assigning it to a day.",
+      "Example: Update employee availability before creating their blocks."
+    ],
+    "related": [
+      "settings-school",
+      "settings-schedule-types",
+      "settings-operating-hours",
+      "settings-field-trips",
+      "settings-job-titles",
+      "settings-employees"
+    ]
+  },
+  {
+    "id": "settings-school",
+    "title": "School settings",
+    "summary": "Set school-level policies such as openers/closers, CPR requirement, and closed days.",
+    "howTo": [
+      "Edit school name and baseline policy counts.",
+      "Set required medical delegation and CPR policy flags.",
+      "Mark closed days to disable scheduling for those days.",
+      "Save school settings before leaving the tab."
+    ],
+    "examples": [
+      "Example: Setting Saturday closed removes Saturday scheduling requirements.",
+      "Example: Enabling CPR requirement means non-current CPR staff can trigger validation issues."
+    ]
+  },
+  {
+    "id": "settings-schedule-types",
+    "title": "Schedule types",
+    "summary": "Schedule types define the staffing ratio used by each day.",
+    "howTo": [
+      "Add or edit schedule type names.",
+      "Set adult:student ratio values for each type.",
+      "Use clear descriptions so directors know when to use each type.",
+      "Save schedule types and then apply them in the grid."
+    ],
+    "examples": [
+      "Example: Full day ratio 1:10, half day ratio 1:12.",
+      "Example: Use custom schedule type labels for district-specific programs."
+    ]
+  },
+  {
+    "id": "settings-operating-hours",
+    "title": "Operating hours",
+    "summary": "Operating hours define open/close windows by schedule type and day set.",
+    "howTo": [
+      "Create operating hour sets and assign days of week.",
+      "Prevent overlap for the same schedule type and day.",
+      "Use open and close times that match policy and building operations.",
+      "Save once overlap warnings are cleared."
+    ],
+    "examples": [
+      "Example: Regular days Mon-Fri 7:00 AM-5:30 PM.",
+      "Example: Summer type Mon-Thu 8:00 AM-4:00 PM."
+    ]
+  },
+  {
+    "id": "settings-field-trips",
+    "title": "Field trip rules",
+    "summary": "Field trip types can enforce stricter adult and leader ratios than normal day ratios.",
+    "howTo": [
+      "Add field trip types used by your school.",
+      "Set adult ratio and optional leader ratio.",
+      "Set leader ratio to 0:0 to disable leader-specific requirements.",
+      "Save then choose the field trip type on the schedule grid."
+    ],
+    "examples": [
+      "Example: Zoo trip adults 1:8 and leaders 1:20.",
+      "Example: Campus walk adults 1:12 with leader ratio disabled (0:0)."
+    ]
+  },
+  {
+    "id": "settings-job-titles",
+    "title": "Job titles",
+    "summary": "Job title flags determine leadership eligibility and open/close requirements.",
+    "howTo": [
+      "Add job titles used by your staff.",
+      "Mark titles as leader qualified when applicable.",
+      "Enable open/close leader requirement for titles that must supervise those windows.",
+      "Save job title changes before assigning staff."
+    ],
+    "examples": [
+      "Example: Mark Director as leader qualified and required at open/close.",
+      "Example: Mark Assistant as not leader qualified."
+    ]
+  },
+  {
+    "id": "settings-employees",
+    "title": "Employees",
+    "summary": "Maintain staff records, availability, and time-off windows used by scheduler validations.",
+    "howTo": [
+      "Create or edit employee records and job titles.",
+      "Set max hours/day and max hours/week limits.",
+      "Configure availability windows for each day and add requested days off.",
+      "Save employee changes before scheduling blocks."
+    ],
+    "examples": [
+      "Example: Employee available Mon 7:00 AM-11:00 AM and 1:00 PM-5:00 PM.",
+      "Example: Enter planned PTO range to prevent accidental assignment."
+    ]
+  }
+]
