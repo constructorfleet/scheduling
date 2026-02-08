@@ -356,6 +356,19 @@ const buildServer = async () => {
     return auth;
   };
 
+  const requireSuperUser = async (request: FastifyRequest, reply: FastifyReply) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      reply.code(401).send({ message: "Authentication required." });
+      return null;
+    }
+    if (!auth.isSuperUser) {
+      reply.code(403).send({ message: "Super user access required." });
+      return null;
+    }
+    return auth;
+  };
+
   const isIpRateLimited = (ipAddress: string) => {
     const now = Date.now();
     const cutoff = now - LOGIN_RATE_LIMIT_WINDOW_MS;
@@ -788,6 +801,123 @@ const buildServer = async () => {
       name?: string;
     };
     const schoolId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : `school-${Date.now()}`;
+    const schoolName = typeof body.name === "string" && body.name.trim() ? body.name.trim() : schoolId;
+    const prisma = getPrisma();
+    const school = await prisma.school.upsert({
+      where: { id: schoolId },
+      create: {
+        id: schoolId,
+        districtId,
+        name: schoolName,
+        closedDays: [],
+        openerCount: 0,
+        closerCount: 0,
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      },
+      update: {
+        districtId,
+        name: schoolName
+      }
+    });
+    return reply.send({ school });
+  });
+
+  fastify.get("/api/admin/districts", async (request, reply) => {
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      return reply.code(401).send({ message: "Authentication required." });
+    }
+    const prisma = getPrisma();
+    const districts = auth.isSuperUser
+      ? await prisma.district.findMany({
+          orderBy: { name: "asc" }
+        })
+      : await prisma.district.findMany({
+          where: {
+            memberships: {
+              some: { userId: auth.userId }
+            }
+          },
+          orderBy: { name: "asc" }
+        });
+    return reply.send({ districts });
+  });
+
+  fastify.post("/api/admin/districts", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    if (!(await requireSuperUser(request, reply))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      id?: string;
+      name?: string;
+    };
+    const districtId = typeof body.id === "string" && body.id.trim() ? body.id.trim() : `district-${Date.now()}`;
+    const districtName = typeof body.name === "string" && body.name.trim() ? body.name.trim() : districtId;
+    const prisma = getPrisma();
+    const district = await prisma.district.upsert({
+      where: { id: districtId },
+      create: {
+        id: districtId,
+        name: districtName
+      },
+      update: {
+        name: districtName
+      }
+    });
+    return reply.send({ district });
+  });
+
+  fastify.put("/api/admin/districts/:districtId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireSuperUser(request, reply))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      name?: string;
+    };
+    const districtName = typeof body.name === "string" ? body.name.trim() : "";
+    if (!districtName) {
+      return reply.code(400).send({ message: "name is required." });
+    }
+    const prisma = getPrisma();
+    const district = await prisma.district.update({
+      where: { id: districtId },
+      data: { name: districtName }
+    });
+    return reply.send({ district });
+  });
+
+  fastify.get("/api/admin/districts/:districtId/schools", async (request, reply) => {
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const prisma = getPrisma();
+    const schools = await prisma.school.findMany({
+      where: { districtId },
+      orderBy: { name: "asc" }
+    });
+    return reply.send({ schools });
+  });
+
+  fastify.put("/api/admin/districts/:districtId/schools/:schoolId", async (request, reply) => {
+    if (!requireCsrf(request, reply)) {
+      return;
+    }
+    const { districtId, schoolId } = request.params as { districtId: string; schoolId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const body = (request.body ?? {}) as {
+      name?: string;
+    };
     const schoolName = typeof body.name === "string" && body.name.trim() ? body.name.trim() : schoolId;
     const prisma = getPrisma();
     const school = await prisma.school.upsert({

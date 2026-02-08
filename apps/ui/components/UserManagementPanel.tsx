@@ -14,6 +14,7 @@ interface UserManagementPanelProps {
   onScopeChange: (scope: UserManagementScope) => void;
   canUseDistrictScope: boolean;
   canUseSchoolScope: boolean;
+  canManageDistricts: boolean;
   districtOptions: { districtId: string; role: Role }[];
   selectedDistrictId: string;
   onSelectDistrict: (districtId: string) => void;
@@ -27,6 +28,16 @@ interface UserManagementPanelProps {
   inviteSubmitting: boolean;
   inviteFeedback: string | null;
   onInviteDraftChange: (next: InviteDraft) => void;
+  districts: Array<{ id: string; name: string }>;
+  districtSchools: Array<{ id: string; districtId: string; name: string }>;
+  districtDraft: { id: string; name: string };
+  schoolDraft: { id: string; name: string };
+  districtSubmitting: boolean;
+  schoolSubmitting: boolean;
+  onDistrictDraftChange: (next: { id: string; name: string }) => void;
+  onSchoolDraftChange: (next: { id: string; name: string }) => void;
+  onSaveDistrict: () => void;
+  onSaveSchool: () => void;
   onSendInvite: () => void;
   onRefresh: () => void;
   onClose: () => void;
@@ -47,6 +58,7 @@ export default function UserManagementPanel({
   onScopeChange,
   canUseDistrictScope,
   canUseSchoolScope,
+  canManageDistricts,
   districtOptions,
   selectedDistrictId,
   onSelectDistrict,
@@ -60,6 +72,16 @@ export default function UserManagementPanel({
   inviteSubmitting,
   inviteFeedback,
   onInviteDraftChange,
+  districts,
+  districtSchools,
+  districtDraft,
+  schoolDraft,
+  districtSubmitting,
+  schoolSubmitting,
+  onDistrictDraftChange,
+  onSchoolDraftChange,
+  onSaveDistrict,
+  onSaveSchool,
   onSendInvite,
   onRefresh,
   onClose
@@ -199,6 +221,134 @@ export default function UserManagementPanel({
             </label>
           )}
         </div>
+
+        {scope === "district" && (
+          <section
+            style={{
+              marginTop: "0.9rem",
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+              padding: "0.8rem",
+              background: "#f8fafc"
+            }}
+          >
+            <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>District management</h3>
+            <div style={{ display: "grid", gap: "0.55rem", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+              <input
+                value={districtDraft.id}
+                onChange={(event) => onDistrictDraftChange({ ...districtDraft, id: event.target.value })}
+                placeholder="District ID (required to edit)"
+                disabled={!canManageDistricts}
+                style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "0.5rem 0.65rem" }}
+              />
+              <input
+                value={districtDraft.name}
+                onChange={(event) => onDistrictDraftChange({ ...districtDraft, name: event.target.value })}
+                placeholder="District name"
+                disabled={!canManageDistricts}
+                style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "0.5rem 0.65rem" }}
+              />
+              <button
+                type="button"
+                onClick={onSaveDistrict}
+                disabled={!canManageDistricts || districtSubmitting || !districtDraft.name.trim()}
+                style={{
+                  borderRadius: 8,
+                  border: "none",
+                  background: !canManageDistricts || districtSubmitting ? "#94a3b8" : "#0f766e",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "0.5rem 0.75rem",
+                  cursor: !canManageDistricts || districtSubmitting ? "not-allowed" : "pointer"
+                }}
+              >
+                {districtSubmitting ? "Saving..." : districtDraft.id.trim() ? "Update district" : "Create district"}
+              </button>
+            </div>
+            <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+              {districts.map((district) => (
+                <button
+                  key={district.id}
+                  type="button"
+                  onClick={() => onDistrictDraftChange({ id: district.id, name: district.name })}
+                  style={{
+                    borderRadius: 999,
+                    border: "1px solid #cbd5e1",
+                    background: "#fff",
+                    color: "#334155",
+                    padding: "0.22rem 0.62rem",
+                    fontSize: "0.78rem"
+                  }}
+                >
+                  {district.name} ({district.id})
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {scope === "district" && (
+          <section
+            style={{
+              marginTop: "0.9rem",
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+              padding: "0.8rem",
+              background: "#f8fafc"
+            }}
+          >
+            <h3 style={{ margin: "0 0 0.65rem", fontSize: "0.98rem", color: "#0f172a" }}>School management</h3>
+            <div style={{ display: "grid", gap: "0.55rem", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+              <input
+                value={schoolDraft.id}
+                onChange={(event) => onSchoolDraftChange({ ...schoolDraft, id: event.target.value })}
+                placeholder="School ID"
+                style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "0.5rem 0.65rem" }}
+              />
+              <input
+                value={schoolDraft.name}
+                onChange={(event) => onSchoolDraftChange({ ...schoolDraft, name: event.target.value })}
+                placeholder="School name"
+                style={{ border: "1px solid #cbd5e1", borderRadius: 8, padding: "0.5rem 0.65rem" }}
+              />
+              <button
+                type="button"
+                onClick={onSaveSchool}
+                disabled={schoolSubmitting || !schoolDraft.id.trim() || !schoolDraft.name.trim()}
+                style={{
+                  borderRadius: 8,
+                  border: "none",
+                  background: schoolSubmitting ? "#94a3b8" : "#0f766e",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "0.5rem 0.75rem",
+                  cursor: schoolSubmitting ? "not-allowed" : "pointer"
+                }}
+              >
+                {schoolSubmitting ? "Saving..." : "Save school"}
+              </button>
+            </div>
+            <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+              {districtSchools.map((school) => (
+                <button
+                  key={school.id}
+                  type="button"
+                  onClick={() => onSchoolDraftChange({ id: school.id, name: school.name })}
+                  style={{
+                    borderRadius: 999,
+                    border: "1px solid #cbd5e1",
+                    background: "#fff",
+                    color: "#334155",
+                    padding: "0.22rem 0.62rem",
+                    fontSize: "0.78rem"
+                  }}
+                >
+                  {school.name} ({school.id})
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section
           style={{

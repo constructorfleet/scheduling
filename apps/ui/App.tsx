@@ -205,6 +205,8 @@ const canManageSettingsForRole = (role: Role | null) =>
 const canManageUsersForRole = (role: Role | null) =>
   role !== null && ["super_user", "district_admin", "district_user", "school_admin"].includes(role);
 
+const canManageDistrictsForRole = (role: Role | null) => role === "super_user";
+
 const USER_POLICY_CITATION: PolicyCitation = {
   id: "ui-audit",
   name: "User schedule action",
@@ -309,6 +311,7 @@ export default function App() {
   const canEditSchedule = canEditScheduleForRole(currentRole);
   const canManageSettings = canManageSettingsForRole(currentRole);
   const canManageUsers = canManageUsersForRole(currentRole);
+  const canManageDistricts = canManageDistrictsForRole(currentRole);
   const canUseDistrictScope =
     currentRole !== null && ["super_user", "district_admin"].includes(currentRole);
   const canUseSchoolScope =
@@ -331,11 +334,22 @@ export default function App() {
     inviteDraft,
     setInviteDraft,
     inviteRoleOptions,
+    districts,
+    districtSchools,
+    districtDraft,
+    setDistrictDraft,
+    schoolDraft,
+    setSchoolDraft,
+    districtSubmitting,
+    schoolSubmitting,
     refreshUserManagement,
     handleSendUserInvite,
-    toggleUserManagement
+    toggleUserManagement,
+    handleSaveDistrict,
+    handleSaveSchool
   } = useUserManagement({
     canManageUsers,
+    canManageDistricts,
     canUseDistrictScope,
     canUseSchoolScope,
     selectedSchoolId,
@@ -2257,6 +2271,7 @@ export default function App() {
                 onScopeChange={setUserManagementScope}
                 canUseDistrictScope={canUseDistrictScope}
                 canUseSchoolScope={canUseSchoolScope}
+                canManageDistricts={canManageDistricts}
                 districtOptions={districtMemberships}
                 selectedDistrictId={selectedDistrictId}
                 onSelectDistrict={setSelectedDistrictId}
@@ -2270,6 +2285,20 @@ export default function App() {
                 inviteSubmitting={inviteSubmitting}
                 inviteFeedback={inviteFeedback}
                 onInviteDraftChange={setInviteDraft}
+                districts={districts}
+                districtSchools={districtSchools}
+                districtDraft={districtDraft}
+                schoolDraft={schoolDraft}
+                districtSubmitting={districtSubmitting}
+                schoolSubmitting={schoolSubmitting}
+                onDistrictDraftChange={setDistrictDraft}
+                onSchoolDraftChange={setSchoolDraft}
+                onSaveDistrict={() => {
+                  void handleSaveDistrict();
+                }}
+                onSaveSchool={() => {
+                  void handleSaveSchool();
+                }}
                 onSendInvite={() => {
                   void handleSendUserInvite();
                 }}

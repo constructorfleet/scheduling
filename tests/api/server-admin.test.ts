@@ -15,6 +15,11 @@ const mockPrisma: any = {
   districtMembership: {
     upsert: jest.fn()
   },
+  district: {
+    upsert: jest.fn(),
+    update: jest.fn(),
+    findMany: jest.fn()
+  },
   schoolMembership: {
     upsert: jest.fn()
   },
@@ -88,6 +93,10 @@ describe("server admin and invite routes", () => {
     jest.clearAllMocks();
     mockPrisma.school.findUnique.mockResolvedValue({ districtId: "district-1" });
     mockPrisma.school.upsert.mockResolvedValue({ id: "school-2", districtId: "district-1", name: "School Two" });
+    mockPrisma.school.findMany.mockResolvedValue([{ id: "school-1", districtId: "district-1", name: "School One" }]);
+    mockPrisma.district.upsert.mockResolvedValue({ id: "district-2", name: "District Two" });
+    mockPrisma.district.update.mockResolvedValue({ id: "district-1", name: "District One Updated" });
+    mockPrisma.district.findMany.mockResolvedValue([{ id: "district-1", name: "District One" }]);
     mockPrisma.userInvite.updateMany.mockResolvedValue({ count: 0 });
     mockPrisma.userInvite.create.mockResolvedValue({
       id: "invite-1",
@@ -307,6 +316,78 @@ describe("server admin and invite routes", () => {
     const body = response.json();
     expect(Array.isArray(body.invites)).toBe(true);
     expect(body.invites[0].inviteUrl).toContain("token=");
+    await server.close();
+  });
+
+  test("super user can create and update districts", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ isSuperUser: true }));
+    const server = await buildServer();
+    const createResponse = await server.inject({
+      method: "POST",
+      url: "/api/admin/districts",
+      headers: {
+        "x-csrf-token": "csrf-token",
+        cookie: authCookie
+      },
+      payload: { id: "district-2", name: "District Two" }
+    });
+    expect(createResponse.statusCode).toBe(200);
+    expect(mockPrisma.district.upsert).toHaveBeenCalled();
+
+    const updateResponse = await server.inject({
+      method: "PUT",
+      url: "/api/admin/districts/district-1",
+      headers: {
+        "x-csrf-token": "csrf-token",
+        cookie: authCookie
+      },
+      payload: { name: "District One Updated" }
+    });
+    expect(updateResponse.statusCode).toBe(200);
+    expect(mockPrisma.district.update).toHaveBeenCalled();
+    await server.close();
+  });
+
+  test("district admin cannot create districts", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+    const server = await buildServer();
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/admin/districts",
+      headers: {
+        "x-csrf-token": "csrf-token",
+        cookie: authCookie
+      },
+      payload: { id: "district-2", name: "District Two" }
+    });
+    expect(response.statusCode).toBe(403);
+    await server.close();
+  });
+
+  test("district admin can list and update district schools", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+    const server = await buildServer();
+    const listResponse = await server.inject({
+      method: "GET",
+      url: "/api/admin/districts/district-1/schools",
+      headers: {
+        cookie: "sched_session=session-token"
+      }
+    });
+    expect(listResponse.statusCode).toBe(200);
+    expect(mockPrisma.school.findMany).toHaveBeenCalled();
+
+    const updateResponse = await server.inject({
+      method: "PUT",
+      url: "/api/admin/districts/district-1/schools/school-2",
+      headers: {
+        "x-csrf-token": "csrf-token",
+        cookie: authCookie
+      },
+      payload: { name: "School Two Updated" }
+    });
+    expect(updateResponse.statusCode).toBe(200);
+    expect(mockPrisma.school.upsert).toHaveBeenCalled();
     await server.close();
   });
 });

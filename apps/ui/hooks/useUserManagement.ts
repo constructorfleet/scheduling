@@ -2,13 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import type { Role } from "../data/generated";
 import type { UserManagementScope } from "../data/apiClient";
 import {
+  createAdminDistrict,
+  fetchAdminDistricts,
+  fetchDistrictSchools,
   fetchDistrictInvites,
   fetchDistrictUsers,
   fetchSchoolInvites,
   fetchSchoolUsers,
   inviteDistrictUser,
   inviteSchoolUser,
-  isApiErrorStatus
+  isApiErrorStatus,
+  updateAdminDistrict,
+  upsertDistrictSchool
 } from "../data/apiClient";
 
 type DistrictMembership = {
@@ -24,6 +29,7 @@ type InviteDraft = {
 
 interface UseUserManagementArgs {
   canManageUsers: boolean;
+  canManageDistricts: boolean;
   canUseDistrictScope: boolean;
   canUseSchoolScope: boolean;
   selectedSchoolId: string;
@@ -33,6 +39,7 @@ interface UseUserManagementArgs {
 
 export const useUserManagement = ({
   canManageUsers,
+  canManageDistricts,
   canUseDistrictScope,
   canUseSchoolScope,
   selectedSchoolId,
@@ -72,6 +79,12 @@ export const useUserManagement = ({
     displayName: "",
     role: "school_user"
   });
+  const [districts, setDistricts] = useState<Array<{ id: string; name: string }>>([]);
+  const [districtSchools, setDistrictSchools] = useState<Array<{ id: string; districtId: string; name: string }>>([]);
+  const [districtDraft, setDistrictDraft] = useState<{ id: string; name: string }>({ id: "", name: "" });
+  const [schoolDraft, setSchoolDraft] = useState<{ id: string; name: string }>({ id: "", name: "" });
+  const [districtSubmitting, setDistrictSubmitting] = useState(false);
+  const [schoolSubmitting, setSchoolSubmitting] = useState(false);
 
   useEffect(() => {
     if (!selectedDistrictId && districtMemberships.length > 0) {
@@ -114,6 +127,10 @@ export const useUserManagement = ({
     setUserManagementLoading(true);
     setUserManagementError(null);
     try {
+      if (canManageDistricts) {
+        const districtsResponse = await fetchAdminDistricts();
+        setDistricts(districtsResponse?.districts ?? []);
+      }
       if (userManagementScope === "district") {
         if (!selectedDistrictId) {
           setManagedUsers([]);
@@ -126,6 +143,8 @@ export const useUserManagement = ({
         ]);
         setManagedUsers(usersResponse?.users ?? []);
         setManagedInvites(invitesResponse?.invites ?? []);
+        const schoolsResponse = await fetchDistrictSchools(selectedDistrictId);
+        setDistrictSchools(schoolsResponse?.schools ?? []);
       } else {
         const [usersResponse, invitesResponse] = await Promise.all([
           fetchSchoolUsers(selectedSchoolId),
@@ -223,6 +242,68 @@ export const useUserManagement = ({
     setShowUserManagement((prev) => !prev);
   };
 
+  const handleSaveDistrict = async () => {
+    if (!canManageDistricts) {
+      setUserManagementError("Only super users can manage districts.");
+      return;
+    }
+    const districtId = districtDraft.id.trim();
+    const districtName = districtDraft.name.trim();
+    if (!districtName) {
+      setUserManagementError("District name is required.");
+      return;
+    }
+    setDistrictSubmitting(true);
+    setUserManagementError(null);
+    try {
+      if (districtId) {
+        await updateAdminDistrict(districtId, { name: districtName });
+      } else {
+        await createAdminDistrict({ name: districtName });
+      }
+      setDistrictDraft({ id: "", name: "" });
+      await refreshUserManagement();
+      setInviteFeedback("District saved.");
+    } catch (error) {
+      if (isApiErrorStatus(error, 403)) {
+        setUserManagementError("Only super users can manage districts.");
+      } else {
+        setUserManagementError("Could not save district.");
+      }
+    } finally {
+      setDistrictSubmitting(false);
+    }
+  };
+
+  const handleSaveSchool = async () => {
+    const schoolId = schoolDraft.id.trim();
+    const schoolName = schoolDraft.name.trim();
+    if (!selectedDistrictId) {
+      setUserManagementError("Select a district first.");
+      return;
+    }
+    if (!schoolId || !schoolName) {
+      setUserManagementError("School ID and name are required.");
+      return;
+    }
+    setSchoolSubmitting(true);
+    setUserManagementError(null);
+    try {
+      await upsertDistrictSchool(selectedDistrictId, schoolId, { name: schoolName });
+      setSchoolDraft({ id: "", name: "" });
+      await refreshUserManagement();
+      setInviteFeedback("School saved.");
+    } catch (error) {
+      if (isApiErrorStatus(error, 403)) {
+        setUserManagementError("You do not have permission to manage schools in this district.");
+      } else {
+        setUserManagementError("Could not save school.");
+      }
+    } finally {
+      setSchoolSubmitting(false);
+    }
+  };
+
   return {
     showUserManagement,
     setShowUserManagement,
@@ -239,8 +320,18 @@ export const useUserManagement = ({
     inviteDraft,
     setInviteDraft,
     inviteRoleOptions,
+    districts,
+    districtSchools,
+    districtDraft,
+    setDistrictDraft,
+    schoolDraft,
+    setSchoolDraft,
+    districtSubmitting,
+    schoolSubmitting,
     refreshUserManagement,
     handleSendUserInvite,
-    toggleUserManagement
+    toggleUserManagement,
+    handleSaveDistrict,
+    handleSaveSchool
   };
 };

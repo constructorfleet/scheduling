@@ -56,8 +56,21 @@ export type AdminInviteRequest = {
   role: Role;
 };
 
+export type AdminDistrictRecord = {
+  id: string;
+  name: string;
+};
+
+export type AdminSchoolRecord = {
+  id: string;
+  districtId: string;
+  name: string;
+};
+
 type AdminUsersResponse = { users: AdminUserRecord[] };
 type AdminInvitesResponse = { invites: AdminInviteRecord[] };
+type AdminDistrictsResponse = { districts: AdminDistrictRecord[] };
+type AdminSchoolsResponse = { schools: AdminSchoolRecord[] };
 type AdminInviteCreateResponse = {
   invite: AdminInviteRecord;
   delivery: {
@@ -181,3 +194,38 @@ export const inviteSchoolUser = async (schoolId: string, payload: AdminInviteReq
     },
     body: JSON.stringify(payload)
   });
+
+export const fetchAdminDistricts = async () => requestJson<AdminDistrictsResponse>("/api/admin/districts");
+
+export const createAdminDistrict = async (payload: { id?: string; name?: string }) =>
+  requestJson<{ district: AdminDistrictRecord }>("/api/admin/districts", {
+    method: "POST",
+    headers: {
+      "x-csrf-token": getCsrfToken()
+    },
+    body: JSON.stringify(payload)
+  });
+
+export const updateAdminDistrict = async (districtId: string, payload: { name: string }) =>
+  requestJson<{ district: AdminDistrictRecord }>(`/api/admin/districts/${encodeURIComponent(districtId)}`, {
+    method: "PUT",
+    headers: {
+      "x-csrf-token": getCsrfToken()
+    },
+    body: JSON.stringify(payload)
+  });
+
+export const fetchDistrictSchools = async (districtId: string) =>
+  requestJson<AdminSchoolsResponse>(`/api/admin/districts/${encodeURIComponent(districtId)}/schools`);
+
+export const upsertDistrictSchool = async (districtId: string, schoolId: string, payload: { name: string }) =>
+  requestJson<{ school: AdminSchoolRecord }>(
+    `/api/admin/districts/${encodeURIComponent(districtId)}/schools/${encodeURIComponent(schoolId)}`,
+    {
+      method: "PUT",
+      headers: {
+        "x-csrf-token": getCsrfToken()
+      },
+      body: JSON.stringify(payload)
+    }
+  );
