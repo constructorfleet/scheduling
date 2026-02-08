@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { AuditEvent } from "../types";
 import HelpIconButton from "./HelpIconButton";
 import type { HelpTopicId } from "./helpContent";
+import { colors, shadows } from "../theme";
 
 interface AuditTimelineProps {
   events: AuditEvent[];
@@ -95,11 +96,11 @@ export default function AuditTimeline({
         width: "min(380px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
-        background: "#f1f5f9",
+        background: colors.surface,
         borderRadius: 18,
         padding: "0.75rem",
-        boxShadow: "0 25px 50px rgba(15, 23, 42, 0.25)",
-        border: "1px solid #e2e8f0",
+        boxShadow: shadows.card,
+        border: `1px solid ${colors.borderSubtle}`,
         zIndex: 40
       }}
     >
@@ -139,8 +140,8 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e5e7eb",
-              background: canUndo ? "#eff6ff" : "#f1f5f9",
-              color: canUndo ? "#2563eb" : "#94a3b8",
+              background: canUndo ? colors.surfaceAccent : colors.surface,
+              color: canUndo ? colors.brandBlue : "#94a3b8",
               padding: "0.3rem 0.7rem"
             }}
           >
@@ -152,8 +153,8 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e5e7eb",
-              background: canRedo ? "#eff6ff" : "#f1f5f9",
-              color: canRedo ? "#2563eb" : "#94a3b8",
+              background: canRedo ? colors.surfaceAccent : colors.surface,
+              color: canRedo ? colors.brandBlue : "#94a3b8",
               padding: "0.3rem 0.7rem"
             }}
           >
@@ -165,8 +166,8 @@ export default function AuditTimeline({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: "#e2e8f0",
-              color: "#0f172a",
+              background: colors.surfaceAlt,
+              color: colors.textPrimary,
               padding: "0.3rem 0.7rem",
               fontSize: "0.8rem"
             }}

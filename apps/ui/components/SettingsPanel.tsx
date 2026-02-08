@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { DayOfWeek, FieldTripType, Employee, ScheduleType } from "@core/domain/types";
+import { colors, shadows } from "../theme";
 import {
   EmployeesSection,
   FieldTripsSection,
@@ -313,10 +314,10 @@ export default function SettingsPanel({
         transition={{ duration: 0.2, ease: "linear" }}
         style={{
           width: "min(1080px, 100%)",
-          background: "#f1f5f9",
+          background: colors.surface,
           borderRadius: 18,
-          boxShadow: "0 30px 60px rgba(15, 23, 42, 0.2)",
-          border: "1px solid #e2e8f0",
+          boxShadow: shadows.card,
+          border: `1px solid ${colors.borderSubtle}`,
           overflow: "hidden",
           maxHeight: "calc(100vh - 1.25rem)",
           display: "flex",
@@ -358,7 +359,7 @@ export default function SettingsPanel({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: "#e2e8f0",
+              background: colors.surfaceAlt,
               padding: "0.35rem 0.9rem"
             }}
           >
@@ -370,7 +371,7 @@ export default function SettingsPanel({
           style={{
             display: "flex",
             borderBottom: "1px solid #e5e7eb",
-            background: "#e2e8f0",
+            background: colors.surfaceAlt,
             overflowX: "auto",
             alignItems: "center"
           }}
@@ -586,7 +587,7 @@ export default function SettingsPanel({
         <div
           style={{
             borderTop: "1px solid #e5e7eb",
-            background: "#e2e8f0",
+            background: colors.surfaceAlt,
             padding: "0.75rem 1.5rem",
             display: "flex",
             justifyContent: "flex-end",

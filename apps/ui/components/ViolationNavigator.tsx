@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { RuleViolation } from "../types";
 import HelpIconButton from "./HelpIconButton";
 import type { HelpTopicId } from "./helpContent";
+import { colors, shadows } from "../theme";
 
 interface ViolationNavigatorProps {
   violations: RuleViolation[];
@@ -160,11 +161,11 @@ export default function ViolationNavigator({
         width: "min(360px, calc(100vw - 1.5rem))",
         maxHeight: "70vh",
         overflow: "hidden",
-        background: "#f1f5f9",
+        background: colors.surface,
         borderRadius: 18,
         padding: "0.75rem",
-        boxShadow: "0 25px 50px rgba(15, 23, 42, 0.25)",
-        border: "1px solid #e2e8f0",
+        boxShadow: shadows.card,
+        border: `1px solid ${colors.borderSubtle}`,
         zIndex: 40
       }}
     >
@@ -240,7 +241,7 @@ export default function ViolationNavigator({
               borderRadius: 12,
               border: "1px solid #e5e7eb",
               padding: "0.75rem",
-              background: "#f1f5f9",
+              background: colors.surface,
               display: "flex",
               flexDirection: "column",
               gap: "0.35rem"

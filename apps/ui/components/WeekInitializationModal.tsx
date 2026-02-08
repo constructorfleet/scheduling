@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { colors, shadows } from "../theme";
 
 interface WeekInitializationModalProps {
   isOpen: boolean;
@@ -43,10 +44,10 @@ export default function WeekInitializationModal({
         transition={{ duration: 0.2, ease: "linear" }}
         style={{
           width: "min(520px, 100%)",
-          background: "#f1f5f9",
+          background: colors.surface,
           borderRadius: 14,
-          border: "1px solid #e2e8f0",
-          boxShadow: "0 24px 48px rgba(15, 23, 42, 0.24)",
+          border: `1px solid ${colors.borderSubtle}`,
+          boxShadow: shadows.modal,
           padding: "1rem 1.1rem",
           display: "flex",
           flexDirection: "column",

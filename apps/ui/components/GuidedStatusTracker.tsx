@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { colors, shadows } from "../theme";
 import { GuidedStep } from "../types";
 
 interface GuidedStatusTrackerProps {
@@ -33,10 +34,10 @@ export default function GuidedStatusTracker({ steps, onStepAction }: GuidedStatu
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "linear", layout: { type: "tween", duration: 0.2, ease: "linear" } }}
       style={{
-        background: "#f1f5f9",
+        background: colors.surface,
         borderRadius: 18,
         padding: "1rem",
-        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.1)"
+        boxShadow: shadows.card
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem" }}>

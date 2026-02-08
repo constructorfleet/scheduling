@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { colors, shadows } from "../theme";
 import { HELP_TOPICS, HELP_TOPICS_BY_ID, HelpTopicId } from "./helpContent";
 
 interface HelpCenterModalProps {
@@ -66,10 +67,10 @@ export default function HelpCenterModal({
         style={{
           width: "min(980px, 100%)",
           maxHeight: "min(90vh, 880px)",
-          background: "#f1f5f9",
+          background: colors.surface,
           borderRadius: 18,
-          border: "1px solid #e2e8f0",
-          boxShadow: "0 30px 60px rgba(15, 23, 42, 0.35)",
+          border: `1px solid ${colors.borderSubtle}`,
+          boxShadow: shadows.card,
           display: "grid",
           gridTemplateColumns: "minmax(230px, 280px) minmax(0, 1fr)",
           overflow: "hidden"
@@ -78,7 +79,7 @@ export default function HelpCenterModal({
         <aside
           style={{
             borderRight: "1px solid #e5e7eb",
-            background: "#e2e8f0",
+            background: colors.surfaceAlt,
             display: "flex",
             flexDirection: "column",
             overflow: "auto"
@@ -135,7 +136,7 @@ export default function HelpCenterModal({
               style={{
                 borderRadius: 999,
                 border: "1px solid #cbd5e1",
-                background: "#e2e8f0",
+                background: colors.surfaceAlt,
                 color: "#0f172a",
                 padding: "0.35rem 0.8rem",
                 whiteSpace: "nowrap"

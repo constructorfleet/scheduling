@@ -1,4 +1,5 @@
 import type { LoginPayload } from "../data/generated";
+import { colors, gradients, shadows } from "../theme";
 
 interface AuthGateProps {
   authStatus: "loading" | "authenticated" | "unauthenticated";
@@ -35,7 +36,7 @@ export default function AuthGate({
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        background: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
+        background: gradients.appBackground,
         padding: "1.5rem",
         fontFamily: "Inter, sans-serif"
       }}
@@ -43,10 +44,10 @@ export default function AuthGate({
       <section
         style={{
           width: "min(420px, 100%)",
-          background: "#f1f5f9",
-          border: "1px solid #e2e8f0",
+          background: colors.surface,
+          border: `1px solid ${colors.borderSubtle}`,
           borderRadius: 14,
-          boxShadow: "0 20px 40px rgba(15,23,42,0.1)",
+          boxShadow: shadows.card,
           padding: "1rem"
         }}
       >

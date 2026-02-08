@@ -15,6 +15,7 @@ import { ScheduleTypeOption, FieldTripSelection } from "./DayMetadataStrip";
 import { parseTimeToMinutes } from "@core/rules/utils";
 import HelpIconButton from "./HelpIconButton";
 import type { HelpTopicId } from "./helpContent";
+import { colors, shadows } from "../theme";
 
 interface ScheduleMatrixProps {
   staff: Employee[];
@@ -270,10 +271,10 @@ export default function ScheduleMatrix({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "linear", layout: { type: "tween", duration: 0.2, ease: "linear" } }}
       style={{
-        background: "#f1f5f9",
+        background: colors.surface,
         borderRadius: 18,
         padding: "clamp(0.75rem, 2vw, 1rem)",
-        boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
+        boxShadow: shadows.card,
         overflowX: "auto"
       }}
     >
@@ -309,8 +310,8 @@ export default function ScheduleMatrix({
               style={{
                 textAlign: "left",
                 padding: "0.75rem",
-                border: "1px solid #e5e7eb",
-                background: "#e2e8f0",
+                border: `1px solid ${colors.borderStrong}`,
+                background: colors.surfaceAlt,
                 minWidth: 170
               }}
             >
@@ -343,8 +344,8 @@ export default function ScheduleMatrix({
                   data-day-column-header={day}
                   style={{
                     padding: "0.5rem",
-                    border: "1px solid #e5e7eb",
-                    background: isFocusedDay ? "#bfdbfe" : "#e2e8f0",
+                    border: `1px solid ${colors.borderStrong}`,
+                    background: isFocusedDay ? colors.brandBlueLight : colors.surfaceAlt,
                     minWidth: 160,
                     verticalAlign: "top",
                     boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
@@ -486,15 +487,15 @@ export default function ScheduleMatrix({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
-                  background: overscheduled ? "#fecdd3" : undefined
+                  background: overscheduled ? colors.dangerSurface : undefined
                 }}
               >
                 <td
                   style={{
-                    border: "1px solid #e5e7eb",
+                    border: `1px solid ${colors.borderStrong}`,
                     padding: "0.75rem",
                     verticalAlign: "top",
-                    background: overscheduled ? "#fecdd3" : "#f8fafc",
+                    background: overscheduled ? colors.dangerSurface : colors.surfaceAlt,
                     position: "relative"
                   }}
                 >
@@ -563,9 +564,9 @@ export default function ScheduleMatrix({
                         }}
                         style={{
                           borderRadius: 999,
-                          border: "1px solid #bfdbfe",
-                          background: reassignmentTarget ? "#dbeafe" : "#e2e8f0",
-                          color: reassignmentTarget ? "#1d4ed8" : "#94a3b8",
+                          border: `1px solid ${colors.brandBlueLight}`,
+                          background: reassignmentTarget ? colors.surfaceAccent : colors.surfaceAlt,
+                          color: reassignmentTarget ? colors.brandBlue : "#94a3b8",
                           padding: "0.25rem 0.65rem",
                           fontSize: "0.75rem"
                         }}
@@ -582,15 +583,15 @@ export default function ScheduleMatrix({
                           fontSize: "0.7rem",
                           padding: "0.1rem 0.45rem",
                           borderRadius: 999,
-                          border: "1px solid #e5e7eb",
-                          background: "#e2e8f0"
+                          border: `1px solid ${colors.borderStrong}`,
+                          background: colors.surfaceAlt
                         }}
                       >
                         {badge}
                       </span>
                     ))}
                   </div>
-                  <div style={{ marginTop: "0.45rem", fontSize: "0.78rem", color: overscheduled ? "#b91c1c" : "#475569", fontWeight: 600 }}>
+                  <div style={{ marginTop: "0.45rem", fontSize: "0.78rem", color: overscheduled ? colors.dangerText : colors.textSecondary, fontWeight: 600 }}>
                     Total hours: {totalHours.toFixed(1)}
                   </div>
                 </td>
@@ -623,7 +624,7 @@ export default function ScheduleMatrix({
                         border: cellBorder,
                         padding: "0.5rem",
                         verticalAlign: "top",
-                        background: closedDay ? "#e2e8f0" : isFocusedDay ? "#dbeafe" : overscheduled ? "#fecdd3" : "#f8fafc",
+                        background: closedDay ? colors.surfaceAlt : isFocusedDay ? colors.surfaceAccent : overscheduled ? colors.dangerSurface : colors.surfaceAlt,
                         position: "relative"
                       }}
                     >
@@ -651,9 +652,9 @@ export default function ScheduleMatrix({
                             width: 18,
                             height: 18,
                             borderRadius: "50%",
-                            border: "1px solid #dc2626",
-                            background: "#fee2e2",
-                            color: "#b91c1c",
+                            border: `1px solid ${colors.danger}`,
+                            background: colors.dangerSurface,
+                            color: colors.dangerText,
                             fontSize: "0.75rem",
                             fontWeight: 700,
                             display: "flex",
@@ -749,9 +750,9 @@ export default function ScheduleMatrix({
                                     width: 16,
                                     height: 16,
                                     borderRadius: "50%",
-                                    border: "1px solid #dc2626",
-                                    background: "#f1f5f9",
-                                    color: "#b91c1c",
+                                    border: `1px solid ${colors.danger}`,
+                                    background: colors.surface,
+                                    color: colors.dangerText,
                                     fontSize: "0.65rem",
                                     fontWeight: 700,
                                     display: "inline-flex",

@@ -1,5 +1,6 @@
 import { MotionConfig, motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { colors, gradients } from "../theme";
 
 interface AppShellProps {
   banner: ReactNode;
@@ -16,10 +17,10 @@ export default function AppShell({ banner, status, content, overlays }: AppShell
         transition={{ layout: { type: "tween", ease: "linear", duration: 0.2 } }}
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
+          background: gradients.appBackground,
           padding: "clamp(0.75rem, 2.5vw, 2rem)",
           fontFamily: "Inter, system-ui, sans-serif",
-          color: "#0f172a"
+          color: colors.textPrimary
         }}
       >
         <style>{`

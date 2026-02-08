@@ -1,4 +1,5 @@
 import { DayOfWeek, FieldTripEvent, FieldTripType, ScheduleDay, ScheduleType } from "@core/domain/types";
+import { colors, shadows } from "../theme";
 
 export interface ScheduleTypeOption {
   value: ScheduleType;
@@ -61,10 +62,10 @@ export default function DayMetadataStrip({
   return (
     <section
       style={{
-        background: "#f1f5f9",
+        background: colors.surface,
         borderRadius: 18,
         padding: "1rem",
-        boxShadow: "0 15px 35px rgba(15, 23, 42, 0.08)"
+        boxShadow: shadows.card
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

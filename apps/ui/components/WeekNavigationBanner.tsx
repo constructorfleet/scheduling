@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ScheduleStatus } from "@core/domain/types";
 import HelpIconButton from "./HelpIconButton";
 import type { HelpTopicId } from "./helpContent";
+import { colors, gradients, shadows } from "../theme";
 
 type LabelColor = {
     label: string;
@@ -55,27 +56,27 @@ const pillStyle = (tone: PillTone | LabelColor, disabled = false) => {
     neutral: {
       background: "rgba(30, 41, 59, 0.45)",
       border: "1px solid rgba(148, 163, 184, 0.55)",
-      color: "#f1f5f9"
+      color: colors.surface
     },
     active: {
       background: "rgba(14, 165, 233, 0.28)",
       border: "1px solid rgba(56, 189, 248, 0.65)",
-      color: "#f0f9ff"
+      color: colors.textInverse
     },
     warn: {
       background: "rgba(245, 158, 11, 0.25)",
       border: "1px solid rgba(251, 191, 36, 0.6)",
-      color: "#fef9c7"
+      color: colors.textInverse
     },
     danger: {
       background: "rgba(239, 68, 68, 0.28)",
       border: "1px solid rgba(248, 113, 113, 0.6)",
-      color: "#fef2f2"
+      color: colors.textInverse
     }
   };
   return {
     borderRadius: 999,
-    ...(typeof tone === "string" ? palette[tone] : { background: tone.color, border: `1px solid ${tone.color}`, color: "#fff" }),
+    ...(typeof tone === "string" ? palette[tone] : { background: tone.color, border: `1px solid ${tone.color}`, color: colors.textInverse }),
     padding: "0.42rem 0.88rem",
     display: "inline-flex",
     alignItems: "center",
@@ -142,11 +143,10 @@ export default function WeekNavigationBanner({
         borderRadius: 24,
         padding: "clamp(1rem, 2.8vw, 1.7rem)",
         marginBottom: "1.5rem",
-        background:
-          "radial-gradient(circle at 80% -20%, rgba(56,189,248,0.35), transparent 50%), radial-gradient(circle at 10% 110%, rgba(16,185,129,0.25), transparent 45%), linear-gradient(150deg, #1e293b 0%, #334155 45%, #475569 100%)",
+        background: gradients.bannerBackground,
         border: "1px solid rgba(148,163,184,0.45)",
-        boxShadow: "0 25px 50px rgba(2, 8, 23, 0.25)",
-        color: "#f8fafc",
+        boxShadow: shadows.banner,
+        color: colors.textInverse,
         position: "relative",
         overflow: "hidden"
       }}
@@ -196,8 +196,7 @@ export default function WeekNavigationBanner({
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "linear-gradient(rgba(148,163,184,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.12) 1px, transparent 1px)",
+          backgroundImage: gradients.bannerGrid,
           backgroundSize: "28px 28px",
           maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.4), transparent 80%)",
           pointerEvents: "none"
@@ -213,7 +212,7 @@ export default function WeekNavigationBanner({
           }}
         >
           <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: "0.75rem", letterSpacing: "0.16em", textTransform: "uppercase", color: "#cbd5e1" }}>
+            <p style={{ margin: 0, fontSize: "0.75rem", letterSpacing: "0.16em", textTransform: "uppercase", color: colors.borderDefault }}>
               Scheduling Workspace
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.4rem" }}>
@@ -227,14 +226,14 @@ export default function WeekNavigationBanner({
                   borderRadius: 999,
                   border: "1px solid rgba(147, 197, 253, 0.45)",
                   background: "rgba(30, 41, 59, 0.65)",
-                  color: "#f8fafc",
+                  color: colors.textInverse,
                   padding: "0.37rem 0.9rem",
                   fontSize: "0.84rem",
                   minWidth: "min(100px, 100%)"
                 }}
               >
                 {schoolOptions.map((school) => (
-                  <option key={school.id} value={school.id} style={{ background: "#0f172a", color: "#f8fafc" }}>
+                  <option key={school.id} value={school.id} style={{ background: colors.textPrimary, color: colors.textInverse }}>
                     {school.name}
                   </option>
                 ))}
