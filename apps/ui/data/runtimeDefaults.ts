@@ -64,10 +64,28 @@ export const schools = [{ id: "school-evergreen", name: "School" }];
 
 export const scheduleTypeOptions: ScheduleTypeOption[] = [];
 
+const parseIsoDate = (value: string) => {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, (month ?? 1) - 1, day ?? 1);
+};
+
+const toIsoDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const addDays = (isoDate: string, offset: number) => {
+  const base = parseIsoDate(isoDate);
+  base.setDate(base.getDate() + offset);
+  return toIsoDate(base);
+};
+
 export const scheduleDays: ScheduleDay[] = daySequence.map((day, index) => ({
   id: `schedule-day-${day}`,
   scheduleWeekId: weekMeta.id,
-  date: `2026-02-${(16 + index).toString().padStart(2, "0")}`,
+  date: addDays(weekMeta.startDate, index),
   dayOfWeek: day,
   scheduleType: undefined,
   dayScheduleType: undefined,
