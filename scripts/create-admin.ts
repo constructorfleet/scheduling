@@ -1,11 +1,21 @@
 import { applyDbEnv } from "../apps/api/src/config";
 import { getPrisma, resetPrisma } from "../apps/api/src/db";
-import { hashPassword, normalizeEmail } from "../apps/api/src/auth";
+import { hashPassword, normalizeEmail, verifyPassword } from "../apps/api/src/auth";
 
 const getArgValue = (name: string) => {
     const prefix = `--${ name }=`;
-    const value = process.argv.find((arg) => arg.startsWith(prefix));
-    return value ? value.slice(prefix.length).trim() : "";
+    const inline = process.argv.find((arg) => arg.startsWith(prefix));
+    if (inline) {
+        return inline.slice(prefix.length).trim();
+    }
+    const index = process.argv.findIndex((arg) => arg === `--${ name }`);
+    if (index >= 0) {
+        const next = process.argv[index + 1];
+        if (next && !next.startsWith("--")) {
+            return next.trim();
+        }
+    }
+    return "";
 };
 
 const getRequiredArg = (name: string) => {
@@ -17,7 +27,15 @@ const getRequiredArg = (name: string) => {
 };
 
 const createAdmin = async () => {
-    applyDbEnv();
+    const { url } = applyDbEnv();
+    if (!url) {
+        throw new Error("DATABASE_URL is required.");
+    }
+    if (url.startsWith("file:")) {
+        throw new Error(
+            `DATABASE_URL is "${ url }". This project uses PostgreSQL. Set DATABASE_URL (or pass --db-url=...) to your Postgres connection string before running create-admin.`
+        );
+    }
     const email = normalizeEmail(getRequiredArg("email"));
     const password = getRequiredArg("password");
     const displayName = getArgValue("display-name") || "Administrator";
@@ -27,6 +45,8 @@ const createAdmin = async () => {
     const schoolName = getArgValue("school-name") || "Default School";
 
     const prisma = getPrisma();
+    // eslint-disable-next-line no-console
+    console.log(`Using database: ${ url.replace(/:\/\/([^:@]+):([^@]+)@/, "://$1:***@") }`);
 
     const district = await prisma.district.upsert({
         where: { id: districtId },
@@ -73,6 +93,9 @@ const createAdmin = async () => {
             status: "active"
         }
     });
+    if (!verifyPassword(password, user.passwordHash)) {
+        throw new Error("Password verification failed after upsert. User credentials were not written correctly.");
+    }
 
     await prisma.districtMembership.upsert({
         where: {
@@ -108,8 +131,13 @@ const createAdmin = async () => {
         }
     });
 
+    const persistedUser = await prisma.user.findUnique({ where: { email } });
+    if (!persistedUser || !verifyPassword(password, persistedUser.passwordHash)) {
+        throw new Error("Persisted user password verification failed. Aborting.");
+    }
+
     // eslint-disable-next-line no-console
-    console.log(`Super user ready: ${ email } (school: ${ school.id })`);
+    console.log(`Super user ready: ${ email } (school: ${ school.id }, district: ${ district.id })`);
 };
 
 createAdmin()
