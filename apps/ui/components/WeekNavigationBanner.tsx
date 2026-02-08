@@ -292,68 +292,80 @@ export default function WeekNavigationBanner({
               {userDisplayName && (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.35rem" }}>
                   <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
-                    Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
-                    {userRoleLabel ? ` (${userRoleLabel})` : ""}
-                  </p>
-                  {onUpdateDisplayName && (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.35rem",
-                        flexWrap: "wrap",
-                        justifyContent: "flex-end"
-                      }}
-                    >
-                      {isEditingName ? (
-                        <>
-                          <input
-                            value={draftName}
-                            onChange={(event) => setDraftName(event.target.value)}
-                            placeholder="Update display name"
-                            style={{
-                              borderRadius: 999,
-                              border: "1px solid rgba(148, 163, 184, 0.6)",
-                              background: "rgba(15, 23, 42, 0.65)",
-                              color: "#f8fafc",
-                              padding: "0.25rem 0.65rem",
-                              fontSize: "0.78rem",
-                              minWidth: 160
-                            }}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              onUpdateDisplayName(draftName.trim());
-                              setIsEditingName(false);
-                            }}
-                            disabled={Boolean(isDisplayNameSaving)}
-                            style={pillStyle("active", Boolean(isDisplayNameSaving))}
-                          >
-                            Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDraftName(userDisplayName);
-                              setIsEditingName(false);
-                            }}
-                            style={pillStyle("neutral")}
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
+                    Signed in as{" "}
+                    {onUpdateDisplayName && isEditingName ? (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        <input
+                          value={draftName}
+                          onChange={(event) => setDraftName(event.target.value)}
+                          placeholder="Update display name"
+                          style={{
+                            borderRadius: 999,
+                            border: "1px solid rgba(148, 163, 184, 0.6)",
+                            background: "rgba(15, 23, 42, 0.65)",
+                            color: "#f8fafc",
+                            padding: "0.2rem 0.6rem",
+                            fontSize: "0.78rem",
+                            minWidth: 150
+                          }}
+                        />
                         <button
                           type="button"
-                          onClick={() => setIsEditingName(true)}
-                          style={pillStyle("neutral")}
+                          onClick={() => {
+                            onUpdateDisplayName(draftName.trim());
+                            setIsEditingName(false);
+                          }}
+                          disabled={Boolean(isDisplayNameSaving)}
+                          aria-label="Save display name"
+                          style={{
+                            ...pillStyle("active", Boolean(isDisplayNameSaving)),
+                            padding: "0.22rem 0.5rem",
+                            minWidth: 0
+                          }}
                         >
-                          Edit name
+                          ✓
                         </button>
-                      )}
-                    </div>
-                  )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDraftName(userDisplayName);
+                            setIsEditingName(false);
+                          }}
+                          aria-label="Cancel display name edit"
+                          style={{
+                            ...pillStyle("neutral"),
+                            padding: "0.22rem 0.5rem",
+                            minWidth: 0
+                          }}
+                        >
+                          ✕
+                        </button>
+                        {userRoleLabel ? <span style={{ color: "#cbd5e1" }}>({userRoleLabel})</span> : null}
+                      </span>
+                    ) : (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
+                        <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
+                        {onUpdateDisplayName && (
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingName(true)}
+                            aria-label="Edit display name"
+                            style={{
+                              border: "none",
+                              background: "transparent",
+                              color: "#e2e8f0",
+                              cursor: "pointer",
+                              padding: 0,
+                              fontSize: "0.85rem"
+                            }}
+                          >
+                            ✎
+                          </button>
+                        )}
+                        {userRoleLabel ? <span style={{ color: "#cbd5e1" }}>({userRoleLabel})</span> : null}
+                      </span>
+                    )}
+                  </p>
                   {displayNameError && (
                     <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>{displayNameError}</span>
                   )}
