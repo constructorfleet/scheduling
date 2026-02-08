@@ -47,11 +47,16 @@ const formatTime = (value: string) => {
   return `${displayHour}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
 
+const parseDateOnly = (value: string) => {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, (month ?? 1) - 1, day ?? 1);
+};
+
 const formatDateLabel = (value?: string) => {
   if (!value) {
     return "";
   }
-  const parsed = new Date(value);
+  const parsed = value.includes("T") ? new Date(value) : parseDateOnly(value);
   if (Number.isNaN(parsed.getTime())) {
     return value;
   }

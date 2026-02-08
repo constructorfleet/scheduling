@@ -161,9 +161,10 @@ const addDays = (isoDate: string, offset: number) => {
   base.setDate(base.getDate() + offset);
   return toIsoDate(base);
 };
+const normalizeDateOnly = (value: string) => value.split("T")[0];
 const formatShortDate = (value?: string) => {
   if (!value) return "";
-  const parsed = new Date(value);
+  const parsed = value.includes("T") ? new Date(value) : parseIsoDate(value);
   if (Number.isNaN(parsed.getTime())) return value;
   return parsed.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 };
@@ -1126,7 +1127,7 @@ export default function App() {
         if (schedule) {
           const loadedScheduleDaysRaw = (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
             ...day,
-            date: day.date ? new Date(day.date).toISOString().split("T")[0] : day.date
+            date: day.date ? normalizeDateOnly(day.date) : day.date
           }));
           const loadedScheduleDaysByDow = new Map(
             loadedScheduleDaysRaw.map((day) => [day.dayOfWeek, day] as const)

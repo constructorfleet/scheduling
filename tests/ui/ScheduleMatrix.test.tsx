@@ -137,6 +137,22 @@ const renderMatrix = (overrides?: Partial<{
 };
 
 describe("ScheduleMatrix", () => {
+  it("shows date labels without timezone shift", () => {
+    renderMatrix({
+      days: [
+        {
+          id: "day-1",
+          scheduleWeekId: "week-1",
+          date: "2026-02-16",
+          dayOfWeek: "mon" as DayOfWeek,
+          scheduleType: "regular",
+          enrollmentCount: 12
+        }
+      ]
+    });
+
+    expect(screen.getByText(/Feb\s+16/i)).toBeInTheDocument();
+  });
   it("highlights and scrolls to the focused segment block", () => {
     const scrollIntoView = jest.fn();
     const original = HTMLElement.prototype.scrollIntoView;
