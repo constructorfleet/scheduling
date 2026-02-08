@@ -368,7 +368,8 @@ exports.Role = exports.$Enums.Role = {
   district_admin: 'district_admin',
   district_user: 'district_user',
   school_admin: 'school_admin',
-  school_user: 'school_user'
+  school_user: 'school_user',
+  school_viewer: 'school_viewer'
 };
 
 exports.Prisma.ModelName = {
