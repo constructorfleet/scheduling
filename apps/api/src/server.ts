@@ -10,15 +10,19 @@ import path from "node:path";
 import { readFileSync } from "node:fs";
 import {
   createCsrfToken,
+  createInviteExpiry,
+  createInviteToken,
   createSessionExpiry,
   createSessionToken,
   CSRF_COOKIE_NAME,
   hashPassword,
+  hashInviteToken,
   hashSessionToken,
   normalizeEmail,
   SESSION_COOKIE_NAME,
   verifyPassword
 } from "./auth";
+import { buildInviteUrl, sendInviteEmail } from "./invitations";
 import {
   canManageDistrict,
   canManageSchoolConfiguration,
@@ -34,7 +38,7 @@ import type {
   EmployeeTimeOffRequest,
   PolicyCitation
 } from "@core/domain/types";
-import type { Role, UserStatus } from "../generated/prisma-client";
+import type { Role } from "../generated/prisma-client";
 
 type DbTransaction = CorePrisma.TransactionClient;
 const toJsonValue = (value: unknown): CorePrisma.InputJsonValue => value as CorePrisma.InputJsonValue;
@@ -381,6 +385,49 @@ const buildServer = async () => {
     return true;
   };
 
+  const roleToLabel = (role: Role) =>
+    role.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+
+  const createInvite = async (payload: {
+    email: string;
+    displayName?: string;
+    role: Role;
+    invitedByUserId: string;
+    districtId?: string;
+    schoolId?: string;
+  }) => {
+    const prisma = getPrisma();
+    const token = createInviteToken();
+    const tokenHash = hashInviteToken(token);
+    const expiresAt = createInviteExpiry();
+    await prisma.userInvite.updateMany({
+      where: {
+        email: payload.email,
+        role: payload.role,
+        districtId: payload.districtId ?? null,
+        schoolId: payload.schoolId ?? null,
+        acceptedAt: null,
+        revokedAt: null
+      },
+      data: {
+        revokedAt: new Date()
+      }
+    });
+    const invite = await prisma.userInvite.create({
+      data: {
+        email: payload.email,
+        displayName: payload.displayName ?? null,
+        role: payload.role,
+        districtId: payload.districtId ?? null,
+        schoolId: payload.schoolId ?? null,
+        invitedByUserId: payload.invitedByUserId,
+        tokenHash,
+        expiresAt
+      }
+    });
+    return { invite, token };
+  };
+
   fastify.get("/api/health", async () => ({ status: "ok" }));
 
   fastify.get("/api/openapi.yaml", async (_, reply) => {
@@ -601,6 +648,132 @@ const buildServer = async () => {
     });
   });
 
+  fastify.get("/api/auth/invites/:token", async (request, reply) => {
+    const { token } = request.params as { token: string };
+    const prisma = getPrisma();
+    const invite = await prisma.userInvite.findUnique({
+      where: { tokenHash: hashInviteToken(token) },
+      include: {
+        district: true,
+        school: true
+      }
+    });
+    if (!invite) {
+      return reply.code(404).send({ message: "Invite not found." });
+    }
+    if (invite.acceptedAt || invite.revokedAt || invite.expiresAt.getTime() <= Date.now()) {
+      return reply.code(410).send({ message: "Invite is no longer valid." });
+    }
+    return reply.send({
+      email: invite.email,
+      displayName: invite.displayName,
+      role: invite.role,
+      districtId: invite.districtId,
+      districtName: invite.district?.name ?? null,
+      schoolId: invite.schoolId,
+      schoolName: invite.school?.name ?? null,
+      expiresAt: invite.expiresAt.toISOString()
+    });
+  });
+
+  fastify.post("/api/auth/invites/accept", async (request, reply) => {
+    const body = (request.body ?? {}) as {
+      token?: string;
+      displayName?: string;
+      password?: string;
+    };
+    const token = typeof body.token === "string" ? body.token.trim() : "";
+    const password = typeof body.password === "string" ? body.password : "";
+    if (!token || !password) {
+      return reply.code(400).send({ message: "token and password are required." });
+    }
+    const prisma = getPrisma();
+    const invite = await prisma.userInvite.findUnique({
+      where: { tokenHash: hashInviteToken(token) }
+    });
+    if (!invite) {
+      return reply.code(404).send({ message: "Invite not found." });
+    }
+    if (invite.acceptedAt || invite.revokedAt || invite.expiresAt.getTime() <= Date.now()) {
+      return reply.code(410).send({ message: "Invite is no longer valid." });
+    }
+    const resolvedDisplayName = body.displayName?.trim() || invite.displayName || invite.email;
+    const existingUser = await prisma.user.findUnique({
+      where: { email: invite.email }
+    });
+    const user = existingUser
+      ? await prisma.user.update({
+          where: { id: existingUser.id },
+          data: {
+            displayName: resolvedDisplayName,
+            passwordHash: hashPassword(password),
+            status: "active"
+          }
+        })
+      : await prisma.user.create({
+          data: {
+            email: invite.email,
+            displayName: resolvedDisplayName,
+            passwordHash: hashPassword(password),
+            status: "active"
+          }
+        });
+
+    if (invite.role === "super_user") {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { isSuperUser: true }
+      });
+    } else if (invite.role === "district_admin" || invite.role === "district_user") {
+      if (!invite.districtId) {
+        return reply.code(400).send({ message: "Invite missing district scope." });
+      }
+      await prisma.districtMembership.upsert({
+        where: {
+          userId_districtId: {
+            userId: user.id,
+            districtId: invite.districtId
+          }
+        },
+        create: {
+          userId: user.id,
+          districtId: invite.districtId,
+          role: invite.role
+        },
+        update: {
+          role: invite.role
+        }
+      });
+    } else if (invite.role === "school_admin" || invite.role === "school_user") {
+      if (!invite.schoolId) {
+        return reply.code(400).send({ message: "Invite missing school scope." });
+      }
+      await prisma.schoolMembership.upsert({
+        where: {
+          userId_schoolId: {
+            userId: user.id,
+            schoolId: invite.schoolId
+          }
+        },
+        create: {
+          userId: user.id,
+          schoolId: invite.schoolId,
+          role: invite.role
+        },
+        update: {
+          role: invite.role
+        }
+      });
+    }
+
+    await prisma.userInvite.update({
+      where: { id: invite.id },
+      data: { acceptedAt: new Date() }
+    });
+
+    return reply.send({ ok: true });
+  });
+
   fastify.post("/api/admin/districts/:districtId/schools", async (request, reply) => {
     if (!requireCsrf(request, reply)) {
       return;
@@ -647,68 +820,41 @@ const buildServer = async () => {
     const body = (request.body ?? {}) as {
       email?: string;
       displayName?: string;
-      password?: string;
-      status?: UserStatus;
       role?: Role;
-      isSuperUser?: boolean;
     };
     const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
     const role = body.role;
     if (!email || !role || !["district_admin", "district_user"].includes(role)) {
       return reply.code(400).send({ message: "email and district role are required." });
     }
-    const prisma = getPrisma();
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    let user = existingUser;
-    if (!user) {
-      if (!body.password) {
-        return reply.code(400).send({ message: "password is required when creating a new user." });
-      }
-      user = await prisma.user.create({
-        data: {
-          email,
-          displayName: body.displayName?.trim() || email,
-          passwordHash: hashPassword(body.password),
-          status: body.status ?? "active",
-          isSuperUser: Boolean(body.isSuperUser)
-        }
-      });
-    } else {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          displayName: body.displayName?.trim() || user.displayName,
-          status: body.status ?? user.status,
-          ...(body.password ? { passwordHash: hashPassword(body.password) } : {}),
-          ...(typeof body.isSuperUser === "boolean" ? { isSuperUser: body.isSuperUser } : {})
-        }
-      });
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      return reply.code(401).send({ message: "Authentication required." });
     }
-    const membership = await prisma.districtMembership.upsert({
-      where: {
-        userId_districtId: {
-          userId: user.id,
-          districtId
-        }
-      },
-      create: {
-        userId: user.id,
-        districtId,
-        role
-      },
-      update: {
-        role
-      }
+    const { invite, token } = await createInvite({
+      email,
+      displayName: body.displayName?.trim(),
+      role,
+      districtId,
+      invitedByUserId: auth.userId
+    });
+    const inviteUrl = buildInviteUrl(token);
+    const delivery = await sendInviteEmail({
+      to: email,
+      invitedByName: auth.displayName,
+      inviteUrl,
+      roleLabel: roleToLabel(role),
+      scopeLabel: `District ${districtId}`
     });
     return reply.send({
-      user: {
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
-        status: user.status,
-        isSuperUser: user.isSuperUser
+      invite: {
+        id: invite.id,
+        email: invite.email,
+        role: invite.role,
+        districtId: invite.districtId,
+        expiresAt: invite.expiresAt.toISOString()
       },
-      membership
+      delivery
     });
   });
 
@@ -723,68 +869,41 @@ const buildServer = async () => {
     const body = (request.body ?? {}) as {
       email?: string;
       displayName?: string;
-      password?: string;
-      status?: UserStatus;
       role?: Role;
-      isSuperUser?: boolean;
     };
     const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
     const role = body.role;
     if (!email || !role || !["school_admin", "school_user"].includes(role)) {
       return reply.code(400).send({ message: "email and school role are required." });
     }
-    const prisma = getPrisma();
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    let user = existingUser;
-    if (!user) {
-      if (!body.password) {
-        return reply.code(400).send({ message: "password is required when creating a new user." });
-      }
-      user = await prisma.user.create({
-        data: {
-          email,
-          displayName: body.displayName?.trim() || email,
-          passwordHash: hashPassword(body.password),
-          status: body.status ?? "active",
-          isSuperUser: Boolean(body.isSuperUser)
-        }
-      });
-    } else {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          displayName: body.displayName?.trim() || user.displayName,
-          status: body.status ?? user.status,
-          ...(body.password ? { passwordHash: hashPassword(body.password) } : {}),
-          ...(typeof body.isSuperUser === "boolean" ? { isSuperUser: body.isSuperUser } : {})
-        }
-      });
+    const auth = await resolveAuth(request);
+    if (!auth) {
+      return reply.code(401).send({ message: "Authentication required." });
     }
-    const membership = await prisma.schoolMembership.upsert({
-      where: {
-        userId_schoolId: {
-          userId: user.id,
-          schoolId
-        }
-      },
-      create: {
-        userId: user.id,
-        schoolId,
-        role
-      },
-      update: {
-        role
-      }
+    const { invite, token } = await createInvite({
+      email,
+      displayName: body.displayName?.trim(),
+      role,
+      schoolId,
+      invitedByUserId: auth.userId
+    });
+    const inviteUrl = buildInviteUrl(token);
+    const delivery = await sendInviteEmail({
+      to: email,
+      invitedByName: auth.displayName,
+      inviteUrl,
+      roleLabel: roleToLabel(role),
+      scopeLabel: `School ${schoolId}`
     });
     return reply.send({
-      user: {
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
-        status: user.status,
-        isSuperUser: user.isSuperUser
+      invite: {
+        id: invite.id,
+        email: invite.email,
+        role: invite.role,
+        schoolId: invite.schoolId,
+        expiresAt: invite.expiresAt.toISOString()
       },
-      membership
+      delivery
     });
   });
 

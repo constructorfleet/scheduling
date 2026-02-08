@@ -9,6 +9,7 @@ const KEY_LENGTH = 64;
 export const SESSION_COOKIE_NAME = "sched_session";
 export const CSRF_COOKIE_NAME = "sched_csrf";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
+const INVITE_TTL_MS = 1000 * 60 * 60 * 72;
 
 const toBase64Url = (buffer: Buffer) =>
   buffer
@@ -27,11 +28,15 @@ export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 export const hashSessionToken = (token: string) =>
   crypto.createHash("sha256").update(token).digest("hex");
+export const hashInviteToken = (token: string) =>
+  crypto.createHash("sha256").update(token).digest("hex");
 
 export const createSessionToken = () => toBase64Url(crypto.randomBytes(32));
+export const createInviteToken = () => toBase64Url(crypto.randomBytes(32));
 export const createCsrfToken = () => toBase64Url(crypto.randomBytes(24));
 
 export const createSessionExpiry = () => new Date(Date.now() + SESSION_TTL_MS);
+export const createInviteExpiry = () => new Date(Date.now() + INVITE_TTL_MS);
 
 export const hashPassword = (password: string): string => {
   const salt = crypto.randomBytes(16);

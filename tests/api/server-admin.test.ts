@@ -15,6 +15,15 @@ const mockPrisma: any = {
   districtMembership: {
     upsert: jest.fn()
   },
+  schoolMembership: {
+    upsert: jest.fn()
+  },
+  userInvite: {
+    updateMany: jest.fn(),
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn()
+  },
   user: {
     findUnique: jest.fn(),
     create: jest.fn(),
@@ -73,11 +82,20 @@ const makeSession = (options?: {
   };
 };
 
-describe("server admin routes", () => {
+describe("server admin and invite routes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPrisma.school.findUnique.mockResolvedValue({ districtId: "district-1" });
     mockPrisma.school.upsert.mockResolvedValue({ id: "school-2", districtId: "district-1", name: "School Two" });
+    mockPrisma.userInvite.updateMany.mockResolvedValue({ count: 0 });
+    mockPrisma.userInvite.create.mockResolvedValue({
+      id: "invite-1",
+      email: "teacher@example.com",
+      role: "school_user",
+      schoolId: "school-1",
+      districtId: null,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+    });
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "user-2",
       email: "teacher@example.com",
@@ -92,14 +110,12 @@ describe("server admin routes", () => {
       status: "active",
       isSuperUser: false
     });
-    mockPrisma.schoolMembership = {
-      upsert: jest.fn().mockResolvedValue({
-        id: "sm-1",
-        schoolId: "school-1",
-        userId: "user-2",
-        role: "school_user"
-      })
-    };
+    mockPrisma.schoolMembership.upsert.mockResolvedValue({
+      id: "sm-1",
+      schoolId: "school-1",
+      userId: "user-2",
+      role: "school_user"
+    });
   });
 
   test("requires csrf for district school creation", async () => {
@@ -150,7 +166,7 @@ describe("server admin routes", () => {
     await server.close();
   });
 
-  test("allows school admin to assign school users", async () => {
+  test("school admin user management creates an invite", async () => {
     mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_admin" }));
     const server = await buildServer();
     const response = await server.inject({
@@ -166,11 +182,31 @@ describe("server admin routes", () => {
       }
     });
     expect(response.statusCode).toBe(200);
-    expect(mockPrisma.schoolMembership.upsert).toHaveBeenCalled();
+    expect(mockPrisma.userInvite.create).toHaveBeenCalled();
     await server.close();
   });
 
-  test("forbids school user from assigning school users", async () => {
+  test("district admin user management creates an invite", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+    const server = await buildServer();
+    const response = await server.inject({
+      method: "PUT",
+      url: "/api/admin/districts/district-1/memberships",
+      headers: {
+        "x-csrf-token": "csrf-token",
+        cookie: authCookie
+      },
+      payload: {
+        email: "teacher@example.com",
+        role: "district_user"
+      }
+    });
+    expect(response.statusCode).toBe(200);
+    expect(mockPrisma.userInvite.create).toHaveBeenCalled();
+    await server.close();
+  });
+
+  test("forbids school user from creating school invites", async () => {
     mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_user" }));
     const server = await buildServer();
     const response = await server.inject({
@@ -186,6 +222,33 @@ describe("server admin routes", () => {
       }
     });
     expect(response.statusCode).toBe(403);
+    await server.close();
+  });
+
+  test("accepting invite applies school membership", async () => {
+    mockPrisma.userInvite.findUnique.mockResolvedValue({
+      id: "invite-accept-1",
+      email: "teacher@example.com",
+      displayName: "Teacher",
+      role: "school_user",
+      schoolId: "school-1",
+      districtId: null,
+      acceptedAt: null,
+      revokedAt: null,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000)
+    });
+    const server = await buildServer();
+    const response = await server.inject({
+      method: "POST",
+      url: "/api/auth/invites/accept",
+      payload: {
+        token: "token-123",
+        password: "SecretPass123!"
+      }
+    });
+    expect(response.statusCode).toBe(200);
+    expect(mockPrisma.schoolMembership.upsert).toHaveBeenCalled();
+    expect(mockPrisma.userInvite.update).toHaveBeenCalled();
     await server.close();
   });
 });

@@ -30,6 +30,7 @@ model District {
 
   schools       School[]
   memberships   DistrictMembership[]
+  invites       UserInvite[]
 }
 
 model School {
@@ -51,6 +52,7 @@ model School {
   fieldTripTypes          FieldTripType[]
   scheduleWeeks           ScheduleWeek[]
   memberships             SchoolMembership[]
+  invites                 UserInvite[]
   district                District           @relation(fields: [districtId], references: [id], onDelete: Cascade)
 }
 
@@ -228,7 +230,32 @@ model User {
 
   districtMemberships DistrictMembership[]
   memberships  SchoolMembership[]
+  invitesSent  UserInvite[]
   sessions     Session[]
+}
+
+model UserInvite {
+  id             String     @id @default(cuid())
+  email          String
+  displayName    String?
+  role           Role
+  districtId     String?
+  schoolId       String?
+  invitedByUserId String
+  tokenHash      String     @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  invitedBy      User       @relation(fields: [invitedByUserId], references: [id], onDelete: Cascade)
+  district       District?  @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  school         School?    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([districtId])
+  @@index([schoolId])
 }
 
 model DistrictMembership {

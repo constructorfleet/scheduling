@@ -282,6 +282,22 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.UserInviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  displayName: 'displayName',
+  role: 'role',
+  districtId: 'districtId',
+  schoolId: 'schoolId',
+  invitedByUserId: 'invitedByUserId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.DistrictMembershipScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -369,6 +385,7 @@ exports.Prisma.ModelName = {
   StaffAssignment: 'StaffAssignment',
   AuditEvent: 'AuditEvent',
   User: 'User',
+  UserInvite: 'UserInvite',
   DistrictMembership: 'DistrictMembership',
   SchoolMembership: 'SchoolMembership',
   Session: 'Session'
