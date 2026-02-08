@@ -29,6 +29,8 @@ interface ScheduleMatrixProps {
   fieldTripTypes: FieldTripType[];
   fieldTripEventsByDay: Record<DayOfWeek, FieldTripEvent | undefined>;
   operatingHoursByDay: Record<DayOfWeek, OperatingHours | undefined>;
+  fieldTripStartTime?: string;
+  fieldTripEndTime?: string;
   onEnrollmentChange: (dayId: string, enrollment: number | undefined) => void;
   onScheduleTypeChange: (dayId: string, scheduleType: ScheduleType | undefined) => void;
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
@@ -98,6 +100,8 @@ export default function ScheduleMatrix({
   fieldTripTypes,
   fieldTripEventsByDay,
   operatingHoursByDay,
+  fieldTripStartTime,
+  fieldTripEndTime,
   onEnrollmentChange,
   onScheduleTypeChange,
   onFieldTripSelection,
@@ -469,6 +473,11 @@ export default function ScheduleMatrix({
                   ) : (
                     <span style={{ fontSize: "0.7rem", color: "#9ca3af" }}>Hours: not set</span>
                   )}
+                  {fieldTripStartTime && fieldTripEndTime && (
+                    <span style={{ fontSize: "0.7rem", color: "#475569" }}>
+                      Field trip: {formatTime(fieldTripStartTime)} – {formatTime(fieldTripEndTime)}
+                    </span>
+                  )}
                   <span style={{ fontSize: "0.7rem", color: "#475569" }}>
                     Required ratio: {fieldTripAdultRatioLabel ? `${fieldTripAdultRatioLabel} (Field trip)` : baseRatioLabel}
                   </span>
@@ -658,30 +667,6 @@ export default function ScheduleMatrix({
                           }}
                         />
                       ))}
-                      {isOverDaily && (
-                        <span
-                          title="Over max hours"
-                          style={{
-                            position: "absolute",
-                            top: 6,
-                            right: 6,
-                            width: 18,
-                            height: 18,
-                            borderRadius: "50%",
-                            border: `1px solid ${colors.danger}`,
-                            background: colors.dangerSurface,
-                            color: colors.dangerText,
-                            fontSize: "0.75rem",
-                            fontWeight: 700,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "default"
-                          }}
-                        >
-                          ?
-                        </span>
-                      )}
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", minHeight: "100%" }}>
                         {blocks.map((block) => {
                           const segmentId = block.segmentBlockId || block.id;
@@ -790,6 +775,8 @@ export default function ScheduleMatrix({
                                         prev ? { ...prev, startTime: event.target.value } : prev
                                       )
                                     }
+                                    onClick={(event) => event.stopPropagation()}
+                                    onPointerDown={(event) => event.stopPropagation()}
                                     style={{
                                       borderRadius: 6,
                                       border: "1px solid #cbd5f5",
@@ -805,6 +792,8 @@ export default function ScheduleMatrix({
                                         prev ? { ...prev, endTime: event.target.value } : prev
                                       )
                                     }
+                                    onClick={(event) => event.stopPropagation()}
+                                    onPointerDown={(event) => event.stopPropagation()}
                                     style={{
                                       borderRadius: 6,
                                       border: "1px solid #cbd5f5",
@@ -1044,6 +1033,30 @@ export default function ScheduleMatrix({
                           </div>
                         )}
                       </div>
+                      {isOverDaily && (
+                        <span
+                          title="Over max hours"
+                          style={{
+                            position: "absolute",
+                            top: 6,
+                            right: 6,
+                            width: 18,
+                            height: 18,
+                            borderRadius: "50%",
+                            border: `1px solid ${colors.danger}`,
+                            background: colors.dangerSurface,
+                            color: colors.dangerText,
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "default"
+                          }}
+                        >
+                          ?
+                        </span>
+                      )}
                     </td>
                   );
                 })}
