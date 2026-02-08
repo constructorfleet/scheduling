@@ -40,23 +40,23 @@ export const policyCitations: Record<string, PolicyCitation> = {
   }
 };
 
-export const daySequence: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+export const daySequence: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 export const dayDisplayNames: Record<DayOfWeek, string> = {
+  sun: "Sun",
   mon: "Mon",
   tue: "Tue",
   wed: "Wed",
   thu: "Thu",
   fri: "Fri",
-  sat: "Sat",
-  sun: "Sun"
+  sat: "Sat"
 };
 
 export const weekMeta = {
-  id: "week-2026-02-16",
+  id: "week-2026-02-15",
   label: "Unconfigured week",
-  startDate: "2026-02-16",
-  endDate: "2026-02-22",
+  startDate: "2026-02-15",
+  endDate: "2026-02-21",
   status: "draft" as ScheduleStatus
 };
 

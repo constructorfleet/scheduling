@@ -23,7 +23,7 @@ export default function EmployeesSection({
   canSave
 }: EmployeesSectionProps) {
   const [expandedEmployeeIds, setExpandedEmployeeIds] = useState<string[]>([]);
-  const daySequence: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const daySequence: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   const dayLabels: Record<DayOfWeek, string> = {
     mon: "Mon",
     tue: "Tue",

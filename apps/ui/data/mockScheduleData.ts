@@ -110,7 +110,7 @@ const operatingHoursByDayScheduleType: Record<DayScheduleType, { open: string; c
   closed: { open: "00:00", close: "00:00" }
 };
 
-export const daySequence: DayOfWeek[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+export const daySequence: DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 export const dayDisplayNames: Record<DayOfWeek, string> = {
   mon: "Mon",
   tue: "Tue",
