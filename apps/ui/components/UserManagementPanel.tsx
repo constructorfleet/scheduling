@@ -412,7 +412,7 @@ export default function UserManagementPanel({
           <h3 style={{ margin: "0 0 0.45rem", fontSize: "0.98rem", color: "#0f172a" }}>
             Users ({users.length})
           </h3>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden", backgroundColor: colors.surfaceRaised }}>
             {isLoading ? (
               <p style={{ margin: 0, padding: "0.8rem", color: "#475569" }}>Loading users...</p>
             ) : users.length === 0 ? (
@@ -450,7 +450,7 @@ export default function UserManagementPanel({
           <h3 style={{ margin: "0 0 0.45rem", fontSize: "0.98rem", color: "#0f172a" }}>
             Invites ({invites.length})
           </h3>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden" }}>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden", backgroundColor: colors.surfaceRaised }}>
             {isLoading ? (
               <p style={{ margin: 0, padding: "0.8rem", color: "#475569" }}>Loading invites...</p>
             ) : invites.length === 0 ? (
