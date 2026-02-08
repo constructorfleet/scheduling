@@ -242,6 +242,7 @@ model UserInvite {
   districtId      String?
   schoolId        String?
   invitedByUserId String
+  token           String?   @unique
   tokenHash       String    @unique
   expiresAt       DateTime
   acceptedAt      DateTime?

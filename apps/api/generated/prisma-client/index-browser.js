@@ -290,6 +290,7 @@ exports.Prisma.UserInviteScalarFieldEnum = {
   districtId: 'districtId',
   schoolId: 'schoolId',
   invitedByUserId: 'invitedByUserId',
+  token: 'token',
   tokenHash: 'tokenHash',
   expiresAt: 'expiresAt',
   acceptedAt: 'acceptedAt',

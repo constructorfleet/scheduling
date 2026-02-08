@@ -19043,6 +19043,7 @@ export namespace Prisma {
     districtId: string | null
     schoolId: string | null
     invitedByUserId: string | null
+    token: string | null
     tokenHash: string | null
     expiresAt: Date | null
     acceptedAt: Date | null
@@ -19059,6 +19060,7 @@ export namespace Prisma {
     districtId: string | null
     schoolId: string | null
     invitedByUserId: string | null
+    token: string | null
     tokenHash: string | null
     expiresAt: Date | null
     acceptedAt: Date | null
@@ -19075,6 +19077,7 @@ export namespace Prisma {
     districtId: number
     schoolId: number
     invitedByUserId: number
+    token: number
     tokenHash: number
     expiresAt: number
     acceptedAt: number
@@ -19093,6 +19096,7 @@ export namespace Prisma {
     districtId?: true
     schoolId?: true
     invitedByUserId?: true
+    token?: true
     tokenHash?: true
     expiresAt?: true
     acceptedAt?: true
@@ -19109,6 +19113,7 @@ export namespace Prisma {
     districtId?: true
     schoolId?: true
     invitedByUserId?: true
+    token?: true
     tokenHash?: true
     expiresAt?: true
     acceptedAt?: true
@@ -19125,6 +19130,7 @@ export namespace Prisma {
     districtId?: true
     schoolId?: true
     invitedByUserId?: true
+    token?: true
     tokenHash?: true
     expiresAt?: true
     acceptedAt?: true
@@ -19214,6 +19220,7 @@ export namespace Prisma {
     districtId: string | null
     schoolId: string | null
     invitedByUserId: string
+    token: string | null
     tokenHash: string
     expiresAt: Date
     acceptedAt: Date | null
@@ -19247,6 +19254,7 @@ export namespace Prisma {
     districtId?: boolean
     schoolId?: boolean
     invitedByUserId?: boolean
+    token?: boolean
     tokenHash?: boolean
     expiresAt?: boolean
     acceptedAt?: boolean
@@ -19266,6 +19274,7 @@ export namespace Prisma {
     districtId?: boolean
     schoolId?: boolean
     invitedByUserId?: boolean
+    token?: boolean
     tokenHash?: boolean
     expiresAt?: boolean
     acceptedAt?: boolean
@@ -19285,6 +19294,7 @@ export namespace Prisma {
     districtId?: boolean
     schoolId?: boolean
     invitedByUserId?: boolean
+    token?: boolean
     tokenHash?: boolean
     expiresAt?: boolean
     acceptedAt?: boolean
@@ -19304,6 +19314,7 @@ export namespace Prisma {
     districtId?: boolean
     schoolId?: boolean
     invitedByUserId?: boolean
+    token?: boolean
     tokenHash?: boolean
     expiresAt?: boolean
     acceptedAt?: boolean
@@ -19312,7 +19323,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserInviteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "districtId" | "schoolId" | "invitedByUserId" | "tokenHash" | "expiresAt" | "acceptedAt" | "revokedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userInvite"]>
+  export type UserInviteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "districtId" | "schoolId" | "invitedByUserId" | "token" | "tokenHash" | "expiresAt" | "acceptedAt" | "revokedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userInvite"]>
   export type UserInviteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     invitedBy?: boolean | UserDefaultArgs<ExtArgs>
     district?: boolean | UserInvite$districtArgs<ExtArgs>
@@ -19344,6 +19355,7 @@ export namespace Prisma {
       districtId: string | null
       schoolId: string | null
       invitedByUserId: string
+      token: string | null
       tokenHash: string
       expiresAt: Date
       acceptedAt: Date | null
@@ -19783,6 +19795,7 @@ export namespace Prisma {
     readonly districtId: FieldRef<"UserInvite", 'String'>
     readonly schoolId: FieldRef<"UserInvite", 'String'>
     readonly invitedByUserId: FieldRef<"UserInvite", 'String'>
+    readonly token: FieldRef<"UserInvite", 'String'>
     readonly tokenHash: FieldRef<"UserInvite", 'String'>
     readonly expiresAt: FieldRef<"UserInvite", 'DateTime'>
     readonly acceptedAt: FieldRef<"UserInvite", 'DateTime'>
@@ -23735,6 +23748,7 @@ export namespace Prisma {
     districtId: 'districtId',
     schoolId: 'schoolId',
     invitedByUserId: 'invitedByUserId',
+    token: 'token',
     tokenHash: 'tokenHash',
     expiresAt: 'expiresAt',
     acceptedAt: 'acceptedAt',
@@ -25052,6 +25066,7 @@ export namespace Prisma {
     districtId?: StringNullableFilter<"UserInvite"> | string | null
     schoolId?: StringNullableFilter<"UserInvite"> | string | null
     invitedByUserId?: StringFilter<"UserInvite"> | string
+    token?: StringNullableFilter<"UserInvite"> | string | null
     tokenHash?: StringFilter<"UserInvite"> | string
     expiresAt?: DateTimeFilter<"UserInvite"> | Date | string
     acceptedAt?: DateTimeNullableFilter<"UserInvite"> | Date | string | null
@@ -25071,6 +25086,7 @@ export namespace Prisma {
     districtId?: SortOrderInput | SortOrder
     schoolId?: SortOrderInput | SortOrder
     invitedByUserId?: SortOrder
+    token?: SortOrderInput | SortOrder
     tokenHash?: SortOrder
     expiresAt?: SortOrder
     acceptedAt?: SortOrderInput | SortOrder
@@ -25084,6 +25100,7 @@ export namespace Prisma {
 
   export type UserInviteWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    token?: string
     tokenHash?: string
     AND?: UserInviteWhereInput | UserInviteWhereInput[]
     OR?: UserInviteWhereInput[]
@@ -25102,7 +25119,7 @@ export namespace Prisma {
     invitedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
     district?: XOR<DistrictNullableScalarRelationFilter, DistrictWhereInput> | null
     school?: XOR<SchoolNullableScalarRelationFilter, SchoolWhereInput> | null
-  }, "id" | "tokenHash">
+  }, "id" | "token" | "tokenHash">
 
   export type UserInviteOrderByWithAggregationInput = {
     id?: SortOrder
@@ -25112,6 +25129,7 @@ export namespace Prisma {
     districtId?: SortOrderInput | SortOrder
     schoolId?: SortOrderInput | SortOrder
     invitedByUserId?: SortOrder
+    token?: SortOrderInput | SortOrder
     tokenHash?: SortOrder
     expiresAt?: SortOrder
     acceptedAt?: SortOrderInput | SortOrder
@@ -25134,6 +25152,7 @@ export namespace Prisma {
     districtId?: StringNullableWithAggregatesFilter<"UserInvite"> | string | null
     schoolId?: StringNullableWithAggregatesFilter<"UserInvite"> | string | null
     invitedByUserId?: StringWithAggregatesFilter<"UserInvite"> | string
+    token?: StringNullableWithAggregatesFilter<"UserInvite"> | string | null
     tokenHash?: StringWithAggregatesFilter<"UserInvite"> | string
     expiresAt?: DateTimeWithAggregatesFilter<"UserInvite"> | Date | string
     acceptedAt?: DateTimeNullableWithAggregatesFilter<"UserInvite"> | Date | string | null
@@ -26555,6 +26574,7 @@ export namespace Prisma {
     email: string
     displayName?: string | null
     role: $Enums.Role
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -26574,6 +26594,7 @@ export namespace Prisma {
     districtId?: string | null
     schoolId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -26587,6 +26608,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26606,6 +26628,7 @@ export namespace Prisma {
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26622,6 +26645,7 @@ export namespace Prisma {
     districtId?: string | null
     schoolId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -26635,6 +26659,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26651,6 +26676,7 @@ export namespace Prisma {
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27932,6 +27958,7 @@ export namespace Prisma {
     districtId?: SortOrder
     schoolId?: SortOrder
     invitedByUserId?: SortOrder
+    token?: SortOrder
     tokenHash?: SortOrder
     expiresAt?: SortOrder
     acceptedAt?: SortOrder
@@ -27948,6 +27975,7 @@ export namespace Prisma {
     districtId?: SortOrder
     schoolId?: SortOrder
     invitedByUserId?: SortOrder
+    token?: SortOrder
     tokenHash?: SortOrder
     expiresAt?: SortOrder
     acceptedAt?: SortOrder
@@ -27964,6 +27992,7 @@ export namespace Prisma {
     districtId?: SortOrder
     schoolId?: SortOrder
     invitedByUserId?: SortOrder
+    token?: SortOrder
     tokenHash?: SortOrder
     expiresAt?: SortOrder
     acceptedAt?: SortOrder
@@ -29668,6 +29697,7 @@ export namespace Prisma {
     email: string
     displayName?: string | null
     role: $Enums.Role
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -29685,6 +29715,7 @@ export namespace Prisma {
     role: $Enums.Role
     schoolId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -29790,6 +29821,7 @@ export namespace Prisma {
     districtId?: StringNullableFilter<"UserInvite"> | string | null
     schoolId?: StringNullableFilter<"UserInvite"> | string | null
     invitedByUserId?: StringFilter<"UserInvite"> | string
+    token?: StringNullableFilter<"UserInvite"> | string | null
     tokenHash?: StringFilter<"UserInvite"> | string
     expiresAt?: DateTimeFilter<"UserInvite"> | Date | string
     acceptedAt?: DateTimeNullableFilter<"UserInvite"> | Date | string | null
@@ -30015,6 +30047,7 @@ export namespace Prisma {
     email: string
     displayName?: string | null
     role: $Enums.Role
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -30032,6 +30065,7 @@ export namespace Prisma {
     role: $Enums.Role
     districtId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -31758,6 +31792,7 @@ export namespace Prisma {
     email: string
     displayName?: string | null
     role: $Enums.Role
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -31775,6 +31810,7 @@ export namespace Prisma {
     role: $Enums.Role
     districtId?: string | null
     schoolId?: string | null
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -32563,6 +32599,7 @@ export namespace Prisma {
     role: $Enums.Role
     schoolId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -32652,6 +32689,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32669,6 +32707,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32684,6 +32723,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32765,6 +32805,7 @@ export namespace Prisma {
     role: $Enums.Role
     districtId?: string | null
     invitedByUserId: string
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -32986,6 +33027,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33003,6 +33045,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33018,6 +33061,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     invitedByUserId?: StringFieldUpdateOperationsInput | string
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33331,6 +33375,7 @@ export namespace Prisma {
     role: $Enums.Role
     districtId?: string | null
     schoolId?: string | null
+    token?: string | null
     tokenHash: string
     expiresAt: Date | string
     acceptedAt?: Date | string | null
@@ -33403,6 +33448,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     displayName?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33420,6 +33466,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33435,6 +33482,7 @@ export namespace Prisma {
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     districtId?: NullableStringFieldUpdateOperationsInput | string | null
     schoolId?: NullableStringFieldUpdateOperationsInput | string | null
+    token?: NullableStringFieldUpdateOperationsInput | string | null
     tokenHash?: StringFieldUpdateOperationsInput | string
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     acceptedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

@@ -421,6 +421,7 @@ const buildServer = async () => {
         districtId: payload.districtId ?? null,
         schoolId: payload.schoolId ?? null,
         invitedByUserId: payload.invitedByUserId,
+        token,
         tokenHash,
         expiresAt
       }
@@ -852,7 +853,8 @@ const buildServer = async () => {
         email: invite.email,
         role: invite.role,
         districtId: invite.districtId,
-        expiresAt: invite.expiresAt.toISOString()
+        expiresAt: invite.expiresAt.toISOString(),
+        inviteUrl
       },
       delivery
     });
@@ -901,7 +903,8 @@ const buildServer = async () => {
         email: invite.email,
         role: invite.role,
         schoolId: invite.schoolId,
-        expiresAt: invite.expiresAt.toISOString()
+        expiresAt: invite.expiresAt.toISOString(),
+        inviteUrl
       },
       delivery
     });
@@ -929,6 +932,52 @@ const buildServer = async () => {
     return reply.send({ users });
   });
 
+  fastify.get("/api/admin/districts/:districtId/invites", async (request, reply) => {
+    const { districtId } = request.params as { districtId: string };
+    if (!(await requireDistrictAdmin(request, reply, districtId))) {
+      return;
+    }
+    const prisma = getPrisma();
+    const invites = await prisma.userInvite.findMany({
+      where: {
+        OR: [
+          { districtId },
+          { school: { districtId } }
+        ]
+      },
+      include: {
+        district: {
+          select: { id: true, name: true }
+        },
+        school: {
+          select: { id: true, name: true }
+        },
+        invitedBy: {
+          select: { id: true, email: true, displayName: true }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+    return reply.send({
+      invites: invites.map((invite) => ({
+        id: invite.id,
+        email: invite.email,
+        displayName: invite.displayName,
+        role: invite.role,
+        districtId: invite.districtId,
+        districtName: invite.district?.name ?? null,
+        schoolId: invite.schoolId,
+        schoolName: invite.school?.name ?? null,
+        invitedBy: invite.invitedBy,
+        createdAt: invite.createdAt.toISOString(),
+        expiresAt: invite.expiresAt.toISOString(),
+        acceptedAt: invite.acceptedAt?.toISOString() ?? null,
+        revokedAt: invite.revokedAt?.toISOString() ?? null,
+        inviteUrl: invite.token ? buildInviteUrl(invite.token) : null
+      }))
+    });
+  });
+
   fastify.get("/api/admin/schools/:schoolId/users", async (request, reply) => {
     const { schoolId } = request.params as { schoolId: string };
     if (!(await requireSchoolAccess(request, reply, schoolId, "manage_users"))) {
@@ -949,6 +998,42 @@ const buildServer = async () => {
       orderBy: { email: "asc" }
     });
     return reply.send({ users });
+  });
+
+  fastify.get("/api/admin/schools/:schoolId/invites", async (request, reply) => {
+    const { schoolId } = request.params as { schoolId: string };
+    if (!(await requireSchoolAccess(request, reply, schoolId, "manage_users"))) {
+      return;
+    }
+    const prisma = getPrisma();
+    const invites = await prisma.userInvite.findMany({
+      where: { schoolId },
+      include: {
+        school: {
+          select: { id: true, name: true }
+        },
+        invitedBy: {
+          select: { id: true, email: true, displayName: true }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    });
+    return reply.send({
+      invites: invites.map((invite) => ({
+        id: invite.id,
+        email: invite.email,
+        displayName: invite.displayName,
+        role: invite.role,
+        schoolId: invite.schoolId,
+        schoolName: invite.school?.name ?? null,
+        invitedBy: invite.invitedBy,
+        createdAt: invite.createdAt.toISOString(),
+        expiresAt: invite.expiresAt.toISOString(),
+        acceptedAt: invite.acceptedAt?.toISOString() ?? null,
+        revokedAt: invite.revokedAt?.toISOString() ?? null,
+        inviteUrl: invite.token ? buildInviteUrl(invite.token) : null
+      }))
+    });
   });
 
   fastify.get("/", async (_, reply) => {

@@ -22,7 +22,8 @@ const mockPrisma: any = {
     updateMany: jest.fn(),
     create: jest.fn(),
     findUnique: jest.fn(),
-    update: jest.fn()
+    update: jest.fn(),
+    findMany: jest.fn()
   },
   user: {
     findUnique: jest.fn(),
@@ -92,10 +93,29 @@ describe("server admin and invite routes", () => {
       id: "invite-1",
       email: "teacher@example.com",
       role: "school_user",
+      token: "invite-token-1",
       schoolId: "school-1",
       districtId: null,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
+    mockPrisma.userInvite.findMany.mockResolvedValue([
+      {
+        id: "invite-1",
+        email: "teacher@example.com",
+        displayName: "Teacher",
+        role: "school_user",
+        token: "invite-token-1",
+        districtId: null,
+        schoolId: "school-1",
+        createdAt: new Date(Date.now() - 1000),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        acceptedAt: null,
+        revokedAt: null,
+        district: null,
+        school: { id: "school-1", name: "School One" },
+        invitedBy: { id: "user-1", email: "admin@example.com", displayName: "Admin" }
+      }
+    ]);
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "user-2",
       email: "teacher@example.com",
@@ -183,6 +203,8 @@ describe("server admin and invite routes", () => {
     });
     expect(response.statusCode).toBe(200);
     expect(mockPrisma.userInvite.create).toHaveBeenCalled();
+    const body = response.json();
+    expect(body.invite.inviteUrl).toContain("token=");
     await server.close();
   });
 
@@ -203,6 +225,8 @@ describe("server admin and invite routes", () => {
     });
     expect(response.statusCode).toBe(200);
     expect(mockPrisma.userInvite.create).toHaveBeenCalled();
+    const body = response.json();
+    expect(body.invite.inviteUrl).toContain("token=");
     await server.close();
   });
 
@@ -249,6 +273,40 @@ describe("server admin and invite routes", () => {
     expect(response.statusCode).toBe(200);
     expect(mockPrisma.schoolMembership.upsert).toHaveBeenCalled();
     expect(mockPrisma.userInvite.update).toHaveBeenCalled();
+    await server.close();
+  });
+
+  test("district admin can list invites with invite links", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+    const server = await buildServer();
+    const response = await server.inject({
+      method: "GET",
+      url: "/api/admin/districts/district-1/invites",
+      headers: {
+        cookie: "sched_session=session-token"
+      }
+    });
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(Array.isArray(body.invites)).toBe(true);
+    expect(body.invites[0].inviteUrl).toContain("token=");
+    await server.close();
+  });
+
+  test("school admin can list invites with invite links", async () => {
+    mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_admin" }));
+    const server = await buildServer();
+    const response = await server.inject({
+      method: "GET",
+      url: "/api/admin/schools/school-1/invites",
+      headers: {
+        cookie: "sched_session=session-token"
+      }
+    });
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(Array.isArray(body.invites)).toBe(true);
+    expect(body.invites[0].inviteUrl).toContain("token=");
     await server.close();
   });
 });
