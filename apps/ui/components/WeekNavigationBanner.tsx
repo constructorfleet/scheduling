@@ -191,23 +191,25 @@ export default function WeekNavigationBanner({
             </div>
           </div>
 
-          <div style={{ display: "grid", gap: "0.55rem", justifyItems: "start" }}>
-            <span
-              style={{
-                borderRadius: 999,
-                background: badge.color,
-                color: "#0f172a",
-                fontWeight: 700,
-                fontSize: "0.78rem",
-                letterSpacing: "0.02em",
-                padding: "0.28rem 0.78rem"
-              }}
-            >
-              {badge.label}
-            </span>
-            <span style={pillStyle(apiTone)}>{apiStatus.message}</span>
+          <div style={{ display: "grid", gap: "0.6rem", justifyItems: "end", alignContent: "start" }}>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <span
+                style={{
+                  borderRadius: 999,
+                  background: badge.color,
+                  color: "#0f172a",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.02em",
+                  padding: "0.28rem 0.78rem"
+                }}
+              >
+                {badge.label}
+              </span>
+              <span style={pillStyle(apiTone)}>{apiStatus.message}</span>
+            </div>
             {userDisplayName && (
-              <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem" }}>
+              <p style={{ margin: 0, color: "#cbd5e1", fontSize: "0.82rem", textAlign: "right" }}>
                 Signed in as <strong style={{ color: "#f8fafc" }}>{userDisplayName}</strong>
                 {userRoleLabel ? ` (${userRoleLabel})` : ""}
               </p>
@@ -215,53 +217,62 @@ export default function WeekNavigationBanner({
           </div>
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
-          <button type="button" onClick={onOpenViolations} disabled={!hasViolations} style={pillStyle(isViolationsOpen ? "danger" : "neutral", !hasViolations)}>
-            {isViolationsOpen ? "Close Violations" : "Open Violations"}
-          </button>
-          <HelpIconButton label="Violation navigator" tone="dark" onClick={() => onOpenHelpTopic?.("violations")} />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "0.7rem 1rem",
+            alignItems: "center"
+          }}
+        >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-start", alignItems: "center" }}>
+            <button type="button" onClick={onOpenViolations} disabled={!hasViolations} style={pillStyle(isViolationsOpen ? "danger" : "neutral", !hasViolations)}>
+              {isViolationsOpen ? "Close Violations" : "Open Violations"}
+            </button>
+            <HelpIconButton label="Violation navigator" tone="dark" onClick={() => onOpenHelpTopic?.("violations")} />
 
-          <button type="button" onClick={onOpenAuditTimeline} style={pillStyle(isAuditOpen ? "active" : "neutral")}>
-            {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
-          </button>
-          <HelpIconButton label="Audit timeline" tone="dark" onClick={() => onOpenHelpTopic?.("audit")} />
+            <button type="button" onClick={onOpenAuditTimeline} style={pillStyle(isAuditOpen ? "active" : "neutral")}>
+              {isAuditOpen ? "Close Audit Log" : "Open Audit Log"}
+            </button>
+            <HelpIconButton label="Audit timeline" tone="dark" onClick={() => onOpenHelpTopic?.("audit")} />
 
-          <button type="button" onClick={onOpenSettings} disabled={!canManageSettings} style={pillStyle(isSettingsOpen ? "active" : "neutral", !canManageSettings)}>
-            {isSettingsOpen ? "Close Settings" : "Open Settings"}
-          </button>
+            <button type="button" onClick={onOpenSettings} disabled={!canManageSettings} style={pillStyle(isSettingsOpen ? "active" : "neutral", !canManageSettings)}>
+              {isSettingsOpen ? "Close Settings" : "Open Settings"}
+            </button>
 
-          <button type="button" onClick={onOpenUserManagement} disabled={!canManageUsers} style={pillStyle(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}>
-            {isUserManagementOpen ? "Close Users" : "Manage Users"}
-          </button>
+            <button type="button" onClick={onOpenUserManagement} disabled={!canManageUsers} style={pillStyle(isUserManagementOpen ? "active" : "neutral", !canManageUsers)}>
+              {isUserManagementOpen ? "Close Users" : "Manage Users"}
+            </button>
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-end", alignItems: "center" }}>
+            <button type="button" onClick={onAutoSchedule} disabled={!canEditSchedule} style={pillStyle("active", !canEditSchedule)}>
+              ⚡ Auto
+            </button>
+            <HelpIconButton label="Auto schedule" tone="dark" onClick={() => onOpenHelpTopic?.("auto-schedule")} />
+
+            <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
+              ← Previous
+            </button>
+            <button
+              type="button"
+              onClick={() => onShiftWeek("next")}
+              style={{
+                ...pillStyle("active"),
+                background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
+                border: "1px solid rgba(125,211,252,0.5)",
+                color: "#eff6ff"
+              }}
+            >
+              Next →
+            </button>
+            <button type="button" onClick={onLogout} style={pillStyle("danger")}>
+              Log out
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", alignItems: "center" }}>
-          <button type="button" onClick={onAutoSchedule} disabled={!canEditSchedule} style={pillStyle("active", !canEditSchedule)}>
-            ⚡ Auto
-          </button>
-          <HelpIconButton label="Auto schedule" tone="dark" onClick={() => onOpenHelpTopic?.("auto-schedule")} />
-
-          <button type="button" onClick={() => onShiftWeek("prev")} style={pillStyle("neutral")}>
-            ← Previous
-          </button>
-          <button
-            type="button"
-            onClick={() => onShiftWeek("next")}
-            style={{
-              ...pillStyle("active"),
-              background: "linear-gradient(135deg, #0ea5e9, #2563eb)",
-              border: "1px solid rgba(125,211,252,0.5)",
-              color: "#eff6ff"
-            }}
-          >
-            Next →
-          </button>
-          <button type="button" onClick={onLogout} style={pillStyle("danger")}>
-            Log out
-          </button>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", justifyContent: "flex-end" }}>
           {complianceHighlights.map((highlight) => (
             <span
               key={highlight}
