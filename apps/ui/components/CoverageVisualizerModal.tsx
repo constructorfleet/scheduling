@@ -155,12 +155,15 @@ const MetricsDisplay: React.FC<{ interval: CoverageInterval; enrollment: number 
         </h4>
         <span
           style={{
-            padding: "0.125rem 0.5rem",
+            padding: "0.25rem 0.625rem",
             borderRadius: 999,
             fontSize: "0.75rem",
             fontWeight: 500,
             background: `${statusColors[interval.status]}1a`,
-            color: statusColors[interval.status]
+            color: statusColors[interval.status],
+            display: "inline-flex",
+            alignItems: "center",
+            lineHeight: 1
           }}
         >
           {interval.status === "complete" ? "Adequate" : interval.status === "partial" ? "Partial" : "Critical"}
@@ -542,7 +545,7 @@ export default function CoverageVisualizerModal({
         <div
           style={{
             padding: "1.5rem",
-            paddingTop: "14rem",
+            paddingTop: "3rem",
             flex: 1,
             overflow: "visible"
           }}
