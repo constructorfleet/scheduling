@@ -11,8 +11,8 @@
             "Use the Audit Log to undo or redo recent edits if needed."
         ],
         "examples": [
-            "Example: If Monday enrollment is 32 with ratio 1:10, schedule at least 4 adults during active segments.",
-            "Example: A split shift can be entered as 7:00 AM-10:30 AM and 2:00 PM-5:00 PM for the same person."
+            "Scenario: Monday enrollment is 32 with a 1:10 ratio. Enter the enrollment in the day metadata, then assign at least 4 adults for each active segment so the ratio violation clears.",
+            "Scenario: A staff member works a split shift. Add two separate blocks in the same row (7:00 AM–10:30 AM and 2:00 PM–5:00 PM) so the timeline reflects the gap and avoids overlap warnings."
         ],
         "related": [
             "schedule-grid",
@@ -34,8 +34,8 @@
             "If a red warning appears, adjust times or staffing until the warning clears."
         ],
         "examples": [
-            "Example: Add two blocks for one employee on Tuesday: 8:00 AM-11:00 AM and 1:00 PM-4:30 PM.",
-            "Example: Closed days lock metadata and block creation for that day."
+            "Scenario: A part-time employee works Tuesday morning and afternoon. Use Add block twice to capture 8:00 AM–11:00 AM and 1:00 PM–4:30 PM so the gap is visible and schedule coverage is accurate.",
+            "Scenario: Wednesday is marked closed in School settings. The day column stays read-only, so remove any blocks and rely on the closed-day indicator instead of adjusting staff times."
         ],
         "related": [
             "auto-schedule",
@@ -55,8 +55,8 @@
             "Review remaining violations after the run."
         ],
         "examples": [
-            "Example: Use replace mode at the start of a week for a fresh draft.",
-            "Example: Use keep mode mid-week to patch gaps without losing manual edits."
+            "Scenario: You are starting a new week with no assignments. Choose Replace to generate a full draft schedule from ratios and availability.",
+            "Scenario: You already adjusted Tuesday manually. Choose Keep to fill remaining gaps without overwriting those edits."
         ],
         "related": [
             "schedule-grid",
@@ -75,8 +75,8 @@
             "Ratio issues include the affected time window in the message."
         ],
         "examples": [
-            "Example: Ratio staffing gap usually needs added staff or corrected enrollment.",
-            "Example: Timeline overlap violations require shifting one of the overlapping blocks."
+            "Scenario: A ratio staffing gap appears from 9:00 AM–11:00 AM. Add another qualified staff block during that window or correct the enrollment count until the warning disappears.",
+            "Scenario: Two blocks overlap for the same employee. Shorten or move one block so the start and end times no longer collide."
         ],
         "related": [
             "schedule-grid",
@@ -93,8 +93,8 @@
             "Publish becomes available once all blockers are cleared."
         ],
         "examples": [
-            "Example: Missing enrollment keeps the Prepare step in progress.",
-            "Example: A ratio violation blocks Review until staffing is fixed."
+            "Scenario: Enrollment is missing for Thursday. The Prepare step stays in progress until you enter the count in day metadata.",
+            "Scenario: A ratio violation remains on Friday afternoon. The Review step stays blocked until the staffing level meets the required ratio."
         ],
         "related": [
             "schedule-grid",
@@ -112,8 +112,8 @@
             "Export PDF/CSV for audit records after publishing."
         ],
         "examples": [
-            "Example: Export a PDF after publish for district sign-off.",
-            "Example: Reopen a week to edit, then republish once violations are cleared."
+            "Scenario: After Publish turns green, export a PDF for district sign-off and archive it with your audit records.",
+            "Scenario: A change request comes in after publishing. Reopen the week, fix the issue, clear violations, then publish again."
         ],
         "related": [
             "audit",
@@ -132,8 +132,8 @@
             "Undo history persists per week in the browser."
         ],
         "examples": [
-            "Example: If an assignment was removed by mistake, press Undo from the audit panel.",
-            "Example: After a correction, use Redo to compare two staffing options quickly."
+            "Scenario: A staff block was deleted by mistake. Open Audit Log and choose Undo to restore it.",
+            "Scenario: You want to compare two recent edits. Use Undo to view the previous state, then Redo to return to the newer staffing plan."
         ],
         "related": [
             "violations",
@@ -151,8 +151,8 @@
             "Return to the schedule grid to apply the updated rules."
         ],
         "examples": [
-            "Example: Add a new schedule type before assigning it to a day.",
-            "Example: Update employee availability before creating their blocks."
+            "Scenario: The district introduces a new program day. Add the schedule type first, then select it in the day metadata so ratios are correct.",
+            "Scenario: A staff member changes availability. Update their availability in Settings before placing new blocks so Auto Schedule respects the change."
         ],
         "related": [
             "settings-school",
@@ -175,8 +175,8 @@
             "Save school settings before leaving the tab."
         ],
         "examples": [
-            "Example: Setting Saturday closed removes Saturday scheduling requirements.",
-            "Example: Enabling CPR requirement means non-current CPR staff can trigger validation issues."
+            "Scenario: The building is closed on Saturdays. Mark Saturday as closed so the grid locks that day and removes staffing requirements.",
+            "Scenario: CPR compliance is required. Turn on the CPR requirement so anyone without current CPR triggers a violation until updated."
         ]
     },
     {
@@ -190,8 +190,8 @@
             "Save schedule types and then apply them in the grid."
         ],
         "examples": [
-            "Example: Full day ratio 1:10, half day ratio 1:12.",
-            "Example: Use custom schedule type labels for district-specific programs."
+            "Scenario: Define a Full Day type at 1:10 and a Half Day type at 1:12. Select the correct type per day so ratios are calculated correctly.",
+            "Scenario: The district uses a \"Pre-K Extended\" program. Create a custom schedule type label so staff know when to use that ratio."
         ]
     },
     {
@@ -205,8 +205,8 @@
             "Save once overlap warnings are cleared."
         ],
         "examples": [
-            "Example: Regular days Mon-Fri 7:00 AM-5:30 PM.",
-            "Example: Summer type Mon-Thu 8:00 AM-4:00 PM."
+            "Scenario: Regular operating hours are 7:00 AM–5:30 PM Monday through Friday. Create one set and assign those days together.",
+            "Scenario: Summer hours run 8:00 AM–4:00 PM Monday through Thursday. Create a separate schedule type so the grid shows the right open/close window."
         ]
     },
     {
@@ -221,8 +221,8 @@
             "Field trip ratios apply during the configured field trip window."
         ],
         "examples": [
-            "Example: Zoo trip adults 1:8 and leaders 1:20.",
-            "Example: Campus walk adults 1:12 with leader ratio disabled (0:0)."
+            "Scenario: A zoo trip requires 1 adult per 8 students and 1 leader per 20. Configure both ratios, then select the trip on the day metadata.",
+            "Scenario: A campus walk only needs adult ratios. Set leader ratio to 0:0 so only adult coverage is enforced during the field trip window."
         ]
     },
     {
@@ -236,8 +236,8 @@
             "Save job title changes before assigning staff."
         ],
         "examples": [
-            "Example: Mark Director as leader qualified and required at open/close.",
-            "Example: Mark Assistant as not leader qualified."
+            "Scenario: Directors must open and close. Mark Director as leader qualified and required for open/close coverage.",
+            "Scenario: Assistants should not satisfy leader requirements. Leave leader qualification unchecked so they do not clear leader violations."
         ]
     },
     {
@@ -251,8 +251,8 @@
             "Save employee changes before scheduling blocks."
         ],
         "examples": [
-            "Example: Employee available Mon 7:00 AM-11:00 AM and 1:00 PM-5:00 PM.",
-            "Example: Enter planned PTO range to prevent accidental assignment."
+            "Scenario: An employee can work mornings and afternoons on Monday. Add availability blocks for 7:00 AM–11:00 AM and 1:00 PM–5:00 PM.",
+            "Scenario: A staff member is on PTO next week. Enter the time-off range so Auto Schedule avoids assigning them."
         ]
     }
 ]
