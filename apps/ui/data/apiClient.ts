@@ -11,6 +11,7 @@ import {
     type ScheduleSavePayload
 } from "./generated";
 import { ApiError } from "./generated";
+import type { DayOfWeek, SegmentBlock, StaffAssignment } from "@core/domain/types";
 
 OpenAPI.BASE = "";
 OpenAPI.WITH_CREDENTIALS = true;
@@ -90,6 +91,25 @@ export type InviteDetails = {
     expiresAt: string;
 };
 
+export type EmployeeScheduleViewEmployee = {
+    id: string;
+    name: string;
+};
+
+export type EmployeeScheduleViewResponse = {
+    weekId: string;
+    scheduleDays: Array<{
+        id: string;
+        dayOfWeek: DayOfWeek;
+        date?: string | null;
+        scheduleType?: string | null;
+        dayScheduleType?: string | null;
+    }>;
+    segmentBlocks: Array<Pick<SegmentBlock, "id" | "dayOfWeek" | "segment" | "startTime" | "endTime">>;
+    staffAssignments: Array<Pick<StaffAssignment, "id" | "segmentBlockId" | "employeeId" | "startTime" | "endTime">>;
+    employees: EmployeeScheduleViewEmployee[];
+};
+
 type AdminUsersResponse = { users: AdminUserRecord[]; };
 type AdminInvitesResponse = { invites: AdminInviteRecord[]; };
 type AdminDistrictsResponse = { districts: AdminDistrictRecord[]; };
@@ -167,6 +187,19 @@ export const saveSettings = async (schoolId: string, payload: SettingsPayload) =
 export const fetchSchedule = async (weekId: string) => {
     try {
         return await DefaultService.getApiSchedule(weekId);
+    } catch (error) {
+        if (isApiErrorStatus(error, 404)) {
+            return null;
+        }
+        throw error;
+    }
+};
+
+export const fetchEmployeeScheduleView = async (weekId: string) => {
+    try {
+        return await requestJson<EmployeeScheduleViewResponse>(
+            `/api/schedule/${ encodeURIComponent(weekId) }/employee-view`
+        );
     } catch (error) {
         if (isApiErrorStatus(error, 404)) {
             return null;

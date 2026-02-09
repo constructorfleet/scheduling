@@ -1619,6 +1619,57 @@ const buildServer = async () => {
         };
     });
 
+    fastify.get("/api/schedule/:weekId/employee-view", async (request, reply) => {
+        const { weekId } = request.params as { weekId: string; };
+        const prisma = getPrisma();
+        const scheduleWeek = await prisma.scheduleWeek.findUnique({
+            where: { id: weekId },
+            include: {
+                scheduleDays: true,
+                segmentBlocks: true,
+                staffAssignments: true
+            }
+        });
+        if (!scheduleWeek) {
+            return reply.code(404).send({ message: `Schedule week ${ weekId } not found` });
+        }
+        if (!(await requireSchoolAccess(request, reply, scheduleWeek.schoolId, "read_schedule"))) {
+            return;
+        }
+
+        const employees = await prisma.employee.findMany({
+            where: { schoolId: scheduleWeek.schoolId },
+            select: { id: true, name: true },
+            orderBy: { name: "asc" }
+        });
+
+        return {
+            weekId: scheduleWeek.id,
+            scheduleDays: scheduleWeek.scheduleDays.map((day) => ({
+                id: day.id,
+                dayOfWeek: day.dayOfWeek,
+                date: day.date ? day.date.toISOString() : null,
+                scheduleType: day.scheduleType ?? null,
+                dayScheduleType: day.dayScheduleType ?? null
+            })),
+            segmentBlocks: scheduleWeek.segmentBlocks.map((block) => ({
+                id: block.id,
+                dayOfWeek: block.dayOfWeek,
+                segment: block.segment,
+                startTime: block.startTime,
+                endTime: block.endTime
+            })),
+            staffAssignments: scheduleWeek.staffAssignments.map((assignment) => ({
+                id: assignment.id,
+                segmentBlockId: assignment.segmentBlockId,
+                employeeId: assignment.employeeId,
+                startTime: assignment.startTime,
+                endTime: assignment.endTime
+            })),
+            employees
+        };
+    });
+
     fastify.delete("/api/schedule/:weekId/staff-assignments", async (request, reply) => {
         if (!requireCsrf(request, reply)) {
             return;

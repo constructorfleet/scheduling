@@ -59,6 +59,7 @@ import {
   deleteScheduleAssignments,
   deleteScheduleAssignment,
   fetchAuthMe,
+  fetchEmployeeScheduleView,
   fetchSchedule,
   fetchSettings,
   isApiErrorStatus,
@@ -69,6 +70,7 @@ import {
   updateDisplayName,
   type ScheduleSavePayload
 } from "./data/apiClient";
+import type { EmployeeScheduleViewResponse } from "./data/apiClient";
 import { buildLegacyWeekId, buildWeekId } from "./data/scheduleUtils";
 import { autoSchedule, validateDayMetadata } from "@core/scheduler";
 
@@ -142,6 +144,33 @@ const ensureClosedScheduleType = (options: typeof scheduleTypeOptions) => {
     return options;
   }
   return [...options, CLOSED_SCHEDULE_TYPE_OPTION];
+};
+
+const buildEmployeeViewDaySequence = (
+  scheduleDays: Array<{
+    dayOfWeek: DayOfWeek;
+    scheduleType?: string | null;
+    dayScheduleType?: string | null;
+  }>
+) => {
+  if (scheduleDays.length === 0) {
+    return weekDaySequence;
+  }
+  const byDay = new Map(scheduleDays.map((day) => [day.dayOfWeek, day] as const));
+  const sequence = weekDaySequence.filter((day) => {
+    const scheduleDay = byDay.get(day);
+    if (!scheduleDay) {
+      return true;
+    }
+    if (scheduleDay.dayScheduleType === "closed") {
+      return false;
+    }
+    if (scheduleDay.scheduleType === CLOSED_SCHEDULE_TYPE) {
+      return false;
+    }
+    return true;
+  });
+  return sequence.length > 0 ? sequence : weekDaySequence;
 };
 
 const EMPLOYMENT_STATUS_VALUES: Employee["employmentStatus"][] = ["active", "on_leave", "archived"];
@@ -296,6 +325,7 @@ export default function App() {
   const [scheduleDaysState, setScheduleDaysState] = useState(scheduleDays);
   const [segmentBlocksState, setSegmentBlocksState] = useState(segmentBlocks);
   const [staffAssignmentsState, setStaffAssignmentsState] = useState(staffAssignments);
+  const [employeeScheduleView, setEmployeeScheduleView] = useState<EmployeeScheduleViewResponse | null>(null);
   const [showViolationNavigator, setShowViolationNavigator] = useState(false);
   const [showAuditTimeline, setShowAuditTimeline] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -807,6 +837,21 @@ export default function App() {
     return weekDaySequence.filter((day) => !closedDaysState.includes(day));
   }, [weekDaySequence, closedDaysState]);
 
+  const employeeViewDays = useMemo(() => employeeScheduleView?.scheduleDays ?? [], [employeeScheduleView]);
+  const employeeViewEmployees = useMemo(() => employeeScheduleView?.employees ?? [], [employeeScheduleView]);
+  const employeeViewAssignments = useMemo(
+    () => employeeScheduleView?.staffAssignments ?? [],
+    [employeeScheduleView]
+  );
+  const employeeViewSegments = useMemo(
+    () => employeeScheduleView?.segmentBlocks ?? [],
+    [employeeScheduleView]
+  );
+  const employeeDaySequence = useMemo(
+    () => buildEmployeeViewDaySequence(employeeViewDays),
+    [employeeViewDays]
+  );
+
   useEffect(() => {
     const defaultOpenScheduleType =
       scheduleTypeOptionsState.find((type) => type.value !== CLOSED_SCHEDULE_TYPE)?.value;
@@ -1078,6 +1123,26 @@ export default function App() {
     if (authStatus !== "authenticated") {
       return;
     }
+    if (!canEditSchedule) {
+      setIsConfigured(true);
+      setShowSettings(false);
+      setSchoolName(selectedSchoolName);
+      setClosedDaysState([]);
+      setSchoolRulesState({
+        openerCount: 0,
+        closerCount: 0,
+        fieldTripStartTime: "09:00",
+        fieldTripEndTime: "15:00",
+        minimumMedicalDelegated: 0,
+        requireCurrentCpr: false
+      });
+      setScheduleTypeOptionsState(ensureClosedScheduleType([]));
+      setJobTitlesState([]);
+      setEmployeesState([]);
+      setOperatingHoursConfigState([]);
+      setFieldTripTypesState([]);
+      return;
+    }
     let isActive = true;
     const hydrate = async () => {
       try {
@@ -1185,10 +1250,10 @@ export default function App() {
     return () => {
       isActive = false;
     };
-  }, [selectedSchoolId, authStatus]);
+  }, [selectedSchoolId, authStatus, canEditSchedule, selectedSchoolName]);
 
   useEffect(() => {
-    if (IS_TEST_ENV) {
+    if (IS_TEST_ENV || !canEditSchedule) {
       return;
     }
     let isActive = true;
@@ -1346,7 +1411,59 @@ export default function App() {
     return () => {
       isActive = false;
     };
-  }, [selectedSchoolId, currentWeekId, authStatus, canViewSchool]);
+  }, [selectedSchoolId, currentWeekId, authStatus, canViewSchool, canEditSchedule]);
+
+  useEffect(() => {
+    if (IS_TEST_ENV || authStatus !== "authenticated") {
+      return;
+    }
+    if (!canViewSchool || canEditSchedule) {
+      setEmployeeScheduleView(null);
+      return;
+    }
+    let isActive = true;
+    const loadEmployeeScheduleView = async () => {
+      beginApiAction("loading", "Loading schedule...");
+      try {
+        const view = await fetchEmployeeScheduleView(currentWeekId);
+        completeApiAction("Schedule loaded");
+        if (!isActive) return;
+        if (view) {
+          setEmployeeScheduleView(view);
+          return;
+        }
+        setEmployeeScheduleView({
+          weekId: currentWeekId,
+          scheduleDays: weekDaySequence.map((dayOfWeek, index) => ({
+            id: `${currentWeekId}-day-${dayOfWeek}`,
+            dayOfWeek,
+            date: addDays(currentWeekStartDateIso, index),
+            scheduleType: null,
+            dayScheduleType: "full_day"
+          })),
+          segmentBlocks: [],
+          staffAssignments: [],
+          employees: []
+        });
+      } catch (error) {
+        failApiAction("Schedule load failed");
+        // eslint-disable-next-line no-console
+        console.error("Failed to load employee schedule", error);
+      }
+    };
+
+    loadEmployeeScheduleView();
+    return () => {
+      isActive = false;
+    };
+  }, [
+    authStatus,
+    canEditSchedule,
+    canViewSchool,
+    currentWeekId,
+    currentWeekStartDateIso,
+    selectedSchoolId
+  ]);
 
   useEffect(() => {
     if (!canEditSchedule) {
@@ -2458,10 +2575,10 @@ export default function App() {
           />
         ) : (
           <EmployeeScheduleView
-            employees={employeesDerived}
-            assignments={staffAssignmentsState}
-            segmentBlocks={segmentBlocksState}
-            daySequence={openDaySequence}
+            employees={employeeViewEmployees}
+            assignments={employeeViewAssignments}
+            segmentBlocks={employeeViewSegments}
+            daySequence={employeeDaySequence}
             dayDisplayNames={dayDisplayNames}
           />
         )

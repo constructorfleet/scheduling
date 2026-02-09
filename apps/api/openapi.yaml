@@ -147,6 +147,28 @@ paths:
           description: Authentication required
         '403':
           description: Insufficient access
+  /api/schedule/{weekId}/employee-view:
+    get:
+      summary: Get employee schedule view
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee schedule view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeScheduleViewResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
     put:
       summary: Save schedule week
       security:
@@ -973,6 +995,79 @@ components:
           items:
             $ref: '#/components/schemas/AuditEvent'
       required: [id, schoolId, status, scheduleDays, segmentBlocks, staffAssignments, fieldTripEvents, auditEvents]
+    EmployeeScheduleViewResponse:
+      type: object
+      properties:
+        weekId:
+          type: string
+        scheduleDays:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeScheduleDay'
+        segmentBlocks:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeScheduleSegmentBlock'
+        staffAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeScheduleAssignment'
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeScheduleEmployee'
+      required: [weekId, scheduleDays, segmentBlocks, staffAssignments, employees]
+    EmployeeScheduleEmployee:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required: [id, name]
+    EmployeeScheduleDay:
+      type: object
+      properties:
+        id:
+          type: string
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        date:
+          type: string
+          nullable: true
+        scheduleType:
+          $ref: '#/components/schemas/ScheduleType'
+        dayScheduleType:
+          $ref: '#/components/schemas/DayScheduleType'
+      required: [id, dayOfWeek]
+    EmployeeScheduleSegmentBlock:
+      type: object
+      properties:
+        id:
+          type: string
+        dayOfWeek:
+          $ref: '#/components/schemas/DayOfWeek'
+        segment:
+          $ref: '#/components/schemas/DaySegment'
+        startTime:
+          type: string
+        endTime:
+          type: string
+      required: [id, dayOfWeek, segment, startTime, endTime]
+    EmployeeScheduleAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+        segmentBlockId:
+          type: string
+        employeeId:
+          type: string
+        startTime:
+          type: string
+        endTime:
+          type: string
+      required: [id, segmentBlockId, employeeId, startTime, endTime]
     GenericOk:
       type: object
       properties:

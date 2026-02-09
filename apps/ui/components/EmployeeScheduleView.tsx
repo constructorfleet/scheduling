@@ -1,11 +1,26 @@
-import { useMemo, useState } from "react";
-import type { DayOfWeek, Employee, SegmentBlock, StaffAssignment } from "@core/domain/types";
+import { useEffect, useMemo, useState } from "react";
+import type { DayOfWeek, SegmentBlock, StaffAssignment } from "@core/domain/types";
 import { colors } from "../theme";
 
+export type EmployeeScheduleEmployee = {
+  id: string;
+  name: string;
+};
+
+export type EmployeeScheduleSegmentBlock = Pick<
+  SegmentBlock,
+  "id" | "dayOfWeek" | "segment" | "startTime" | "endTime"
+>;
+
+export type EmployeeScheduleAssignment = Pick<
+  StaffAssignment,
+  "id" | "segmentBlockId" | "employeeId" | "startTime" | "endTime"
+>;
+
 interface EmployeeScheduleViewProps {
-  employees: Employee[];
-  assignments: StaffAssignment[];
-  segmentBlocks: SegmentBlock[];
+  employees: EmployeeScheduleEmployee[];
+  assignments: EmployeeScheduleAssignment[];
+  segmentBlocks: EmployeeScheduleSegmentBlock[];
   daySequence: DayOfWeek[];
   dayDisplayNames: Record<DayOfWeek, string>;
 }
@@ -27,9 +42,19 @@ export default function EmployeeScheduleView({
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(() => employees[0]?.id ?? "");
   const segmentById = useMemo(() => new Map(segmentBlocks.map((segment) => [segment.id, segment])), [segmentBlocks]);
 
+  useEffect(() => {
+    if (!selectedEmployeeId && employees.length > 0) {
+      setSelectedEmployeeId(employees[0].id);
+      return;
+    }
+    if (selectedEmployeeId && !employees.some((employee) => employee.id === selectedEmployeeId)) {
+      setSelectedEmployeeId(employees[0]?.id ?? "");
+    }
+  }, [employees, selectedEmployeeId]);
+
   const selectedEmployee = employees.find((employee) => employee.id === selectedEmployeeId) ?? null;
   const assignmentsByDay = useMemo(() => {
-    const grouped = new Map<DayOfWeek, StaffAssignment[]>();
+    const grouped = new Map<DayOfWeek, EmployeeScheduleAssignment[]>();
     daySequence.forEach((day) => grouped.set(day, []));
     assignments
       .filter((assignment) => assignment.employeeId === selectedEmployeeId)

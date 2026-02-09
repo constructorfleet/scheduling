@@ -1,6 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import EmployeeScheduleView from "../../apps/ui/components/EmployeeScheduleView";
-import type { DayOfWeek, Employee, SegmentBlock, StaffAssignment } from "@core/domain/types";
+import EmployeeScheduleView, {
+  type EmployeeScheduleAssignment,
+  type EmployeeScheduleEmployee,
+  type EmployeeScheduleSegmentBlock
+} from "../../apps/ui/components/EmployeeScheduleView";
+import type { DayOfWeek } from "@core/domain/types";
 
 const daySequence: DayOfWeek[] = ["mon", "tue"];
 const dayDisplayNames: Record<DayOfWeek, string> = {
@@ -15,56 +19,34 @@ const dayDisplayNames: Record<DayOfWeek, string> = {
 
 describe("EmployeeScheduleView", () => {
   it("renders shifts for the selected employee", () => {
-    const employees: Employee[] = [
+    const employees: EmployeeScheduleEmployee[] = [
       {
         id: "emp-1",
-        name: "Alex",
-        jobTitle: "Teacher",
-        maxHoursPerDay: 8,
-        maxHoursPerWeek: 40,
-        employmentStatus: "active",
-        leaderQualified: false,
-        medicallyDelegated: false,
-        cprCurrent: true,
-        notes: ""
+        name: "Alex"
       },
       {
         id: "emp-2",
-        name: "Sam",
-        jobTitle: "Teacher",
-        maxHoursPerDay: 8,
-        maxHoursPerWeek: 40,
-        employmentStatus: "active",
-        leaderQualified: false,
-        medicallyDelegated: false,
-        cprCurrent: true,
-        notes: ""
+        name: "Sam"
       }
     ];
 
-    const segmentBlocks: SegmentBlock[] = [
+    const segmentBlocks: EmployeeScheduleSegmentBlock[] = [
       {
         id: "seg-1",
-        scheduleWeekId: "week-1",
         dayOfWeek: "mon",
         segment: "open",
         startTime: "08:00",
-        endTime: "12:00",
-        childCount: 10,
-        status: "draft",
-        scheduleDayId: "day-1"
+        endTime: "12:00"
       }
     ];
 
-    const assignments: StaffAssignment[] = [
+    const assignments: EmployeeScheduleAssignment[] = [
       {
         id: "assign-1",
         segmentBlockId: "seg-1",
         employeeId: "emp-1",
-        assignmentSource: "manual_adjustment",
         startTime: "08:00",
-        endTime: "12:00",
-        status: "scheduled"
+        endTime: "12:00"
       }
     ];
 
