@@ -217,9 +217,15 @@ model StaffAssignment {
   endTime          String
   status           String
   notes            String?
+  isOnCall         Boolean @default(false)
+  is1on1           Boolean @default(false)
+  studentName      String?
 
   scheduleWeek ScheduleWeek @relation(fields: [scheduleWeekId], references: [id], onDelete: Cascade)
   segmentBlock SegmentBlock @relation(fields: [segmentBlockId], references: [id], onDelete: Cascade)
+
+  @@index([isOnCall])
+  @@index([is1on1])
 }
 
 model AuditEvent {

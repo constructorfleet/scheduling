@@ -266,7 +266,10 @@ exports.Prisma.StaffAssignmentScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   status: 'status',
-  notes: 'notes'
+  notes: 'notes',
+  isOnCall: 'isOnCall',
+  is1on1: 'is1on1',
+  studentName: 'studentName'
 };
 
 exports.Prisma.AuditEventScalarFieldEnum = {

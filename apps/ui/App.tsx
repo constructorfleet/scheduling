@@ -136,7 +136,7 @@ const DAY_OF_WEEK_INDEX: Record<DayOfWeek, number> = {
 const isDayOfWeek = (value: string): value is DayOfWeek =>
   DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
 const CLOSED_SCHEDULE_TYPE = "closed" as ScheduleType;
-const CLOSED_SCHEDULE_TYPE_OPTION = {
+const CLOSED_SCHEDULE_TYPE_OPTION: ScheduleTypeOption = {
   value: CLOSED_SCHEDULE_TYPE,
   label: "Closed",
   ratio: { adults: 1, students: 1 },
@@ -991,12 +991,14 @@ export default function App() {
       };
     }
     if ("scheduleTypes" in overrides) {
-      payload.scheduleTypes = (overrides.scheduleTypes ?? scheduleTypeOptionsState).map((type) => ({
+      const scheduleTypes = overrides.scheduleTypes ?? scheduleTypeOptionsState;
+      payload.scheduleTypes = scheduleTypes.map((type): ScheduleTypePayloadModel => ({
         value: type.value,
         label: type.label,
         ratio: type.ratio,
-        description: type.description
-      })) as ScheduleTypePayloadModel[];
+        description: type.description,
+        timeWindows: type.timeWindows
+      }));
     }
     if ("jobTitles" in overrides) {
       payload.jobTitles = overrides.jobTitles ?? jobTitlesState;
@@ -1310,7 +1312,8 @@ export default function App() {
                   adults: type.ratioAdults ?? 1,
                   students: type.ratioStudents ?? 1
                 },
-                description: type.description ?? ""
+                description: type.description ?? "",
+                timeWindows: type.timeWindows
               }))
             )
           );
@@ -2673,7 +2676,7 @@ export default function App() {
             onUpdateAssignmentTime={handleUpdateAssignmentTime}
             onDeleteAssignment={handleDeleteAssignment}
             onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
-            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall }) => {
+            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall, is1on1, studentName }) => {
               if (!canEditSchedule) {
                 setAuthMessage("You do not have permission to edit assignments.");
                 return;
@@ -2720,7 +2723,9 @@ export default function App() {
                       startTime,
                       endTime,
                       status: "scheduled" as const,
-                      isOnCall: isOnCall ?? false
+                      isOnCall: isOnCall ?? false,
+                      is1on1: is1on1 ?? false,
+                      studentName: studentName ?? undefined
                     }
                   ];
                   return {
@@ -2729,9 +2734,17 @@ export default function App() {
                   };
                 },
                 {
-                  action: isOnCall ? "Created on-call assignment" : "Created assignment",
+                  action: is1on1
+                    ? "Created 1:1 assignment"
+                    : isOnCall
+                      ? "Created on-call assignment"
+                      : "Created assignment",
                   notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]})${
-                    isOnCall ? " - ON CALL" : `: ${startTime}-${endTime}`
+                    is1on1
+                      ? ` - 1:1 with ${studentName ?? "Unknown"}: ${startTime}-${endTime}`
+                      : isOnCall
+                        ? " - ON CALL"
+                        : `: ${startTime}-${endTime}`
                   }`
                 }
               );

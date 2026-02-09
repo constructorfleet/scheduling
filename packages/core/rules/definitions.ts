@@ -11,6 +11,7 @@ import {
 } from "./utils";
 import type { RulesContext, RuleViolation } from "./types";
 import type { DayOfWeek, StaffAssignment } from "../domain/types";
+import { count1on1StudentsInInterval } from "../domain/constants";
 
 const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "ratio-segment": "policy-ratio",
@@ -25,7 +26,8 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "open-close-coverage": "policy-open-close",
     "medical-delegated-coverage": "policy-med-delegated",
     "cpr-current-required": "policy-cpr-current",
-    "on-call-exclusivity": "policy-on-call"
+    "on-call-exclusivity": "policy-on-call",
+    "one-on-one-student-name": "policy-1on1"
 };
 
 const buildViolation = (
@@ -134,6 +136,7 @@ const getActiveAssignmentsForDay = (
     context.staffAssignments
         .filter((assignment) => assignment.status !== "completed")
         .filter((assignment) => !assignment.isOnCall)
+        .filter((assignment) => !assignment.is1on1)
         .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === dayOfWeek)
         .map((assignment) => {
             const employee = getEmployeeById(context, assignment.employeeId);
@@ -336,7 +339,7 @@ export const ratioSegmentRule: RuleDefinition = {
                 return;
             }
             const scheduleType = day.scheduleType;
-            const effectiveChildCount =
+            const baseEnrollment =
                 typeof day.enrollmentCount === "number"
                     ? day.enrollmentCount
                     : 0;
@@ -378,6 +381,7 @@ export const ratioSegmentRule: RuleDefinition = {
             const dayAssignments = context.staffAssignments
                 .filter((assignment) => assignment.status !== "completed")
                 .filter((assignment) => !assignment.isOnCall)
+                .filter((assignment) => !assignment.is1on1)
                 .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
                 .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
             const boundaries = new Set<number>([ openMinutes, closeMinutes ]);
@@ -414,6 +418,7 @@ export const ratioSegmentRule: RuleDefinition = {
                 required: number;
                 minStaff: number;
                 assigned: number;
+                effectiveChildCount: number;
             }> = [];
             for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
                 const start = sortedBoundaries[ index ];
@@ -445,6 +450,16 @@ export const ratioSegmentRule: RuleDefinition = {
                         normalizedChildrenPerStaff = normalizedScheduleChildrenPerStaff;
                     }
                 }
+                // Subtract students in 1:1 assignments during this interval
+                const studentsIn1on1 = count1on1StudentsInInterval(
+                    context.staffAssignments,
+                    day.dayOfWeek,
+                    start,
+                    end,
+                    (assignment) => getDayOfWeekForAssignment(context, assignment),
+                    parseTimeToMinutes
+                );
+                const effectiveChildCount = Math.max(0, baseEnrollment - studentsIn1on1);
                 const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
                 const required = Math.max(minStaff, requiredFromRatio);
                 const assigned = new Set(
@@ -457,7 +472,7 @@ export const ratioSegmentRule: RuleDefinition = {
                         .map((assignment) => assignment.employeeId)
                 ).size;
                 if (assigned < required) {
-                    failingIntervals.push({ start, end, required, minStaff, assigned });
+                    failingIntervals.push({ start, end, required, minStaff, assigned, effectiveChildCount });
                 }
             }
             if (failingIntervals.length === 0) {
@@ -471,7 +486,8 @@ export const ratioSegmentRule: RuleDefinition = {
                     previous.end === interval.start &&
                     previous.required === interval.required &&
                     previous.minStaff === interval.minStaff &&
-                    previous.assigned === interval.assigned
+                    previous.assigned === interval.assigned &&
+                    previous.effectiveChildCount === interval.effectiveChildCount
                 ) {
                     previous.end = interval.end;
                     return;
@@ -501,7 +517,7 @@ export const ratioSegmentRule: RuleDefinition = {
                 const sourceLabel = useFieldTripRatio ? "field trip override" : "schedule type";
                 const message =
                     `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
-                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ effectiveChildCount }) ` +
+                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ interval.effectiveChildCount }) ` +
                     `but only ${ interval.assigned } assigned`;
                 violations.push(
                     buildViolation(
@@ -513,7 +529,7 @@ export const ratioSegmentRule: RuleDefinition = {
                         "error",
                         {
                             dayOfWeek: day.dayOfWeek,
-                            childCount: effectiveChildCount,
+                            childCount: interval.effectiveChildCount,
                             ratioSource: useFieldTripRatio ? "fieldTrip" : "scheduleType",
                             required: interval.required,
                             actual: interval.assigned,
@@ -1518,6 +1534,43 @@ export const onCallExclusivityRule: RuleDefinition = {
     }
 };
 
+export const oneOnOneStudentNameRule: RuleDefinition = {
+    id: "one-on-one-student-name",
+    description: "Ensures 1:1 assignments have a student name specified",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "one-on-one-student-name",
+            DEFAULT_POLICY_CITATIONS["one-on-one-student-name"] || "policy-1on1"
+        );
+
+        context.staffAssignments
+            .filter((assignment) => assignment.is1on1)
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                if (!assignment.studentName || assignment.studentName.trim() === "") {
+                    const employee = getEmployeeById(context, assignment.employeeId);
+                    const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+
+                    violations.push(
+                        buildViolation(
+                            "one-on-one-student-name",
+                            `${employee?.name ?? "Staff member"} has 1:1 assignment on ${dayOfWeek?.toUpperCase()} without student name`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            { employeeId: employee?.id, dayOfWeek }
+                        )
+                    );
+                }
+            });
+
+        return violations;
+    }
+};
+
 export const fieldTripEventIntegrityRule: RuleDefinition = {
     id: "field-trip-event",
     description:
@@ -1661,6 +1714,7 @@ export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
     medicalDelegatedCoverageRule,
     cprCurrentRequiredRule,
     onCallExclusivityRule,
+    oneOnOneStudentNameRule,
     fieldTripEventIntegrityRule,
     fieldTripRatiosRule
 ];

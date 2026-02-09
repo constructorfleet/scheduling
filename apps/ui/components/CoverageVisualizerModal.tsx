@@ -12,6 +12,7 @@ import type {
 import type { ScheduleTypeTimeWindow } from "@core/rules/types";
 import type { SchoolRules } from "./SettingsPanel";
 import { colors, shadows } from "../theme";
+import { count1on1StudentsInInterval } from "@core/domain/constants";
 
 interface CoverageVisualizerModalProps {
   isOpen: boolean;
@@ -444,13 +445,29 @@ export default function CoverageVisualizerModal({
         schoolRules
       );
 
-      const enrollmentCount = day.enrollmentCount ?? 0;
+      const baseEnrollment = day.enrollmentCount ?? 0;
+
+      // Subtract students in 1:1 assignments during this interval
+      const studentsIn1on1 = count1on1StudentsInInterval(
+        assignments,
+        day.dayOfWeek,
+        start,
+        end,
+        () => day.dayOfWeek,
+        parseTimeToMinutes
+      );
+
+      const enrollmentCount = Math.max(0, baseEnrollment - studentsIn1on1);
       const required = Math.ceil(enrollmentCount / ratio);
 
       const actual = assignments.filter(a => {
         const aStart = parseTimeToMinutes(a.startTime);
         const aEnd = parseTimeToMinutes(a.endTime);
-        return aStart < end && aEnd > start && employees.some(e => e.id === a.employeeId);
+        return aStart < end &&
+               aEnd > start &&
+               !a.is1on1 &&
+               !a.isOnCall &&
+               employees.some(e => e.id === a.employeeId);
       }).length;
 
       let status: CoverageInterval["status"];

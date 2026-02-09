@@ -110,6 +110,8 @@ export interface StaffAssignment {
     status: "scheduled" | "active" | "on_break" | "completed";
     notes?: string;
     isOnCall?: boolean;
+    is1on1?: boolean;
+    studentName?: string;
 }
 
 export interface ScheduleDay {

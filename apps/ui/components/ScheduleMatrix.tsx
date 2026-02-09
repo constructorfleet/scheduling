@@ -36,7 +36,7 @@ interface ScheduleMatrixProps {
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
   onDeleteAssignment: (assignmentId: string) => void;
-  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean }) => void;
+  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean; is1on1?: boolean; studentName?: string }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
   onDayClick: (dayOfWeek: DayOfWeek) => void;
   focusedSegmentIds?: string[] | null;
@@ -135,6 +135,8 @@ export default function ScheduleMatrix({
     endTime: string;
     isNew: boolean;
     isOnCall?: boolean;
+    is1on1?: boolean;
+    studentName?: string;
   } | null>(null);
   const [reassignmentTargetBySource, setReassignmentTargetBySource] = useState<Record<string, string>>({});
   const openerWindowMinutes = 15;
@@ -706,6 +708,7 @@ export default function ScheduleMatrix({
                             block.endTime
                           );
                           const isOnCall = block.isOnCall || (block.startTime === "00:00" && block.endTime === "23:59");
+                          const is1on1 = block.is1on1;
                           const isOpener = operatingWindow
                             ? Math.abs(parseTimeToMinutes(block.startTime) - operatingWindow.open) <=
                               openerWindowMinutes
@@ -714,20 +717,24 @@ export default function ScheduleMatrix({
                             ? Math.abs(parseTimeToMinutes(block.endTime) - operatingWindow.close) <=
                               closerWindowMinutes
                             : false;
-                          const blockBackground = isOnCall
-                            ? "rgba(251, 191, 36, 0.25)"
-                            : isOpener && isCloser
-                              ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
-                              : isOpener
-                                ? "rgba(0, 96, 250, 0.25)"
-                                : isCloser
-                                  ? "rgba(132, 0, 255, 0.25)"
-                                  : "#ecfeff";
-                          const blockBorder = isOnCall
-                            ? "2px solid rgba(251, 191, 36, 0.6)"
-                            : isOpener || isCloser
-                              ? "1px solid rgba(79,70,229,0.5)"
-                              : "1px solid #bae6fd";
+                          const blockBackground = is1on1
+                            ? "rgba(16, 185, 129, 0.25)"
+                            : isOnCall
+                              ? "rgba(251, 191, 36, 0.25)"
+                              : isOpener && isCloser
+                                ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
+                                : isOpener
+                                  ? "rgba(0, 96, 250, 0.25)"
+                                  : isCloser
+                                    ? "rgba(132, 0, 255, 0.25)"
+                                    : "#ecfeff";
+                          const blockBorder = is1on1
+                            ? "2px solid rgba(16, 185, 129, 0.6)"
+                            : isOnCall
+                              ? "2px solid rgba(251, 191, 36, 0.6)"
+                              : isOpener || isCloser
+                                ? "1px solid rgba(79,70,229,0.5)"
+                                : "1px solid #bae6fd";
                           const isFocused = focusedSet.has(segmentId);
                           const hasAvailabilityViolation = Boolean(availabilityMessage);
 
@@ -801,7 +808,7 @@ export default function ScheduleMatrix({
                               )}
                               {editing?.assignmentId === block.id ? (
                                 <>
-                                  {!editing.isOnCall && (
+                                  {!editing.isOnCall && !editing.is1on1 && (
                                     <>
                                       <input
                                         type="time"
@@ -850,6 +857,62 @@ export default function ScheduleMatrix({
                                     >
                                       ON CALL (All Day)
                                     </div>
+                                  )}
+                                  {editing.is1on1 && (
+                                    <>
+                                      <input
+                                        type="time"
+                                        value={editing.startTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, startTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="time"
+                                        value={editing.endTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, endTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="text"
+                                        value={editing.studentName ?? ""}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, studentName: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        placeholder="Student name"
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                    </>
                                   )}
                                   <button
                                     type="button"
@@ -905,7 +968,23 @@ export default function ScheduleMatrix({
                                 </>
                               ) : (
                                 <>
-                                  {isOnCall ? (
+                                  {is1on1 ? (
+                                    <>
+                                      <div
+                                        style={{
+                                          fontSize: "0.75rem",
+                                          fontWeight: 700,
+                                          color: "rgba(5, 150, 105, 1)",
+                                          textAlign: "center"
+                                        }}
+                                      >
+                                        1:1 - {block.studentName || "Unknown"}
+                                      </div>
+                                      <div style={{ fontSize: "0.65rem", color: "#64748b", textAlign: "center" }}>
+                                        {formatTime(block.startTime)} - {formatTime(block.endTime)}
+                                      </div>
+                                    </>
+                                  ) : isOnCall ? (
                                     <div
                                       style={{
                                         fontSize: "0.85rem",
@@ -926,7 +1005,9 @@ export default function ScheduleMatrix({
                                   <span style={{ fontSize: "0.7rem", color: "#64748b" }}>
                                     {isOnCall
                                       ? "All day"
-                                      : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
+                                      : is1on1
+                                        ? `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`
+                                        : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
                                   </span>
                                 </>
                               )}
@@ -999,10 +1080,44 @@ export default function ScheduleMatrix({
                               color: colors.textPrimary,
                               padding: "0.3rem 0.7rem",
                               cursor: "pointer",
-                              marginLeft: "0.5rem"
                             }}
                           >
                             On call
+                          </motion.button>
+                        )}
+                        {canCreateAssignment && dayHours < member.maxHoursPerDay && (
+                          <motion.button
+                            layout
+                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            type="button"
+                            onClick={() => {
+                              const defaultStart = operatingWindow
+                                ? `${Math.floor(operatingWindow.open / 60).toString().padStart(2, "0")}:${(operatingWindow.open % 60).toString().padStart(2, "0")}`
+                                : "08:00";
+                              const defaultEnd = operatingWindow
+                                ? `${Math.floor((operatingWindow.open + 60) / 60).toString().padStart(2, "0")}:${((operatingWindow.open + 60) % 60).toString().padStart(2, "0")}`
+                                : "09:00";
+                              setEditing({
+                                employeeId: member.id,
+                                dayOfWeek: day,
+                                startTime: defaultStart,
+                                endTime: defaultEnd,
+                                isNew: true,
+                                is1on1: true
+                              });
+                            }}
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(16, 185, 129, 0.6)",
+                              background: "rgba(16, 185, 129, 0.15)",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: colors.textPrimary,
+                              padding: "0.3rem 0.7rem",
+                              cursor: "pointer",
+                            }}
+                          >
+                            1:1
                           </motion.button>
                         )}
                         {!closedDay && !canCreateAssignment && (
@@ -1038,7 +1153,7 @@ export default function ScheduleMatrix({
                               const overlapMessage = getOverlapMessage(editing);
                               return (
                                 <>
-                            {!editing.isOnCall && (
+                            {!editing.isOnCall && !editing.is1on1 && (
                               <>
                                 <input
                                   type="time"
@@ -1084,10 +1199,63 @@ export default function ScheduleMatrix({
                                 ON CALL (All Day)
                               </div>
                             )}
+                            {editing.is1on1 && (
+                              <>
+                                <input
+                                  type="time"
+                                  value={editing.startTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, startTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="time"
+                                  value={editing.endTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, endTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="text"
+                                  value={editing.studentName ?? ""}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, studentName: event.target.value } : prev
+                                    )
+                                  }
+                                  placeholder="Student name"
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                              </>
+                            )}
                             <button
                               type="button"
                               onClick={() => {
                                 if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
+                                  return;
+                                }
+                                if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
                                   return;
                                 }
                                 if (overlapMessage) {
@@ -1098,7 +1266,9 @@ export default function ScheduleMatrix({
                                   dayOfWeek: editing.dayOfWeek,
                                   startTime: editing.isOnCall ? "00:00" : editing.startTime,
                                   endTime: editing.isOnCall ? "23:59" : editing.endTime,
-                                  isOnCall: editing.isOnCall
+                                  isOnCall: editing.isOnCall,
+                                  is1on1: editing.is1on1,
+                                  studentName: editing.studentName
                                 });
                                 setEditing(null);
                               }}

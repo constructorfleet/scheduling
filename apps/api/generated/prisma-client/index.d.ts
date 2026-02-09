@@ -16934,6 +16934,9 @@ export namespace Prisma {
     endTime: string | null
     status: string | null
     notes: string | null
+    isOnCall: boolean | null
+    is1on1: boolean | null
+    studentName: string | null
   }
 
   export type StaffAssignmentMaxAggregateOutputType = {
@@ -16946,6 +16949,9 @@ export namespace Prisma {
     endTime: string | null
     status: string | null
     notes: string | null
+    isOnCall: boolean | null
+    is1on1: boolean | null
+    studentName: string | null
   }
 
   export type StaffAssignmentCountAggregateOutputType = {
@@ -16958,6 +16964,9 @@ export namespace Prisma {
     endTime: number
     status: number
     notes: number
+    isOnCall: number
+    is1on1: number
+    studentName: number
     _all: number
   }
 
@@ -16972,6 +16981,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
   }
 
   export type StaffAssignmentMaxAggregateInputType = {
@@ -16984,6 +16996,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
   }
 
   export type StaffAssignmentCountAggregateInputType = {
@@ -16996,6 +17011,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
     _all?: true
   }
 
@@ -17081,6 +17099,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes: string | null
+    isOnCall: boolean
+    is1on1: boolean
+    studentName: string | null
     _count: StaffAssignmentCountAggregateOutputType | null
     _min: StaffAssignmentMinAggregateOutputType | null
     _max: StaffAssignmentMaxAggregateOutputType | null
@@ -17110,6 +17131,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -17124,6 +17148,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -17138,6 +17165,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -17152,9 +17182,12 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
   }
 
-  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes", ExtArgs["result"]["staffAssignment"]>
+  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes" | "isOnCall" | "is1on1" | "studentName", ExtArgs["result"]["staffAssignment"]>
   export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
@@ -17184,6 +17217,9 @@ export namespace Prisma {
       endTime: string
       status: string
       notes: string | null
+      isOnCall: boolean
+      is1on1: boolean
+      studentName: string | null
     }, ExtArgs["result"]["staffAssignment"]>
     composites: {}
   }
@@ -17618,6 +17654,9 @@ export namespace Prisma {
     readonly endTime: FieldRef<"StaffAssignment", 'String'>
     readonly status: FieldRef<"StaffAssignment", 'String'>
     readonly notes: FieldRef<"StaffAssignment", 'String'>
+    readonly isOnCall: FieldRef<"StaffAssignment", 'Boolean'>
+    readonly is1on1: FieldRef<"StaffAssignment", 'Boolean'>
+    readonly studentName: FieldRef<"StaffAssignment", 'String'>
   }
     
 
@@ -25114,7 +25153,10 @@ export namespace Prisma {
     startTime: 'startTime',
     endTime: 'endTime',
     status: 'status',
-    notes: 'notes'
+    notes: 'notes',
+    isOnCall: 'isOnCall',
+    is1on1: 'is1on1',
+    studentName: 'studentName'
   };
 
   export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
@@ -26323,6 +26365,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
   }
@@ -26337,6 +26382,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrderInput | SortOrder
     scheduleWeek?: ScheduleWeekOrderByWithRelationInput
     segmentBlock?: SegmentBlockOrderByWithRelationInput
   }
@@ -26354,6 +26402,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
   }, "id">
@@ -26368,6 +26419,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrderInput | SortOrder
     _count?: StaffAssignmentCountOrderByAggregateInput
     _max?: StaffAssignmentMaxOrderByAggregateInput
     _min?: StaffAssignmentMinOrderByAggregateInput
@@ -26386,6 +26440,9 @@ export namespace Prisma {
     endTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
     status?: StringWithAggregatesFilter<"StaffAssignment"> | string
     notes?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
   }
 
   export type AuditEventWhereInput = {
@@ -27904,6 +27961,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
     segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
   }
@@ -27918,6 +27978,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateInput = {
@@ -27928,6 +27991,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
     segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
@@ -27942,6 +28008,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentCreateManyInput = {
@@ -27954,6 +28023,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateManyMutationInput = {
@@ -27964,6 +28036,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyInput = {
@@ -27976,6 +28051,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditEventCreateInput = {
@@ -29471,6 +29549,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type StaffAssignmentMaxOrderByAggregateInput = {
@@ -29483,6 +29564,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type StaffAssignmentMinOrderByAggregateInput = {
@@ -29495,6 +29579,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type AuditEventCountOrderByAggregateInput = {
@@ -33039,6 +33126,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
   }
 
@@ -33051,6 +33141,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentCreateOrConnectWithoutScheduleWeekInput = {
@@ -33279,6 +33372,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
   }
 
   export type FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput = {
@@ -33530,6 +33626,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
   }
 
@@ -33542,6 +33641,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentCreateOrConnectWithoutSegmentBlockInput = {
@@ -35325,6 +35427,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type FieldTripEventCreateManyScheduleWeekInput = {
@@ -35433,6 +35538,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
 
@@ -35445,6 +35553,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekInput = {
@@ -35456,6 +35567,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type FieldTripEventUpdateWithoutScheduleWeekInput = {
@@ -35539,6 +35653,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateWithoutSegmentBlockInput = {
@@ -35549,6 +35666,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
 
@@ -35561,6 +35681,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockInput = {
@@ -35572,6 +35695,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DistrictMembershipCreateManyUserInput = {
