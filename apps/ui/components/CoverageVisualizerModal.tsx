@@ -219,7 +219,7 @@ const Timeline: React.FC<{
           height: "60px",
           background: colors.surface,
           borderRadius: 8,
-          overflow: "hidden"
+          overflow: "visible"
         }}
       >
         {intervals.map((interval, idx) => {
@@ -237,13 +237,88 @@ const Timeline: React.FC<{
                 width: `${width}%`,
                 height: "100%",
                 background: `${statusColors[interval.status]}${hoveredInterval === idx ? "" : "cc"}`,
-                borderRight: idx < intervals.length - 1 ? "1px solid white" : "none",
                 cursor: "pointer",
-                transition: "background 0.15s ease"
+                transition: "background 0.15s ease",
+                overflow: "hidden",
+                borderTopLeftRadius: idx === 0 ? 8 : 0,
+                borderBottomLeftRadius: idx === 0 ? 8 : 0,
+                borderTopRightRadius: idx === intervals.length - 1 ? 8 : 0,
+                borderBottomRightRadius: idx === intervals.length - 1 ? 8 : 0
               }}
             />
           );
         })}
+
+        {/* Segment boundaries */}
+        {intervals.slice(0, -1).map((interval, idx) => {
+          const position = ((interval.end - openMinutes) / totalMinutes) * 100;
+          return (
+            <div
+              key={`boundary-${idx}`}
+              style={{
+                position: "absolute",
+                left: `${position}%`,
+                top: 0,
+                bottom: 0,
+                width: "2px",
+                background: "rgba(255, 255, 255, 0.5)",
+                pointerEvents: "none"
+              }}
+            />
+          );
+        })}
+
+        {/* Popover metrics */}
+        <AnimatePresence mode="wait">
+          {hoveredInterval !== null && (() => {
+            const interval = intervals[hoveredInterval];
+            const left = ((interval.start - openMinutes) / totalMinutes) * 100;
+            const width = ((interval.end - interval.start) / totalMinutes) * 100;
+            const centerPos = left + width / 2;
+
+            return (
+              <motion.div
+                key={`popover-${hoveredInterval}`}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.15 }}
+                onMouseEnter={() => setHoveredInterval(hoveredInterval)}
+                onMouseLeave={() => setHoveredInterval(null)}
+                style={{
+                  position: "absolute",
+                  bottom: "calc(100% + 12px)",
+                  left: centerPos < 50 ? `${left}%` : "auto",
+                  right: centerPos >= 50 ? `${100 - (left + width)}%` : "auto",
+                  minWidth: "320px",
+                  maxWidth: "400px",
+                  padding: "1rem",
+                  background: "white",
+                  borderRadius: 8,
+                  border: `1px solid ${colors.borderSubtle}`,
+                  boxShadow: shadows.modal,
+                  zIndex: 10,
+                  pointerEvents: "auto"
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "-6px",
+                    left: centerPos < 50 ? "20px" : "auto",
+                    right: centerPos >= 50 ? "20px" : "auto",
+                    width: 0,
+                    height: 0,
+                    borderLeft: "6px solid transparent",
+                    borderRight: "6px solid transparent",
+                    borderTop: `6px solid white`
+                  }}
+                />
+                <MetricsDisplay interval={interval} enrollment={enrollment} />
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
       </div>
 
       {/* Legend */}
@@ -261,30 +336,6 @@ const Timeline: React.FC<{
           <span>Critical (&lt;50%)</span>
         </div>
       </div>
-
-      {/* Metrics panel on hover */}
-      <AnimatePresence mode="wait">
-        {hoveredInterval !== null && (
-          <motion.div
-            key={`metrics-${hoveredInterval}`}
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-            onMouseEnter={() => setHoveredInterval(hoveredInterval)}
-            onMouseLeave={() => setHoveredInterval(null)}
-            style={{
-              marginTop: "1rem",
-              padding: "1rem",
-              background: colors.surfaceRaised,
-              borderRadius: 8,
-              border: `1px solid ${colors.borderSubtle}`
-            }}
-          >
-            <MetricsDisplay interval={intervals[hoveredInterval]} enrollment={enrollment} />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
