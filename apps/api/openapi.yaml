@@ -51,6 +51,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericOk'
+  /api/public/districts:
+    get:
+      summary: List districts and schools for login
+      responses:
+        '200':
+          description: District list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicDistrictsResponse'
   /api/auth/me:
     get:
       summary: Get current authenticated user
@@ -342,6 +352,36 @@ components:
           items:
             $ref: '#/components/schemas/DistrictMembership'
       required: [user, memberships, schoolMemberships, districtMemberships]
+    PublicSchool:
+      type: object
+      properties:
+        id:
+          type: string
+        districtId:
+          type: string
+        name:
+          type: string
+      required: [id, districtId, name]
+    PublicDistrict:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        schools:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSchool'
+      required: [id, name, schools]
+    PublicDistrictsResponse:
+      type: object
+      properties:
+        districts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicDistrict'
+      required: [districts]
     DayOfWeek:
       type: string
       enum: [mon, tue, wed, thu, fri, sat, sun]

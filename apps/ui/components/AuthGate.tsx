@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
 import type { LoginPayload } from "../data/generated";
+import { fetchPublicDistricts, type PublicDistrictRecord } from "../data/apiClient";
 import { colors, gradients, shadows } from "../theme";
 
 interface AuthGateProps {
@@ -18,6 +20,57 @@ export default function AuthGate({
   onLogin,
   onLoginFormChange
 }: AuthGateProps) {
+  const [showSchoolInput, setShowSchoolInput] = useState(false);
+  const [districtOptions, setDistrictOptions] = useState<PublicDistrictRecord[]>([]);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+  const [districtsError, setDistrictsError] = useState<string | null>(null);
+  const [selectedDistrictId, setSelectedDistrictId] = useState("");
+
+  useEffect(() => {
+    let isActive = true;
+    setDistrictsLoading(true);
+    fetchPublicDistricts()
+      .then((response) => {
+        if (!isActive) return;
+        setDistrictOptions(response.districts ?? []);
+        setDistrictsError(null);
+      })
+      .catch(() => {
+        if (!isActive) return;
+        setDistrictOptions([]);
+        setDistrictsError("Could not load districts.");
+      })
+      .finally(() => {
+        if (!isActive) return;
+        setDistrictsLoading(false);
+      });
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (districtOptions.length === 0) {
+      setSelectedDistrictId("");
+      return;
+    }
+    const match = districtOptions.find((district) =>
+      district.schools.some((school) => school.id === loginForm.schoolId)
+    );
+    const nextDistrictId = match?.id ?? districtOptions[0].id;
+    setSelectedDistrictId(nextDistrictId);
+    const nextDistrict = districtOptions.find((district) => district.id === nextDistrictId);
+    const nextSchoolId = nextDistrict?.schools[0]?.id;
+    if (!loginForm.schoolId && nextSchoolId) {
+      onLoginFormChange({ ...loginForm, schoolId: nextSchoolId });
+    }
+  }, [districtOptions, loginForm, onLoginFormChange]);
+
+  const selectedDistrict = useMemo(
+    () => districtOptions.find((district) => district.id === selectedDistrictId),
+    [districtOptions, selectedDistrictId]
+  );
+  const schoolOptions = selectedDistrict?.schools ?? [];
   if (authStatus === "loading") {
     return (
       <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", fontFamily: "Inter, sans-serif" }}>
@@ -84,26 +137,101 @@ export default function AuthGate({
             marginBottom: "0.65rem"
           }}
         />
-        <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>
-          School (optional)
-        </label>
-        <input
-          value={loginForm.schoolId ?? ""}
-          onChange={(event) =>
-            onLoginFormChange({
-              ...loginForm,
-              schoolId: event.target.value.trim() === "" ? undefined : event.target.value
-            })
-          }
-          placeholder="school-evergreen"
+        <button
+          type="button"
+          onClick={() => setShowSchoolInput((prev) => !prev)}
           style={{
-            width: "100%",
-            boxSizing: "border-box",
-            borderRadius: 8,
-            border: "1px solid #cbd5e1",
-            padding: "0.5rem 0.65rem"
+            display: "flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            border: "none",
+            background: "transparent",
+            color: "#1d4ed8",
+            fontSize: "0.85rem",
+            padding: 0,
+            marginBottom: "0.35rem",
+            cursor: "pointer"
           }}
-        />
+        >
+          <span style={{
+            display: "inline-flex",
+            transform: showSchoolInput ? "rotate(90deg)" : "rotate(0deg)",
+            transition: "transform 120ms ease"
+          }}>
+            ▶
+          </span>
+          Add school (optional)
+        </button>
+        {showSchoolInput && (
+          <div style={{ display: "grid", gap: "0.45rem", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.8rem", color: "#475569" }}>District</label>
+            <select
+              value={selectedDistrictId}
+              onChange={(event) => {
+                const nextDistrictId = event.target.value;
+                const nextDistrict = districtOptions.find((district) => district.id === nextDistrictId);
+                const nextSchoolId = nextDistrict?.schools[0]?.id;
+                setSelectedDistrictId(nextDistrictId);
+                onLoginFormChange({
+                  ...loginForm,
+                  schoolId: nextSchoolId
+                });
+              }}
+              disabled={districtsLoading || districtOptions.length === 0}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                borderRadius: 8,
+                border: "1px solid #cbd5e1",
+                padding: "0.5rem 0.65rem"
+              }}
+            >
+              {districtsLoading && <option value="">Loading districts...</option>}
+              {!districtsLoading && districtOptions.length === 0 && (
+                <option value="">No districts available</option>
+              )}
+              {!districtsLoading &&
+                districtOptions.map((district) => (
+                  <option key={district.id} value={district.id}>
+                    {district.name}
+                  </option>
+                ))}
+            </select>
+            <label style={{ display: "block", fontSize: "0.8rem", color: "#475569" }}>School</label>
+            <select
+              value={loginForm.schoolId ?? ""}
+              onChange={(event) =>
+                onLoginFormChange({
+                  ...loginForm,
+                  schoolId: event.target.value || undefined
+                })
+              }
+              disabled={districtsLoading || schoolOptions.length === 0}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                borderRadius: 8,
+                border: "1px solid #cbd5e1",
+                padding: "0.5rem 0.65rem",
+                background: schoolOptions.length === 0 || districtsLoading ? "#f8fafc" : "#fff"
+              }}
+            >
+              {districtsLoading && <option value="">Loading schools...</option>}
+              {!districtsLoading && schoolOptions.length === 0 && (
+                <option value="">No schools available</option>
+              )}
+              {!districtsLoading &&
+                schoolOptions.map((school) => (
+                  <option key={school.id} value={school.id}>
+                    {school.name}
+                  </option>
+                ))}
+            </select>
+            {districtsError && (
+              <span style={{ fontSize: "0.75rem", color: "#b91c1c" }}>{districtsError}</span>
+            )}
+          </div>
+        )}
         {loginError && <p style={{ color: "#b91c1c", fontSize: "0.85rem", margin: "0.65rem 0 0" }}>{loginError}</p>}
         <button
           type="button"

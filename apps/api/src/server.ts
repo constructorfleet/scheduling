@@ -646,6 +646,24 @@ const buildServer = async () => {
         return reply.send({ ok: true });
     });
 
+    fastify.get("/api/public/districts", async (_request, reply) => {
+        const prisma = getPrisma();
+        const districts = await prisma.district.findMany({
+            orderBy: { name: "asc" },
+            include: {
+                schools: {
+                    select: {
+                        id: true,
+                        districtId: true,
+                        name: true
+                    },
+                    orderBy: { name: "asc" }
+                }
+            }
+        });
+        return reply.send({ districts });
+    });
+
     fastify.get("/api/auth/me", async (request, reply) => {
         const auth = await resolveAuth(request);
         if (!auth) {

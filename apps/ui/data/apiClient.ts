@@ -67,6 +67,18 @@ export type AdminSchoolRecord = {
     name: string;
 };
 
+export type PublicSchoolRecord = {
+    id: string;
+    districtId: string;
+    name: string;
+};
+
+export type PublicDistrictRecord = {
+    id: string;
+    name: string;
+    schools: PublicSchoolRecord[];
+};
+
 export type InviteDetails = {
     email: string;
     displayName: string | null;
@@ -82,6 +94,7 @@ type AdminUsersResponse = { users: AdminUserRecord[]; };
 type AdminInvitesResponse = { invites: AdminInviteRecord[]; };
 type AdminDistrictsResponse = { districts: AdminDistrictRecord[]; };
 type AdminSchoolsResponse = { schools: AdminSchoolRecord[]; };
+type PublicDistrictsResponse = { districts: PublicDistrictRecord[]; };
 type AdminInviteCreateResponse = {
     invite: AdminInviteRecord;
     delivery: {
@@ -229,6 +242,8 @@ export const inviteSchoolUser = async (schoolId: string, payload: AdminInviteReq
     });
 
 export const fetchAdminDistricts = async () => requestJson<AdminDistrictsResponse>("/api/admin/districts");
+
+export const fetchPublicDistricts = async () => requestJson<PublicDistrictsResponse>("/api/public/districts");
 
 export const createAdminDistrict = async (payload: { id?: string; name?: string; }) =>
     requestJson<{ district: AdminDistrictRecord; }>("/api/admin/districts", {
