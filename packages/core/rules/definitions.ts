@@ -24,7 +24,8 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "employee-availability": "policy-coverage",
     "open-close-coverage": "policy-open-close",
     "medical-delegated-coverage": "policy-med-delegated",
-    "cpr-current-required": "policy-cpr-current"
+    "cpr-current-required": "policy-cpr-current",
+    "on-call-exclusivity": "policy-on-call"
 };
 
 const buildViolation = (
@@ -132,6 +133,7 @@ const getActiveAssignmentsForDay = (
 ): DayAssignmentWithEmployee[] =>
     context.staffAssignments
         .filter((assignment) => assignment.status !== "completed")
+        .filter((assignment) => !assignment.isOnCall)
         .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === dayOfWeek)
         .map((assignment) => {
             const employee = getEmployeeById(context, assignment.employeeId);
@@ -375,6 +377,7 @@ export const ratioSegmentRule: RuleDefinition = {
             const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
             const dayAssignments = context.staffAssignments
                 .filter((assignment) => assignment.status !== "completed")
+                .filter((assignment) => !assignment.isOnCall)
                 .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
                 .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
             const boundaries = new Set<number>([ openMinutes, closeMinutes ]);
@@ -1435,6 +1438,86 @@ export const cprCurrentRequiredRule: RuleDefinition = {
     }
 };
 
+export const onCallExclusivityRule: RuleDefinition = {
+    id: "on-call-exclusivity",
+    description: "Ensures employees on-call for a day cannot have regular time block assignments",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "on-call-exclusivity",
+            DEFAULT_POLICY_CITATIONS["on-call-exclusivity"] || "policy-on-call"
+        );
+
+        // Build map: employeeId:dayOfWeek -> on-call assignment
+        const onCallByEmployeeDay = new Map<string, StaffAssignment>();
+        context.staffAssignments
+            .filter((assignment) => assignment.isOnCall)
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (dayOfWeek) {
+                    const key = `${assignment.employeeId}:${dayOfWeek}`;
+                    onCallByEmployeeDay.set(key, assignment);
+                }
+            });
+
+        // Check all assignments for conflicts
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (!dayOfWeek) return;
+
+                const employee = getEmployeeById(context, assignment.employeeId);
+                if (!employee) return;
+
+                const key = `${assignment.employeeId}:${dayOfWeek}`;
+                const onCallAssignment = onCallByEmployeeDay.get(key);
+
+                // If on-call, check for conflicting regular assignments
+                if (assignment.isOnCall) {
+                    const regularAssignments = context.staffAssignments.filter(
+                        (other) =>
+                            !other.isOnCall &&
+                            other.employeeId === assignment.employeeId &&
+                            getDayOfWeekForAssignment(context, other) === dayOfWeek &&
+                            other.status !== "completed"
+                    );
+
+                    if (regularAssignments.length > 0) {
+                        violations.push(
+                            buildViolation(
+                                "on-call-exclusivity",
+                                `${employee.name} is on-call for ${dayOfWeek.toUpperCase()} and cannot have regular time blocks`,
+                                "StaffAssignment",
+                                assignment.id,
+                                citationId,
+                                "error",
+                                { employeeId: employee.id, employeeName: employee.name, dayOfWeek }
+                            )
+                        );
+                    }
+                }
+                // If regular assignment, check for on-call conflict
+                else if (onCallAssignment) {
+                    violations.push(
+                        buildViolation(
+                            "on-call-exclusivity",
+                            `${employee.name} cannot have time blocks on ${dayOfWeek.toUpperCase()} while on-call`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            { employeeId: employee.id, employeeName: employee.name, dayOfWeek }
+                        )
+                    );
+                }
+            });
+
+        return violations;
+    }
+};
+
 export const fieldTripEventIntegrityRule: RuleDefinition = {
     id: "field-trip-event",
     description:
@@ -1577,6 +1660,7 @@ export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
     openCloseCoverageRule,
     medicalDelegatedCoverageRule,
     cprCurrentRequiredRule,
+    onCallExclusivityRule,
     fieldTripEventIntegrityRule,
     fieldTripRatiosRule
 ];

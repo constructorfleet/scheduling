@@ -36,7 +36,7 @@ interface ScheduleMatrixProps {
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
   onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
   onDeleteAssignment: (assignmentId: string) => void;
-  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
+  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
   onDayClick: (dayOfWeek: DayOfWeek) => void;
   focusedSegmentIds?: string[] | null;
@@ -134,6 +134,7 @@ export default function ScheduleMatrix({
     startTime: string;
     endTime: string;
     isNew: boolean;
+    isOnCall?: boolean;
   } | null>(null);
   const [reassignmentTargetBySource, setReassignmentTargetBySource] = useState<Record<string, string>>({});
   const openerWindowMinutes = 15;
@@ -704,6 +705,7 @@ export default function ScheduleMatrix({
                             block.startTime,
                             block.endTime
                           );
+                          const isOnCall = block.isOnCall || (block.startTime === "00:00" && block.endTime === "23:59");
                           const isOpener = operatingWindow
                             ? Math.abs(parseTimeToMinutes(block.startTime) - operatingWindow.open) <=
                               openerWindowMinutes
@@ -712,14 +714,20 @@ export default function ScheduleMatrix({
                             ? Math.abs(parseTimeToMinutes(block.endTime) - operatingWindow.close) <=
                               closerWindowMinutes
                             : false;
-                          const blockBackground = isOpener && isCloser
-                            ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
-                            : isOpener
-                              ? "rgba(0, 96, 250, 0.25)"
-                              : isCloser
-                                ? "rgba(132, 0, 255, 0.25)"
-                                : "#ecfeff";
-                          const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
+                          const blockBackground = isOnCall
+                            ? "rgba(251, 191, 36, 0.25)"
+                            : isOpener && isCloser
+                              ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
+                              : isOpener
+                                ? "rgba(0, 96, 250, 0.25)"
+                                : isCloser
+                                  ? "rgba(132, 0, 255, 0.25)"
+                                  : "#ecfeff";
+                          const blockBorder = isOnCall
+                            ? "2px solid rgba(251, 191, 36, 0.6)"
+                            : isOpener || isCloser
+                              ? "1px solid rgba(79,70,229,0.5)"
+                              : "1px solid #bae6fd";
                           const isFocused = focusedSet.has(segmentId);
                           const hasAvailabilityViolation = Boolean(availabilityMessage);
 
@@ -793,40 +801,56 @@ export default function ScheduleMatrix({
                               )}
                               {editing?.assignmentId === block.id ? (
                                 <>
-                                  <input
-                                    type="time"
-                                    value={editing.startTime}
-                                    onChange={(event) =>
-                                      setEditing((prev) =>
-                                        prev ? { ...prev, startTime: event.target.value } : prev
-                                      )
-                                    }
-                                    onClick={(event) => event.stopPropagation()}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 6,
-                                      border: "1px solid #cbd5f5",
-                                      padding: "0.2rem 0.3rem",
-                                      fontSize: "0.7rem"
-                                    }}
-                                  />
-                                  <input
-                                    type="time"
-                                    value={editing.endTime}
-                                    onChange={(event) =>
-                                      setEditing((prev) =>
-                                        prev ? { ...prev, endTime: event.target.value } : prev
-                                      )
-                                    }
-                                    onClick={(event) => event.stopPropagation()}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 6,
-                                      border: "1px solid #cbd5f5",
-                                      padding: "0.2rem 0.3rem",
-                                      fontSize: "0.7rem"
-                                    }}
-                                  />
+                                  {!editing.isOnCall && (
+                                    <>
+                                      <input
+                                        type="time"
+                                        value={editing.startTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, startTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid #cbd5f5",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="time"
+                                        value={editing.endTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, endTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid #cbd5f5",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                  {editing.isOnCall && (
+                                    <div
+                                      style={{
+                                        fontSize: "0.85rem",
+                                        fontWeight: 700,
+                                        color: "rgba(180, 83, 9, 1)",
+                                        textAlign: "center"
+                                      }}
+                                    >
+                                      ON CALL (All Day)
+                                    </div>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={(event) => {
@@ -881,8 +905,29 @@ export default function ScheduleMatrix({
                                 </>
                               ) : (
                                 <>
-                                  <span>{formatTime(block.startTime)}</span>
-                                  <span>{formatTime(block.endTime)}</span>
+                                  {isOnCall ? (
+                                    <div
+                                      style={{
+                                        fontSize: "0.85rem",
+                                        fontWeight: 700,
+                                        color: "rgba(180, 83, 9, 1)",
+                                        textAlign: "center",
+                                        padding: "0.25rem 0"
+                                      }}
+                                    >
+                                      ON CALL
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <span>{formatTime(block.startTime)}</span>
+                                      <span>{formatTime(block.endTime)}</span>
+                                    </>
+                                  )}
+                                  <span style={{ fontSize: "0.7rem", color: "#64748b" }}>
+                                    {isOnCall
+                                      ? "All day"
+                                      : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
+                                  </span>
                                 </>
                               )}
                             </motion.div>
@@ -930,6 +975,36 @@ export default function ScheduleMatrix({
                             Add block
                           </motion.button>
                         )}
+                        {canCreateAssignment && dayHours < member.maxHoursPerDay && (
+                          <motion.button
+                            layout
+                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            type="button"
+                            onClick={() => {
+                              setEditing({
+                                employeeId: member.id,
+                                dayOfWeek: day,
+                                startTime: "00:00",
+                                endTime: "23:59",
+                                isNew: true,
+                                isOnCall: true
+                              });
+                            }}
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(251, 191, 36, 0.6)",
+                              background: "rgba(251, 191, 36, 0.15)",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: colors.textPrimary,
+                              padding: "0.3rem 0.7rem",
+                              cursor: "pointer",
+                              marginLeft: "0.5rem"
+                            }}
+                          >
+                            On call
+                          </motion.button>
+                        )}
                         {!closedDay && !canCreateAssignment && (
                           <span style={{ fontSize: "0.7rem", color: "#b91c1c", fontWeight: 600 }}>
                             {hasRequestedDayOff
@@ -963,40 +1038,56 @@ export default function ScheduleMatrix({
                               const overlapMessage = getOverlapMessage(editing);
                               return (
                                 <>
-                            <input
-                              type="time"
-                              value={editing.startTime}
-                              onChange={(event) =>
-                                setEditing((prev) =>
-                                  prev ? { ...prev, startTime: event.target.value } : prev
-                                )
-                              }
-                              style={{
-                                borderRadius: 6,
-                                border: "1px solid #cbd5f5",
-                                padding: "0.2rem 0.3rem",
-                                fontSize: "0.7rem"
-                              }}
-                            />
-                            <input
-                              type="time"
-                              value={editing.endTime}
-                              onChange={(event) =>
-                                setEditing((prev) =>
-                                  prev ? { ...prev, endTime: event.target.value } : prev
-                                )
-                              }
-                              style={{
-                                borderRadius: 6,
-                                border: "1px solid #cbd5f5",
-                                padding: "0.2rem 0.3rem",
-                                fontSize: "0.7rem"
-                              }}
-                            />
+                            {!editing.isOnCall && (
+                              <>
+                                <input
+                                  type="time"
+                                  value={editing.startTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, startTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid #cbd5f5",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="time"
+                                  value={editing.endTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, endTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid #cbd5f5",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                              </>
+                            )}
+                            {editing.isOnCall && (
+                              <div
+                                style={{
+                                  fontSize: "0.85rem",
+                                  fontWeight: 700,
+                                  color: "rgba(180, 83, 9, 1)",
+                                  textAlign: "center"
+                                }}
+                              >
+                                ON CALL (All Day)
+                              </div>
+                            )}
                             <button
                               type="button"
                               onClick={() => {
-                                if (!editing.startTime || !editing.endTime) {
+                                if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
                                   return;
                                 }
                                 if (overlapMessage) {
@@ -1005,8 +1096,9 @@ export default function ScheduleMatrix({
                                 onCreateAssignment({
                                   employeeId: editing.employeeId,
                                   dayOfWeek: editing.dayOfWeek,
-                                  startTime: editing.startTime,
-                                  endTime: editing.endTime
+                                  startTime: editing.isOnCall ? "00:00" : editing.startTime,
+                                  endTime: editing.isOnCall ? "23:59" : editing.endTime,
+                                  isOnCall: editing.isOnCall
                                 });
                                 setEditing(null);
                               }}

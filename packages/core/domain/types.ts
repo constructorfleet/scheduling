@@ -109,6 +109,7 @@ export interface StaffAssignment {
     endTime: string;
     status: "scheduled" | "active" | "on_break" | "completed";
     notes?: string;
+    isOnCall?: boolean;
 }
 
 export interface ScheduleDay {

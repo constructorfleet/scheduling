@@ -2673,7 +2673,7 @@ export default function App() {
             onUpdateAssignmentTime={handleUpdateAssignmentTime}
             onDeleteAssignment={handleDeleteAssignment}
             onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
-            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
+            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall }) => {
               if (!canEditSchedule) {
                 setAuthMessage("You do not have permission to edit assignments.");
                 return;
@@ -2719,7 +2719,8 @@ export default function App() {
                       assignmentSource: "manual_adjustment" as const,
                       startTime,
                       endTime,
-                      status: "scheduled" as const
+                      status: "scheduled" as const,
+                      isOnCall: isOnCall ?? false
                     }
                   ];
                   return {
@@ -2728,8 +2729,10 @@ export default function App() {
                   };
                 },
                 {
-                  action: "Created assignment",
-                  notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]}): ${startTime}-${endTime}`
+                  action: isOnCall ? "Created on-call assignment" : "Created assignment",
+                  notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]})${
+                    isOnCall ? " - ON CALL" : `: ${startTime}-${endTime}`
+                  }`
                 }
               );
             }}
