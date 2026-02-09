@@ -297,7 +297,7 @@ const Timeline: React.FC<{
                   borderRadius: 8,
                   border: `1px solid ${colors.borderSubtle}`,
                   boxShadow: shadows.modal,
-                  zIndex: 10,
+                  zIndex: 100,
                   pointerEvents: "auto"
                 }}
               >
@@ -495,7 +495,7 @@ export default function CoverageVisualizerModal({
           borderRadius: 14,
           border: `1px solid ${colors.borderSubtle}`,
           boxShadow: shadows.modal,
-          overflow: "hidden",
+          overflow: "visible",
           display: "flex",
           flexDirection: "column"
         }}
@@ -542,7 +542,9 @@ export default function CoverageVisualizerModal({
         <div
           style={{
             padding: "1.5rem",
-            overflowY: "auto"
+            paddingTop: "14rem",
+            flex: 1,
+            overflow: "visible"
           }}
         >
           <Timeline
