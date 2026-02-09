@@ -255,10 +255,13 @@ const ensureEmployeeAvailability = (employee: Employee) => {
 
 export default function App() {
   const [weekStartDate, setWeekStartDate] = useState(() => parseIsoDate(weekMeta.startDate));
-  const currentWeekStartDateIso = useMemo(() => toIsoDate(weekStartDate), [weekStartDate]);
-  const currentWeekId = useMemo(() => `week-${currentWeekStartDateIso}`, [currentWeekStartDateIso]);
-  const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
+  const currentWeekStartDateIso = useMemo(() => toIsoDate(weekStartDate), [weekStartDate]);
+  const currentWeekId = useMemo(
+    () => `week-${selectedSchoolId}-${currentWeekStartDateIso}`,
+    [selectedSchoolId, currentWeekStartDateIso]
+  );
+  const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);
   const [authStatus, setAuthStatus] = useState<"loading" | "authenticated" | "unauthenticated">(
     IS_TEST_ENV ? "authenticated" : "loading"
   );
@@ -330,20 +333,6 @@ export default function App() {
   const [activeHelpTopic, setActiveHelpTopic] = useState<HelpTopicId | null>(null);
   const [autoScheduleState, setAutoScheduleState] = useState<AutoScheduleState>({ type: "idle" });
 
-  const schoolOptions = useMemo(() => {
-    if (memberships.length === 0) {
-      return schools;
-    }
-    const defaultById = new Map(schools.map((school) => [school.id, school]));
-    return memberships.map((membership) => {
-      const fallback = defaultById.get(membership.schoolId);
-      return {
-        id: membership.schoolId,
-        name: fallback?.name ?? membership.schoolId
-      };
-    });
-  }, [memberships]);
-
   const membershipBySchool = useMemo(
     () => new Map(memberships.map((membership) => [membership.schoolId, membership.role])),
     [memberships]
@@ -359,8 +348,6 @@ export default function App() {
     currentRole !== null && ["super_user", "district_admin"].includes(currentRole);
   const canUseSchoolScope =
     currentRole !== null && ["super_user", "district_admin", "district_user", "school_admin"].includes(currentRole);
-  const selectedSchoolName =
-    schoolOptions.find((school) => school.id === selectedSchoolId)?.name ?? selectedSchoolId;
   const {
     showUserManagement,
     setShowUserManagement,
@@ -399,6 +386,27 @@ export default function App() {
     districtMemberships,
     onPermissionError: setAuthMessage
   });
+
+  const schoolOptions = useMemo(() => {
+    const baseOptions =
+      memberships.length === 0
+        ? schools
+        : memberships.map((membership) => {
+            const fallback = schools.find((school) => school.id === membership.schoolId);
+            return {
+              id: membership.schoolId,
+              name: fallback?.name ?? membership.schoolId
+            };
+          });
+    const merged = new Map(baseOptions.map((school) => [school.id, school]));
+    districtSchools.forEach((school) => {
+      merged.set(school.id, { id: school.id, name: school.name });
+    });
+    return Array.from(merged.values());
+  }, [districtSchools, memberships]);
+
+  const selectedSchoolName =
+    schoolOptions.find((school) => school.id === selectedSchoolId)?.name ?? selectedSchoolId;
 
   const makeSnapshot = (
     next: Partial<ScheduleSnapshot> = {},
@@ -1073,86 +1081,90 @@ export default function App() {
         if (!isActive) return;
         if (settings?.school) {
           setIsConfigured(true);
-          setSchoolName(settings.school.name ?? schoolName);
+          setSchoolName(settings.school.name ?? selectedSchoolName);
           setClosedDaysState(
-            (settings.school.closedDays ?? closedDaysState).filter((day): day is DayOfWeek =>
+            (settings.school.closedDays ?? []).filter((day): day is DayOfWeek =>
               isDayOfWeek(day)
             )
           );
           setSchoolRulesState({
-            openerCount: settings.school.openerCount ?? schoolRulesState.openerCount,
-            closerCount: settings.school.closerCount ?? schoolRulesState.closerCount,
-            fieldTripStartTime: settings.school.fieldTripStartTime ?? schoolRulesState.fieldTripStartTime,
-            fieldTripEndTime: settings.school.fieldTripEndTime ?? schoolRulesState.fieldTripEndTime,
-            minimumMedicalDelegated:
-              settings.school.minimumMedicalDelegated ?? schoolRulesState.minimumMedicalDelegated,
-            requireCurrentCpr: settings.school.requireCurrentCpr ?? schoolRulesState.requireCurrentCpr
+            openerCount: settings.school.openerCount ?? 0,
+            closerCount: settings.school.closerCount ?? 0,
+            fieldTripStartTime: settings.school.fieldTripStartTime ?? "09:00",
+            fieldTripEndTime: settings.school.fieldTripEndTime ?? "15:00",
+            minimumMedicalDelegated: settings.school.minimumMedicalDelegated ?? 0,
+            requireCurrentCpr: settings.school.requireCurrentCpr ?? false
           });
-          if (settings.scheduleTypes?.length) {
-            setScheduleTypeOptionsState(
-              ensureClosedScheduleType(
-                settings.scheduleTypes.map((type) => ({
-                  value: type.value,
-                  label: type.label,
-                  ratio: {
-                    adults: type.ratioAdults ?? 1,
-                    students: type.ratioStudents ?? 1
-                  },
-                  description: type.description ?? ""
-                }))
-              )
-            );
-          }
-          if (settings.jobTitles?.length) {
-            setJobTitlesState(
-              settings.jobTitles.map((title) => ({
-                id: title.id,
-                title: title.title,
-                leaderQualified: title.leaderQualified,
-                requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
+          setScheduleTypeOptionsState(
+            ensureClosedScheduleType(
+              (settings.scheduleTypes ?? []).map((type) => ({
+                value: type.value,
+                label: type.label,
+                ratio: {
+                  adults: type.ratioAdults ?? 1,
+                  students: type.ratioStudents ?? 1
+                },
+                description: type.description ?? ""
               }))
-            );
-          }
-          if (settings.employees?.length) {
-            const jobTitleLookup = new Map(
-              (settings.jobTitles ?? []).map((title) => [title.title, title.leaderQualified])
-            );
-            setEmployeesState(
-              settings.employees.map((employee) =>
-                ensureEmployeeAvailability({
-                  ...employee,
-                  leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
-                  employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
-                  availability: employee.availability ?? [],
-                  requestedDaysOff: employee.requestedDaysOff ?? []
-                })
-              )
-            );
-          }
-          if (settings.operatingHours?.length) {
-            setOperatingHoursConfigState(
-              settings.operatingHours.map((entry) => ({
-                id: entry.id,
-                scheduleType: entry.scheduleType,
-                daysOfWeek: (entry.daysOfWeek ?? []).filter((day): day is DayOfWeek =>
-                  isDayOfWeek(day)
-                ),
-                open: entry.open,
-                close: entry.close
-              }))
-            );
-          }
-          if (settings.fieldTripTypes?.length) {
-            setFieldTripTypesState(
-              settings.fieldTripTypes.map((trip) => ({
-                ...trip,
-                policyCitationId: trip.policyCitationId ?? "policy-field-trip"
-              }))
-            );
-          }
+            )
+          );
+          setJobTitlesState(
+            (settings.jobTitles ?? []).map((title) => ({
+              id: title.id,
+              title: title.title,
+              leaderQualified: title.leaderQualified,
+              requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
+            }))
+          );
+          const jobTitleLookup = new Map(
+            (settings.jobTitles ?? []).map((title) => [title.title, title.leaderQualified])
+          );
+          setEmployeesState(
+            (settings.employees ?? []).map((employee) =>
+              ensureEmployeeAvailability({
+                ...employee,
+                leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
+                employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
+                availability: employee.availability ?? [],
+                requestedDaysOff: employee.requestedDaysOff ?? []
+              })
+            )
+          );
+          setOperatingHoursConfigState(
+            (settings.operatingHours ?? []).map((entry) => ({
+              id: entry.id,
+              scheduleType: entry.scheduleType,
+              daysOfWeek: (entry.daysOfWeek ?? []).filter((day): day is DayOfWeek =>
+                isDayOfWeek(day)
+              ),
+              open: entry.open,
+              close: entry.close
+            }))
+          );
+          setFieldTripTypesState(
+            (settings.fieldTripTypes ?? []).map((trip) => ({
+              ...trip,
+              policyCitationId: trip.policyCitationId ?? "policy-field-trip"
+            }))
+          );
         } else {
           setIsConfigured(false);
           setShowSettings(true);
+          setSchoolName(selectedSchoolName);
+          setClosedDaysState([]);
+          setSchoolRulesState({
+            openerCount: 0,
+            closerCount: 0,
+            fieldTripStartTime: "09:00",
+            fieldTripEndTime: "15:00",
+            minimumMedicalDelegated: 0,
+            requireCurrentCpr: false
+          });
+          setScheduleTypeOptionsState(ensureClosedScheduleType([]));
+          setJobTitlesState([]);
+          setEmployeesState([]);
+          setOperatingHoursConfigState([]);
+          setFieldTripTypesState([]);
         }
       } catch (error) {
         failApiAction("Settings load failed");

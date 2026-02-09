@@ -99,7 +99,7 @@ describe("App week-aware navigation", () => {
       fieldTripTypes: []
     });
     fetchScheduleMock.mockImplementation(async (weekId: string) => {
-      if (weekId === weekMeta.id) {
+      if (weekId.includes(weekMeta.startDate)) {
         return buildSchedule(weekId, weekMeta.startDate);
       }
       return null;
