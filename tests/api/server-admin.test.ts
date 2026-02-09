@@ -1,11 +1,7 @@
 /** @jest-environment node */
 import { type PrismaClient } from "apps/api/generated/prisma-client";
 
-type DeepPartial<T> = T extends object ? {
-    [ P in keyof T ]?: DeepPartial<T[ P ]>;
-} : T;
-
-const mockPrisma: DeepPartial<jest.MaybeMockedDeep<PrismaClient>> = {
+const mockPrisma = {
     session: {
         findUnique: jest.fn(),
         update: jest.fn(),
@@ -41,7 +37,9 @@ const mockPrisma: DeepPartial<jest.MaybeMockedDeep<PrismaClient>> = {
         update: jest.fn(),
         findMany: jest.fn()
     }
-};
+} as unknown as PrismaClient;
+
+const asMock = <T extends (...args: any[]) => any>(fn: T) => fn as jest.MockedFunction<T>;
 
 jest.mock("../../apps/api/src/db", () => ({
     getPrisma: jest.fn(() => mockPrisma)
@@ -97,14 +95,14 @@ const makeSession = (options?: {
 describe("server admin and invite routes", () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        mockPrisma.school.findUnique.mockResolvedValue({ districtId: "district-1" });
-        mockPrisma.school.upsert.mockResolvedValue({ id: "school-2", districtId: "district-1", name: "School Two" });
-        mockPrisma.school.findMany.mockResolvedValue([ { id: "school-1", districtId: "district-1", name: "School One" } ]);
-        mockPrisma.district.upsert.mockResolvedValue({ id: "district-2", name: "District Two" });
-        mockPrisma.district.update.mockResolvedValue({ id: "district-1", name: "District One Updated" });
-        mockPrisma.district.findMany.mockResolvedValue([ { id: "district-1", name: "District One" } ]);
-        mockPrisma.userInvite.updateMany.mockResolvedValue({ count: 0 });
-        mockPrisma.userInvite.create.mockResolvedValue({
+        asMock(mockPrisma.school.findUnique).mockResolvedValue({ districtId: "district-1" } as any);
+        asMock(mockPrisma.school.upsert).mockResolvedValue({ id: "school-2", districtId: "district-1", name: "School Two" } as any);
+        asMock(mockPrisma.school.findMany).mockResolvedValue([ { id: "school-1", districtId: "district-1", name: "School One" } ] as any);
+        asMock(mockPrisma.district.upsert).mockResolvedValue({ id: "district-2", name: "District Two" } as any);
+        asMock(mockPrisma.district.update).mockResolvedValue({ id: "district-1", name: "District One Updated" } as any);
+        asMock(mockPrisma.district.findMany).mockResolvedValue([ { id: "district-1", name: "District One" } ] as any);
+        asMock(mockPrisma.userInvite.updateMany).mockResolvedValue({ count: 0 } as any);
+        asMock(mockPrisma.userInvite.create).mockResolvedValue({
             id: "invite-1",
             email: "teacher@example.com",
             role: "school_user",
@@ -112,8 +110,8 @@ describe("server admin and invite routes", () => {
             schoolId: "school-1",
             districtId: null,
             expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-        });
-        mockPrisma.userInvite.findMany.mockResolvedValue([
+        } as any);
+        asMock(mockPrisma.userInvite.findMany).mockResolvedValue([
             {
                 id: "invite-1",
                 email: "teacher@example.com",
@@ -130,31 +128,31 @@ describe("server admin and invite routes", () => {
                 school: { id: "school-1", name: "School One" },
                 invitedBy: { id: "user-1", email: "admin@example.com", displayName: "Admin" }
             }
-        ]);
-        mockPrisma.user.findUnique.mockResolvedValue({
+        ] as any);
+        asMock(mockPrisma.user.findUnique).mockResolvedValue({
             id: "user-2",
             email: "teacher@example.com",
             displayName: "Teacher",
             status: "active",
             isSuperUser: false
-        });
-        mockPrisma.user.update.mockResolvedValue({
+        } as any);
+        asMock(mockPrisma.user.update).mockResolvedValue({
             id: "user-2",
             email: "teacher@example.com",
             displayName: "Teacher",
             status: "active",
             isSuperUser: false
-        });
-        mockPrisma.schoolMembership.upsert.mockResolvedValue({
+        } as any);
+        asMock(mockPrisma.schoolMembership.upsert).mockResolvedValue({
             id: "sm-1",
             schoolId: "school-1",
             userId: "user-2",
             role: "school_user"
-        });
+        } as any);
     });
 
     test("requires csrf for district school creation", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "POST",
@@ -169,7 +167,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("allows district admin to add a school to district", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "POST",
@@ -186,7 +184,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("forbids district user from adding district schools", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_user" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_user" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "POST",
@@ -202,7 +200,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("school admin user management creates an invite", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ schoolRole: "school_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "PUT",
@@ -224,7 +222,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("district admin user management creates an invite", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "PUT",
@@ -246,7 +244,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("forbids school user from creating school invites", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_user" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ schoolRole: "school_user" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "PUT",
@@ -265,7 +263,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("accepting invite applies school membership", async () => {
-        mockPrisma.userInvite.findUnique.mockResolvedValue({
+        asMock(mockPrisma.userInvite.findUnique).mockResolvedValue({
             id: "invite-accept-1",
             email: "teacher@example.com",
             displayName: "Teacher",
@@ -275,7 +273,7 @@ describe("server admin and invite routes", () => {
             acceptedAt: null,
             revokedAt: null,
             expiresAt: new Date(Date.now() + 60 * 60 * 1000)
-        });
+        } as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "POST",
@@ -292,7 +290,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("district admin can list invites with invite links", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "GET",
@@ -309,7 +307,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("school admin can list invites with invite links", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ schoolRole: "school_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "GET",
@@ -326,7 +324,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("super user can create and update districts", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ isSuperUser: true }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ isSuperUser: true }) as any);
         const server = await buildServer();
         const createResponse = await server.inject({
             method: "POST",
@@ -355,7 +353,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("district admin cannot create districts", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const response = await server.inject({
             method: "POST",
@@ -371,7 +369,7 @@ describe("server admin and invite routes", () => {
     });
 
     test("district admin can list and update district schools", async () => {
-        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        asMock(mockPrisma.session.findUnique).mockResolvedValue(makeSession({ districtRole: "district_admin" }) as any);
         const server = await buildServer();
         const listResponse = await server.inject({
             method: "GET",
