@@ -5,16 +5,15 @@ Site directors, scheduling coordinators, and substitute coordinators who need to
 
 ## Workspace overview
 - **Configuration panel** (top-right gear): add/remove employees, update certifications, edit availability windows, and manage ratio/certification requirements. Every change flows instantly into the validation engine.
-- **Schedule Grid** (center): shows the week’s segments. Drag staff, log clock-in/out times, and add multiple work blocks per day by dropping the same person into separate segments.
-- **Staff Palette** (right rail): lists eligible employees with their job titles, certifications, and auto-select recommendations. Cards highlight leaders/certified staff to help you meet ratio and qualification rules.
+- **Schedule Grid** (center): shows the week’s segments. Add staff blocks, log clock-in/out times, and create multiple work blocks per day by adding separate blocks on the same day.
 - **Guided Status Tracker** (left rail): walks you through Prepare → Assign → Review → Publish. Each step exposes the current blockers; you cannot advance until the underlying rules are satisfied.
 - **Violation Navigator** (bottom tray): surfaces outstanding policy violations along with the policy citation. Click an item to highlight the affected segment or certification.
-- **Field Trip & Substitute panels**: appear when a block is flagged as a field trip or when a substitute request is pending. Use the panels to sign off approvals, check parity, and trigger re-validation.
+- **Audit Log** (top banner): review recent changes and use Undo/Redo to step through edits.
 
 ## Step 1: Prepare staff & configurations
 1. Open the configuration panel and select “People & Certs.”
-2. For each employee, add the contact info, job title, employment status, and max hours per day/week. You can track multiple certifications (`cpr`, `first_aid`, `medical_delegation`, etc.) with issued/expiry dates so the rules engine knows when coverage lapses.
-3. Use the same panel to define **ratio profiles** (`children_per_staff`, `leader_required`, `policy citation`) for each day segment (`open`, `mid`, `close`). Field trip types live here too—specify their adult/leader ratios and attach the relevant policy citation so off-site blocks inherit the correct guardrails.
+2. For each employee, add the job title, employment status, and max hours per day/week. Toggle CPR current and medical delegation flags so the rules engine can validate certifications.
+3. Use the same panel to define **schedule types** and **field trip types** with their ratios and policy citations. Configure operating hours and the field trip ratio window in the School tab.
 4. Save changes. The workspace immediately recalculates violations and updates the Guided Status Tracker; nothing is marked “addressed” manually—validation entries disappear only when the data meets the rule.
 
 ## Step 2: Build the weekly schedule
@@ -25,10 +24,9 @@ Site directors, scheduling coordinators, and substitute coordinators who need to
 5. Once blocks are seeded, the violation tracker immediately flags coverage gaps or missing certifications. The Plan step in the status tracker will remain blocked until those are resolved.
 
 ## Step 3: Assign staff & handle special cases
-- **Auto-select helper.** Use the “Auto-select” action from the Staff Palette to let the system choose the best-fit staff for a highlighted block; it considers leader requirements, certifications, and availability.
-- **Substitutes.** When a shift needs a substitute, raise a request (plus reason), pick a qualified candidate, and submit it. The substitute approval must meet parity rules (certification, hours) before the block is validated. The Substitute panel updates the violation list so the Review step doesn’t clear until parity holds.
-- **Field trips.** Mark a segment as a field trip event, choose the related `FieldTripType`, and sign off in the Field Trip panel. Approvals change the ratio/leader requirements for that block and may trigger new violations until the new ratios are satisfied.
-- **Multiple blocks & breaks.** Insert `ShiftBreak` entries between blocks when staff need rest or meal time. The rules engine checks for mandated breaks, so you can see gap warnings right next to the block.
+- **Auto Schedule.** Use the “Auto” action in the banner to seed staffing based on ratios, certifications, and availability.
+- **Field trips.** Select a field trip type in the day metadata. Field trip ratios apply during the configured field trip window and may trigger new violations until staffing meets the requirement.
+- **Multiple blocks.** Add separate blocks to represent split shifts and non-contiguous coverage on the same day.
 
 ## Step 4: Review validations & guided steps
 1. Open the Violation Navigator (bottom tray) to review outstanding findings. Each entry links back to the grid or a certification record and shows the policy citation.

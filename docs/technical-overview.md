@@ -4,10 +4,11 @@
 This reference explains how the Scheduling workspace hangs together so any engineer, ops lead, or documentation agent can update, verify, or deploy the system without relying on tribal knowledge. It complements the onboarding narrative by spelling out the architecture, data lifecycle, rules execution, and agent coordination that keep the UI compliant.
 
 ## Architecture at a Glance
-- **Static HTML5 frontend.** `apps/ui` contains the guided React workspace built for offline-first delivery; the entry point wires into `index.html` and relies on `vite.config.ts` for build-time asset bundling.
-- **Domain layer.** `packages/core/domain` encapsulates entities such as `School`, `Staff`, `Schedule`, `PolicyCitation`, `RatioProfile`, and `Certification`. Business rules—validation hooks, derived booleans, state transitions—reside close to these models.
-- **Rules engine.** `packages/core/rules/RulesEngine.ts` orchestrates the compliance checks described in the charter: ratio coverage, certification expiration, break enforcement, field-trip overrides, coverage gaps, substitute parity, and approval gating. The engine exposes `violationRecords` that the UI consumes to render `ViolationNavigator`, the guided tracker, and the publish CTA state.
-- **Storage & persistence.** Local storage (IndexedDB snapshots or JSON-based journals) lives under `packages/core/storage`. Every scheduling action produces a journal entry so offline edits can replay, audit trails stay complete, and data can later sync or export.
+- **Static HTML5 frontend.** `apps/ui` contains the guided React workspace; the entry point wires into `index.html` and relies on `vite.config.ts` for build-time asset bundling.
+- **Domain layer.** `packages/core/domain` encapsulates entities such as `School`, `Employee`, `ScheduleWeek`, `PolicyCitation`, and `FieldTripType`. Business rules—validation hooks, derived booleans, state transitions—reside close to these models.
+- **Rules engine.** `packages/core/rules/definitions.ts` orchestrates compliance checks for ratio coverage, certification flags (CPR/medical delegation), field-trip overrides, coverage gaps, and availability. The engine exposes `violationRecords` that the UI consumes to render `ViolationNavigator`, the guided tracker, and publish gating.
+- **API & persistence.** `apps/api/src/server.ts` exposes Fastify endpoints backed by Prisma + Postgres. The UI autosaves schedule weeks via `PUT /api/schedule/{weekId}` and persists audit events alongside schedule data.
+- **Undo/redo history.** The UI maintains undo/redo stacks in browser storage per week so refreshes retain the history; audit events are still persisted server-side.
 - **Agent orchestration.** `orchestrate.ts` drives the agent phases, routing specs from `AGENTS.md`, `PROJECT.md`, and `DOMAIN_MODEL.md` into the appropriate outputs (`artifacts/*`). Each phase (Product, Solution, Data Model, etc.) publishes artifacts that downstream agents reference; documentation is the final handoff.
 
 ## Core Data Model
@@ -15,13 +16,13 @@ These entities appear throughout the docs and the UI:
 
 | Entity | Responsibility |
 | --- | --- |
-| `PolicyCitation` | Anchors every ratio, certification, and substitute rule to a policy or district section so violations can include citations. |
-| `SchoolProfile` / `OperatingHours` | Capture the daycare’s timezone, primary contact, and daily templates. |
-| `RatioProfile` / `FieldTripType` | Define children-per-staff ratios, leader requirements, and policy references for both in-house and off-site blocks. |
-| `ScheduleWeek` / `SegmentBlock` | Track a week’s life cycle, segment timing, child counts, required staff, and field-trip state. |
-| `StaffAssignment` / `ShiftBreak` | Represent who works each block, allow multiple non-contiguous assignments per day, and record break metadata for regulatory enforcement. |
-| `Certification` / `AvailabilityWindow` / `Employee` | Drive derived flags (leader-qualified, CPR-current, med delegation) and hard limits (`max_hours_per_day`, `max_hours_per_week`). |
-| `SubstituteRequest` / `FieldTripEvent` | Hold approval metadata, parity requirements, and the signatures required before blocks go live. |
+| `PolicyCitation` | Anchors ratio, certification, and compliance rules to a policy section for violation citations. |
+| `School` / `OperatingHours` | Capture school-level settings (open/close windows, field trip window, staffing minimums). |
+| `ScheduleType` / `FieldTripType` | Define children-per-staff ratios and policy references for in-house and off-site blocks. |
+| `ScheduleWeek` / `ScheduleDay` / `SegmentBlock` | Track a week’s life cycle, day metadata, segment timing, and child counts. |
+| `StaffAssignment` | Represents who works each block and allows multiple non-contiguous assignments per day. |
+| `Employee` / `JobTitle` | Drive derived flags (leader-qualified, CPR-current, medical delegation) and hour limits (`max_hours_per_day`, `max_hours_per_week`). |
+| `FieldTripEvent` / `AuditEvent` | Hold field trip decisions, approvals, and audit trail entries for schedule changes. |
 
 Enumerations such as `DayScheduleType`, `DaySegment`, `JobTitle`, `CertificationType`, `AssignmentSource`, `ApprovalState`, and `ShiftStatus` remain centralized in the domain layer so the UI, rules engine, and configuration screens share the same vocabulary.
 
@@ -31,16 +32,17 @@ Enumerations such as `DayScheduleType`, `DaySegment`, `JobTitle`, `Certification
 - **Validations clear automatically.** There is no “mark addressed” button. Once the underlying configuration or assignment satisfies the rule, the violation disappears and the workspace advances.
 
 ## UI Modules & Guided Workflow
-- **ScheduleGrid** (`apps/ui/components/ScheduleGrid.tsx`) displays weekly blocks, supports clock-in/clock-out data entry, and allows staff to hold multiple non-contiguous time slices per day. Users drag staff cards from the palette onto segments or rely on the “Auto-select” helper to honor leader/ratio needs.
-- **StaffPalette** shows the roster, certifications, availability, and auto-select predictions. Clicking a card pushes that staff member into the focus trail; keyboard shortcuts for the guided steps are documented in `docs/onboarding-guide.md`.
-- **ViolationNavigator** lists every outstanding rule with links to the offending segment or certificate. Opening the navigator also highlights the card inside the grid and the status tracker, giving users contextual guidance about what to adjust before publish.
-- **Guided Status Tracker** enforces the sequence: prepare staff → assign shifts/field trips → review violations → publish. Each step surfaces blockers derived from the rules engine, the substitution queue, and the field-trip signoff checklist.
-- **Configuration panel.** From the web UI users manage employees (contact info, job title, employment status), certifications, availability windows, ratio profiles, and policy citations.
+- **ScheduleMatrix** (`apps/ui/components/ScheduleMatrix.tsx`) displays weekly blocks, supports clock-in/clock-out data entry, and allows staff to hold multiple non-contiguous time slices per day. Users add blocks, edit times, and use Auto Schedule to seed coverage.
+- **ViolationNavigator** lists every outstanding rule with links to the offending segment. Opening the navigator highlights the related grid area to guide fixes before publish.
+- **Guided Status Tracker** enforces the sequence: prepare staff → assign shifts/field trips → review violations → publish. Each step surfaces blockers derived from the rules engine and approval states.
+- **AuditTimeline** shows schedule edits and supports undo/redo of recent changes.
+- **Configuration panel.** From the web UI users manage employees (job title, employment status, CPR/medical delegation flags), availability windows, schedule types, field trip ratios, and operating hours.
 
 ## Persistence, Export, & Audit
-- **Local journals.** Every clock-in/clock-out, assignment edit, field trip signoff, or substitute approval emits a journal entry that feeds the audit trail. The UI surface shows timestamps and approver names sourced from those entries.
-- **Exports.** Users can generate PDF/CSV exports from the schedule view; exports include ratio calculations, staff certifications, and violation snapshots so auditors can see why a schedule was published.
-- **Sync readiness.** While the MVP stores everything locally, the journal/audit APIs were designed so the optional sync layer (future extension) can replay commands against a remote service without re-implementing rules logic.
+- **Schedule persistence.** The UI autosaves schedule weeks to the API (`PUT /api/schedule/{weekId}`), which stores schedule days, segment blocks, staff assignments, field trip events, and audit events in Postgres.
+- **Audit log.** Every edit emits an audit event that is persisted with the schedule week and rendered in the Audit Timeline.
+- **Undo/redo.** Undo/redo history is stored in browser storage per week to survive refreshes; it does not replace the server-side audit trail.
+- **Exports.** Users can generate PDF/CSV exports from the schedule view; exports include ratio calculations, staff coverage, and violation snapshots so auditors can see why a schedule was published.
 
 ## Testing & Automation
 - **Unit/Integration** frameworks: Jest + React Testing Library. `tests/utils/rulesUtils.test.ts` ensures helper math (e.g., `parseTimeToMinutes`, `calculateDurationHours`) handles wrap-around times and invalid inputs before violations fire. Component specs (`tests/ui/*.test.tsx`) cover guided tracker actions, field-trip approvals, substitute parity, violation navigator controls, and staff palette behaviors.
