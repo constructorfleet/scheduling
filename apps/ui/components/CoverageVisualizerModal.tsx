@@ -271,6 +271,8 @@ const Timeline: React.FC<{
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
+            onMouseEnter={() => setHoveredInterval(hoveredInterval)}
+            onMouseLeave={() => setHoveredInterval(null)}
             style={{
               marginTop: "1rem",
               padding: "1rem",
