@@ -335,7 +335,6 @@ export default function App() {
   const [showViolationNavigator, setShowViolationNavigator] = useState(false);
   const [showAuditTimeline, setShowAuditTimeline] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [isConfigured, setIsConfigured] = useState(false);
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [settingsCloseAttempt, setSettingsCloseAttempt] = useState(0);
   const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>([]);
@@ -1054,7 +1053,6 @@ export default function App() {
     beginApiAction("saving", "Saving settings...");
     try {
       await saveSettings(selectedSchoolId, buildSettingsPayload(overrides));
-      setIsConfigured(true);
       completeApiAction("Settings saved");
     } catch (error) {
       failApiAction("Settings save failed");
@@ -1241,7 +1239,6 @@ export default function App() {
       return;
     }
     if (!canEditSchedule) {
-      setIsConfigured(true);
       setShowSettings(false);
       setSchoolName(selectedSchoolName);
       setClosedDaysState([]);
@@ -1268,7 +1265,6 @@ export default function App() {
         completeApiAction("Settings loaded");
         if (!isActive) return;
         if (settings?.school) {
-          setIsConfigured(true);
           setSchoolName(settings.school.name ?? selectedSchoolName);
           setClosedDaysState(
             (settings.school.closedDays ?? []).filter((day): day is DayOfWeek =>
@@ -1336,7 +1332,6 @@ export default function App() {
             }))
           );
         } else {
-          setIsConfigured(false);
           setShowSettings(true);
           setSchoolName(selectedSchoolName);
           setClosedDaysState([]);
