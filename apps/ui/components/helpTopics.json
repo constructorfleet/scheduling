@@ -31,17 +31,42 @@
             "Use Add block in a staff row to create a new clock-in/clock-out block.",
             "Click an existing block to edit or delete it.",
             "Review operating hours and the field trip window under the day metadata.",
-            "If a red warning appears, adjust times or staffing until the warning clears."
+            "If a red warning appears, adjust times or staffing until the warning clears.",
+            "Click the 📊 icon in a day header to view the coverage report for that day."
         ],
         "examples": [
             "Scenario: A part-time employee works Tuesday morning and afternoon. Use Add block twice to capture 8:00 AM–11:00 AM and 1:00 PM–4:30 PM so the gap is visible and schedule coverage is accurate.",
             "Scenario: Wednesday is marked closed in School settings. The day column stays read-only, so remove any blocks and rely on the closed-day indicator instead of adjusting staff times."
         ],
         "related": [
+            "coverage-visualizer",
             "auto-schedule",
             "violations",
             "settings-operating-hours",
             "settings-school"
+        ]
+    },
+    {
+        "id": "coverage-visualizer",
+        "title": "Coverage visualizer",
+        "summary": "The coverage visualizer shows staffing adequacy throughout the day with color-coded timeline segments.",
+        "howTo": [
+            "Click the 📊 icon in any open day's column header to open the report.",
+            "Review the timeline bar showing coverage segments: green (adequate), orange (partial), red (critical).",
+            "Hover over any segment to see detailed metrics: enrollment, staff count, required ratio, and actual ratio.",
+            "Time window boundaries appear as segment divisions when schedule types have configured time windows.",
+            "Field trip ratios automatically apply during the field trip window for days with trips.",
+            "Close the report by clicking outside the modal, pressing Escape, or clicking the × button."
+        ],
+        "examples": [
+            "Scenario: Monday shows a red segment from 9:00 AM–11:00 AM. Hover to see you need 4 staff but only have 2 assigned. Add 2 more staff during that window to turn the segment green.",
+            "Scenario: A schedule type has a stricter 1:6 ratio during arrival (7:00 AM–9:00 AM) and departure (3:00 PM–5:00 PM). The timeline shows these as separate segments with the time window ratio badge.",
+            "Scenario: Tuesday has a field trip with a 1:5 ratio. The timeline shows the field trip window segments with the field trip ratio, helping you ensure adequate coverage during the trip."
+        ],
+        "related": [
+            "schedule-grid",
+            "violations",
+            "settings-schedule-types"
         ]
     },
     {
@@ -72,13 +97,15 @@
             "Sort through critical items first.",
             "Use Focus Segment to jump to the exact block or day column.",
             "Make edits in the grid and confirm the violation count decreases automatically.",
-            "Ratio issues include the affected time window in the message."
+            "Ratio issues include the affected time window in the message.",
+            "Use the coverage visualizer (📊 icon) to see a visual breakdown of staffing gaps throughout the day."
         ],
         "examples": [
             "Scenario: A ratio staffing gap appears from 9:00 AM–11:00 AM. Add another qualified staff block during that window or correct the enrollment count until the warning disappears.",
             "Scenario: Two blocks overlap for the same employee. Shorten or move one block so the start and end times no longer collide."
         ],
         "related": [
+            "coverage-visualizer",
             "schedule-grid",
             "audit"
         ]
@@ -182,16 +209,22 @@
     {
         "id": "settings-schedule-types",
         "title": "Schedule types",
-        "summary": "Schedule types define the staffing ratio used by each day.",
+        "summary": "Schedule types define the staffing ratio used by each day, with optional time windows for different ratios during specific hours.",
         "howTo": [
             "Add or edit schedule type names.",
             "Set adult:student ratio values for each type.",
+            "Configure time window ratios to specify different ratios during arrival, midday, or departure hours.",
+            "Ensure time windows do not overlap and that start times come before end times.",
             "Use clear descriptions so directors know when to use each type.",
             "Save schedule types and then apply them in the grid."
         ],
         "examples": [
             "Scenario: Define a Full Day type at 1:10 and a Half Day type at 1:12. Select the correct type per day so ratios are calculated correctly.",
-            "Scenario: The district uses a \"Pre-K Extended\" program. Create a custom schedule type label so staff know when to use that ratio."
+            "Scenario: The district uses a \"Pre-K Extended\" program. Create a custom schedule type label so staff know when to use that ratio.",
+            "Scenario: Arrival and departure times need stricter ratios. Add time windows for 7:00 AM–9:00 AM at 1:6 and 3:00 PM–5:00 PM at 1:6, while midday stays at 1:8. The coverage visualizer will show these distinct segments."
+        ],
+        "related": [
+            "coverage-visualizer"
         ]
     },
     {

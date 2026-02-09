@@ -263,9 +263,10 @@ const Timeline: React.FC<{
       </div>
 
       {/* Metrics panel on hover */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {hoveredInterval !== null && (
           <motion.div
+            key={`metrics-${hoveredInterval}`}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}

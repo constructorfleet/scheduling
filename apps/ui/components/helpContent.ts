@@ -3,6 +3,7 @@ import helpTopicsJson from "./helpTopics.json";
 export type HelpTopicId =
     | "overview"
     | "schedule-grid"
+    | "coverage-visualizer"
     | "auto-schedule"
     | "violations"
     | "audit"

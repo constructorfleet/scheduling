@@ -366,23 +366,41 @@ export default function ScheduleMatrix({
                 <th
                   key={`header-${day}`}
                   data-day-column-header={day}
-                  onClick={() => {
-                    if (!closedDay && dayMeta) {
-                      onDayClick(day);
-                    }
-                  }}
                   style={{
                     padding: "0.5rem",
                     border: `1px solid ${colors.borderStrong}`,
                     background: isFocusedDay ? colors.brandBlueLight : colors.surfaceAlt,
                     minWidth: 160,
                     verticalAlign: "top",
-                    cursor: !closedDay && dayMeta ? "pointer" : "default",
                     boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
                   }}
                 >
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-                    <span style={{ fontWeight: 700 }}>{dayDisplayNames[day]}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ fontWeight: 700 }}>{dayDisplayNames[day]}</span>
+                      {!closedDay && dayMeta && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDayClick(day);
+                          }}
+                          title="View coverage report"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: "0.25rem",
+                            display: "flex",
+                            alignItems: "center",
+                            color: "#3b82f6",
+                            fontSize: "1rem"
+                          }}
+                        >
+                          📊
+                        </button>
+                      )}
+                    </div>
                     <span style={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
                       {formatDateLabel(dayMeta?.date)}
                     </span>
