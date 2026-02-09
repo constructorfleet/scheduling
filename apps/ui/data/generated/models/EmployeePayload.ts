@@ -7,6 +7,8 @@ import type { EmployeeTimeOffRequest } from './EmployeeTimeOffRequest';
 import type { EmploymentStatus } from './EmploymentStatus';
 export type EmployeePayload = {
     name: string;
+    email?: string;
+    phone?: string;
     jobTitle: string;
     maxHoursPerDay: number;
     maxHoursPerWeek: number;

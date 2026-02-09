@@ -885,6 +885,8 @@ export default function App() {
       payload.employees = (overrides.employees ?? employeesState).map((employee) => ({
         id: employee.id,
         name: employee.name,
+        email: employee.email,
+        phone: employee.phone,
         jobTitle: employee.jobTitle,
         maxHoursPerDay: employee.maxHoursPerDay,
         maxHoursPerWeek: employee.maxHoursPerWeek,

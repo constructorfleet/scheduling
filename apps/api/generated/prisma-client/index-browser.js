@@ -164,6 +164,8 @@ exports.Prisma.EmployeeScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
   name: 'name',
+  email: 'email',
+  phone: 'phone',
   jobTitle: 'jobTitle',
   maxHoursPerDay: 'maxHoursPerDay',
   maxHoursPerWeek: 'maxHoursPerWeek',

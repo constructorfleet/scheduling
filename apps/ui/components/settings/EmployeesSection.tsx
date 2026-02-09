@@ -99,12 +99,14 @@ export default function EmployeesSection({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.2fr 1fr 1fr 1fr",
+            gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr",
             gap: "0.75rem",
             alignItems: "center"
           }}
         >
           <span style={{ textAlign: "center", justifySelf: "center" }}>Employee</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Email</span>
+          <span style={{ textAlign: "center", justifySelf: "center" }}>Phone</span>
           <span style={{ textAlign: "center", justifySelf: "center" }}>Job title</span>
           <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/day</span>
           <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/week</span>
@@ -127,7 +129,13 @@ export default function EmployeesSection({
               gap: "0.75rem"
             }}
           >
-            <div style={{ display: "grid", gap: "0.75rem", gridTemplateColumns: "1.2fr 1fr 1fr 1fr 200px" }}>
+            <div
+              style={{
+                display: "grid",
+                gap: "0.75rem",
+                gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr 200px"
+              }}
+            >
               <input
                 value={employee.name}
                 onChange={(event) => {
@@ -139,6 +147,32 @@ export default function EmployeesSection({
                   padding: "0.45rem 0.6rem"
                 }}
                 placeholder="Name"
+              />
+              <input
+                type="email"
+                value={employee.email ?? ""}
+                onChange={(event) => {
+                  setEmployee(index, { ...employee, email: event.target.value });
+                }}
+                style={{
+                  borderRadius: 10,
+                  border: "1px solid #d1d5db",
+                  padding: "0.45rem 0.6rem"
+                }}
+                placeholder="Email"
+              />
+              <input
+                type="tel"
+                value={employee.phone ?? ""}
+                onChange={(event) => {
+                  setEmployee(index, { ...employee, phone: event.target.value });
+                }}
+                style={{
+                  borderRadius: 10,
+                  border: "1px solid #d1d5db",
+                  padding: "0.45rem 0.6rem"
+                }}
+                placeholder="Phone"
               />
               <select
                 value={employee.jobTitle}

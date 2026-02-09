@@ -8,6 +8,8 @@ export type EmployeeResponse = {
     id: string;
     schoolId: string;
     name: string;
+    email?: string;
+    phone?: string;
     jobTitle: string;
     maxHoursPerDay: number;
     maxHoursPerWeek: number;

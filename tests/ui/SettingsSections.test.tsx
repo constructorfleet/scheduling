@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FieldTripsSection from "../../apps/ui/components/settings/FieldTripsSection";
 import JobTitlesSection from "../../apps/ui/components/settings/JobTitlesSection";
@@ -277,6 +277,8 @@ describe("Settings section components", () => {
       {
         id: "emp-1",
         name: "Jordan Lee",
+        email: "",
+        phone: "",
         jobTitle: "Assistant",
         maxHoursPerDay: 8,
         maxHoursPerWeek: 40,
@@ -300,6 +302,23 @@ describe("Settings section components", () => {
         canSave={true}
       />
     );
+
+    const emailInput = screen.getByPlaceholderText("Email");
+    const phoneInput = screen.getByPlaceholderText("Phone");
+
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: "jordan@example.com" } });
+    });
+
+    const latestAfterEmail = onChange.mock.calls[onChange.mock.calls.length - 1][0] as Employee[];
+    expect(latestAfterEmail[0].email).toBe("jordan@example.com");
+
+    await act(async () => {
+      fireEvent.change(phoneInput, { target: { value: "555-123-4567" } });
+    });
+
+    const latestAfterPhone = onChange.mock.calls[onChange.mock.calls.length - 1][0] as Employee[];
+    expect(latestAfterPhone[0].phone).toBe("555-123-4567");
 
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Availability" }));

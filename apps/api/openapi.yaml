@@ -491,6 +491,10 @@ components:
       properties:
         name:
           type: string
+        email:
+          type: string
+        phone:
+          type: string
         jobTitle:
           type: string
         maxHoursPerDay:
@@ -529,6 +533,10 @@ components:
         schoolId:
           type: string
         name:
+          type: string
+        email:
+          type: string
+        phone:
           type: string
         jobTitle:
           type: string

@@ -4,7 +4,7 @@
 Site directors, scheduling coordinators, and substitute coordinators who need to staff the district daycare without relying on live training. The goal is to walk through the guided workflow—staff setup, schedule building, approvals, and publication—using the UI components that enforce policy compliance.
 
 ## Workspace overview
-- **Configuration panel** (top-right gear): add/remove employees, update certifications, edit availability windows, and manage ratio/certification requirements. Every change flows instantly into the validation engine.
+- **Configuration panel** (top-right gear): add/remove employees, capture contact info (email/phone), update certifications, edit availability windows, and manage ratio/certification requirements. Every change flows instantly into the validation engine.
 - **Schedule Grid** (center): shows the week’s segments. Add staff blocks, log clock-in/out times, and create multiple work blocks per day by adding separate blocks on the same day.
 - **Guided Status Tracker** (left rail): walks you through Prepare → Assign → Review → Publish. Each step exposes the current blockers; you cannot advance until the underlying rules are satisfied.
 - **Violation Navigator** (bottom tray): surfaces outstanding policy violations along with the policy citation. Click an item to highlight the affected segment or certification.

@@ -87,6 +87,8 @@ model Employee {
   id                 String  @id @default(cuid())
   schoolId           String
   name               String
+  email              String?
+  phone              String?
   jobTitle           String
   maxHoursPerDay     Int
   maxHoursPerWeek    Int

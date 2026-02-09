@@ -26,7 +26,7 @@ In the **School** tab of Settings, set the **Field trip start time** and **Field
 
 ### Manage employees
 1. Open the gear icon and select **People & Certifications**.
-2. Create or update employees with job title, employment status, and working limits (`max_hours_per_day`, `max_hours_per_week`). These caps feed overtime and guardrail checks, so keep them accurate for every staff member.
+2. Create or update employees with contact info (email, phone), job title, employment status, and working limits (`max_hours_per_day`, `max_hours_per_week`). These caps feed overtime and guardrail checks, so keep them accurate for every staff member.
 3. Add availability windows so Auto Schedule and manual assignments respect the employee’s start/end preferences. Each window uses the same `HH:MM AM/PM` format you enter in the timeline.
 
 ### Record certifications

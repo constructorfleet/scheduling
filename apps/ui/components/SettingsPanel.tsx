@@ -91,6 +91,8 @@ const fullDayAvailability = (): Employee["availability"] =>
 const emptyEmployee = (): Employee => ({
   id: `emp-${Date.now()}`,
   name: "New employee",
+  email: "",
+  phone: "",
   jobTitle: "Staff",
   maxHoursPerDay: 8,
   maxHoursPerWeek: 40,

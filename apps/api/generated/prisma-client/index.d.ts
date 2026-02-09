@@ -7472,6 +7472,8 @@ export namespace Prisma {
     id: string | null
     schoolId: string | null
     name: string | null
+    email: string | null
+    phone: string | null
     jobTitle: string | null
     maxHoursPerDay: number | null
     maxHoursPerWeek: number | null
@@ -7485,6 +7487,8 @@ export namespace Prisma {
     id: string | null
     schoolId: string | null
     name: string | null
+    email: string | null
+    phone: string | null
     jobTitle: string | null
     maxHoursPerDay: number | null
     maxHoursPerWeek: number | null
@@ -7498,6 +7502,8 @@ export namespace Prisma {
     id: number
     schoolId: number
     name: number
+    email: number
+    phone: number
     jobTitle: number
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -7525,6 +7531,8 @@ export namespace Prisma {
     id?: true
     schoolId?: true
     name?: true
+    email?: true
+    phone?: true
     jobTitle?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
@@ -7538,6 +7546,8 @@ export namespace Prisma {
     id?: true
     schoolId?: true
     name?: true
+    email?: true
+    phone?: true
     jobTitle?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
@@ -7551,6 +7561,8 @@ export namespace Prisma {
     id?: true
     schoolId?: true
     name?: true
+    email?: true
+    phone?: true
     jobTitle?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
@@ -7653,6 +7665,8 @@ export namespace Prisma {
     id: string
     schoolId: string
     name: string
+    email: string | null
+    phone: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -7687,6 +7701,8 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
+    email?: boolean
+    phone?: boolean
     jobTitle?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
@@ -7703,6 +7719,8 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
+    email?: boolean
+    phone?: boolean
     jobTitle?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
@@ -7719,6 +7737,8 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
+    email?: boolean
+    phone?: boolean
     jobTitle?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
@@ -7735,6 +7755,8 @@ export namespace Prisma {
     id?: boolean
     schoolId?: boolean
     name?: boolean
+    email?: boolean
+    phone?: boolean
     jobTitle?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
@@ -7746,7 +7768,7 @@ export namespace Prisma {
     requestedDaysOff?: boolean
   }
 
-  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "email" | "phone" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
   export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
   }
@@ -7766,6 +7788,8 @@ export namespace Prisma {
       id: string
       schoolId: string
       name: string
+      email: string | null
+      phone: string | null
       jobTitle: string
       maxHoursPerDay: number
       maxHoursPerWeek: number
@@ -8202,6 +8226,8 @@ export namespace Prisma {
     readonly id: FieldRef<"Employee", 'String'>
     readonly schoolId: FieldRef<"Employee", 'String'>
     readonly name: FieldRef<"Employee", 'String'>
+    readonly email: FieldRef<"Employee", 'String'>
+    readonly phone: FieldRef<"Employee", 'String'>
     readonly jobTitle: FieldRef<"Employee", 'String'>
     readonly maxHoursPerDay: FieldRef<"Employee", 'Int'>
     readonly maxHoursPerWeek: FieldRef<"Employee", 'Int'>
@@ -23619,6 +23645,8 @@ export namespace Prisma {
     id: 'id',
     schoolId: 'schoolId',
     name: 'name',
+    email: 'email',
+    phone: 'phone',
     jobTitle: 'jobTitle',
     maxHoursPerDay: 'maxHoursPerDay',
     maxHoursPerWeek: 'maxHoursPerWeek',
@@ -24291,6 +24319,8 @@ export namespace Prisma {
     id?: StringFilter<"Employee"> | string
     schoolId?: StringFilter<"Employee"> | string
     name?: StringFilter<"Employee"> | string
+    email?: StringNullableFilter<"Employee"> | string | null
+    phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
@@ -24307,6 +24337,8 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
     jobTitle?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
@@ -24326,6 +24358,8 @@ export namespace Prisma {
     NOT?: EmployeeWhereInput | EmployeeWhereInput[]
     schoolId?: StringFilter<"Employee"> | string
     name?: StringFilter<"Employee"> | string
+    email?: StringNullableFilter<"Employee"> | string | null
+    phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
@@ -24342,6 +24376,8 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
     jobTitle?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
@@ -24365,6 +24401,8 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Employee"> | string
     schoolId?: StringWithAggregatesFilter<"Employee"> | string
     name?: StringWithAggregatesFilter<"Employee"> | string
+    email?: StringNullableWithAggregatesFilter<"Employee"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"Employee"> | string | null
     jobTitle?: StringWithAggregatesFilter<"Employee"> | string
     maxHoursPerDay?: IntWithAggregatesFilter<"Employee"> | number
     maxHoursPerWeek?: IntWithAggregatesFilter<"Employee"> | number
@@ -25727,6 +25765,8 @@ export namespace Prisma {
   export type EmployeeCreateInput = {
     id?: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -25743,6 +25783,8 @@ export namespace Prisma {
     id?: string
     schoolId: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -25757,6 +25799,8 @@ export namespace Prisma {
   export type EmployeeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -25773,6 +25817,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     schoolId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -25788,6 +25834,8 @@ export namespace Prisma {
     id?: string
     schoolId: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -25802,6 +25850,8 @@ export namespace Prisma {
   export type EmployeeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -25817,6 +25867,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     schoolId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -27410,6 +27462,8 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
     jobTitle?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
@@ -27430,6 +27484,8 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
     jobTitle?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
@@ -27443,6 +27499,8 @@ export namespace Prisma {
     id?: SortOrder
     schoolId?: SortOrder
     name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
     jobTitle?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
@@ -29950,6 +30008,8 @@ export namespace Prisma {
   export type EmployeeCreateWithoutSchoolInput = {
     id?: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -29964,6 +30024,8 @@ export namespace Prisma {
   export type EmployeeUncheckedCreateWithoutSchoolInput = {
     id?: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -30251,6 +30313,8 @@ export namespace Prisma {
     id?: StringFilter<"Employee"> | string
     schoolId?: StringFilter<"Employee"> | string
     name?: StringFilter<"Employee"> | string
+    email?: StringNullableFilter<"Employee"> | string | null
+    phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
@@ -32888,6 +32952,8 @@ export namespace Prisma {
   export type EmployeeCreateManySchoolInput = {
     id?: string
     name: string
+    email?: string | null
+    phone?: string | null
     jobTitle: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
@@ -33002,6 +33068,8 @@ export namespace Prisma {
   export type EmployeeUpdateWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -33016,6 +33084,8 @@ export namespace Prisma {
   export type EmployeeUncheckedUpdateWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
@@ -33030,6 +33100,8 @@ export namespace Prisma {
   export type EmployeeUncheckedUpdateManyWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number

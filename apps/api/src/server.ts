@@ -1281,6 +1281,8 @@ const buildServer = async () => {
             employees?: Array<{
                 id?: string;
                 name: string;
+                email?: string;
+                phone?: string;
                 jobTitle: string;
                 maxHoursPerDay: number;
                 maxHoursPerWeek: number;
@@ -1448,6 +1450,8 @@ const buildServer = async () => {
                             where: { id: targetId },
                             data: {
                                 name: employee.name,
+                                email: employee.email ?? null,
+                                phone: employee.phone ?? null,
                                 jobTitle: employee.jobTitle,
                                 maxHoursPerDay: employee.maxHoursPerDay,
                                 maxHoursPerWeek: employee.maxHoursPerWeek,
@@ -1457,7 +1461,7 @@ const buildServer = async () => {
                                 notes: employee.notes ?? null,
                                 availability: toJsonValue(normalizeAvailability(employee.availability)),
                                 requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
-                            }
+                            } as CorePrisma.EmployeeUncheckedUpdateInput
                         });
                         continue;
                     }
@@ -1467,6 +1471,8 @@ const buildServer = async () => {
                             id: employee.id,
                             schoolId,
                             name: employee.name,
+                            email: employee.email ?? null,
+                            phone: employee.phone ?? null,
                             jobTitle: employee.jobTitle,
                             maxHoursPerDay: employee.maxHoursPerDay,
                             maxHoursPerWeek: employee.maxHoursPerWeek,
@@ -1476,7 +1482,7 @@ const buildServer = async () => {
                             notes: employee.notes ?? null,
                             availability: toJsonValue(normalizeAvailability(employee.availability)),
                             requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
-                        }
+                        } as CorePrisma.EmployeeUncheckedCreateInput
                     });
                     keptEmployeeIds.add(created.id);
                 }
