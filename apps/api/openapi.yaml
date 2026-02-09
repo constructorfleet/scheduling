@@ -1036,7 +1036,8 @@ components:
           type: string
           nullable: true
         scheduleType:
-          $ref: '#/components/schemas/ScheduleType'
+          type: string
+          nullable: true
         dayScheduleType:
           $ref: '#/components/schemas/DayScheduleType'
       required: [id, dayOfWeek]
