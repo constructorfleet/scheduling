@@ -9,6 +9,7 @@ import {
     type User,
     type UserInvite
 } from "apps/api/generated/prisma-client";
+import { hashPassword } from "../../apps/api/src/auth";
 
 const mockPrisma = {
     session: {
@@ -182,6 +183,53 @@ describe("server admin and invite routes", () => {
             userId: "user-2",
             role: "school_user"
         });
+    });
+
+    test("falls back to first school when login school is not assigned", async () => {
+        const password = "SecurePass123!";
+        mockPrisma.user.findUnique.mockResolvedValue({
+            id: "user-9",
+            email: "teacher@example.com",
+            displayName: "Teacher",
+            status: "active",
+            isSuperUser: false,
+            passwordHash: hashPassword(password),
+            failedLoginAttempts: 0,
+            lockoutUntil: null,
+            memberships: [
+                {
+                    schoolId: "school-1",
+                    role: "school_user",
+                    school: { districtId: "district-1" }
+                }
+            ],
+            districtMemberships: []
+        });
+        mockPrisma.session.updateMany.mockResolvedValue({ count: 0 });
+        mockPrisma.session.create.mockResolvedValue({ id: "session-1" });
+        mockPrisma.user.update.mockResolvedValue({
+            id: "user-9",
+            email: "teacher@example.com",
+            displayName: "Teacher",
+            status: "active",
+            isSuperUser: false
+        });
+
+        const server = await buildServer();
+        const response = await server.inject({
+            method: "POST",
+            url: "/api/auth/login",
+            payload: {
+                email: "teacher@example.com",
+                password,
+                schoolId: "school-2"
+            }
+        });
+
+        expect(response.statusCode).toBe(200);
+        const payload = response.json() as { currentSchoolId: string | null };
+        expect(payload.currentSchoolId).toBe("school-1");
+        await server.close();
     });
 
     test("requires csrf for district school creation", async () => {

@@ -556,8 +556,9 @@ const buildServer = async () => {
         const targetMembership = requestedSchoolId
             ? memberships.find((membership) => membership.schoolId === requestedSchoolId)
             : memberships[ 0 ];
+        const resolvedMembership = targetMembership ?? memberships[ 0 ];
 
-        if (!targetMembership && !user.isSuperUser) {
+        if (!resolvedMembership && !user.isSuperUser) {
             return reply.code(403).send({ message: "No school access assigned for this user." });
         }
 
@@ -613,7 +614,7 @@ const buildServer = async () => {
                 displayName: user.displayName,
                 isSuperUser: user.isSuperUser
             },
-            currentSchoolId: targetMembership?.schoolId ?? null,
+            currentSchoolId: resolvedMembership?.schoolId ?? null,
             memberships,
             schoolMemberships: memberships,
             districtMemberships: user.districtMemberships.map((membership) => ({
