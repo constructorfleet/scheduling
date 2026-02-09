@@ -9,6 +9,7 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 - **Guided Status Tracker (left rail)**: enforces the Prepare → Assign → Review → Publish flow. Every step lists blockers; you cannot publish until all violations are cleared.
 - **Violation Navigator (bottom tray)**: lists unresolved policy violations with citations and metadata badges such as the “Operating hours guardrail.” Selecting an issue highlights the affected block so you can fix the underlying data.
 - **Audit Log (top banner)**: review recent changes and use Undo/Redo to step through edits. Undo history is stored per week in the browser so it persists across refreshes.
+- **Employee schedule view (read-only)**: employees can select their name and review assigned shifts without editing schedules or settings.
 
 ![Scheduling grid with staff assignments, violations, and guided tracker highlighted.](Example Schedule Spreadsheet.png)
 

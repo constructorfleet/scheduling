@@ -14,6 +14,7 @@ import InviteAccept from "./components/InviteAccept";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
 import AppShell from "./components/AppShell";
+import EmployeeScheduleView from "./components/EmployeeScheduleView";
 import { useUserManagement } from "./hooks/useUserManagement";
 import type { HelpTopicId } from "./components/helpContent";
 import {
@@ -1063,16 +1064,15 @@ export default function App() {
     }
   };
 
-  const isInviteRoute = useMemo(() => {
+  const [isInviteRoute, setIsInviteRoute] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.location.pathname.startsWith("/invite");
-  }, []);
-
-  const inviteToken = useMemo(() => {
+  });
+  const [inviteToken, setInviteToken] = useState(() => {
     if (typeof window === "undefined") return "";
     const params = new URLSearchParams(window.location.search);
     return params.get("token")?.trim() ?? "";
-  }, []);
+  });
 
   useEffect(() => {
     if (authStatus !== "authenticated") {
@@ -2289,6 +2289,8 @@ export default function App() {
             if (typeof window !== "undefined") {
               window.history.replaceState({}, "", "/");
             }
+            setInviteToken("");
+            setIsInviteRoute(false);
             setAuthStatus("unauthenticated");
           }}
         />
@@ -2370,89 +2372,99 @@ export default function App() {
         </>
       }
       content={
-        <ScheduleMatrix
-          staff={scheduleStaff}
-          employeeOptions={employeesDerived}
-          assignments={staffAssignmentsState}
-          segmentBlocks={segmentBlocksState}
-          days={scheduleDaysState}
-          daySequence={openDaySequence}
-          dayDisplayNames={dayDisplayNames}
-          scheduleTypeOptions={scheduleTypeOptionsState}
-          fieldTripTypes={fieldTripTypesState}
-          fieldTripEventsByDay={fieldTripEventsByDay}
-          operatingHoursByDay={operatingHoursByDay}
-          fieldTripStartTime={schoolRulesState.fieldTripStartTime}
-          fieldTripEndTime={schoolRulesState.fieldTripEndTime}
-          onEnrollmentChange={handleEnrollmentUpdate}
-          onScheduleTypeChange={handleScheduleTypeUpdate}
-          onFieldTripSelection={handleFieldTripSelection}
-          onUpdateAssignmentTime={handleUpdateAssignmentTime}
-          onDeleteAssignment={handleDeleteAssignment}
-          onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
-          onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
-            if (!canEditSchedule) {
-              setAuthMessage("You do not have permission to edit assignments.");
-              return;
-            }
-            applyScheduleChange(
-              (current) => {
-                const scheduleDay = current.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
-                const existingBlock = current.segmentBlocks.find((block) => {
-                  return (
-                    block.dayOfWeek === dayOfWeek &&
-                    block.startTime === startTime &&
-                    block.endTime === endTime &&
-                    block.scheduleDayId === scheduleDay?.id
-                  );
-                });
-                const segmentId = existingBlock?.id ?? `segment-${dayOfWeek}-custom-${Date.now()}`;
-                const newBlock: SegmentBlock | null = existingBlock
-                  ? null
-                  : {
-                      id: segmentId,
-                      scheduleWeekId: currentWeekId,
-                      dayOfWeek,
-                      segment: "open",
+        canEditSchedule ? (
+          <ScheduleMatrix
+            staff={scheduleStaff}
+            employeeOptions={employeesDerived}
+            assignments={staffAssignmentsState}
+            segmentBlocks={segmentBlocksState}
+            days={scheduleDaysState}
+            daySequence={openDaySequence}
+            dayDisplayNames={dayDisplayNames}
+            scheduleTypeOptions={scheduleTypeOptionsState}
+            fieldTripTypes={fieldTripTypesState}
+            fieldTripEventsByDay={fieldTripEventsByDay}
+            operatingHoursByDay={operatingHoursByDay}
+            fieldTripStartTime={schoolRulesState.fieldTripStartTime}
+            fieldTripEndTime={schoolRulesState.fieldTripEndTime}
+            onEnrollmentChange={handleEnrollmentUpdate}
+            onScheduleTypeChange={handleScheduleTypeUpdate}
+            onFieldTripSelection={handleFieldTripSelection}
+            onUpdateAssignmentTime={handleUpdateAssignmentTime}
+            onDeleteAssignment={handleDeleteAssignment}
+            onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
+            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
+              if (!canEditSchedule) {
+                setAuthMessage("You do not have permission to edit assignments.");
+                return;
+              }
+              applyScheduleChange(
+                (current) => {
+                  const scheduleDay = current.scheduleDays.find((day) => day.dayOfWeek === dayOfWeek);
+                  const existingBlock = current.segmentBlocks.find((block) => {
+                    return (
+                      block.dayOfWeek === dayOfWeek &&
+                      block.startTime === startTime &&
+                      block.endTime === endTime &&
+                      block.scheduleDayId === scheduleDay?.id
+                    );
+                  });
+                  const segmentId = existingBlock?.id ?? `segment-${dayOfWeek}-custom-${Date.now()}`;
+                  const newBlock: SegmentBlock | null = existingBlock
+                    ? null
+                    : {
+                        id: segmentId,
+                        scheduleWeekId: currentWeekId,
+                        dayOfWeek,
+                        segment: "open",
+                        startTime,
+                        endTime,
+                        childCount: scheduleDay?.enrollmentCount ?? 0,
+                        status: "draft",
+                        scheduleDayId: scheduleDay?.id
+                      };
+                  const nextAssignments = [
+                    ...current.staffAssignments.filter((assignment) => {
+                      return !(
+                        assignment.segmentBlockId === segmentId &&
+                        assignment.employeeId === employeeId &&
+                        assignment.startTime === startTime &&
+                        assignment.endTime === endTime
+                      );
+                    }),
+                    {
+                      id: `assign-${segmentId}-${employeeId}`,
+                      segmentBlockId: segmentId,
+                      employeeId,
+                      assignmentSource: "manual_adjustment" as const,
                       startTime,
                       endTime,
-                      childCount: scheduleDay?.enrollmentCount ?? 0,
-                      status: "draft",
-                      scheduleDayId: scheduleDay?.id
-                    };
-                const nextAssignments = [
-                  ...current.staffAssignments.filter((assignment) => {
-                    return !(
-                      assignment.segmentBlockId === segmentId &&
-                      assignment.employeeId === employeeId &&
-                      assignment.startTime === startTime &&
-                      assignment.endTime === endTime
-                    );
-                  }),
-                  {
-                    id: `assign-${segmentId}-${employeeId}`,
-                    segmentBlockId: segmentId,
-                    employeeId,
-                    assignmentSource: "manual_adjustment" as const,
-                    startTime,
-                    endTime,
-                    status: "scheduled" as const
-                  }
-                ];
-                return {
-                  staffAssignments: nextAssignments,
-                  segmentBlocks: newBlock ? [...current.segmentBlocks, newBlock] : current.segmentBlocks
-                };
-              },
-              {
-                action: "Created assignment",
-                notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]}): ${startTime}-${endTime}`
-              }
-            );
-          }}
-          focusedSegmentIds={focusedSegmentIds}
-          onOpenHelpTopic={openHelpTopic}
-        />
+                      status: "scheduled" as const
+                    }
+                  ];
+                  return {
+                    staffAssignments: nextAssignments,
+                    segmentBlocks: newBlock ? [...current.segmentBlocks, newBlock] : current.segmentBlocks
+                  };
+                },
+                {
+                  action: "Created assignment",
+                  notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]}): ${startTime}-${endTime}`
+                }
+              );
+            }}
+            focusedSegmentIds={focusedSegmentIds}
+            onOpenHelpTopic={openHelpTopic}
+          />
+        ) : (
+          <EmployeeScheduleView
+            employees={employeesDerived}
+            assignments={staffAssignmentsState}
+            segmentBlocks={segmentBlocksState}
+            daySequence={openDaySequence}
+            dayDisplayNames={dayDisplayNames}
+          />
+        )
       }
       overlays={
         <>
