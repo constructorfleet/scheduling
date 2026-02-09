@@ -204,15 +204,56 @@ const Timeline: React.FC<{
       {/* Time axis labels */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "0.5rem",
-          fontSize: "0.75rem",
-          color: colors.textMuted
+          position: "relative",
+          height: "20px",
+          marginBottom: "0.5rem"
         }}
       >
-        <span>{formatMinutesAsTime(openMinutes)}</span>
-        <span>{formatMinutesAsTime(closeMinutes)}</span>
+        {/* Opening time */}
+        <span
+          style={{
+            position: "absolute",
+            left: 0,
+            fontSize: "0.75rem",
+            color: colors.textMuted,
+            fontWeight: 600
+          }}
+        >
+          {formatMinutesAsTime(openMinutes)}
+        </span>
+
+        {/* Time window boundary labels */}
+        {intervals.slice(0, -1).map((interval, idx) => {
+          const position = ((interval.end - openMinutes) / totalMinutes) * 100;
+          return (
+            <span
+              key={`time-label-${idx}`}
+              style={{
+                position: "absolute",
+                left: `${position}%`,
+                transform: "translateX(-50%)",
+                fontSize: "0.75rem",
+                color: colors.textMuted,
+                fontWeight: 500
+              }}
+            >
+              {formatMinutesAsTime(interval.end)}
+            </span>
+          );
+        })}
+
+        {/* Closing time */}
+        <span
+          style={{
+            position: "absolute",
+            right: 0,
+            fontSize: "0.75rem",
+            color: colors.textMuted,
+            fontWeight: 600
+          }}
+        >
+          {formatMinutesAsTime(closeMinutes)}
+        </span>
       </div>
 
       {/* Timeline bar */}
