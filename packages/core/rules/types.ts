@@ -9,6 +9,16 @@ import {
     OperatingHours
 } from "../domain/types";
 
+export interface ScheduleTypeTimeWindow {
+    id: string;
+    scheduleTypeId: string;
+    scheduleTypeValue: string;
+    startTime: string;
+    endTime: string;
+    ratioAdults: number;
+    ratioStudents: number;
+}
+
 export interface RulesContext {
     scheduleDays: ScheduleDay[];
     segmentBlocks: SegmentBlock[];
@@ -18,6 +28,7 @@ export interface RulesContext {
     fieldTripTypes: FieldTripType[];
     operatingHours: OperatingHours[];
     scheduleTypeRatios?: Record<string, number>;
+    scheduleTypeTimeWindows?: ScheduleTypeTimeWindow[];
     schoolRules?: SchoolRules;
     jobTitleRules?: Record<string, JobTitleRule>;
     policyCitations?: PolicyCitation[];

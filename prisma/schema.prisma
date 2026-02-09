@@ -69,8 +69,22 @@ model ScheduleType {
   description   String?
 
   school        School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  timeWindows   ScheduleTypeTimeWindow[]
 
   @@unique([schoolId, value])
+}
+
+model ScheduleTypeTimeWindow {
+  id             String       @id @default(cuid())
+  scheduleTypeId String
+  startTime      String
+  endTime        String
+  ratioAdults    Int
+  ratioStudents  Int
+
+  scheduleType   ScheduleType @relation(fields: [scheduleTypeId], references: [id], onDelete: Cascade)
+
+  @@index([scheduleTypeId])
 }
 
 model JobTitle {

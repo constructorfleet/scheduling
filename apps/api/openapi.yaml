@@ -702,6 +702,22 @@ components:
           required: [adults, students]
         description:
           type: string
+        timeWindows:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              startTime:
+                type: string
+              endTime:
+                type: string
+              ratioAdults:
+                type: integer
+              ratioStudents:
+                type: integer
+            required: [startTime, endTime, ratioAdults, ratioStudents]
       required: [value, label, ratio]
     ScheduleTypeResponse:
       type: object
@@ -720,6 +736,24 @@ components:
           type: integer
         description:
           type: string
+        timeWindows:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              scheduleTypeId:
+                type: string
+              startTime:
+                type: string
+              endTime:
+                type: string
+              ratioAdults:
+                type: integer
+              ratioStudents:
+                type: integer
+            required: [id, scheduleTypeId, startTime, endTime, ratioAdults, ratioStudents]
       required: [id, schoolId, value, label, ratioAdults, ratioStudents]
     JobTitlePayload:
       type: object

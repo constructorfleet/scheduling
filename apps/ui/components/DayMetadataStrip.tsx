@@ -6,6 +6,13 @@ export interface ScheduleTypeOption {
   label: string;
   ratio: { adults: number; students: number };
   description: string;
+  timeWindows?: Array<{
+    id?: string;
+    startTime: string;
+    endTime: string;
+    ratioAdults: number;
+    ratioStudents: number;
+  }>;
 }
 
 export type FieldTripSelection = { type: "trip"; fieldTripTypeId: string } | { type: "none" };

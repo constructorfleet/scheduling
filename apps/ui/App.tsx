@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import WeekNavigationBanner from "./components/WeekNavigationBanner";
-import { FieldTripSelection } from "./components/DayMetadataStrip";
+import { FieldTripSelection, ScheduleTypeOption } from "./components/DayMetadataStrip";
 import ScheduleMatrix from "./components/ScheduleMatrix";
 import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
@@ -55,7 +55,7 @@ import type {
   ScheduleTypePayload as ScheduleTypePayloadModel
 } from "./data/generated";
 import { createRulesEngine } from "@core/rules/engine";
-import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
+import type { RuleViolation as EngineRuleViolation, RulesContext, ScheduleTypeTimeWindow } from "@core/rules/types";
 import {
   deleteScheduleAssignments,
   deleteScheduleAssignment,
@@ -926,6 +926,26 @@ export default function App() {
     }, {});
   }, [scheduleTypeOptionsState]);
 
+  const scheduleTypeTimeWindows = useMemo(() => {
+    const windows: ScheduleTypeTimeWindow[] = [];
+    scheduleTypeOptionsState.forEach((option: ScheduleTypeOption) => {
+      if (option.timeWindows) {
+        option.timeWindows.forEach((window: NonNullable<ScheduleTypeOption['timeWindows']>[number]) => {
+          windows.push({
+            id: window.id || '',
+            scheduleTypeId: '',
+            scheduleTypeValue: option.value,
+            startTime: window.startTime,
+            endTime: window.endTime,
+            ratioAdults: window.ratioAdults,
+            ratioStudents: window.ratioStudents
+          });
+        });
+      }
+    });
+    return windows;
+  }, [scheduleTypeOptionsState]);
+
   const derivedOperatingHours = useMemo<OperatingHours[]>(() => {
     return weekDaySequence
       .map((day) => {
@@ -1697,6 +1717,7 @@ export default function App() {
       scheduleDays: scheduleDaysState,
       operatingHours: derivedOperatingHours,
       scheduleTypeRatios: ratioByScheduleType,
+      scheduleTypeTimeWindows,
       schoolRules: schoolRulesState,
       jobTitleRules
     };
@@ -1714,6 +1735,7 @@ export default function App() {
     schoolRulesState,
     jobTitleRules,
     ratioByScheduleType,
+    scheduleTypeTimeWindows,
     isViewer
   ]);
 

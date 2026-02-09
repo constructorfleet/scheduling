@@ -10,5 +10,12 @@ export type ScheduleTypePayload = {
         students: number;
     };
     description?: string;
+    timeWindows?: Array<{
+        id?: string;
+        startTime: string;
+        endTime: string;
+        ratioAdults: number;
+        ratioStudents: number;
+    }>;
 };
 

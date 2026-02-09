@@ -81,6 +81,38 @@ const normalizeChildrenPerStaff = (value: number) => {
     return Math.max(1, Math.ceil(value));
 };
 
+const findTimeWindowRatio = (
+    context: RulesContext,
+    scheduleTypeValue: string,
+    intervalStartMinutes: number,
+    intervalEndMinutes: number
+): number | undefined => {
+    const timeWindows = context.scheduleTypeTimeWindows;
+    if (!timeWindows || timeWindows.length === 0) {
+        return undefined;
+    }
+
+    const relevantWindows = timeWindows.filter(
+        w => w.scheduleTypeValue === scheduleTypeValue
+    );
+
+    if (relevantWindows.length === 0) {
+        return undefined;
+    }
+
+    // Find window that fully contains this interval
+    for (const window of relevantWindows) {
+        const windowStart = parseTimeToMinutes(window.startTime);
+        const windowEnd = parseTimeToMinutes(window.endTime);
+
+        if (intervalStartMinutes >= windowStart && intervalEndMinutes <= windowEnd) {
+            return window.ratioStudents / window.ratioAdults;
+        }
+    }
+
+    return undefined;
+};
+
 type DayAssignmentWithEmployee = {
     assignment: StaffAssignment;
     employee: NonNullable<ReturnType<typeof getEmployeeById>>;
@@ -350,6 +382,19 @@ export const ratioSegmentRule: RuleDefinition = {
                 boundaries.add(fieldTripWindowStart);
                 boundaries.add(fieldTripWindowEnd);
             }
+            // Add time window boundaries
+            const scheduleTypeWindows = (context.scheduleTypeTimeWindows || [])
+                .filter(w => w.scheduleTypeValue === scheduleType);
+            scheduleTypeWindows.forEach(window => {
+                const windowStart = parseTimeToMinutes(window.startTime);
+                const windowEnd = parseTimeToMinutes(window.endTime);
+                if (windowStart >= openMinutes && windowStart <= closeMinutes) {
+                    boundaries.add(windowStart);
+                }
+                if (windowEnd >= openMinutes && windowEnd <= closeMinutes) {
+                    boundaries.add(windowEnd);
+                }
+            });
             dayAssignments.forEach((assignment) => {
                 const start = parseTimeToMinutes(assignment.startTime);
                 const end = parseTimeToMinutes(assignment.endTime);
@@ -380,10 +425,23 @@ export const ratioSegmentRule: RuleDefinition = {
                 if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
                     minStaff = Math.max(minStaff, schoolRules.closerCount);
                 }
-                const useFieldTripRatio = hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd;
-                const normalizedChildrenPerStaff = useFieldTripRatio
-                    ? normalizedFieldTripChildrenPerStaff
-                    : normalizedScheduleChildrenPerStaff;
+                // Three-tier priority: FieldTrip > TimeWindow > Default
+                let normalizedChildrenPerStaff: number;
+                if (hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd) {
+                    // Priority 1: Field trip ratio (highest)
+                    normalizedChildrenPerStaff = normalizedFieldTripChildrenPerStaff;
+                } else {
+                    // Priority 2: Check for time window ratio
+                    const timeWindowRatio = scheduleType
+                        ? findTimeWindowRatio(context, scheduleType, start, end)
+                        : undefined;
+                    if (timeWindowRatio !== undefined) {
+                        normalizedChildrenPerStaff = normalizeChildrenPerStaff(timeWindowRatio);
+                    } else {
+                        // Priority 3: Default schedule type ratio (fallback)
+                        normalizedChildrenPerStaff = normalizedScheduleChildrenPerStaff;
+                    }
+                }
                 const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
                 const required = Math.max(minStaff, requiredFromRatio);
                 const assigned = new Set(
