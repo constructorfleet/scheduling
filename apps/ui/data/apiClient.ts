@@ -310,3 +310,44 @@ export const upsertDistrictSchool = async (districtId: string, schoolId: string,
             body: JSON.stringify(payload)
         }
     );
+
+export const deleteDistrict = async (districtId: string) =>
+    requestJson<{ ok: true; deleted: number; }>(`/api/admin/districts/${ encodeURIComponent(districtId) }`, {
+        method: "DELETE",
+        headers: {
+            "x-csrf-token": getCsrfToken()
+        }
+    });
+
+export const deleteDistrictSchool = async (districtId: string, schoolId: string) =>
+    requestJson<{ ok: true; deleted: number; }>(
+        `/api/admin/districts/${ encodeURIComponent(districtId) }/schools/${ encodeURIComponent(schoolId) }`,
+        {
+            method: "DELETE",
+            headers: {
+                "x-csrf-token": getCsrfToken()
+            }
+        }
+    );
+
+export const deleteDistrictUser = async (districtId: string, userId: string) =>
+    requestJson<{ ok: true; deleted: number; }>(
+        `/api/admin/districts/${ encodeURIComponent(districtId) }/users/${ encodeURIComponent(userId) }`,
+        {
+            method: "DELETE",
+            headers: {
+                "x-csrf-token": getCsrfToken()
+            }
+        }
+    );
+
+export const deleteSchoolUser = async (schoolId: string, userId: string) =>
+    requestJson<{ ok: true; deleted: number; }>(
+        `/api/admin/schools/${ encodeURIComponent(schoolId) }/users/${ encodeURIComponent(userId) }`,
+        {
+            method: "DELETE",
+            headers: {
+                "x-csrf-token": getCsrfToken()
+            }
+        }
+    );

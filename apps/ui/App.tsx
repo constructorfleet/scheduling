@@ -409,7 +409,10 @@ export default function App() {
     handleSendUserInvite,
     toggleUserManagement,
     handleSaveDistrict,
-    handleSaveSchool
+    handleSaveSchool,
+    handleRemoveUser,
+    handleRemoveSchool,
+    handleDeleteDistrict
   } = useUserManagement({
     canManageUsers,
     canManageDistricts,
@@ -2698,6 +2701,15 @@ export default function App() {
                 }}
                 onSendInvite={() => {
                   void handleSendUserInvite();
+                }}
+                onRemoveUser={(userId) => {
+                  void handleRemoveUser(userId);
+                }}
+                onRemoveSchool={(schoolId) => {
+                  void handleRemoveSchool(schoolId);
+                }}
+                onDeleteDistrict={(districtId) => {
+                  void handleDeleteDistrict(districtId);
                 }}
                 onRefresh={() => {
                   void refreshUserManagement();

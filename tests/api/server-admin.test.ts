@@ -21,18 +21,22 @@ const mockPrisma = {
     school: {
         findUnique: jest.fn(),
         upsert: jest.fn(),
-        findMany: jest.fn()
+        findMany: jest.fn(),
+        deleteMany: jest.fn()
     },
     districtMembership: {
-        upsert: jest.fn()
+        upsert: jest.fn(),
+        deleteMany: jest.fn()
     },
     district: {
         upsert: jest.fn(),
         update: jest.fn(),
-        findMany: jest.fn()
+        findMany: jest.fn(),
+        deleteMany: jest.fn()
     },
     schoolMembership: {
-        upsert: jest.fn()
+        upsert: jest.fn(),
+        deleteMany: jest.fn()
     },
     userInvite: {
         updateMany: jest.fn(),
@@ -264,6 +268,42 @@ describe("server admin and invite routes", () => {
         await server.close();
     });
 
+    test("allows district admin to delete a school", async () => {
+        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        mockPrisma.school.deleteMany.mockResolvedValue({ count: 1 });
+        const server = await buildServer();
+        const response = await server.inject({
+            method: "DELETE",
+            url: "/api/admin/districts/district-1/schools/school-1",
+            headers: {
+                "x-csrf-token": "csrf-token",
+                cookie: authCookie
+            }
+        });
+        expect(response.statusCode).toBe(200);
+        expect(mockPrisma.school.deleteMany).toHaveBeenCalledWith({
+            where: { id: "school-1", districtId: "district-1" }
+        });
+        await server.close();
+    });
+
+    test("allows super user to delete a district", async () => {
+        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ isSuperUser: true }));
+        mockPrisma.district.deleteMany.mockResolvedValue({ count: 1 });
+        const server = await buildServer();
+        const response = await server.inject({
+            method: "DELETE",
+            url: "/api/admin/districts/district-1",
+            headers: {
+                "x-csrf-token": "csrf-token",
+                cookie: authCookie
+            }
+        });
+        expect(response.statusCode).toBe(200);
+        expect(mockPrisma.district.deleteMany).toHaveBeenCalledWith({ where: { id: "district-1" } });
+        await server.close();
+    });
+
     test("forbids district user from adding district schools", async () => {
         mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_user" }));
         const server = await buildServer();
@@ -277,6 +317,48 @@ describe("server admin and invite routes", () => {
             payload: { id: "school-2", name: "School Two" }
         });
         expect(response.statusCode).toBe(403);
+        await server.close();
+    });
+
+    test("allows school admin to remove a school user", async () => {
+        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ schoolRole: "school_admin" }));
+        mockPrisma.schoolMembership.deleteMany.mockResolvedValue({ count: 1 });
+        const server = await buildServer();
+        const response = await server.inject({
+            method: "DELETE",
+            url: "/api/admin/schools/school-1/users/user-1",
+            headers: {
+                "x-csrf-token": "csrf-token",
+                cookie: authCookie
+            }
+        });
+        expect(response.statusCode).toBe(200);
+        expect(mockPrisma.schoolMembership.deleteMany).toHaveBeenCalledWith({
+            where: { schoolId: "school-1", userId: "user-1" }
+        });
+        await server.close();
+    });
+
+    test("allows district admin to remove a district user", async () => {
+        mockPrisma.session.findUnique.mockResolvedValue(makeSession({ districtRole: "district_admin" }));
+        mockPrisma.districtMembership.deleteMany.mockResolvedValue({ count: 1 });
+        mockPrisma.schoolMembership.deleteMany.mockResolvedValue({ count: 2 });
+        const server = await buildServer();
+        const response = await server.inject({
+            method: "DELETE",
+            url: "/api/admin/districts/district-1/users/user-9",
+            headers: {
+                "x-csrf-token": "csrf-token",
+                cookie: authCookie
+            }
+        });
+        expect(response.statusCode).toBe(200);
+        expect(mockPrisma.districtMembership.deleteMany).toHaveBeenCalledWith({
+            where: { districtId: "district-1", userId: "user-9" }
+        });
+        expect(mockPrisma.schoolMembership.deleteMany).toHaveBeenCalledWith({
+            where: { userId: "user-9", school: { districtId: "district-1" } }
+        });
         await server.close();
     });
 

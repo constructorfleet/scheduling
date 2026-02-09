@@ -41,6 +41,9 @@ interface UserManagementPanelProps {
   onSaveDistrict: () => void;
   onSaveSchool: () => void;
   onSendInvite: () => void;
+  onRemoveUser: (userId: string) => void;
+  onRemoveSchool: (schoolId: string) => void;
+  onDeleteDistrict: (districtId: string) => void;
   onRefresh: () => void;
   onClose: () => void;
 }
@@ -85,11 +88,15 @@ export default function UserManagementPanel({
   onSaveDistrict,
   onSaveSchool,
   onSendInvite,
+  onRemoveUser,
+  onRemoveSchool,
+  onDeleteDistrict,
   onRefresh,
   onClose
 }: UserManagementPanelProps) {
   const [copiedInviteId, setCopiedInviteId] = useState<string | null>(null);
   const [copyError, setCopyError] = useState<string | null>(null);
+  const resolvedDeleteDistrictId = districtDraft.id.trim() || selectedDistrictId;
   if (!isOpen) {
     return null;
   }
@@ -268,26 +275,49 @@ export default function UserManagementPanel({
               >
                 {districtSubmitting ? "Saving..." : districtDraft.id.trim() ? "Update district" : "Create district"}
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!resolvedDeleteDistrictId) return;
+                  if (window.confirm("Delete this district and all associated schools?")) {
+                    onDeleteDistrict(resolvedDeleteDistrictId);
+                  }
+                }}
+                disabled={!canManageDistricts || !resolvedDeleteDistrictId}
+                style={{
+                  borderRadius: 8,
+                  border: "1px solid #fecaca",
+                  background: "#fee2e2",
+                  color: "#991b1b",
+                  fontWeight: 600,
+                  padding: "0.5rem 0.75rem",
+                  cursor: !canManageDistricts || !resolvedDeleteDistrictId ? "not-allowed" : "pointer"
+                }}
+              >
+                Delete district
+              </button>
             </div>
-            <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-              {districts.map((district) => (
-                <button
-                  key={district.id}
-                  type="button"
-                  onClick={() => onDistrictDraftChange({ id: district.id, name: district.name })}
-                  style={{
-                    borderRadius: 999,
-                    border: "1px solid #cbd5e1",
-                    background: colors.surface,
-                    color: "#334155",
-                    padding: "0.22rem 0.62rem",
-                    fontSize: "0.78rem"
-                  }}
-                >
-                  {district.name} ({district.id})
-                </button>
-              ))}
-            </div>
+            {districts.length > 0 && (
+              <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {districts.map((district) => (
+                  <button
+                    key={district.id}
+                    type="button"
+                    onClick={() => onDistrictDraftChange({ id: district.id, name: district.name })}
+                    style={{
+                      borderRadius: 999,
+                      border: "1px solid #cbd5e1",
+                      background: colors.surface,
+                      color: "#334155",
+                      padding: "0.22rem 0.62rem",
+                      fontSize: "0.78rem"
+                    }}
+                  >
+                    {district.name} ({district.id})
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -334,21 +364,40 @@ export default function UserManagementPanel({
             </div>
             <div style={{ marginTop: "0.6rem", display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
               {districtSchools.map((school) => (
-                <button
-                  key={school.id}
-                  type="button"
-                  onClick={() => onSchoolDraftChange({ id: school.id, name: school.name })}
-                  style={{
-                    borderRadius: 999,
-                    border: "1px solid #cbd5e1",
-                    background: colors.surface,
-                    color: "#334155",
-                    padding: "0.22rem 0.62rem",
-                    fontSize: "0.78rem"
-                  }}
-                >
-                  {school.name} ({school.id})
-                </button>
+                <div key={school.id} style={{ display: "inline-flex", gap: "0.35rem", alignItems: "center" }}>
+                  <button
+                    type="button"
+                    onClick={() => onSchoolDraftChange({ id: school.id, name: school.name })}
+                    style={{
+                      borderRadius: 999,
+                      border: "1px solid #cbd5e1",
+                      background: colors.surface,
+                      color: "#334155",
+                      padding: "0.22rem 0.62rem",
+                      fontSize: "0.78rem"
+                    }}
+                  >
+                    {school.name} ({school.id})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm(`Remove ${school.name}? This deletes the school and its data.`)) {
+                        onRemoveSchool(school.id);
+                      }
+                    }}
+                    style={{
+                      borderRadius: 999,
+                      border: "1px solid #fecaca",
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      padding: "0.22rem 0.5rem",
+                      fontSize: "0.72rem"
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
             </div>
           </section>
@@ -429,18 +478,38 @@ export default function UserManagementPanel({
                         <strong style={{ color: "#0f172a" }}>{user.displayName || user.email}</strong>
                         <p style={{ margin: "0.2rem 0 0", color: "#475569", fontSize: "0.85rem" }}>{user.email}</p>
                       </div>
-                      <span
-                        style={{
-                          borderRadius: 999,
-                          background: "#e2e8f0",
-                          color: "#334155",
-                          padding: "0.2rem 0.6rem",
-                          fontSize: "0.78rem",
-                          height: "fit-content"
-                        }}
-                      >
-                        {user.status}
-                      </span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span
+                          style={{
+                            borderRadius: 999,
+                            background: "#e2e8f0",
+                            color: "#334155",
+                            padding: "0.2rem 0.6rem",
+                            fontSize: "0.78rem",
+                            height: "fit-content"
+                          }}
+                        >
+                          {user.status}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm("Remove this user from the current scope?")) {
+                              onRemoveUser(user.id);
+                            }
+                          }}
+                          style={{
+                            borderRadius: 999,
+                            border: "1px solid #fecaca",
+                            background: "#fee2e2",
+                            color: "#991b1b",
+                            padding: "0.2rem 0.6rem",
+                            fontSize: "0.75rem"
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </article>
                 ))}

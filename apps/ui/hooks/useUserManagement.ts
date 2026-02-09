@@ -3,6 +3,10 @@ import type { Role } from "../data/generated";
 import type { UserManagementScope } from "../data/apiClient";
 import {
     createAdminDistrict,
+    deleteDistrict,
+    deleteDistrictSchool,
+    deleteDistrictUser,
+    deleteSchoolUser,
     fetchAdminDistricts,
     fetchDistrictSchools,
     fetchDistrictInvites,
@@ -305,6 +309,74 @@ export const useUserManagement = ({
         }
     };
 
+    const handleRemoveUser = async (userId: string) => {
+        if (!canManageUsers) {
+            setUserManagementError("You do not have permission to remove users.");
+            return;
+        }
+        setUserManagementError(null);
+        try {
+            if (userManagementScope === "district") {
+                if (!selectedDistrictId) {
+                    setUserManagementError("Select a district first.");
+                    return;
+                }
+                await deleteDistrictUser(selectedDistrictId, userId);
+            } else {
+                await deleteSchoolUser(selectedSchoolId, userId);
+            }
+            await refreshUserManagement();
+        } catch (error) {
+            if (isApiErrorStatus(error, 403)) {
+                setUserManagementError("You do not have permission to remove users in this scope.");
+            } else {
+                setUserManagementError("Could not remove user.");
+            }
+        }
+    };
+
+    const handleRemoveSchool = async (schoolId: string) => {
+        if (!selectedDistrictId) {
+            setUserManagementError("Select a district first.");
+            return;
+        }
+        setUserManagementError(null);
+        try {
+            await deleteDistrictSchool(selectedDistrictId, schoolId);
+            await refreshUserManagement();
+        } catch (error) {
+            if (isApiErrorStatus(error, 403)) {
+                setUserManagementError("You do not have permission to remove schools in this district.");
+            } else {
+                setUserManagementError("Could not remove school.");
+            }
+        }
+    };
+
+    const handleDeleteDistrict = async (districtId: string) => {
+        if (!canManageDistricts) {
+            setUserManagementError("Only super users can delete districts.");
+            return;
+        }
+        if (!districtId.trim()) {
+            setUserManagementError("District ID is required.");
+            return;
+        }
+        setUserManagementError(null);
+        try {
+            await deleteDistrict(districtId.trim());
+            setDistrictDraft({ id: "", name: "" });
+            await refreshUserManagement();
+            setInviteFeedback("District deleted.");
+        } catch (error) {
+            if (isApiErrorStatus(error, 403)) {
+                setUserManagementError("Only super users can delete districts.");
+            } else {
+                setUserManagementError("Could not delete district.");
+            }
+        }
+    };
+
     return {
         showUserManagement,
         setShowUserManagement,
@@ -333,6 +405,9 @@ export const useUserManagement = ({
         handleSendUserInvite,
         toggleUserManagement,
         handleSaveDistrict,
-        handleSaveSchool
+        handleSaveSchool,
+        handleRemoveUser,
+        handleRemoveSchool,
+        handleDeleteDistrict
     };
 };

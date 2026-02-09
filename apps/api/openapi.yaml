@@ -75,6 +75,117 @@ paths:
                 $ref: '#/components/schemas/MeResponse'
         '401':
           description: Not authenticated
+  /api/admin/districts/{districtId}:
+    delete:
+      summary: Delete district
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: districtId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Authentication required
+        '403':
+          description: Super user access required
+        '404':
+          description: District not found
+  /api/admin/districts/{districtId}/schools/{schoolId}:
+    delete:
+      summary: Delete school
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: districtId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: schoolId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
+        '404':
+          description: School not found
+  /api/admin/districts/{districtId}/users/{userId}:
+    delete:
+      summary: Remove user from district
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: districtId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
+  /api/admin/schools/{schoolId}/users/{userId}:
+    delete:
+      summary: Remove user from school
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+        - in: path
+          name: schoolId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Delete result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteResult'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
   /api/settings/{schoolId}:
     get:
       summary: Get settings for a school
@@ -1075,3 +1186,11 @@ components:
         ok:
           type: boolean
       required: [ok]
+    DeleteResult:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        deleted:
+          type: integer
+      required: [ok, deleted]

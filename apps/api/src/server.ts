@@ -944,6 +944,24 @@ const buildServer = async () => {
         return reply.send({ district });
     });
 
+    fastify.delete("/api/admin/districts/:districtId", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const { districtId } = request.params as { districtId: string; };
+        if (!(await requireSuperUser(request, reply))) {
+            return;
+        }
+        const prisma = getPrisma();
+        const result = await prisma.district.deleteMany({
+            where: { id: districtId }
+        });
+        if (result.count === 0) {
+            return reply.code(404).send({ message: "District not found." });
+        }
+        return reply.send({ ok: true, deleted: result.count });
+    });
+
     fastify.get("/api/admin/districts/:districtId/schools", async (request, reply) => {
         const { districtId } = request.params as { districtId: string; };
         if (!(await requireDistrictAdmin(request, reply, districtId))) {
@@ -955,6 +973,27 @@ const buildServer = async () => {
             orderBy: { name: "asc" }
         });
         return reply.send({ schools });
+    });
+
+    fastify.delete("/api/admin/districts/:districtId/schools/:schoolId", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const { districtId, schoolId } = request.params as { districtId: string; schoolId: string; };
+        if (!(await requireDistrictAdmin(request, reply, districtId))) {
+            return;
+        }
+        const prisma = getPrisma();
+        const result = await prisma.school.deleteMany({
+            where: {
+                id: schoolId,
+                districtId
+            }
+        });
+        if (result.count === 0) {
+            return reply.code(404).send({ message: "School not found." });
+        }
+        return reply.send({ ok: true, deleted: result.count });
     });
 
     fastify.put("/api/admin/districts/:districtId/schools/:schoolId", async (request, reply) => {
@@ -1114,6 +1153,30 @@ const buildServer = async () => {
         return reply.send({ users });
     });
 
+    fastify.delete("/api/admin/districts/:districtId/users/:userId", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const { districtId, userId } = request.params as { districtId: string; userId: string; };
+        if (!(await requireDistrictAdmin(request, reply, districtId))) {
+            return;
+        }
+        const prisma = getPrisma();
+        const districtResult = await prisma.districtMembership.deleteMany({
+            where: {
+                districtId,
+                userId
+            }
+        });
+        const schoolResult = await prisma.schoolMembership.deleteMany({
+            where: {
+                userId,
+                school: { districtId }
+            }
+        });
+        return reply.send({ ok: true, deleted: districtResult.count + schoolResult.count });
+    });
+
     fastify.get("/api/admin/districts/:districtId/invites", async (request, reply) => {
         const { districtId } = request.params as { districtId: string; };
         if (!(await requireDistrictAdmin(request, reply, districtId))) {
@@ -1180,6 +1243,24 @@ const buildServer = async () => {
             orderBy: { email: "asc" }
         });
         return reply.send({ users });
+    });
+
+    fastify.delete("/api/admin/schools/:schoolId/users/:userId", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const { schoolId, userId } = request.params as { schoolId: string; userId: string; };
+        if (!(await requireSchoolAccess(request, reply, schoolId, "manage_users"))) {
+            return;
+        }
+        const prisma = getPrisma();
+        const result = await prisma.schoolMembership.deleteMany({
+            where: {
+                schoolId,
+                userId
+            }
+        });
+        return reply.send({ ok: true, deleted: result.count });
     });
 
     fastify.get("/api/admin/schools/:schoolId/invites", async (request, reply) => {

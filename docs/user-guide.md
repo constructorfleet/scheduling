@@ -19,6 +19,7 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 - **Update your display name**: use **Edit name** in the top banner to change how your name appears in the scheduler.
 - **School selection at login**: if you pick a school you do not have access to, the app signs you in and defaults to the first school you can access.
 - **School Viewer role**: view schedules in any week without editing schedules, settings, or violations. The guided tracker and employee picker are hidden so viewers only see their own shifts.
+- **User management deletions**: school admins can remove users from their school, district admins can remove schools and users within the district, and super users can delete districts.
 
 ## Step 1: Configure employees, certifications, and ratio requirements
 Every configuration change reruns validations immediately. Once a record satisfies the corresponding rule, its violation disappears—there are no “addressed” flags to toggle. Follow the sections below so the system can enforce guardrails before you build the schedule.
