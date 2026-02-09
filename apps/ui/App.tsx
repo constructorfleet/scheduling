@@ -851,6 +851,27 @@ export default function App() {
     () => buildEmployeeViewDaySequence(employeeViewDays),
     [employeeViewDays]
   );
+  const viewerEmployeeId = useMemo(() => {
+    if (!isViewer) {
+      return null;
+    }
+    const displayName = authUser?.displayName?.trim().toLowerCase() ?? "";
+    if (!displayName) {
+      return null;
+    }
+    return (
+      employeeViewEmployees.find((employee) => employee.name.trim().toLowerCase() === displayName)?.id ?? null
+    );
+  }, [authUser, employeeViewEmployees, isViewer]);
+  const viewerEmployees = useMemo(() => {
+    if (!isViewer) {
+      return employeeViewEmployees;
+    }
+    if (!viewerEmployeeId) {
+      return [];
+    }
+    return employeeViewEmployees.filter((employee) => employee.id === viewerEmployeeId);
+  }, [employeeViewEmployees, isViewer, viewerEmployeeId]);
 
   useEffect(() => {
     const defaultOpenScheduleType =
@@ -2479,7 +2500,7 @@ export default function App() {
       }
       status={
         <>
-          <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />
+          {!isViewer && <GuidedStatusTracker steps={guidedSteps} onStepAction={handleStepAction} />}
           {scheduleSaveError && (
             <p style={{ margin: "0.5rem 0 0", color: "#b91c1c", fontSize: "0.85rem" }}>{scheduleSaveError}</p>
           )}
@@ -2575,11 +2596,13 @@ export default function App() {
           />
         ) : (
           <EmployeeScheduleView
-            employees={employeeViewEmployees}
+            employees={isViewer ? viewerEmployees : employeeViewEmployees}
             assignments={employeeViewAssignments}
             segmentBlocks={employeeViewSegments}
             daySequence={employeeDaySequence}
             dayDisplayNames={dayDisplayNames}
+            hideEmployeeSelector={isViewer}
+            forcedEmployeeId={isViewer ? viewerEmployeeId : null}
           />
         )
       }

@@ -23,6 +23,8 @@ interface EmployeeScheduleViewProps {
   segmentBlocks: EmployeeScheduleSegmentBlock[];
   daySequence: DayOfWeek[];
   dayDisplayNames: Record<DayOfWeek, string>;
+  hideEmployeeSelector?: boolean;
+  forcedEmployeeId?: string | null;
 }
 
 const formatTime = (value: string) => {
@@ -37,12 +39,18 @@ export default function EmployeeScheduleView({
   assignments,
   segmentBlocks,
   daySequence,
-  dayDisplayNames
+  dayDisplayNames,
+  hideEmployeeSelector = false,
+  forcedEmployeeId = null
 }: EmployeeScheduleViewProps) {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(() => employees[0]?.id ?? "");
   const segmentById = useMemo(() => new Map(segmentBlocks.map((segment) => [segment.id, segment])), [segmentBlocks]);
 
   useEffect(() => {
+    if (forcedEmployeeId) {
+      setSelectedEmployeeId(forcedEmployeeId);
+      return;
+    }
     if (!selectedEmployeeId && employees.length > 0) {
       setSelectedEmployeeId(employees[0].id);
       return;
@@ -50,9 +58,11 @@ export default function EmployeeScheduleView({
     if (selectedEmployeeId && !employees.some((employee) => employee.id === selectedEmployeeId)) {
       setSelectedEmployeeId(employees[0]?.id ?? "");
     }
-  }, [employees, selectedEmployeeId]);
+  }, [employees, selectedEmployeeId, forcedEmployeeId]);
 
   const selectedEmployee = employees.find((employee) => employee.id === selectedEmployeeId) ?? null;
+  const headerLabel = hideEmployeeSelector ? "Your schedule" : "View schedule";
+  const headerTitle = selectedEmployee?.name ?? (hideEmployeeSelector ? "Schedule unavailable" : "Select an employee");
   const assignmentsByDay = useMemo(() => {
     const grouped = new Map<DayOfWeek, EmployeeScheduleAssignment[]>();
     daySequence.forEach((day) => grouped.set(day, []));
@@ -82,31 +92,35 @@ export default function EmployeeScheduleView({
     >
       <header style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
         <div style={{ flex: "1 1 220px" }}>
-          <p style={{ margin: 0, fontSize: "0.8rem", color: colors.textMuted, fontWeight: 600 }}>View schedule</p>
+          <p style={{ margin: 0, fontSize: "0.8rem", color: colors.textMuted, fontWeight: 600 }}>
+            {headerLabel}
+          </p>
           <h2 style={{ margin: "0.15rem 0 0", fontSize: "1.1rem" }}>
-            {selectedEmployee?.name ?? "Select an employee"}
+            {headerTitle}
           </h2>
         </div>
-        <div style={{ display: "grid", gap: "0.35rem", minWidth: 220 }}>
-          <label style={{ fontSize: "0.75rem", color: colors.textMuted }}>Employee</label>
-          <select
-            value={selectedEmployeeId}
-            onChange={(event) => setSelectedEmployeeId(event.target.value)}
-            style={{
-              borderRadius: 10,
-              border: `1px solid ${colors.borderSubtle}`,
-              padding: "0.45rem 0.6rem",
-              background: colors.surface
-            }}
-          >
-            {employees.length === 0 && <option value="">No employees</option>}
-            {employees.map((employee) => (
-              <option key={employee.id} value={employee.id}>
-                {employee.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!hideEmployeeSelector && (
+          <div style={{ display: "grid", gap: "0.35rem", minWidth: 220 }}>
+            <label style={{ fontSize: "0.75rem", color: colors.textMuted }}>Employee</label>
+            <select
+              value={selectedEmployeeId}
+              onChange={(event) => setSelectedEmployeeId(event.target.value)}
+              style={{
+                borderRadius: 10,
+                border: `1px solid ${colors.borderSubtle}`,
+                padding: "0.45rem 0.6rem",
+                background: colors.surface
+              }}
+            >
+              {employees.length === 0 && <option value="">No employees</option>}
+              {employees.map((employee) => (
+                <option key={employee.id} value={employee.id}>
+                  {employee.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </header>
 
       <div style={{ display: "grid", gap: "0.75rem" }}>

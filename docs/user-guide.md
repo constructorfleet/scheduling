@@ -6,10 +6,10 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 ## Overview of the workspace
 - **Configuration panel (gear icon, top-right)**: add or remove employees, maintain certifications, and keep ratio requirements current. Every edit immediately feeds the validation engine, so no finding can be marked “addressed” manually; the violation disappears the instant the rule is satisfied.
 - **Schedule Grid (calendar center)**: shows the selected week with segments, child counts, and staff assignments. Schedule block windows display the operating hours guardrail overlay and highlight violations so staff can stay within open/close boundaries. Add blocks directly in the grid and log clock-in/clock-out times per block.
-- **Guided Status Tracker (left rail)**: enforces the Prepare → Assign → Review → Publish flow. Every step lists blockers; you cannot publish until all violations are cleared.
+- **Guided Status Tracker (left rail)**: enforces the Prepare → Assign → Review → Publish flow for scheduling staff. Every step lists blockers; you cannot publish until all violations are cleared.
 - **Violation Navigator (bottom tray)**: lists unresolved policy violations with citations and metadata badges such as the “Operating hours guardrail.” Selecting an issue highlights the affected block so you can fix the underlying data.
 - **Audit Log (top banner)**: review recent changes and use Undo/Redo to step through edits. Undo history is stored per week in the browser so it persists across refreshes.
-- **Employee schedule view (read-only)**: employees can select their name and review assigned shifts without editing schedules or settings.
+- **Employee schedule view (read-only)**: employees review assigned shifts without editing schedules or settings. School viewers only see their own schedule and do not see the tracker.
 
 ![Scheduling grid with staff assignments, violations, and guided tracker highlighted.](Example Schedule Spreadsheet.png)
 
@@ -17,7 +17,7 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 - **Invite links**: open the invite link to set a display name and password before signing in for the first time.
 - **Copying invites**: administrators can use the **Copy link** button in User Management if email delivery fails.
 - **Update your display name**: use **Edit name** in the top banner to change how your name appears in the scheduler.
-- **School Viewer role**: view schedules in any week without editing schedules, settings, or violations.
+- **School Viewer role**: view schedules in any week without editing schedules, settings, or violations. The guided tracker and employee picker are hidden so viewers only see their own shifts.
 
 ## Step 1: Configure employees, certifications, and ratio requirements
 Every configuration change reruns validations immediately. Once a record satisfies the corresponding rule, its violation disappears—there are no “addressed” flags to toggle. Follow the sections below so the system can enforce guardrails before you build the schedule.

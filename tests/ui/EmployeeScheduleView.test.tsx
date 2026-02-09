@@ -64,4 +64,21 @@ describe("EmployeeScheduleView", () => {
     expect(screen.getByText("8:00 AM - 12:00 PM")).toBeInTheDocument();
     expect(screen.getByText("No shifts")).toBeInTheDocument();
   });
+
+  it("hides the employee selector when configured", () => {
+    render(
+      <EmployeeScheduleView
+        employees={[{ id: "emp-1", name: "Alex" }]}
+        assignments={[]}
+        segmentBlocks={[]}
+        daySequence={daySequence}
+        dayDisplayNames={dayDisplayNames}
+        hideEmployeeSelector
+        forcedEmployeeId="emp-1"
+      />
+    );
+
+    expect(screen.getByText("Your schedule")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Employee")).toBeNull();
+  });
 });
