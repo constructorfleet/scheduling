@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   DayOfWeek,
   Employee,
@@ -273,6 +273,35 @@ export default function ScheduleMatrix({
     return `Outside availability (${labels.join(", ")})`;
   };
 
+  const getOperatingHoursWarningMessage = (
+    day: DayOfWeek,
+    startTime: string,
+    endTime: string
+  ) => {
+    const operatingHours = operatingHoursByDay[day];
+    if (!operatingHours) {
+      return null;
+    }
+    const start = parseTimeToMinutes(startTime);
+    const end = parseTimeToMinutes(endTime);
+    const openMinutes = parseTimeToMinutes(operatingHours.open);
+    const closeMinutes = parseTimeToMinutes(operatingHours.close);
+
+    const startsBefore = start < openMinutes;
+    const endsAfter = end > closeMinutes;
+
+    if (startsBefore && endsAfter) {
+      return `Starts before open (${formatTime(operatingHours.open)}) and ends after close (${formatTime(operatingHours.close)})`;
+    }
+    if (startsBefore) {
+      return `Starts before operating hours (${formatTime(operatingHours.open)})`;
+    }
+    if (endsAfter) {
+      return `Ends after operating hours (${formatTime(operatingHours.close)})`;
+    }
+    return null;
+  };
+
   useEffect(() => {
     if (!primaryFocusedSegmentId) return;
     const focusedSegment = segmentById[primaryFocusedSegmentId];
@@ -539,7 +568,7 @@ export default function ScheduleMatrix({
               <motion.tr
                 key={member.id}
                 layout
-                transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
@@ -707,15 +736,18 @@ export default function ScheduleMatrix({
                             block.startTime,
                             block.endTime
                           );
+                          const operatingHoursWarning = getOperatingHoursWarningMessage(
+                            day,
+                            block.startTime,
+                            block.endTime
+                          );
                           const isOnCall = block.isOnCall || (block.startTime === "00:00" && block.endTime === "23:59");
                           const is1on1 = block.is1on1;
                           const isOpener = operatingWindow
-                            ? Math.abs(parseTimeToMinutes(block.startTime) - operatingWindow.open) <=
-                              openerWindowMinutes
+                            ? parseTimeToMinutes(block.startTime) <= operatingWindow.open + openerWindowMinutes
                             : false;
                           const isCloser = operatingWindow
-                            ? Math.abs(parseTimeToMinutes(block.endTime) - operatingWindow.close) <=
-                              closerWindowMinutes
+                            ? parseTimeToMinutes(block.endTime) >= operatingWindow.close - closerWindowMinutes
                             : false;
                           const blockBackground = is1on1
                             ? "rgba(16, 185, 129, 0.25)"
@@ -737,11 +769,10 @@ export default function ScheduleMatrix({
                                 : "1px solid #bae6fd";
                           const isFocused = focusedSet.has(segmentId);
                           const hasAvailabilityViolation = Boolean(availabilityMessage);
+                          const hasOperatingHoursWarning = Boolean(operatingHoursWarning) && !hasAvailabilityViolation;
 
                           return (
                             <motion.div
-                              layout
-                              transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
                               key={`${member.id}-${day}-${block.id}`}
                               style={{
                                 display: "flex",
@@ -782,7 +813,7 @@ export default function ScheduleMatrix({
                                   isNew: false
                                 });
                               }}
-                              title={availabilityMessage ?? undefined}
+                              title={availabilityMessage ?? operatingHoursWarning ?? undefined}
                             >
                               {hasAvailabilityViolation && (
                                 <span
@@ -806,8 +837,38 @@ export default function ScheduleMatrix({
                                   ?
                                 </span>
                               )}
+                              {hasOperatingHoursWarning && (
+                                <span
+                                  style={{
+                                    position: "absolute",
+                                    top: 4,
+                                    right: 4,
+                                    width: 16,
+                                    height: 16,
+                                    borderRadius: "50%",
+                                    border: "1px solid #f97316",
+                                    background: colors.surface,
+                                    color: "#f97316",
+                                    fontSize: "0.65rem",
+                                    fontWeight: 700,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}
+                                >
+                                  !
+                                </span>
+                              )}
+                              <AnimatePresence mode="wait" initial={false}>
                               {editing?.assignmentId === block.id ? (
-                                <>
+                                <motion.div
+                                  key="editing"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}
+                                >
                                   {!editing.isOnCall && !editing.is1on1 && (
                                     <>
                                       <input
@@ -914,60 +975,86 @@ export default function ScheduleMatrix({
                                       />
                                     </>
                                   )}
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      if (!editing?.startTime || !editing?.endTime) {
-                                        return;
-                                      }
-                                      if (overlapMessage) {
-                                        return;
-                                      }
-                                      onUpdateAssignmentTime(block.id, editing.startTime, editing.endTime);
-                                      setEditing(null);
-                                    }}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 999,
-                                      border: "none",
-                                      background: overlapMessage ? "#94a3b8" : "#2563eb",
-                                      color: "#fff",
-                                      padding: "0.15rem 0.6rem",
-                                      fontSize: "0.7rem",
-                                      alignSelf: "flex-start",
-                                      cursor: overlapMessage ? "not-allowed" : "pointer"
-                                    }}
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      onDeleteAssignment(block.id);
-                                      setEditing(null);
-                                    }}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 999,
-                                      border: "1px solid #fecaca",
-                                      background: "#fee2e2",
-                                      color: "#b91c1c",
-                                      padding: "0.15rem 0.6rem",
-                                      fontSize: "0.7rem",
-                                      alignSelf: "flex-start",
-                                      cursor: "pointer"
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
+                                  <div style={{ display: "flex", gap: "0.25rem" }}>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        if (!editing?.startTime || !editing?.endTime) {
+                                          return;
+                                        }
+                                        if (overlapMessage) {
+                                          return;
+                                        }
+                                        onUpdateAssignmentTime(block.id, editing.startTime, editing.endTime);
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "none",
+                                        background: overlapMessage ? "#94a3b8" : "#2563eb",
+                                        color: "#fff",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: overlapMessage ? "not-allowed" : "pointer"
+                                      }}
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "1px solid #cbd5e1",
+                                        background: "#f1f5f9",
+                                        color: "#475569",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: "pointer"
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        onDeleteAssignment(block.id);
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "1px solid #fecaca",
+                                        background: "#fee2e2",
+                                        color: "#b91c1c",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: "pointer"
+                                      }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
                                   {overlapMessage && (
                                     <span style={{ fontSize: "0.7rem", color: "#b91c1c" }}>{overlapMessage}</span>
                                   )}
-                                </>
+                                </motion.div>
                               ) : (
-                                <>
+                                <motion.div
+                                  key="display"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}
+                                >
                                   {is1on1 ? (
                                     <>
                                       <div
@@ -1009,15 +1096,16 @@ export default function ScheduleMatrix({
                                         ? `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`
                                         : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
                                   </span>
-                                </>
+                                </motion.div>
                               )}
+                              </AnimatePresence>
                             </motion.div>
                           );
                         })}
                         {canCreateAssignment && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                             type="button"
                             onClick={() => {
                               const defaultStart = operatingWindow
@@ -1059,7 +1147,7 @@ export default function ScheduleMatrix({
                         {canCreateAssignment && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                             type="button"
                             onClick={() => {
                               setEditing({
@@ -1088,7 +1176,7 @@ export default function ScheduleMatrix({
                         {canCreateAssignment && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                             type="button"
                             onClick={() => {
                               const defaultStart = operatingWindow
@@ -1129,13 +1217,17 @@ export default function ScheduleMatrix({
                                 : "Unavailable"}
                           </span>
                         )}
+                        <AnimatePresence mode="wait">
                         {!closedDay &&
                           editing?.isNew &&
                           editing.employeeId === member.id &&
                           editing.dayOfWeek === day && (
                           <motion.div
-                            layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            key="new-assignment"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
                             style={{
                               display: "flex",
                               flexDirection: "column",
@@ -1143,7 +1235,8 @@ export default function ScheduleMatrix({
                               padding: "0.25rem 0.4rem",
                               borderRadius: 8,
                               background: "#fed7aa",
-                              border: "1px solid #fed7aa"
+                              border: "1px solid #fed7aa",
+                              overflow: "hidden"
                             }}
                           >
                             {(() => {
@@ -1151,6 +1244,11 @@ export default function ScheduleMatrix({
                                 return null;
                               }
                               const overlapMessage = getOverlapMessage(editing);
+                              const newAssignmentOperatingHoursWarning = getOperatingHoursWarningMessage(
+                                editing.dayOfWeek,
+                                editing.startTime,
+                                editing.endTime
+                              );
                               return (
                                 <>
                             {!editing.isOnCall && !editing.is1on1 && (
@@ -1249,50 +1347,70 @@ export default function ScheduleMatrix({
                                 />
                               </>
                             )}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
-                                  return;
-                                }
-                                if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
-                                  return;
-                                }
-                                if (overlapMessage) {
-                                  return;
-                                }
-                                onCreateAssignment({
-                                  employeeId: editing.employeeId,
-                                  dayOfWeek: editing.dayOfWeek,
-                                  startTime: editing.isOnCall ? "00:00" : editing.startTime,
-                                  endTime: editing.isOnCall ? "23:59" : editing.endTime,
-                                  isOnCall: editing.isOnCall,
-                                  is1on1: editing.is1on1,
-                                  studentName: editing.studentName
-                                });
-                                setEditing(null);
-                              }}
-                              style={{
-                                borderRadius: 999,
-                                border: "none",
-                                background: overlapMessage ? "#94a3b8" : "#2563eb",
-                                color: "#fff",
-                                padding: "0.15rem 0.6rem",
-                                fontSize: "0.7rem",
-                                alignSelf: "flex-start",
-                                cursor: overlapMessage ? "not-allowed" : "pointer"
-                              }}
-                            >
-                              Save
-                            </button>
+                            <div style={{ display: "flex", gap: "0.25rem" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
+                                    return;
+                                  }
+                                  if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
+                                    return;
+                                  }
+                                  if (overlapMessage) {
+                                    return;
+                                  }
+                                  onCreateAssignment({
+                                    employeeId: editing.employeeId,
+                                    dayOfWeek: editing.dayOfWeek,
+                                    startTime: editing.isOnCall ? "00:00" : editing.startTime,
+                                    endTime: editing.isOnCall ? "23:59" : editing.endTime,
+                                    isOnCall: editing.isOnCall,
+                                    is1on1: editing.is1on1,
+                                    studentName: editing.studentName
+                                  });
+                                  setEditing(null);
+                                }}
+                                style={{
+                                  borderRadius: 999,
+                                  border: "none",
+                                  background: overlapMessage ? "#94a3b8" : "#2563eb",
+                                  color: "#fff",
+                                  padding: "0.15rem 0.6rem",
+                                  fontSize: "0.7rem",
+                                  cursor: overlapMessage ? "not-allowed" : "pointer"
+                                }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditing(null)}
+                                style={{
+                                  borderRadius: 999,
+                                  border: "1px solid #cbd5e1",
+                                  background: "#f1f5f9",
+                                  color: "#475569",
+                                  padding: "0.15rem 0.6rem",
+                                  fontSize: "0.7rem",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
                             {overlapMessage && (
                               <span style={{ fontSize: "0.7rem", color: "#b91c1c" }}>{overlapMessage}</span>
+                            )}
+                            {newAssignmentOperatingHoursWarning && (
+                              <span style={{ fontSize: "0.7rem", color: "#f97316" }}>⚠️ {newAssignmentOperatingHoursWarning}</span>
                             )}
                             </>
                               );
                             })()}
                           </motion.div>
                           )}
+                        </AnimatePresence>
                         {!closedDay && !hasRequestedDayOff && availabilityLabels.length > 0 && (
                           <div
                             style={{
