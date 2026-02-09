@@ -87,30 +87,23 @@ export default function EmployeesSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 200px",
+          gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr 200px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
-          paddingLeft: "0.25rem",
+          paddingLeft: "0.75rem",
           paddingRight: "0.75rem",
-          alignItems: "center"
+          alignItems: "center",
+          justifyItems: "center",
+          boxSizing: "border-box"
         }}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr",
-            gap: "0.75rem",
-            alignItems: "center"
-          }}
-        >
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Employee</span>
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Email</span>
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Phone</span>
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Job title</span>
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/day</span>
-          <span style={{ textAlign: "center", justifySelf: "center" }}>Max hours/week</span>
-        </div>
+        <span style={{ textAlign: "center", width: "100%" }}>Employee</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Email</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Phone</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Job title</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Max hours/day</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Max hours/week</span>
         <span />
       </div>
       {draftEmployees.map((employee, index) => {
@@ -133,7 +126,11 @@ export default function EmployeesSection({
               style={{
                 display: "grid",
                 gap: "0.75rem",
-                gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr 200px"
+                gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr .15fr .15fr 170px",
+                paddingLeft: "0.75rem",
+                paddingRight: "0.75rem",
+                boxSizing: "border-box",
+                width: "100%"
               }}
             >
               <input
@@ -201,7 +198,10 @@ export default function EmployeesSection({
                 style={{
                   borderRadius: 10,
                   border: "1px solid #d1d5db",
-                  padding: "0.45rem 0.6rem"
+                  padding: "0.45rem 0.6rem",
+                  width: "2rem",
+                  justifySelf: "center",
+                  textAlign: "center"
                 }}
                 placeholder="Max hours/day"
               />
@@ -215,7 +215,10 @@ export default function EmployeesSection({
                 style={{
                   borderRadius: 10,
                   border: "1px solid #d1d5db",
-                  padding: "0.45rem 0.6rem"
+                  padding: "0.45rem 0.6rem",
+                  width: "2rem",
+                  justifySelf: "center",
+                  textAlign: "center"
                 }}
                 placeholder="Max hours/week"
               />

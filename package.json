@@ -1,6 +1,6 @@
 {
     "name": "daycare-scheduler",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "description": "Standalone scheduling application for managing daycare staff schedules",
     "main": "dist/index.js",
     "scripts": {
@@ -17,6 +17,7 @@
         "api:generate": "prisma generate --schema prisma/schema.prisma",
         "api:migrate": "prisma migrate dev --name dev --schema prisma/schema.prisma",
         "api:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
+        "api:migrate:reset": "prisma migrate reset",
         "api:create-admin": "tsx scripts/create-admin.ts",
         "api:openapi:client": "openapi --input apps/api/openapi.yaml --output apps/ui/data/generated --client fetch --useUnionTypes",
         "preview": "vite preview",
