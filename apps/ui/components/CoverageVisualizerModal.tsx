@@ -545,7 +545,6 @@ export default function CoverageVisualizerModal({
         <div
           style={{
             padding: "1.5rem",
-            paddingTop: "3rem",
             flex: 1,
             overflow: "visible"
           }}
