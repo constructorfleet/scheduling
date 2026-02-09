@@ -14,6 +14,7 @@ import InviteAccept from "./components/InviteAccept";
 import PasswordReset from "./components/PasswordReset";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
+import CoverageVisualizerModal from "./components/CoverageVisualizerModal";
 import AppShell from "./components/AppShell";
 import EmployeeScheduleView from "./components/EmployeeScheduleView";
 import { useUserManagement } from "./hooks/useUserManagement";
@@ -338,6 +339,7 @@ export default function App() {
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [settingsCloseAttempt, setSettingsCloseAttempt] = useState(0);
   const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>([]);
+  const [coverageModalDay, setCoverageModalDay] = useState<DayOfWeek | null>(null);
   const [schoolRulesState, setSchoolRulesState] = useState<SchoolRules>({
     openerCount: 0,
     closerCount: 0,
@@ -2141,6 +2143,10 @@ export default function App() {
     );
   };
 
+  const handleDayClick = (dayOfWeek: DayOfWeek) => {
+    setCoverageModalDay(dayOfWeek);
+  };
+
   const handleStepAction = (stepId: string) => {
     if (stepId === "schedule") {
       setShowViolationNavigator(true);
@@ -2729,6 +2735,7 @@ export default function App() {
             }}
             focusedSegmentIds={focusedSegmentIds}
             onOpenHelpTopic={openHelpTopic}
+            onDayClick={handleDayClick}
           />
         ) : (
           <EmployeeScheduleView
@@ -2766,6 +2773,29 @@ export default function App() {
                 isOpen={showAuditTimeline}
                 onClose={() => setShowAuditTimeline(false)}
                 onOpenHelpTopic={openHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {coverageModalDay && (
+              <CoverageVisualizerModal
+                isOpen={Boolean(coverageModalDay)}
+                onClose={() => setCoverageModalDay(null)}
+                dayOfWeek={coverageModalDay}
+                day={scheduleDaysState.find(d => d.dayOfWeek === coverageModalDay)!}
+                operatingHours={operatingHoursByDay[coverageModalDay]!}
+                assignments={staffAssignmentsState.filter(a => {
+                  const block = segmentBlocksState.find(sb => sb.id === a.segmentBlockId);
+                  return block?.dayOfWeek === coverageModalDay;
+                })}
+                employees={employeesDerived}
+                scheduleTypeRatios={ratioByScheduleType}
+                scheduleTypeTimeWindows={scheduleTypeTimeWindows}
+                schoolRules={schoolRulesState}
+                fieldTripEvent={fieldTripEventsByDay[coverageModalDay]}
+                fieldTripType={fieldTripTypesState.find(ft =>
+                  ft.id === fieldTripEventsByDay[coverageModalDay]?.fieldTripTypeId
+                )}
               />
             )}
           </AnimatePresence>

@@ -38,6 +38,7 @@ interface ScheduleMatrixProps {
   onDeleteAssignment: (assignmentId: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
+  onDayClick: (dayOfWeek: DayOfWeek) => void;
   focusedSegmentIds?: string[] | null;
   onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
@@ -110,7 +111,8 @@ export default function ScheduleMatrix({
   onCreateAssignment,
   onReassignUnlinkedStaff,
   focusedSegmentIds,
-  onOpenHelpTopic
+  onOpenHelpTopic,
+  onDayClick
 }: ScheduleMatrixProps) {
   const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
   const primaryFocusedSegmentId = focusedSegmentIds?.[0] ?? null;
@@ -364,12 +366,18 @@ export default function ScheduleMatrix({
                 <th
                   key={`header-${day}`}
                   data-day-column-header={day}
+                  onClick={() => {
+                    if (!closedDay && dayMeta) {
+                      onDayClick(day);
+                    }
+                  }}
                   style={{
                     padding: "0.5rem",
                     border: `1px solid ${colors.borderStrong}`,
                     background: isFocusedDay ? colors.brandBlueLight : colors.surfaceAlt,
                     minWidth: 160,
                     verticalAlign: "top",
+                    cursor: !closedDay && dayMeta ? "pointer" : "default",
                     boxShadow: isFocusedDay ? "inset 0 0 0 2px rgba(37, 99, 235, 0.45)" : "none"
                   }}
                 >
