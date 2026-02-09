@@ -7,6 +7,7 @@ import { applyDbEnv, isDebugEnabled } from "./config";
 import { backupBeforeWrite, startPeriodicBackups } from "./backups";
 import { openapiPath } from "./openapi";
 import path from "node:path";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { readFileSync } from "node:fs";
 import {
     createCsrfToken,
@@ -22,7 +23,7 @@ import {
     SESSION_COOKIE_NAME,
     verifyPassword
 } from "./auth";
-import { buildInviteUrl, sendInviteEmail } from "./invitations";
+import { buildInviteUrl, buildPasswordResetUrl, sendInviteEmail, sendPasswordResetEmail } from "./invitations";
 import {
     canManageDistrict,
     canManageSchoolConfiguration,
@@ -175,6 +176,58 @@ type AuthContext = {
         districtId: string;
         role: Role;
     }>;
+};
+
+type PasswordResetPayload = {
+    email: string;
+    expiresAt: number;
+};
+
+const PASSWORD_RESET_TTL_MS = 1000 * 60 * 30;
+const PASSWORD_RESET_SECRET = process.env.PASSWORD_RESET_SECRET?.trim() || "dev-password-reset-secret";
+
+const encodeResetPayload = (payload: PasswordResetPayload) =>
+    Buffer.from(JSON.stringify(payload)).toString("base64url");
+
+const signResetPayload = (encodedPayload: string) =>
+    createHmac("sha256", PASSWORD_RESET_SECRET).update(encodedPayload).digest("base64url");
+
+const buildPasswordResetToken = (email: string) => {
+    const payload = encodeResetPayload({
+        email,
+        expiresAt: Date.now() + PASSWORD_RESET_TTL_MS
+    });
+    const signature = signResetPayload(payload);
+    return `${payload}.${signature}`;
+};
+
+const verifyPasswordResetToken = (token: string) => {
+    const [ payload, signature ] = token.split(".");
+    if (!payload || !signature) {
+        return null;
+    }
+    const expected = signResetPayload(payload);
+    const signatureBuffer = Buffer.from(signature);
+    const expectedBuffer = Buffer.from(expected);
+    if (signatureBuffer.length !== expectedBuffer.length) {
+        return null;
+    }
+    if (!timingSafeEqual(signatureBuffer, expectedBuffer)) {
+        return null;
+    }
+    let decoded: PasswordResetPayload;
+    try {
+        decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8")) as PasswordResetPayload;
+    } catch {
+        return null;
+    }
+    if (!decoded?.email || !decoded?.expiresAt) {
+        return null;
+    }
+    if (decoded.expiresAt <= Date.now()) {
+        return null;
+    }
+    return decoded;
 };
 
 const SESSION_COOKIE_OPTIONS = {
@@ -708,6 +761,71 @@ const buildServer = async () => {
                 displayName: user.displayName
             }
         });
+    });
+
+    fastify.patch("/api/auth/password", async (request, reply) => {
+        if (!requireCsrf(request, reply)) {
+            return;
+        }
+        const auth = await resolveAuth(request);
+        if (!auth) {
+            return reply.code(401).send({ message: "Authentication required." });
+        }
+        const body = (request.body ?? {}) as { currentPassword?: string; newPassword?: string; };
+        const currentPassword = typeof body.currentPassword === "string" ? body.currentPassword : "";
+        const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
+        if (!currentPassword || !newPassword) {
+            return reply.code(400).send({ message: "currentPassword and newPassword are required." });
+        }
+        const prisma = getPrisma();
+        const user = await prisma.user.findUnique({ where: { id: auth.userId } });
+        if (!user || !verifyPassword(currentPassword, user.passwordHash)) {
+            return reply.code(403).send({ message: "Current password is incorrect." });
+        }
+        await prisma.user.update({
+            where: { id: auth.userId },
+            data: { passwordHash: hashPassword(newPassword) }
+        });
+        return reply.send({ ok: true });
+    });
+
+    fastify.post("/api/auth/password/forgot", async (request, reply) => {
+        const body = (request.body ?? {}) as { email?: string; };
+        const email = typeof body.email === "string" ? normalizeEmail(body.email) : "";
+        if (!email) {
+            return reply.code(400).send({ message: "email is required." });
+        }
+        const prisma = getPrisma();
+        const user = await prisma.user.findUnique({ where: { email } });
+        if (user && user.status === "active") {
+            const token = buildPasswordResetToken(email);
+            const resetUrl = buildPasswordResetUrl(token);
+            await sendPasswordResetEmail({ to: email, resetUrl });
+        }
+        return reply.send({ ok: true });
+    });
+
+    fastify.post("/api/auth/password/reset", async (request, reply) => {
+        const body = (request.body ?? {}) as { token?: string; password?: string; };
+        const token = typeof body.token === "string" ? body.token.trim() : "";
+        const password = typeof body.password === "string" ? body.password : "";
+        if (!token || !password) {
+            return reply.code(400).send({ message: "token and password are required." });
+        }
+        const payload = verifyPasswordResetToken(token);
+        if (!payload) {
+            return reply.code(410).send({ message: "Reset token is invalid or expired." });
+        }
+        const prisma = getPrisma();
+        const user = await prisma.user.findUnique({ where: { email: normalizeEmail(payload.email) } });
+        if (!user) {
+            return reply.code(404).send({ message: "User not found." });
+        }
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { passwordHash: hashPassword(password) }
+        });
+        return reply.send({ ok: true });
     });
 
     fastify.get("/api/auth/invites/:token", async (request, reply) => {

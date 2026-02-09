@@ -11,6 +11,7 @@ import HelpCenterModal from "./components/HelpCenterModal";
 import UserManagementPanel from "./components/UserManagementPanel";
 import AuthGate from "./components/AuthGate";
 import InviteAccept from "./components/InviteAccept";
+import PasswordReset from "./components/PasswordReset";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
 import AppShell from "./components/AppShell";
@@ -65,6 +66,7 @@ import {
   isApiErrorStatus,
   login,
   logout,
+  changePassword,
   saveSchedule,
   saveSettings,
   updateDisplayName,
@@ -266,6 +268,7 @@ const USER_POLICY_CITATION: PolicyCitation = {
   section: "N/A"
 };
 const IS_TEST_ENV = typeof process !== "undefined" && process.env.NODE_ENV === "test";
+const SELECTED_SCHOOL_STORAGE_KEY = "sched_selected_school";
 const fullDayAvailabilityTemplate = weekDaySequence.map((dayOfWeek) => ({
   dayOfWeek,
   blocks: [{ startTime: "00:00", endTime: "23:59" }]
@@ -311,6 +314,9 @@ export default function App() {
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [displayNameSaving, setDisplayNameSaving] = useState(false);
   const [displayNameError, setDisplayNameError] = useState<string | null>(null);
+  const [passwordUpdateSaving, setPasswordUpdateSaving] = useState(false);
+  const [passwordUpdateError, setPasswordUpdateError] = useState<string | null>(null);
+  const [passwordUpdateSuccess, setPasswordUpdateSuccess] = useState<string | null>(null);
   const [schoolName, setSchoolName] = useState(schools[0].name);
   const [scheduleTypeOptionsState, setScheduleTypeOptionsState] = useState(
     ensureClosedScheduleType(scheduleTypeOptions)
@@ -1034,7 +1040,14 @@ export default function App() {
         setDistrictMemberships(response.districtMemberships ?? []);
         setSelectedDistrictId((current) => current || response.districtMemberships?.[0]?.districtId || "");
         if (response.memberships.length > 0) {
+          const storedSchoolId = (() => {
+            if (typeof window === "undefined") return "";
+            return window.localStorage.getItem(SELECTED_SCHOOL_STORAGE_KEY) ?? "";
+          })();
           setSelectedSchoolId((current) => {
+            if (storedSchoolId && response.memberships.some((membership) => membership.schoolId === storedSchoolId)) {
+              return storedSchoolId;
+            }
             if (response.memberships.some((membership) => membership.schoolId === current)) {
               return current;
             }
@@ -1060,6 +1073,16 @@ export default function App() {
       isActive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (authStatus !== "authenticated") {
+      return;
+    }
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.localStorage.setItem(SELECTED_SCHOOL_STORAGE_KEY, selectedSchoolId);
+  }, [authStatus, selectedSchoolId]);
 
   const handleLogin = async () => {
     setIsAuthenticating(true);
@@ -1133,11 +1156,43 @@ export default function App() {
     }
   };
 
+  const handlePasswordUpdate = async (currentPassword: string, newPassword: string) => {
+    if (!currentPassword || !newPassword) {
+      setPasswordUpdateError("Enter your current and new password.");
+      setPasswordUpdateSuccess(null);
+      return;
+    }
+    setPasswordUpdateSaving(true);
+    setPasswordUpdateError(null);
+    setPasswordUpdateSuccess(null);
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setPasswordUpdateSuccess("Password updated.");
+    } catch (error) {
+      if (isApiErrorStatus(error, 403)) {
+        setPasswordUpdateError("Current password is incorrect.");
+      } else {
+        setPasswordUpdateError("Could not update password.");
+      }
+    } finally {
+      setPasswordUpdateSaving(false);
+    }
+  };
+
   const [isInviteRoute, setIsInviteRoute] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.location.pathname.startsWith("/invite");
   });
   const [inviteToken, setInviteToken] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const params = new URLSearchParams(window.location.search);
+    return params.get("token")?.trim() ?? "";
+  });
+  const [isResetRoute, setIsResetRoute] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.location.pathname.startsWith("/reset-password");
+  });
+  const [resetToken, setResetToken] = useState(() => {
     if (typeof window === "undefined") return "";
     const params = new URLSearchParams(window.location.search);
     return params.get("token")?.trim() ?? "";
@@ -2437,6 +2492,21 @@ export default function App() {
         />
       );
     }
+    if (isResetRoute) {
+      return (
+        <PasswordReset
+          token={resetToken}
+          onReturnToLogin={() => {
+            if (typeof window !== "undefined") {
+              window.history.replaceState({}, "", "/");
+            }
+            setResetToken("");
+            setIsResetRoute(false);
+            setAuthStatus("unauthenticated");
+          }}
+        />
+      );
+    }
     return (
       <AuthGate
         authStatus={authStatus}
@@ -2481,6 +2551,10 @@ export default function App() {
           isDisplayNameSaving={displayNameSaving}
           displayNameError={displayNameError}
           onUpdateDisplayName={handleDisplayNameUpdate}
+          onChangePassword={handlePasswordUpdate}
+          isPasswordUpdating={passwordUpdateSaving}
+          passwordUpdateError={passwordUpdateError}
+          passwordUpdateSuccess={passwordUpdateSuccess}
           onLogout={() => {
             void handleLogout();
           }}

@@ -244,6 +244,27 @@ export const updateDisplayName = async (displayName: string) =>
         body: JSON.stringify({ displayName })
     });
 
+export const changePassword = async (payload: { currentPassword: string; newPassword: string; }) =>
+    requestJson<{ ok: true }>("/api/auth/password", {
+        method: "PATCH",
+        headers: {
+            "x-csrf-token": getCsrfToken()
+        },
+        body: JSON.stringify(payload)
+    });
+
+export const requestPasswordReset = async (email: string) =>
+    requestJson<{ ok: true }>("/api/auth/password/forgot", {
+        method: "POST",
+        body: JSON.stringify({ email })
+    });
+
+export const resetPassword = async (payload: { token: string; password: string; }) =>
+    requestJson<{ ok: true }>("/api/auth/password/reset", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+
 export const fetchDistrictUsers = async (districtId: string) =>
     requestJson<AdminUsersResponse>(`/api/admin/districts/${ encodeURIComponent(districtId) }/users`);
 

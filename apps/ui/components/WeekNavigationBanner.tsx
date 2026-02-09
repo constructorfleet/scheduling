@@ -44,6 +44,10 @@ interface WeekNavigationBannerProps {
   onUpdateDisplayName?: (nextName: string) => void;
   isDisplayNameSaving?: boolean;
   displayNameError?: string | null;
+  onChangePassword?: (currentPassword: string, newPassword: string) => void;
+  isPasswordUpdating?: boolean;
+  passwordUpdateError?: string | null;
+  passwordUpdateSuccess?: string | null;
   onLogout: () => void;
   onOpenHelpTopic?: (topicId: HelpTopicId) => void;
   apiStatus: {
@@ -124,6 +128,10 @@ export default function WeekNavigationBanner({
   onUpdateDisplayName,
   isDisplayNameSaving,
   displayNameError,
+  onChangePassword,
+  isPasswordUpdating,
+  passwordUpdateError,
+  passwordUpdateSuccess,
   onLogout,
   onOpenHelpTopic,
   apiStatus,
@@ -131,10 +139,21 @@ export default function WeekNavigationBanner({
 }: WeekNavigationBannerProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [draftName, setDraftName] = useState(userDisplayName ?? "");
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [nextPassword, setNextPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
     setDraftName(userDisplayName ?? "");
   }, [userDisplayName]);
+  useEffect(() => {
+    if (!showPasswordForm) {
+      setCurrentPassword("");
+      setNextPassword("");
+      setConfirmPassword("");
+    }
+  }, [showPasswordForm]);
   const badge = statusBadges[status] ?? statusBadges.draft;
   const selectedSchool = schoolOptions.find((school) => school.id === selectedSchoolId) ?? schoolOptions[0];
 
@@ -368,6 +387,105 @@ export default function WeekNavigationBanner({
                   </p>
                   {displayNameError && (
                     <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>{displayNameError}</span>
+                  )}
+                  {onChangePassword && (
+                    <div style={{ display: "grid", gap: "0.35rem", justifyItems: "end" }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswordForm((prev) => !prev)}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          color: "#93c5fd",
+                          cursor: "pointer",
+                          fontSize: "0.8rem",
+                          padding: 0
+                        }}
+                      >
+                        {showPasswordForm ? "Hide password form" : "Change password"}
+                      </button>
+                      {showPasswordForm && (
+                        <div style={{ display: "grid", gap: "0.35rem", justifyItems: "end" }}>
+                          <input
+                            type="password"
+                            value={currentPassword}
+                            onChange={(event) => setCurrentPassword(event.target.value)}
+                            placeholder="Current password"
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(148, 163, 184, 0.6)",
+                              background: "rgba(15, 23, 42, 0.65)",
+                              color: "#f8fafc",
+                              padding: "0.2rem 0.6rem",
+                              fontSize: "0.78rem",
+                              minWidth: 180
+                            }}
+                          />
+                          <input
+                            type="password"
+                            value={nextPassword}
+                            onChange={(event) => setNextPassword(event.target.value)}
+                            placeholder="New password"
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(148, 163, 184, 0.6)",
+                              background: "rgba(15, 23, 42, 0.65)",
+                              color: "#f8fafc",
+                              padding: "0.2rem 0.6rem",
+                              fontSize: "0.78rem",
+                              minWidth: 180
+                            }}
+                          />
+                          <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(event) => setConfirmPassword(event.target.value)}
+                            placeholder="Confirm new password"
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(148, 163, 184, 0.6)",
+                              background: "rgba(15, 23, 42, 0.65)",
+                              color: "#f8fafc",
+                              padding: "0.2rem 0.6rem",
+                              fontSize: "0.78rem",
+                              minWidth: 180
+                            }}
+                          />
+                          {nextPassword !== confirmPassword && confirmPassword && (
+                            <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>Passwords do not match.</span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => onChangePassword(currentPassword, nextPassword)}
+                            disabled={
+                              Boolean(isPasswordUpdating) ||
+                              !currentPassword ||
+                              !nextPassword ||
+                              nextPassword !== confirmPassword
+                            }
+                            style={{
+                              ...pillStyle(
+                                "active",
+                                Boolean(isPasswordUpdating) ||
+                                  !currentPassword ||
+                                  !nextPassword ||
+                                  nextPassword !== confirmPassword
+                              ),
+                              padding: "0.22rem 0.5rem",
+                              minWidth: 0
+                            }}
+                          >
+                            {isPasswordUpdating ? "Saving..." : "Update password"}
+                          </button>
+                          {passwordUpdateError && (
+                            <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>{passwordUpdateError}</span>
+                          )}
+                          {passwordUpdateSuccess && (
+                            <span style={{ fontSize: "0.75rem", color: "#86efac" }}>{passwordUpdateSuccess}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

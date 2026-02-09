@@ -15,6 +15,8 @@ Site directors, scheduling coordinators, and substitute coordinators who must st
 
 ## Accessing your account
 - **Invite links**: open the invite link to set a display name and password before signing in for the first time.
+- **Forgot password**: use **Forgot password?** on the sign-in screen to request a reset link.
+- **Change password**: while signed in, open **Change password** in the top banner to update your credentials.
 - **Copying invites**: administrators can use the **Copy link** button in User Management if email delivery fails.
 - **Update your display name**: use **Edit name** in the top banner to change how your name appears in the scheduler.
 - **School selection at login**: if you pick a school you do not have access to, the app signs you in and defaults to the first school you can access.

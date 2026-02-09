@@ -75,6 +75,70 @@ paths:
                 $ref: '#/components/schemas/MeResponse'
         '401':
           description: Not authenticated
+  /api/auth/password:
+    patch:
+      summary: Change password
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangePayload'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+        '401':
+          description: Authentication required
+        '403':
+          description: Current password is incorrect
+  /api/auth/password/forgot:
+    post:
+      summary: Request password reset email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordForgotPayload'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+        '400':
+          description: Email is required
+  /api/auth/password/reset:
+    post:
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetPayload'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+        '400':
+          description: Token and password required
+        '404':
+          description: User not found
+        '410':
+          description: Token expired
   /api/admin/districts/{districtId}:
     delete:
       summary: Delete district
@@ -467,6 +531,28 @@ components:
         csrfToken:
           type: string
       required: [user, memberships, schoolMemberships, districtMemberships, session, csrfToken]
+    PasswordChangePayload:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+      required: [currentPassword, newPassword]
+    PasswordForgotPayload:
+      type: object
+      properties:
+        email:
+          type: string
+      required: [email]
+    PasswordResetPayload:
+      type: object
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+      required: [token, password]
     MeResponse:
       type: object
       properties:

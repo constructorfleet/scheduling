@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { LoginPayload } from "../data/generated";
-import { fetchPublicDistricts, type PublicDistrictRecord } from "../data/apiClient";
+import { fetchPublicDistricts, requestPasswordReset, type PublicDistrictRecord } from "../data/apiClient";
 import { colors, gradients, shadows } from "../theme";
 
 interface AuthGateProps {
@@ -25,6 +25,11 @@ export default function AuthGate({
   const [districtsLoading, setDistrictsLoading] = useState(false);
   const [districtsError, setDistrictsError] = useState<string | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState("");
+  const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetFeedback, setResetFeedback] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -65,6 +70,26 @@ export default function AuthGate({
       onLoginFormChange({ ...loginForm, schoolId: nextSchoolId });
     }
   }, [districtOptions, loginForm, onLoginFormChange]);
+
+  const handleResetRequest = async () => {
+    const email = resetEmail.trim();
+    if (!email) {
+      setResetError("Enter your email address.");
+      setResetFeedback(null);
+      return;
+    }
+    setResetSubmitting(true);
+    setResetError(null);
+    setResetFeedback(null);
+    try {
+      await requestPasswordReset(email);
+      setResetFeedback("Check your email for a reset link.");
+    } catch {
+      setResetError("Could not send reset email.");
+    } finally {
+      setResetSubmitting(false);
+    }
+  };
 
   const selectedDistrict = useMemo(
     () => districtOptions.find((district) => district.id === selectedDistrictId),
@@ -137,6 +162,65 @@ export default function AuthGate({
             marginBottom: "0.65rem"
           }}
         />
+        <button
+          type="button"
+          onClick={() => {
+            setShowResetForm((prev) => !prev);
+            setResetFeedback(null);
+            setResetError(null);
+          }}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.35rem",
+            border: "none",
+            background: "transparent",
+            color: "#1d4ed8",
+            fontSize: "0.85rem",
+            padding: 0,
+            marginBottom: "0.5rem",
+            cursor: "pointer"
+          }}
+        >
+          {showResetForm ? "Hide password reset" : "Forgot password?"}
+        </button>
+        {showResetForm && (
+          <div style={{ display: "grid", gap: "0.45rem", marginBottom: "0.35rem" }}>
+            <label style={{ display: "block", fontSize: "0.8rem", color: "#475569" }}>Reset email</label>
+            <input
+              value={resetEmail}
+              onChange={(event) => setResetEmail(event.target.value)}
+              placeholder="name@school.org"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                borderRadius: 8,
+                border: "1px solid #cbd5e1",
+                padding: "0.5rem 0.65rem"
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleResetRequest}
+              disabled={resetSubmitting}
+              style={{
+                borderRadius: 999,
+                border: "none",
+                background: resetSubmitting ? "#94a3b8" : "#0f766e",
+                color: "#fff",
+                padding: "0.45rem 0.8rem",
+                cursor: resetSubmitting ? "not-allowed" : "pointer",
+                width: "100%"
+              }}
+            >
+              {resetSubmitting ? "Sending..." : "Send reset link"}
+            </button>
+            {resetFeedback && (
+              <span style={{ fontSize: "0.75rem", color: "#166534" }}>{resetFeedback}</span>
+            )}
+            {resetError && <span style={{ fontSize: "0.75rem", color: "#b91c1c" }}>{resetError}</span>}
+          </div>
+        )}
         <button
           type="button"
           onClick={() => setShowSchoolInput((prev) => !prev)}
