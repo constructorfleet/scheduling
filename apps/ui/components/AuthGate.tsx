@@ -133,57 +133,61 @@ export default function AuthGate({
         <p style={{ margin: "0 0 1rem", color: "#475569", fontSize: "0.9rem" }}>
           Use your scheduler account to access school schedules.
         </p>
-        <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Email</label>
-        <input
-          value={loginForm.email}
-          onChange={(event) => onLoginFormChange({ ...loginForm, email: event.target.value })}
-          placeholder="name@school.org"
-          style={{
-            width: "100%",
-            boxSizing: "border-box",
-            borderRadius: 8,
-            border: "1px solid #cbd5e1",
-            padding: "0.5rem 0.65rem",
-            marginBottom: "0.65rem"
-          }}
-        />
-        <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Password</label>
-        <input
-          type="password"
-          value={loginForm.password}
-          onChange={(event) => onLoginFormChange({ ...loginForm, password: event.target.value })}
-          placeholder="••••••••"
-          style={{
-            width: "100%",
-            boxSizing: "border-box",
-            borderRadius: 8,
-            border: "1px solid #cbd5e1",
-            padding: "0.5rem 0.65rem",
-            marginBottom: "0.65rem"
-          }}
-        />
-        <button
-          type="button"
-          onClick={() => {
-            setShowResetForm((prev) => !prev);
-            setResetFeedback(null);
-            setResetError(null);
-          }}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.35rem",
-            border: "none",
-            background: "transparent",
-            color: "#1d4ed8",
-            fontSize: "0.85rem",
-            padding: 0,
-            marginBottom: "0.5rem",
-            cursor: "pointer"
-          }}
-        >
-          {showResetForm ? "Hide password reset" : "Forgot password?"}
-        </button>
+        {!showResetForm && (
+          <>
+            <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Email</label>
+            <input
+              value={loginForm.email}
+              onChange={(event) => onLoginFormChange({ ...loginForm, email: event.target.value })}
+              placeholder="name@school.org"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                borderRadius: 8,
+                border: "1px solid #cbd5e1",
+                padding: "0.5rem 0.65rem",
+                marginBottom: "0.65rem"
+              }}
+            />
+            <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Password</label>
+            <input
+              type="password"
+              value={loginForm.password}
+              onChange={(event) => onLoginFormChange({ ...loginForm, password: event.target.value })}
+              placeholder="••••••••"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                borderRadius: 8,
+                border: "1px solid #cbd5e1",
+                padding: "0.5rem 0.65rem",
+                marginBottom: "0.65rem"
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setShowResetForm(true);
+                setResetFeedback(null);
+                setResetError(null);
+              }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                border: "none",
+                background: "transparent",
+                color: "#1d4ed8",
+                fontSize: "0.85rem",
+                padding: 0,
+                marginBottom: "0.5rem",
+                cursor: "pointer"
+              }}
+            >
+              Forgot password?
+            </button>
+          </>
+        )}
         {showResetForm && (
           <div style={{ display: "grid", gap: "0.45rem", marginBottom: "0.35rem" }}>
             <label style={{ display: "block", fontSize: "0.8rem", color: "#475569" }}>Reset email</label>
@@ -219,34 +223,59 @@ export default function AuthGate({
               <span style={{ fontSize: "0.75rem", color: "#166534" }}>{resetFeedback}</span>
             )}
             {resetError && <span style={{ fontSize: "0.75rem", color: "#b91c1c" }}>{resetError}</span>}
+            <button
+              type="button"
+              onClick={() => {
+                setShowResetForm(false);
+                setResetFeedback(null);
+                setResetError(null);
+                setResetEmail("");
+              }}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                border: "none",
+                background: "transparent",
+                color: "#1d4ed8",
+                fontSize: "0.85rem",
+                padding: 0,
+                marginTop: "0.25rem",
+                cursor: "pointer"
+              }}
+            >
+              Back to login
+            </button>
           </div>
         )}
-        <button
-          type="button"
-          onClick={() => setShowSchoolInput((prev) => !prev)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            border: "none",
-            background: "transparent",
-            color: "#1d4ed8",
-            fontSize: "0.85rem",
-            padding: 0,
-            marginBottom: "0.35rem",
-            cursor: "pointer"
-          }}
-        >
-          <span style={{
-            display: "inline-flex",
-            transform: showSchoolInput ? "rotate(90deg)" : "rotate(0deg)",
-            transition: "transform 120ms ease"
-          }}>
-            ▶
-          </span>
-          Add school (optional)
-        </button>
-        {showSchoolInput && (
+        {!showResetForm && (
+          <button
+            type="button"
+            onClick={() => setShowSchoolInput((prev) => !prev)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              border: "none",
+              background: "transparent",
+              color: "#1d4ed8",
+              fontSize: "0.85rem",
+              padding: 0,
+              marginBottom: "0.35rem",
+              cursor: "pointer"
+            }}
+          >
+            <span style={{
+              display: "inline-flex",
+              transform: showSchoolInput ? "rotate(90deg)" : "rotate(0deg)",
+              transition: "transform 120ms ease"
+            }}>
+              ▶
+            </span>
+            Add school (optional)
+          </button>
+        )}
+        {!showResetForm && showSchoolInput && (
           <div style={{ display: "grid", gap: "0.45rem", marginBottom: "0.35rem" }}>
             <label style={{ display: "block", fontSize: "0.8rem", color: "#475569" }}>District</label>
             <select
@@ -316,24 +345,28 @@ export default function AuthGate({
             )}
           </div>
         )}
-        {loginError && <p style={{ color: "#b91c1c", fontSize: "0.85rem", margin: "0.65rem 0 0" }}>{loginError}</p>}
-        <button
-          type="button"
-          onClick={onLogin}
-          disabled={isAuthenticating || !loginForm.email || !loginForm.password}
-          style={{
-            marginTop: "0.9rem",
-            width: "100%",
-            borderRadius: 999,
-            border: "none",
-            background: isAuthenticating ? "#94a3b8" : "#2563eb",
-            color: "#fff",
-            padding: "0.55rem 0.9rem",
-            cursor: isAuthenticating ? "not-allowed" : "pointer"
-          }}
-        >
-          {isAuthenticating ? "Signing in..." : "Sign in"}
-        </button>
+        {!showResetForm && loginError && (
+          <p style={{ color: "#b91c1c", fontSize: "0.85rem", margin: "0.65rem 0 0" }}>{loginError}</p>
+        )}
+        {!showResetForm && (
+          <button
+            type="button"
+            onClick={onLogin}
+            disabled={isAuthenticating || !loginForm.email || !loginForm.password}
+            style={{
+              marginTop: "0.9rem",
+              width: "100%",
+              borderRadius: 999,
+              border: "none",
+              background: isAuthenticating ? "#94a3b8" : "#2563eb",
+              color: "#fff",
+              padding: "0.55rem 0.9rem",
+              cursor: isAuthenticating ? "not-allowed" : "pointer"
+            }}
+          >
+            {isAuthenticating ? "Signing in..." : "Sign in"}
+          </button>
+        )}
       </section>
     </div>
   );
