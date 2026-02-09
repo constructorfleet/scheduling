@@ -11,3 +11,4 @@ scheduling.db
 .DS_Store
 **/.DS_Store
 test-results/
+.env
