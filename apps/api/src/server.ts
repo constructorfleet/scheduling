@@ -198,7 +198,7 @@ const buildPasswordResetToken = (email: string) => {
         expiresAt: Date.now() + PASSWORD_RESET_TTL_MS
     });
     const signature = signResetPayload(payload);
-    return `${payload}.${signature}`;
+    return `${ payload }.${ signature }`;
 };
 
 const verifyPasswordResetToken = (token: string) => {

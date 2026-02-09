@@ -60,11 +60,11 @@ type InviteWithRelations = UserInvite & {
 };
 
 type SchoolMembershipWithSchool = SchoolMembership & {
-    school: { districtId: string };
+    school: { districtId: string; };
 };
 
 type DistrictWithSchools = District & {
-    schools: Array<{ id: string }>;
+    schools: Array<{ id: string; }>;
 };
 
 type DistrictMembershipWithDistrict = DistrictMembership & {
@@ -231,7 +231,7 @@ describe("server admin and invite routes", () => {
         });
 
         expect(response.statusCode).toBe(200);
-        const payload = response.json() as { currentSchoolId: string | null };
+        const payload = response.json() as { currentSchoolId: string | null; };
         expect(payload.currentSchoolId).toBe("school-1");
         await server.close();
     });
