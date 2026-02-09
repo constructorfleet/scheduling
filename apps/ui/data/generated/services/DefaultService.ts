@@ -3,10 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AuthSessionResponse } from '../models/AuthSessionResponse';
+import type { DeleteResult } from '../models/DeleteResult';
+import type { EmployeeScheduleViewResponse } from '../models/EmployeeScheduleViewResponse';
 import type { GenericOk } from '../models/GenericOk';
 import type { HealthResponse } from '../models/HealthResponse';
 import type { LoginPayload } from '../models/LoginPayload';
 import type { MeResponse } from '../models/MeResponse';
+import type { PasswordChangePayload } from '../models/PasswordChangePayload';
+import type { PasswordForgotPayload } from '../models/PasswordForgotPayload';
+import type { PasswordResetPayload } from '../models/PasswordResetPayload';
 import type { PublicDistrictsResponse } from '../models/PublicDistrictsResponse';
 import type { ScheduleSavePayload } from '../models/ScheduleSavePayload';
 import type { ScheduleWeekResponse } from '../models/ScheduleWeekResponse';
@@ -88,6 +93,186 @@ export class DefaultService {
             url: '/api/auth/me',
             errors: {
                 401: `Not authenticated`,
+            },
+        });
+    }
+    /**
+     * Change password
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param requestBody
+     * @returns GenericOk OK
+     * @throws ApiError
+     */
+    public static patchApiAuthPassword(
+        xCsrfToken: string,
+        requestBody: PasswordChangePayload,
+    ): CancelablePromise<GenericOk> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/auth/password',
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Current password is incorrect`,
+            },
+        });
+    }
+    /**
+     * Request password reset email
+     * @param requestBody
+     * @returns GenericOk OK
+     * @throws ApiError
+     */
+    public static postApiAuthPasswordForgot(
+        requestBody: PasswordForgotPayload,
+    ): CancelablePromise<GenericOk> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/password/forgot',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Email is required`,
+            },
+        });
+    }
+    /**
+     * Reset password with token
+     * @param requestBody
+     * @returns GenericOk OK
+     * @throws ApiError
+     */
+    public static postApiAuthPasswordReset(
+        requestBody: PasswordResetPayload,
+    ): CancelablePromise<GenericOk> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/password/reset',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Token and password required`,
+                404: `User not found`,
+                410: `Token expired`,
+            },
+        });
+    }
+    /**
+     * Delete district
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param districtId
+     * @returns DeleteResult Delete result
+     * @throws ApiError
+     */
+    public static deleteApiAdminDistricts(
+        xCsrfToken: string,
+        districtId: string,
+    ): CancelablePromise<DeleteResult> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/admin/districts/{districtId}',
+            path: {
+                'districtId': districtId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Super user access required`,
+                404: `District not found`,
+            },
+        });
+    }
+    /**
+     * Delete school
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param districtId
+     * @param schoolId
+     * @returns DeleteResult Delete result
+     * @throws ApiError
+     */
+    public static deleteApiAdminDistrictsSchools(
+        xCsrfToken: string,
+        districtId: string,
+        schoolId: string,
+    ): CancelablePromise<DeleteResult> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/admin/districts/{districtId}/schools/{schoolId}',
+            path: {
+                'districtId': districtId,
+                'schoolId': schoolId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+                404: `School not found`,
+            },
+        });
+    }
+    /**
+     * Remove user from district
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param districtId
+     * @param userId
+     * @returns DeleteResult Delete result
+     * @throws ApiError
+     */
+    public static deleteApiAdminDistrictsUsers(
+        xCsrfToken: string,
+        districtId: string,
+        userId: string,
+    ): CancelablePromise<DeleteResult> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/admin/districts/{districtId}/users/{userId}',
+            path: {
+                'districtId': districtId,
+                'userId': userId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
+        });
+    }
+    /**
+     * Remove user from school
+     * @param xCsrfToken CSRF protection token. Must match the `sched_csrf` cookie.
+     * @param schoolId
+     * @param userId
+     * @returns DeleteResult Delete result
+     * @throws ApiError
+     */
+    public static deleteApiAdminSchoolsUsers(
+        xCsrfToken: string,
+        schoolId: string,
+        userId: string,
+    ): CancelablePromise<DeleteResult> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/admin/schools/{schoolId}/users/{userId}',
+            path: {
+                'schoolId': schoolId,
+                'userId': userId,
+            },
+            headers: {
+                'x-csrf-token': xCsrfToken,
+            },
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
             },
         });
     }
@@ -187,6 +372,27 @@ export class DefaultService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `Authentication required`,
+                403: `Insufficient access`,
+            },
+        });
+    }
+    /**
+     * Get employee schedule view
+     * @param weekId
+     * @returns EmployeeScheduleViewResponse Employee schedule view
+     * @throws ApiError
+     */
+    public static getApiScheduleEmployeeView(
+        weekId: string,
+    ): CancelablePromise<EmployeeScheduleViewResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/schedule/{weekId}/employee-view',
+            path: {
+                'weekId': weekId,
+            },
             errors: {
                 401: `Authentication required`,
                 403: `Insufficient access`,

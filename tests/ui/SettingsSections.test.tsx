@@ -270,6 +270,39 @@ describe("Settings section components", () => {
     expect(monCheckboxes[1]).toBeDisabled();
   });
 
+  it("hides the closed schedule type in operating hours", () => {
+    const operatingHours: OperatingHoursConfig[] = [
+      {
+        id: "hours-1",
+        scheduleType: "regular",
+        daysOfWeek: ["mon"],
+        open: "07:00",
+        close: "17:00"
+      }
+    ];
+    const scheduleTypes: ScheduleTypeOption[] = [
+      { value: "regular", label: "Regular", ratio: { adults: 1, students: 10 }, description: "Base" },
+      { value: "closed", label: "Closed", ratio: { adults: 1, students: 10 }, description: "Closed" }
+    ];
+
+    render(
+      <OperatingHoursSection
+        draftOperatingHours={operatingHours}
+        draftScheduleTypes={scheduleTypes}
+        draftClosedDays={[]}
+        allDays={["mon", "tue"]}
+        operatingHoursOverlap={[]}
+        onChange={jest.fn()}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+        onSave={jest.fn()}
+        canSave={true}
+      />
+    );
+
+    expect(screen.queryByRole("option", { name: "Closed" })).toBeNull();
+  });
+
   it("expands employee availability and manages time off ranges", async () => {
     const user = userEvent.setup();
     const onChange = jest.fn();

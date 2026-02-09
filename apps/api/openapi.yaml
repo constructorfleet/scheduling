@@ -322,28 +322,6 @@ paths:
           description: Authentication required
         '403':
           description: Insufficient access
-  /api/schedule/{weekId}/employee-view:
-    get:
-      summary: Get employee schedule view
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: path
-          name: weekId
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Employee schedule view
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmployeeScheduleViewResponse'
-        '401':
-          description: Authentication required
-        '403':
-          description: Insufficient access
     put:
       summary: Save schedule week
       security:
@@ -368,6 +346,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenericOk'
+        '401':
+          description: Authentication required
+        '403':
+          description: Insufficient access
+  /api/schedule/{weekId}/employee-view:
+    get:
+      summary: Get employee schedule view
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: weekId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Employee schedule view
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeScheduleViewResponse'
         '401':
           description: Authentication required
         '403':

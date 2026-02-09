@@ -156,6 +156,34 @@ export default function SettingsPanel({
   const [draftJobTitles, setDraftJobTitles] = useState<JobTitleSetting[]>(jobTitles);
   const [draftEmployees, setDraftEmployees] = useState<Employee[]>(employees);
 
+  const normalizeScheduleTypeValue = (value: string) => value.trim().toLowerCase();
+
+  const operatingScheduleTypeOptions = useMemo(
+    () =>
+      draftScheduleTypes.filter(
+        (option) => normalizeScheduleTypeValue(option.value) !== "closed"
+      ),
+    [draftScheduleTypes]
+  );
+
+  useEffect(() => {
+    const fallback = operatingScheduleTypeOptions[0]?.value;
+    if (!fallback) {
+      return;
+    }
+    setDraftOperatingHours((prev) => {
+      let didChange = false;
+      const next = prev.map((entry) => {
+        if (normalizeScheduleTypeValue(entry.scheduleType) !== "closed") {
+          return entry;
+        }
+        didChange = true;
+        return { ...entry, scheduleType: fallback as ScheduleType };
+      });
+      return didChange ? next : prev;
+    });
+  }, [operatingScheduleTypeOptions]);
+
   const [dirtyTabs, setDirtyTabs] = useState<Record<SettingsTab, boolean>>({
     school: false,
     scheduleTypes: false,
@@ -490,7 +518,7 @@ export default function SettingsPanel({
           {activeTab === "operatingHours" && (
             <OperatingHoursSection
               draftOperatingHours={draftOperatingHours}
-              draftScheduleTypes={draftScheduleTypes}
+              draftScheduleTypes={operatingScheduleTypeOptions}
               draftClosedDays={draftClosedDays}
               allDays={allDays}
               operatingHoursOverlap={operatingHoursOverlap}
@@ -499,9 +527,14 @@ export default function SettingsPanel({
                 markDirty("operatingHours");
               }}
               onAdd={() => {
+                const defaultScheduleType = operatingScheduleTypeOptions[0]?.value;
+                if (!defaultScheduleType) {
+                  setTabWarning("Add a schedule type before setting operating hours.");
+                  return;
+                }
                 setDraftOperatingHours([
                   ...draftOperatingHours,
-                  emptyOperatingHours(draftScheduleTypes[0]?.value ?? "regular")
+                  emptyOperatingHours(defaultScheduleType as ScheduleType)
                 ]);
                 markDirty("operatingHours");
               }}

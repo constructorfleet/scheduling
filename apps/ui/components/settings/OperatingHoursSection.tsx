@@ -27,6 +27,11 @@ export default function OperatingHoursSection({
   onSave,
   canSave
 }: OperatingHoursSectionProps) {
+  const normalizeScheduleTypeValue = (value: string) => value.trim().toLowerCase();
+  const selectableScheduleTypes = draftScheduleTypes.filter(
+    (option) => normalizeScheduleTypeValue(option.value) !== "closed"
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
       <div
@@ -89,7 +94,7 @@ export default function OperatingHoursSection({
                 padding: "0.45rem 0.6rem"
               }}
             >
-              {draftScheduleTypes.map((option) => (
+              {selectableScheduleTypes.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
