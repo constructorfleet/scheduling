@@ -1452,12 +1452,28 @@ const buildServer = async () => {
         if (!school) {
             return { school: null };
         }
+        const jobTitleLeaderMap = new Map(
+            school.jobTitles.map((title) => [ title.title.trim().toLowerCase(), title.leaderQualified ])
+        );
         return {
             school,
             scheduleTypes: school.scheduleTypes,
             jobTitles: school.jobTitles,
             employees: school.employees.map((employee) => ({
-                ...employee,
+                id: employee.id,
+                schoolId: employee.schoolId,
+                name: employee.name,
+                email: employee.email ?? undefined,
+                phone: employee.phone ?? undefined,
+                jobTitle: employee.jobTitle,
+                maxHoursPerDay: employee.maxHoursPerDay,
+                maxHoursPerWeek: employee.maxHoursPerWeek,
+                employmentStatus: employee.employmentStatus,
+                leaderQualified:
+                    jobTitleLeaderMap.get(employee.jobTitle.trim().toLowerCase()) ?? false,
+                medicallyDelegated: employee.medicallyDelegated,
+                cprCurrent: employee.cprCurrent,
+                notes: employee.notes ?? undefined,
                 availability: normalizeAvailability(employee.availability),
                 requestedDaysOff: normalizeRequestedDaysOff(employee.requestedDaysOff)
             })),
@@ -1642,6 +1658,13 @@ const buildServer = async () => {
             }
 
             if (Array.isArray(payload.employees) && payload.employees.length > 0) {
+                const jobTitles = await tx.jobTitle.findMany({ where: { schoolId } });
+                const jobTitleByName = new Map(
+                    jobTitles.map((title) => [ title.title.trim().toLowerCase(), title.id ])
+                );
+                const fallbackJobTitle = jobTitles.find(
+                    (title) => title.title.trim().toLowerCase() !== "staff"
+                ) ?? null;
                 const existingEmployees = await tx.employee.findMany({ where: { schoolId } });
                 const keptEmployeeIds = new Set<string>();
                 const existingById = new Map(existingEmployees.map((employee) => [ employee.id, employee ]));
@@ -1655,12 +1678,32 @@ const buildServer = async () => {
                 });
 
                 for (const employee of payload.employees) {
-                    const stableKey = `${ employee.name.trim().toLowerCase() }::${ employee.jobTitle.trim().toLowerCase() }`;
+                    const normalizedJobTitle = employee.jobTitle.trim();
+                    const normalizedJobTitleKey = normalizedJobTitle.toLowerCase();
+                    const resolvedJobTitle =
+                        normalizedJobTitleKey === "staff"
+                            ? fallbackJobTitle?.title ?? "Director"
+                            : normalizedJobTitle;
+                    const stableKey = `${ employee.name.trim().toLowerCase() }::${ resolvedJobTitle.trim().toLowerCase() }`;
                     const fromId = employee.id && existingById.has(employee.id) ? employee.id : null;
                     const fromStableKey = (existingByStableKey.get(stableKey) ?? []).find(
                         (candidateId) => !keptEmployeeIds.has(candidateId)
                     );
                     const targetId = fromId ?? fromStableKey;
+                    const resolvedJobTitleKey = resolvedJobTitle.trim().toLowerCase();
+                    let jobTitleId = jobTitleByName.get(resolvedJobTitleKey) ?? null;
+                    if (!jobTitleId) {
+                        const createdJobTitle = await tx.jobTitle.create({
+                            data: {
+                                schoolId,
+                                title: resolvedJobTitle,
+                                leaderQualified: false,
+                                requiresLeaderForOpenClose: false
+                            }
+                        });
+                        jobTitleId = createdJobTitle.id;
+                        jobTitleByName.set(resolvedJobTitleKey, jobTitleId);
+                    }
 
                     if (targetId) {
                         keptEmployeeIds.add(targetId);
@@ -1670,7 +1713,8 @@ const buildServer = async () => {
                                 name: employee.name,
                                 email: employee.email ?? null,
                                 phone: employee.phone ?? null,
-                                jobTitle: employee.jobTitle,
+                                jobTitle: resolvedJobTitle,
+                                jobTitleId,
                                 maxHoursPerDay: employee.maxHoursPerDay,
                                 maxHoursPerWeek: employee.maxHoursPerWeek,
                                 employmentStatus: employee.employmentStatus,
@@ -1691,7 +1735,8 @@ const buildServer = async () => {
                             name: employee.name,
                             email: employee.email ?? null,
                             phone: employee.phone ?? null,
-                            jobTitle: employee.jobTitle,
+                            jobTitle: resolvedJobTitle,
+                            jobTitleId,
                             maxHoursPerDay: employee.maxHoursPerDay,
                             maxHoursPerWeek: employee.maxHoursPerWeek,
                             employmentStatus: employee.employmentStatus,

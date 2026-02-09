@@ -4,7 +4,6 @@ import { colors, shadows } from "../theme";
 interface WeekInitializationModalProps {
   isOpen: boolean;
   weekLabel: string;
-  onCancel: () => void;
   onInitializeBlank: () => void;
   onInitializeCopy: () => void;
 }
@@ -12,7 +11,6 @@ interface WeekInitializationModalProps {
 export default function WeekInitializationModal({
   isOpen,
   weekLabel,
-  onCancel,
   onInitializeBlank,
   onInitializeCopy
 }: WeekInitializationModalProps) {
@@ -59,19 +57,6 @@ export default function WeekInitializationModal({
           Choose how to initialize this week.
         </p>
         <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
-          <button
-            type="button"
-            onClick={onCancel}
-            style={{
-              borderRadius: 999,
-              border: "1px solid #cbd5e1",
-              background: "#e2e8f0",
-              color: "#0f172a",
-              padding: "0.35rem 0.85rem"
-            }}
-          >
-            Cancel
-          </button>
           <button
             type="button"
             onClick={onInitializeBlank}

@@ -1442,6 +1442,7 @@ export const fieldTripRatiosRule: RuleDefinition = {
             if (day.scheduleType === "closed" || day.dayScheduleType === "closed") {
                 return;
             }
+            const schoolRules = getSchoolRules(context);
             const event = context.fieldTripEvents.find((candidate) => {
                 if (candidate.dayOfWeek !== day.dayOfWeek) {
                     return false;
@@ -1468,11 +1469,18 @@ export const fieldTripRatiosRule: RuleDefinition = {
             if (windowEnd <= windowStart) {
                 return;
             }
+            const fieldTripWindowStartRaw = parseTimeToMinutes(schoolRules.fieldTripStartTime);
+            const fieldTripWindowEndRaw = parseTimeToMinutes(schoolRules.fieldTripEndTime);
+            const fieldTripWindowStart = Math.max(windowStart, fieldTripWindowStartRaw);
+            const fieldTripWindowEnd = Math.min(windowEnd, fieldTripWindowEndRaw);
+            if (fieldTripWindowEnd <= fieldTripWindowStart) {
+                return;
+            }
             const dayAssignments = getActiveAssignmentsForDay(context, day.dayOfWeek);
             const leaderCoverage = evaluateMinimumCoverage(
                 dayAssignments,
-                windowStart,
-                windowEnd,
+                fieldTripWindowStart,
+                fieldTripWindowEnd,
                 requiredLeaders,
                 (entry) => entry.employee.leaderQualified
             );

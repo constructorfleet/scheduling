@@ -93,7 +93,7 @@ const emptyEmployee = (): Employee => ({
   name: "New employee",
   email: "",
   phone: "",
-  jobTitle: "Staff",
+  jobTitle: "",
   maxHoursPerDay: 8,
   maxHoursPerWeek: 40,
   employmentStatus: "active",
@@ -397,7 +397,7 @@ export default function SettingsPanel({
             style={{
               borderRadius: 999,
               border: "1px solid #e2e8f0",
-              background: colors.surfaceAlt,
+              background: colors.surface,
               padding: "0.35rem 0.9rem"
             }}
           >
@@ -611,7 +611,15 @@ export default function SettingsPanel({
                 markDirty("employees");
               }}
               onAdd={() => {
-                setDraftEmployees([...draftEmployees, emptyEmployee()]);
+                const nextJobTitle = jobTitleOptions[0] ?? "";
+                const base = emptyEmployee();
+                setDraftEmployees([
+                  ...draftEmployees,
+                  {
+                    ...base,
+                    jobTitle: nextJobTitle
+                  }
+                ]);
                 markDirty("employees");
               }}
               onRemove={(index) => {

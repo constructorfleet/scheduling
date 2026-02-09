@@ -367,6 +367,12 @@ export default function App() {
   const apiStatusResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suspendHistoryRef = useRef(false);
   const lastLoadedSchoolIdRef = useRef<string | null>(null);
+  const schoolSettingsPersistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSchoolSettingsRef = useRef<{
+    schoolName: string;
+    closedDays: DayOfWeek[];
+    schoolRules: SchoolRules;
+  } | null>(null);
   
   const [showAutoScheduleModal, setShowAutoScheduleModal] = useState(false);
   const [activeHelpTopic, setActiveHelpTopic] = useState<HelpTopicId | null>(null);
@@ -745,13 +751,13 @@ export default function App() {
     return Array.from(configMap.values());
   });
 
-  const jobTitleLeaderMap = useMemo(() => {
-    return new Map(jobTitlesState.map((title) => [title.title, title.leaderQualified]));
-  }, [jobTitlesState]);
+  const normalizeJobTitle = (value: string) => value.trim().toLowerCase();
 
   const jobTitleRules = useMemo(() => {
     return jobTitlesState.reduce<Record<string, { requiresLeaderForOpenClose: boolean }>>((acc, title) => {
-      acc[title.title] = { requiresLeaderForOpenClose: title.requiresLeaderForOpenClose };
+      const rule = { requiresLeaderForOpenClose: title.requiresLeaderForOpenClose };
+      acc[title.title] = rule;
+      acc[normalizeJobTitle(title.title)] = rule;
       return acc;
     }, {});
   }, [jobTitlesState]);
@@ -759,10 +765,10 @@ export default function App() {
   const employeesDerived = useMemo(() => {
     return employeesState.map((employee) => ({
       ...employee,
-      leaderQualified: jobTitleLeaderMap.get(employee.jobTitle) ?? employee.leaderQualified,
+      leaderQualified: employee.leaderQualified,
       cprCurrent: employee.cprCurrent
     }));
-  }, [employeesState, jobTitleLeaderMap]);
+  }, [employeesState]);
 
   const scheduleStaff = useMemo(() => {
     const byId = new Map(employeesDerived.map((employee) => [employee.id, employee]));
@@ -980,7 +986,7 @@ export default function App() {
         name: employee.name,
         email: employee.email,
         phone: employee.phone,
-        jobTitle: employee.jobTitle,
+        jobTitle: employee.jobTitle.trim(),
         maxHoursPerDay: employee.maxHoursPerDay,
         maxHoursPerWeek: employee.maxHoursPerWeek,
         employmentStatus: employee.employmentStatus,
@@ -1006,6 +1012,38 @@ export default function App() {
       })) as FieldTripTypePayload[];
     }
     return payload;
+  };
+
+  const queueSchoolSettingsPersist = (overrides: Partial<{
+    schoolName: string;
+    closedDays: DayOfWeek[];
+    schoolRules: SchoolRules;
+  }>) => {
+    const base = pendingSchoolSettingsRef.current ?? {
+      schoolName,
+      closedDays: closedDaysState,
+      schoolRules: schoolRulesState
+    };
+    pendingSchoolSettingsRef.current = {
+      schoolName: overrides.schoolName ?? base.schoolName,
+      closedDays: overrides.closedDays ?? base.closedDays,
+      schoolRules: overrides.schoolRules ?? base.schoolRules
+    };
+    if (schoolSettingsPersistTimer.current) {
+      clearTimeout(schoolSettingsPersistTimer.current);
+    }
+    schoolSettingsPersistTimer.current = setTimeout(() => {
+      const pending = pendingSchoolSettingsRef.current;
+      pendingSchoolSettingsRef.current = null;
+      if (!pending) {
+        return;
+      }
+      void persistSettings({
+        schoolName: pending.schoolName,
+        closedDays: pending.closedDays,
+        schoolRules: pending.schoolRules
+      });
+    }, 0);
   };
 
   const persistSettings = async (overrides: Parameters<typeof buildSettingsPayload>[0] = {}) => {
@@ -1266,14 +1304,14 @@ export default function App() {
               requiresLeaderForOpenClose: title.requiresLeaderForOpenClose
             }))
           );
-          const jobTitleLookup = new Map(
-            (settings.jobTitles ?? []).map((title) => [title.title, title.leaderQualified])
-          );
           setEmployeesState(
             (settings.employees ?? []).map((employee) =>
               ensureEmployeeAvailability({
                 ...employee,
-                leaderQualified: jobTitleLookup.get(employee.jobTitle) ?? false,
+                jobTitle: employee.jobTitle?.trim() ?? employee.jobTitle,
+                leaderQualified: "leaderQualified" in employee
+                  ? Boolean((employee as { leaderQualified?: boolean }).leaderQualified)
+                  : false,
                 employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
                 availability: employee.availability ?? [],
                 requestedDaysOff: employee.requestedDaysOff ?? []
@@ -1548,7 +1586,7 @@ export default function App() {
     if (!canEditSchedule) {
       return;
     }
-    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) return;
+    if (!hasLoadedRemote || !isWeekInitialized || loadedWeekId !== currentWeekId) return;
     const payload: ScheduleSavePayload = {
       scheduleWeek: {
         id: currentWeekId,
@@ -1595,7 +1633,6 @@ export default function App() {
     };
   }, [
     hasLoadedRemote,
-    isConfigured,
     isWeekInitialized,
     currentWeekId,
     currentWeekLabel,
@@ -1614,7 +1651,7 @@ export default function App() {
     if (!canEditSchedule) {
       return;
     }
-    if (!hasLoadedRemote || !isConfigured || !isWeekInitialized || loadedWeekId !== currentWeekId) {
+    if (!hasLoadedRemote || !isWeekInitialized || loadedWeekId !== currentWeekId) {
       return;
     }
     const handleBeforeUnload = () => {
@@ -1636,12 +1673,15 @@ export default function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [hasLoadedRemote, isConfigured, isWeekInitialized, loadedWeekId, currentWeekId, canEditSchedule]);
+  }, [hasLoadedRemote, isWeekInitialized, loadedWeekId, currentWeekId, canEditSchedule]);
 
   useEffect(() => {
     return () => {
       if (apiStatusResetTimer.current) {
         clearTimeout(apiStatusResetTimer.current);
+      }
+      if (schoolSettingsPersistTimer.current) {
+        clearTimeout(schoolSettingsPersistTimer.current);
       }
     };
   }, []);
@@ -1988,14 +2028,6 @@ export default function App() {
     }
   };
 
-  const handleCancelWeekInitialization = () => {
-    if (!pendingWeekInitialization) {
-      return;
-    }
-    setPendingWeekInitialization(null);
-    setWeekStartDate(new Date(pendingWeekInitialization.previousWeekStartDate));
-  };
-
   const handleEnrollmentUpdate = (dayId: string, enrollment: number | undefined) => {
     if (!canEditSchedule) {
       setAuthMessage("You do not have permission to edit day metadata.");
@@ -2310,6 +2342,16 @@ export default function App() {
       return;
     }
     setJobTitlesState(next);
+    const leaderByTitle = new Map(
+      next.map((title) => [normalizeJobTitle(title.title), title.leaderQualified])
+    );
+    setEmployeesState((prev) =>
+      prev.map((employee) => ({
+        ...employee,
+        leaderQualified:
+          leaderByTitle.get(normalizeJobTitle(employee.jobTitle)) ?? employee.leaderQualified
+      }))
+    );
     void persistSettings({ jobTitles: next });
   };
 
@@ -2328,7 +2370,7 @@ export default function App() {
       return;
     }
     setClosedDaysState(next);
-    void persistSettings({ closedDays: next });
+    queueSchoolSettingsPersist({ closedDays: next });
   };
 
   const handleUpdateSchoolName = (next: string) => {
@@ -2337,7 +2379,7 @@ export default function App() {
       return;
     }
     setSchoolName(next);
-    void persistSettings({ schoolName: next });
+    queueSchoolSettingsPersist({ schoolName: next });
   };
 
   const handleUpdateSchoolRules = (next: SchoolRules) => {
@@ -2346,7 +2388,7 @@ export default function App() {
       return;
     }
     setSchoolRulesState(next);
-    void persistSettings({ schoolRules: next });
+    queueSchoolSettingsPersist({ schoolRules: next });
   };
 
   const handleUpdateFieldTrips = (next: typeof fieldTripTypesState) => {
@@ -2806,7 +2848,6 @@ export default function App() {
             <WeekInitializationModal
               isOpen={Boolean(pendingWeekInitialization)}
               weekLabel={pendingWeekInitialization?.weekLabel ?? ""}
-              onCancel={handleCancelWeekInitialization}
               onInitializeBlank={() => {
                 void handleInitializeWeek("blank");
               }}

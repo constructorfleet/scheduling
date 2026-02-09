@@ -81,6 +81,7 @@ model JobTitle {
   requiresLeaderForOpenClose Boolean
 
   school                    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  employees                 Employee[]
 }
 
 model Employee {
@@ -90,6 +91,7 @@ model Employee {
   email              String?
   phone              String?
   jobTitle           String
+  jobTitleId         String
   maxHoursPerDay     Int
   maxHoursPerWeek    Int
   employmentStatus   String
@@ -100,6 +102,7 @@ model Employee {
   requestedDaysOff   Json?
 
   school             School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  jobTitleRecord     JobTitle @relation(fields: [jobTitleId], references: [id], onDelete: Restrict)
 }
 
 model OperatingHours {

@@ -2581,6 +2581,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type JobTitleCountOutputType
+   */
+
+  export type JobTitleCountOutputType = {
+    employees: number
+  }
+
+  export type JobTitleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    employees?: boolean | JobTitleCountOutputTypeCountEmployeesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * JobTitleCountOutputType without action
+   */
+  export type JobTitleCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JobTitleCountOutputType
+     */
+    select?: JobTitleCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * JobTitleCountOutputType without action
+   */
+  export type JobTitleCountOutputTypeCountEmployeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmployeeWhereInput
+  }
+
+
+  /**
    * Count Type ScheduleWeekCountOutputType
    */
 
@@ -6553,6 +6584,8 @@ export namespace Prisma {
     leaderQualified?: boolean
     requiresLeaderForOpenClose?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    employees?: boolean | JobTitle$employeesArgs<ExtArgs>
+    _count?: boolean | JobTitleCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["jobTitle"]>
 
   export type JobTitleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6584,6 +6617,8 @@ export namespace Prisma {
   export type JobTitleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "title" | "leaderQualified" | "requiresLeaderForOpenClose", ExtArgs["result"]["jobTitle"]>
   export type JobTitleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    employees?: boolean | JobTitle$employeesArgs<ExtArgs>
+    _count?: boolean | JobTitleCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type JobTitleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
@@ -6596,6 +6631,7 @@ export namespace Prisma {
     name: "JobTitle"
     objects: {
       school: Prisma.$SchoolPayload<ExtArgs>
+      employees: Prisma.$EmployeePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6998,6 +7034,7 @@ export namespace Prisma {
   export interface Prisma__JobTitleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    employees<T extends JobTitle$employeesArgs<ExtArgs> = {}>(args?: Subset<T, JobTitle$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7428,6 +7465,30 @@ export namespace Prisma {
   }
 
   /**
+   * JobTitle.employees
+   */
+  export type JobTitle$employeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Employee
+     */
+    select?: EmployeeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Employee
+     */
+    omit?: EmployeeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EmployeeInclude<ExtArgs> | null
+    where?: EmployeeWhereInput
+    orderBy?: EmployeeOrderByWithRelationInput | EmployeeOrderByWithRelationInput[]
+    cursor?: EmployeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EmployeeScalarFieldEnum | EmployeeScalarFieldEnum[]
+  }
+
+  /**
    * JobTitle without action
    */
   export type JobTitleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7475,6 +7536,7 @@ export namespace Prisma {
     email: string | null
     phone: string | null
     jobTitle: string | null
+    jobTitleId: string | null
     maxHoursPerDay: number | null
     maxHoursPerWeek: number | null
     employmentStatus: string | null
@@ -7490,6 +7552,7 @@ export namespace Prisma {
     email: string | null
     phone: string | null
     jobTitle: string | null
+    jobTitleId: string | null
     maxHoursPerDay: number | null
     maxHoursPerWeek: number | null
     employmentStatus: string | null
@@ -7505,6 +7568,7 @@ export namespace Prisma {
     email: number
     phone: number
     jobTitle: number
+    jobTitleId: number
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: number
@@ -7534,6 +7598,7 @@ export namespace Prisma {
     email?: true
     phone?: true
     jobTitle?: true
+    jobTitleId?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
     employmentStatus?: true
@@ -7549,6 +7614,7 @@ export namespace Prisma {
     email?: true
     phone?: true
     jobTitle?: true
+    jobTitleId?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
     employmentStatus?: true
@@ -7564,6 +7630,7 @@ export namespace Prisma {
     email?: true
     phone?: true
     jobTitle?: true
+    jobTitleId?: true
     maxHoursPerDay?: true
     maxHoursPerWeek?: true
     employmentStatus?: true
@@ -7668,6 +7735,7 @@ export namespace Prisma {
     email: string | null
     phone: string | null
     jobTitle: string
+    jobTitleId: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: string
@@ -7704,6 +7772,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     jobTitle?: boolean
+    jobTitleId?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
     employmentStatus?: boolean
@@ -7713,6 +7782,7 @@ export namespace Prisma {
     availability?: boolean
     requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
   export type EmployeeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7722,6 +7792,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     jobTitle?: boolean
+    jobTitleId?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
     employmentStatus?: boolean
@@ -7731,6 +7802,7 @@ export namespace Prisma {
     availability?: boolean
     requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
   export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7740,6 +7812,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     jobTitle?: boolean
+    jobTitleId?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
     employmentStatus?: boolean
@@ -7749,6 +7822,7 @@ export namespace Prisma {
     availability?: boolean
     requestedDaysOff?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
 
   export type EmployeeSelectScalar = {
@@ -7758,6 +7832,7 @@ export namespace Prisma {
     email?: boolean
     phone?: boolean
     jobTitle?: boolean
+    jobTitleId?: boolean
     maxHoursPerDay?: boolean
     maxHoursPerWeek?: boolean
     employmentStatus?: boolean
@@ -7768,21 +7843,25 @@ export namespace Prisma {
     requestedDaysOff?: boolean
   }
 
-  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "email" | "phone" | "jobTitle" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "email" | "phone" | "jobTitle" | "jobTitleId" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
   export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }
   export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }
   export type EmployeeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }
 
   export type $EmployeePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Employee"
     objects: {
       school: Prisma.$SchoolPayload<ExtArgs>
+      jobTitleRecord: Prisma.$JobTitlePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7791,6 +7870,7 @@ export namespace Prisma {
       email: string | null
       phone: string | null
       jobTitle: string
+      jobTitleId: string
       maxHoursPerDay: number
       maxHoursPerWeek: number
       employmentStatus: string
@@ -8194,6 +8274,7 @@ export namespace Prisma {
   export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    jobTitleRecord<T extends JobTitleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, JobTitleDefaultArgs<ExtArgs>>): Prisma__JobTitleClient<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8229,6 +8310,7 @@ export namespace Prisma {
     readonly email: FieldRef<"Employee", 'String'>
     readonly phone: FieldRef<"Employee", 'String'>
     readonly jobTitle: FieldRef<"Employee", 'String'>
+    readonly jobTitleId: FieldRef<"Employee", 'String'>
     readonly maxHoursPerDay: FieldRef<"Employee", 'Int'>
     readonly maxHoursPerWeek: FieldRef<"Employee", 'Int'>
     readonly employmentStatus: FieldRef<"Employee", 'String'>
@@ -23648,6 +23730,7 @@ export namespace Prisma {
     email: 'email',
     phone: 'phone',
     jobTitle: 'jobTitle',
+    jobTitleId: 'jobTitleId',
     maxHoursPerDay: 'maxHoursPerDay',
     maxHoursPerWeek: 'maxHoursPerWeek',
     employmentStatus: 'employmentStatus',
@@ -24267,6 +24350,7 @@ export namespace Prisma {
     leaderQualified?: BoolFilter<"JobTitle"> | boolean
     requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    employees?: EmployeeListRelationFilter
   }
 
   export type JobTitleOrderByWithRelationInput = {
@@ -24276,6 +24360,7 @@ export namespace Prisma {
     leaderQualified?: SortOrder
     requiresLeaderForOpenClose?: SortOrder
     school?: SchoolOrderByWithRelationInput
+    employees?: EmployeeOrderByRelationAggregateInput
   }
 
   export type JobTitleWhereUniqueInput = Prisma.AtLeast<{
@@ -24288,6 +24373,7 @@ export namespace Prisma {
     leaderQualified?: BoolFilter<"JobTitle"> | boolean
     requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    employees?: EmployeeListRelationFilter
   }, "id">
 
   export type JobTitleOrderByWithAggregationInput = {
@@ -24322,6 +24408,7 @@ export namespace Prisma {
     email?: StringNullableFilter<"Employee"> | string | null
     phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
+    jobTitleId?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
     employmentStatus?: StringFilter<"Employee"> | string
@@ -24331,6 +24418,7 @@ export namespace Prisma {
     availability?: JsonNullableFilter<"Employee">
     requestedDaysOff?: JsonNullableFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    jobTitleRecord?: XOR<JobTitleScalarRelationFilter, JobTitleWhereInput>
   }
 
   export type EmployeeOrderByWithRelationInput = {
@@ -24340,6 +24428,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     jobTitle?: SortOrder
+    jobTitleId?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
     employmentStatus?: SortOrder
@@ -24349,6 +24438,7 @@ export namespace Prisma {
     availability?: SortOrderInput | SortOrder
     requestedDaysOff?: SortOrderInput | SortOrder
     school?: SchoolOrderByWithRelationInput
+    jobTitleRecord?: JobTitleOrderByWithRelationInput
   }
 
   export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -24361,6 +24451,7 @@ export namespace Prisma {
     email?: StringNullableFilter<"Employee"> | string | null
     phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
+    jobTitleId?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
     employmentStatus?: StringFilter<"Employee"> | string
@@ -24370,6 +24461,7 @@ export namespace Prisma {
     availability?: JsonNullableFilter<"Employee">
     requestedDaysOff?: JsonNullableFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    jobTitleRecord?: XOR<JobTitleScalarRelationFilter, JobTitleWhereInput>
   }, "id">
 
   export type EmployeeOrderByWithAggregationInput = {
@@ -24379,6 +24471,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     jobTitle?: SortOrder
+    jobTitleId?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
     employmentStatus?: SortOrder
@@ -24404,6 +24497,7 @@ export namespace Prisma {
     email?: StringNullableWithAggregatesFilter<"Employee"> | string | null
     phone?: StringNullableWithAggregatesFilter<"Employee"> | string | null
     jobTitle?: StringWithAggregatesFilter<"Employee"> | string
+    jobTitleId?: StringWithAggregatesFilter<"Employee"> | string
     maxHoursPerDay?: IntWithAggregatesFilter<"Employee"> | number
     maxHoursPerWeek?: IntWithAggregatesFilter<"Employee"> | number
     employmentStatus?: StringWithAggregatesFilter<"Employee"> | string
@@ -25713,6 +25807,7 @@ export namespace Prisma {
     leaderQualified: boolean
     requiresLeaderForOpenClose: boolean
     school: SchoolCreateNestedOneWithoutJobTitlesInput
+    employees?: EmployeeCreateNestedManyWithoutJobTitleRecordInput
   }
 
   export type JobTitleUncheckedCreateInput = {
@@ -25721,6 +25816,7 @@ export namespace Prisma {
     title: string
     leaderQualified: boolean
     requiresLeaderForOpenClose: boolean
+    employees?: EmployeeUncheckedCreateNestedManyWithoutJobTitleRecordInput
   }
 
   export type JobTitleUpdateInput = {
@@ -25729,6 +25825,7 @@ export namespace Prisma {
     leaderQualified?: BoolFieldUpdateOperationsInput | boolean
     requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
     school?: SchoolUpdateOneRequiredWithoutJobTitlesNestedInput
+    employees?: EmployeeUpdateManyWithoutJobTitleRecordNestedInput
   }
 
   export type JobTitleUncheckedUpdateInput = {
@@ -25737,6 +25834,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     leaderQualified?: BoolFieldUpdateOperationsInput | boolean
     requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+    employees?: EmployeeUncheckedUpdateManyWithoutJobTitleRecordNestedInput
   }
 
   export type JobTitleCreateManyInput = {
@@ -25777,6 +25875,7 @@ export namespace Prisma {
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
     school: SchoolCreateNestedOneWithoutEmployeesInput
+    jobTitleRecord: JobTitleCreateNestedOneWithoutEmployeesInput
   }
 
   export type EmployeeUncheckedCreateInput = {
@@ -25786,6 +25885,7 @@ export namespace Prisma {
     email?: string | null
     phone?: string | null
     jobTitle: string
+    jobTitleId: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: string
@@ -25811,6 +25911,7 @@ export namespace Prisma {
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
     school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
+    jobTitleRecord?: JobTitleUpdateOneRequiredWithoutEmployeesNestedInput
   }
 
   export type EmployeeUncheckedUpdateInput = {
@@ -25820,6 +25921,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
+    jobTitleId?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
     employmentStatus?: StringFieldUpdateOperationsInput | string
@@ -25837,6 +25939,7 @@ export namespace Prisma {
     email?: string | null
     phone?: string | null
     jobTitle: string
+    jobTitleId: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: string
@@ -25870,6 +25973,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
+    jobTitleId?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
     employmentStatus?: StringFieldUpdateOperationsInput | string
@@ -27458,6 +27562,11 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type JobTitleScalarRelationFilter = {
+    is?: JobTitleWhereInput
+    isNot?: JobTitleWhereInput
+  }
+
   export type EmployeeCountOrderByAggregateInput = {
     id?: SortOrder
     schoolId?: SortOrder
@@ -27465,6 +27574,7 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrder
     jobTitle?: SortOrder
+    jobTitleId?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
     employmentStatus?: SortOrder
@@ -27487,6 +27597,7 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrder
     jobTitle?: SortOrder
+    jobTitleId?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
     employmentStatus?: SortOrder
@@ -27502,6 +27613,7 @@ export namespace Prisma {
     email?: SortOrder
     phone?: SortOrder
     jobTitle?: SortOrder
+    jobTitleId?: SortOrder
     maxHoursPerDay?: SortOrder
     maxHoursPerWeek?: SortOrder
     employmentStatus?: SortOrder
@@ -28748,6 +28860,20 @@ export namespace Prisma {
     connect?: SchoolWhereUniqueInput
   }
 
+  export type EmployeeCreateNestedManyWithoutJobTitleRecordInput = {
+    create?: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput> | EmployeeCreateWithoutJobTitleRecordInput[] | EmployeeUncheckedCreateWithoutJobTitleRecordInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutJobTitleRecordInput | EmployeeCreateOrConnectWithoutJobTitleRecordInput[]
+    createMany?: EmployeeCreateManyJobTitleRecordInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+  }
+
+  export type EmployeeUncheckedCreateNestedManyWithoutJobTitleRecordInput = {
+    create?: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput> | EmployeeCreateWithoutJobTitleRecordInput[] | EmployeeUncheckedCreateWithoutJobTitleRecordInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutJobTitleRecordInput | EmployeeCreateOrConnectWithoutJobTitleRecordInput[]
+    createMany?: EmployeeCreateManyJobTitleRecordInputEnvelope
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+  }
+
   export type SchoolUpdateOneRequiredWithoutJobTitlesNestedInput = {
     create?: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
     connectOrCreate?: SchoolCreateOrConnectWithoutJobTitlesInput
@@ -28756,10 +28882,44 @@ export namespace Prisma {
     update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutJobTitlesInput, SchoolUpdateWithoutJobTitlesInput>, SchoolUncheckedUpdateWithoutJobTitlesInput>
   }
 
+  export type EmployeeUpdateManyWithoutJobTitleRecordNestedInput = {
+    create?: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput> | EmployeeCreateWithoutJobTitleRecordInput[] | EmployeeUncheckedCreateWithoutJobTitleRecordInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutJobTitleRecordInput | EmployeeCreateOrConnectWithoutJobTitleRecordInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutJobTitleRecordInput | EmployeeUpsertWithWhereUniqueWithoutJobTitleRecordInput[]
+    createMany?: EmployeeCreateManyJobTitleRecordInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutJobTitleRecordInput | EmployeeUpdateWithWhereUniqueWithoutJobTitleRecordInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutJobTitleRecordInput | EmployeeUpdateManyWithWhereWithoutJobTitleRecordInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutJobTitleRecordNestedInput = {
+    create?: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput> | EmployeeCreateWithoutJobTitleRecordInput[] | EmployeeUncheckedCreateWithoutJobTitleRecordInput[]
+    connectOrCreate?: EmployeeCreateOrConnectWithoutJobTitleRecordInput | EmployeeCreateOrConnectWithoutJobTitleRecordInput[]
+    upsert?: EmployeeUpsertWithWhereUniqueWithoutJobTitleRecordInput | EmployeeUpsertWithWhereUniqueWithoutJobTitleRecordInput[]
+    createMany?: EmployeeCreateManyJobTitleRecordInputEnvelope
+    set?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    disconnect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    delete?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    connect?: EmployeeWhereUniqueInput | EmployeeWhereUniqueInput[]
+    update?: EmployeeUpdateWithWhereUniqueWithoutJobTitleRecordInput | EmployeeUpdateWithWhereUniqueWithoutJobTitleRecordInput[]
+    updateMany?: EmployeeUpdateManyWithWhereWithoutJobTitleRecordInput | EmployeeUpdateManyWithWhereWithoutJobTitleRecordInput[]
+    deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
+  }
+
   export type SchoolCreateNestedOneWithoutEmployeesInput = {
     create?: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
     connectOrCreate?: SchoolCreateOrConnectWithoutEmployeesInput
     connect?: SchoolWhereUniqueInput
+  }
+
+  export type JobTitleCreateNestedOneWithoutEmployeesInput = {
+    create?: XOR<JobTitleCreateWithoutEmployeesInput, JobTitleUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: JobTitleCreateOrConnectWithoutEmployeesInput
+    connect?: JobTitleWhereUniqueInput
   }
 
   export type SchoolUpdateOneRequiredWithoutEmployeesNestedInput = {
@@ -28768,6 +28928,14 @@ export namespace Prisma {
     upsert?: SchoolUpsertWithoutEmployeesInput
     connect?: SchoolWhereUniqueInput
     update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutEmployeesInput, SchoolUpdateWithoutEmployeesInput>, SchoolUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type JobTitleUpdateOneRequiredWithoutEmployeesNestedInput = {
+    create?: XOR<JobTitleCreateWithoutEmployeesInput, JobTitleUncheckedCreateWithoutEmployeesInput>
+    connectOrCreate?: JobTitleCreateOrConnectWithoutEmployeesInput
+    upsert?: JobTitleUpsertWithoutEmployeesInput
+    connect?: JobTitleWhereUniqueInput
+    update?: XOR<XOR<JobTitleUpdateToOneWithWhereWithoutEmployeesInput, JobTitleUpdateWithoutEmployeesInput>, JobTitleUncheckedUpdateWithoutEmployeesInput>
   }
 
   export type SchoolCreateNestedOneWithoutOperatingHoursInput = {
@@ -29986,6 +30154,7 @@ export namespace Prisma {
     title: string
     leaderQualified: boolean
     requiresLeaderForOpenClose: boolean
+    employees?: EmployeeCreateNestedManyWithoutJobTitleRecordInput
   }
 
   export type JobTitleUncheckedCreateWithoutSchoolInput = {
@@ -29993,6 +30162,7 @@ export namespace Prisma {
     title: string
     leaderQualified: boolean
     requiresLeaderForOpenClose: boolean
+    employees?: EmployeeUncheckedCreateNestedManyWithoutJobTitleRecordInput
   }
 
   export type JobTitleCreateOrConnectWithoutSchoolInput = {
@@ -30019,6 +30189,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    jobTitleRecord: JobTitleCreateNestedOneWithoutEmployeesInput
   }
 
   export type EmployeeUncheckedCreateWithoutSchoolInput = {
@@ -30027,6 +30198,7 @@ export namespace Prisma {
     email?: string | null
     phone?: string | null
     jobTitle: string
+    jobTitleId: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: string
@@ -30316,6 +30488,7 @@ export namespace Prisma {
     email?: StringNullableFilter<"Employee"> | string | null
     phone?: StringNullableFilter<"Employee"> | string | null
     jobTitle?: StringFilter<"Employee"> | string
+    jobTitleId?: StringFilter<"Employee"> | string
     maxHoursPerDay?: IntFilter<"Employee"> | number
     maxHoursPerWeek?: IntFilter<"Employee"> | number
     employmentStatus?: StringFilter<"Employee"> | string
@@ -30640,6 +30813,50 @@ export namespace Prisma {
     create: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
   }
 
+  export type EmployeeCreateWithoutJobTitleRecordInput = {
+    id?: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    school: SchoolCreateNestedOneWithoutEmployeesInput
+  }
+
+  export type EmployeeUncheckedCreateWithoutJobTitleRecordInput = {
+    id?: string
+    schoolId: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type EmployeeCreateOrConnectWithoutJobTitleRecordInput = {
+    where: EmployeeWhereUniqueInput
+    create: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput>
+  }
+
+  export type EmployeeCreateManyJobTitleRecordInputEnvelope = {
+    data: EmployeeCreateManyJobTitleRecordInput | EmployeeCreateManyJobTitleRecordInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SchoolUpsertWithoutJobTitlesInput = {
     update: XOR<SchoolUpdateWithoutJobTitlesInput, SchoolUncheckedUpdateWithoutJobTitlesInput>
     create: XOR<SchoolCreateWithoutJobTitlesInput, SchoolUncheckedCreateWithoutJobTitlesInput>
@@ -30695,6 +30912,22 @@ export namespace Prisma {
     invites?: UserInviteUncheckedUpdateManyWithoutSchoolNestedInput
   }
 
+  export type EmployeeUpsertWithWhereUniqueWithoutJobTitleRecordInput = {
+    where: EmployeeWhereUniqueInput
+    update: XOR<EmployeeUpdateWithoutJobTitleRecordInput, EmployeeUncheckedUpdateWithoutJobTitleRecordInput>
+    create: XOR<EmployeeCreateWithoutJobTitleRecordInput, EmployeeUncheckedCreateWithoutJobTitleRecordInput>
+  }
+
+  export type EmployeeUpdateWithWhereUniqueWithoutJobTitleRecordInput = {
+    where: EmployeeWhereUniqueInput
+    data: XOR<EmployeeUpdateWithoutJobTitleRecordInput, EmployeeUncheckedUpdateWithoutJobTitleRecordInput>
+  }
+
+  export type EmployeeUpdateManyWithWhereWithoutJobTitleRecordInput = {
+    where: EmployeeScalarWhereInput
+    data: XOR<EmployeeUpdateManyMutationInput, EmployeeUncheckedUpdateManyWithoutJobTitleRecordInput>
+  }
+
   export type SchoolCreateWithoutEmployeesInput = {
     id?: string
     name: string
@@ -30742,6 +30975,27 @@ export namespace Prisma {
   export type SchoolCreateOrConnectWithoutEmployeesInput = {
     where: SchoolWhereUniqueInput
     create: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
+  }
+
+  export type JobTitleCreateWithoutEmployeesInput = {
+    id?: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+    school: SchoolCreateNestedOneWithoutJobTitlesInput
+  }
+
+  export type JobTitleUncheckedCreateWithoutEmployeesInput = {
+    id?: string
+    schoolId: string
+    title: string
+    leaderQualified: boolean
+    requiresLeaderForOpenClose: boolean
+  }
+
+  export type JobTitleCreateOrConnectWithoutEmployeesInput = {
+    where: JobTitleWhereUniqueInput
+    create: XOR<JobTitleCreateWithoutEmployeesInput, JobTitleUncheckedCreateWithoutEmployeesInput>
   }
 
   export type SchoolUpsertWithoutEmployeesInput = {
@@ -30797,6 +31051,33 @@ export namespace Prisma {
     scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUncheckedUpdateManyWithoutSchoolNestedInput
     invites?: UserInviteUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type JobTitleUpsertWithoutEmployeesInput = {
+    update: XOR<JobTitleUpdateWithoutEmployeesInput, JobTitleUncheckedUpdateWithoutEmployeesInput>
+    create: XOR<JobTitleCreateWithoutEmployeesInput, JobTitleUncheckedCreateWithoutEmployeesInput>
+    where?: JobTitleWhereInput
+  }
+
+  export type JobTitleUpdateToOneWithWhereWithoutEmployeesInput = {
+    where?: JobTitleWhereInput
+    data: XOR<JobTitleUpdateWithoutEmployeesInput, JobTitleUncheckedUpdateWithoutEmployeesInput>
+  }
+
+  export type JobTitleUpdateWithoutEmployeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+    school?: SchoolUpdateOneRequiredWithoutJobTitlesNestedInput
+  }
+
+  export type JobTitleUncheckedUpdateWithoutEmployeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    leaderQualified?: BoolFieldUpdateOperationsInput | boolean
+    requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type SchoolCreateWithoutOperatingHoursInput = {
@@ -32955,6 +33236,7 @@ export namespace Prisma {
     email?: string | null
     phone?: string | null
     jobTitle: string
+    jobTitleId: string
     maxHoursPerDay: number
     maxHoursPerWeek: number
     employmentStatus: string
@@ -33049,6 +33331,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     leaderQualified?: BoolFieldUpdateOperationsInput | boolean
     requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+    employees?: EmployeeUpdateManyWithoutJobTitleRecordNestedInput
   }
 
   export type JobTitleUncheckedUpdateWithoutSchoolInput = {
@@ -33056,6 +33339,7 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     leaderQualified?: BoolFieldUpdateOperationsInput | boolean
     requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
+    employees?: EmployeeUncheckedUpdateManyWithoutJobTitleRecordNestedInput
   }
 
   export type JobTitleUncheckedUpdateManyWithoutSchoolInput = {
@@ -33079,6 +33363,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    jobTitleRecord?: JobTitleUpdateOneRequiredWithoutEmployeesNestedInput
   }
 
   export type EmployeeUncheckedUpdateWithoutSchoolInput = {
@@ -33087,6 +33372,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
+    jobTitleId?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
     employmentStatus?: StringFieldUpdateOperationsInput | string
@@ -33103,6 +33389,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: StringFieldUpdateOperationsInput | string
+    jobTitleId?: StringFieldUpdateOperationsInput | string
     maxHoursPerDay?: IntFieldUpdateOperationsInput | number
     maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
     employmentStatus?: StringFieldUpdateOperationsInput | string
@@ -33277,6 +33564,74 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmployeeCreateManyJobTitleRecordInput = {
+    id?: string
+    schoolId: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    jobTitle: string
+    maxHoursPerDay: number
+    maxHoursPerWeek: number
+    employmentStatus: string
+    medicallyDelegated: boolean
+    cprCurrent: boolean
+    notes?: string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type EmployeeUpdateWithoutJobTitleRecordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
+  }
+
+  export type EmployeeUncheckedUpdateWithoutJobTitleRecordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type EmployeeUncheckedUpdateManyWithoutJobTitleRecordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: StringFieldUpdateOperationsInput | string
+    maxHoursPerDay?: IntFieldUpdateOperationsInput | number
+    maxHoursPerWeek?: IntFieldUpdateOperationsInput | number
+    employmentStatus?: StringFieldUpdateOperationsInput | string
+    medicallyDelegated?: BoolFieldUpdateOperationsInput | boolean
+    cprCurrent?: BoolFieldUpdateOperationsInput | boolean
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    availability?: NullableJsonNullValueInput | InputJsonValue
+    requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ScheduleDayCreateManyScheduleWeekInput = {

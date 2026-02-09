@@ -14,6 +14,7 @@ export type EmployeeResponse = {
     maxHoursPerDay: number;
     maxHoursPerWeek: number;
     employmentStatus: string;
+    leaderQualified: boolean;
     medicallyDelegated: boolean;
     cprCurrent: boolean;
     notes?: string;

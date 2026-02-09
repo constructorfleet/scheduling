@@ -13,6 +13,7 @@ export type EmployeePayload = {
     maxHoursPerDay: number;
     maxHoursPerWeek: number;
     employmentStatus: EmploymentStatus;
+    leaderQualified?: boolean;
     medicallyDelegated: boolean;
     cprCurrent: boolean;
     notes?: string;

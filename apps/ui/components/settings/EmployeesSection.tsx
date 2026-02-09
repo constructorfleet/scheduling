@@ -87,7 +87,7 @@ export default function EmployeesSection({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr 1fr 1fr 200px",
+          gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr .15fr .15fr 165px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",

@@ -167,6 +167,7 @@ exports.Prisma.EmployeeScalarFieldEnum = {
   email: 'email',
   phone: 'phone',
   jobTitle: 'jobTitle',
+  jobTitleId: 'jobTitleId',
   maxHoursPerDay: 'maxHoursPerDay',
   maxHoursPerWeek: 'maxHoursPerWeek',
   employmentStatus: 'employmentStatus',

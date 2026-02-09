@@ -762,6 +762,8 @@ components:
           type: integer
         employmentStatus:
           $ref: '#/components/schemas/EmploymentStatus'
+        leaderQualified:
+          type: boolean
         medicallyDelegated:
           type: boolean
         cprCurrent:
@@ -805,6 +807,8 @@ components:
           type: integer
         employmentStatus:
           type: string
+        leaderQualified:
+          type: boolean
         medicallyDelegated:
           type: boolean
         cprCurrent:
@@ -827,6 +831,7 @@ components:
         - maxHoursPerDay
         - maxHoursPerWeek
         - employmentStatus
+        - leaderQualified
         - medicallyDelegated
         - cprCurrent
     EmployeeAvailabilityBlock:
