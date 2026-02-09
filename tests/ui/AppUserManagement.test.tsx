@@ -11,6 +11,9 @@ describe("App user management", () => {
   const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
   const fetchSettingsMock = apiClient.fetchSettings as jest.MockedFunction<typeof apiClient.fetchSettings>;
   const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
+  const fetchPublicDistrictsMock = apiClient.fetchPublicDistricts as jest.MockedFunction<
+    typeof apiClient.fetchPublicDistricts
+  >;
   const fetchSchoolUsersMock = apiClient.fetchSchoolUsers as jest.MockedFunction<typeof apiClient.fetchSchoolUsers>;
   const fetchSchoolInvitesMock = apiClient.fetchSchoolInvites as jest.MockedFunction<typeof apiClient.fetchSchoolInvites>;
   const inviteSchoolUserMock = apiClient.inviteSchoolUser as jest.MockedFunction<typeof apiClient.inviteSchoolUser>;
@@ -86,6 +89,7 @@ describe("App user management", () => {
       })),
       auditEvents: []
     });
+    fetchPublicDistrictsMock.mockResolvedValue({ districts: [] });
     fetchSchoolUsersMock.mockResolvedValue({
       users: [
         {

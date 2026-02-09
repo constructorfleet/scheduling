@@ -48,6 +48,9 @@ describe("App settings flow", () => {
   const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
   const saveSettingsMock = apiClient.saveSettings as jest.MockedFunction<typeof apiClient.saveSettings>;
   const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
+  const fetchPublicDistrictsMock = apiClient.fetchPublicDistricts as jest.MockedFunction<
+    typeof apiClient.fetchPublicDistricts
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -104,6 +107,7 @@ describe("App settings flow", () => {
         requireCurrentCpr: false
       }
     });
+    fetchPublicDistrictsMock.mockResolvedValue({ districts: [] });
   });
 
   it("warns on closing settings with unsaved changes and saves when requested", async () => {

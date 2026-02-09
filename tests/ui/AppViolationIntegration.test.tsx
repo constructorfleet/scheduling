@@ -11,6 +11,9 @@ describe("App violation navigator integration", () => {
   const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
   const fetchSettingsMock = apiClient.fetchSettings as jest.MockedFunction<typeof apiClient.fetchSettings>;
   const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
+  const fetchPublicDistrictsMock = apiClient.fetchPublicDistricts as jest.MockedFunction<
+    typeof apiClient.fetchPublicDistricts
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -83,6 +86,7 @@ describe("App violation navigator integration", () => {
       })),
       auditEvents: []
     });
+    fetchPublicDistrictsMock.mockResolvedValue({ districts: [] });
   });
 
   it("focuses a schedule block when jumping from a violation", async () => {

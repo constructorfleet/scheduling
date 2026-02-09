@@ -68,6 +68,7 @@ import {
   updateDisplayName,
   type ScheduleSavePayload
 } from "./data/apiClient";
+import { buildLegacyWeekId, buildWeekId } from "./data/scheduleUtils";
 import { autoSchedule, validateDayMetadata } from "@core/scheduler";
 
 const RULE_TITLES: Record<string, string> = {
@@ -258,7 +259,7 @@ export default function App() {
   const [selectedSchoolId, setSelectedSchoolId] = useState(schools[0].id);
   const currentWeekStartDateIso = useMemo(() => toIsoDate(weekStartDate), [weekStartDate]);
   const currentWeekId = useMemo(
-    () => `week-${selectedSchoolId}-${currentWeekStartDateIso}`,
+    () => buildWeekId(selectedSchoolId, currentWeekStartDateIso),
     [selectedSchoolId, currentWeekStartDateIso]
   );
   const currentWeekLabel = useMemo(() => formatWeekRange(weekStartDate), [weekStartDate]);
@@ -328,6 +329,7 @@ export default function App() {
   const activeApiRequestsRef = useRef(0);
   const apiStatusResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suspendHistoryRef = useRef(false);
+  const lastLoadedSchoolIdRef = useRef<string | null>(null);
   
   const [showAutoScheduleModal, setShowAutoScheduleModal] = useState(false);
   const [activeHelpTopic, setActiveHelpTopic] = useState<HelpTopicId | null>(null);
@@ -528,9 +530,13 @@ export default function App() {
     appendAuditEvent(audit.action, audit.notes);
   };
 
-  const buildDefaultScheduleDays = (weekId: string, weekStartIso: string): ScheduleDay[] =>
+  const buildScheduleDaysForClosed = (
+    weekId: string,
+    weekStartIso: string,
+    closedDays: DayOfWeek[]
+  ): ScheduleDay[] =>
     weekDaySequence.map((day, index) => {
-      const isClosedDay = closedDaysState.includes(day);
+      const isClosedDay = closedDays.includes(day);
       return {
         id: `${weekId}-day-${day}`,
         scheduleWeekId: weekId,
@@ -542,6 +548,9 @@ export default function App() {
         fieldTripEventId: `${weekId}-field-trip-${day}`
       };
     });
+
+  const buildDefaultScheduleDays = (weekId: string, weekStartIso: string): ScheduleDay[] =>
+    buildScheduleDaysForClosed(weekId, weekStartIso, closedDaysState);
 
   const buildDefaultFieldTripEvents = (weekId: string, scheduleDaysForWeek: ScheduleDay[]): FieldTripEvent[] =>
     scheduleDaysForWeek.map((day) => ({
@@ -941,9 +950,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (IS_TEST_ENV) {
-      return;
-    }
     let isActive = true;
     const hydrateAuth = async () => {
       setAuthStatus("loading");
@@ -1197,9 +1203,24 @@ export default function App() {
       setPendingWeekInitialization(null);
       beginApiAction("loading", "Loading schedule...");
       try {
-        const schedule = await fetchSchedule(currentWeekId);
+        let schedule = await fetchSchedule(currentWeekId);
+        const legacyWeekId = buildLegacyWeekId(currentWeekStartDateIso);
+        if (!schedule && legacyWeekId !== currentWeekId) {
+          const legacySchedule = await fetchSchedule(legacyWeekId);
+          if (legacySchedule?.schoolId === selectedSchoolId) {
+            schedule = legacySchedule;
+          }
+        }
         completeApiAction("Schedule loaded");
         if (!isActive) return;
+        const blankDays = buildScheduleDaysForClosed(currentWeekId, currentWeekStartDateIso, []);
+        const blankSnapshot: ScheduleSnapshot = {
+          scheduleDays: blankDays,
+          segmentBlocks: [],
+          staffAssignments: [],
+          fieldTripEvents: buildDefaultFieldTripEvents(currentWeekId, blankDays),
+          scheduleStatusOverride: "draft"
+        };
         if (schedule) {
           const loadedScheduleDaysRaw = (schedule.scheduleDays ?? []).map((day: ScheduleDay) => ({
             ...day,
@@ -1250,8 +1271,14 @@ export default function App() {
           });
 
           const scheduleDayIdByDow = new Map(loadedScheduleDays.map((day) => [day.dayOfWeek, day.id] as const));
-          const loadedSegmentBlocks = schedule.segmentBlocks ?? [];
-          const loadedStaffAssignments = schedule.staffAssignments ?? [];
+          const loadedSegmentBlocks = (schedule.segmentBlocks ?? []).map((block) => ({
+            ...block,
+            scheduleWeekId: currentWeekId
+          }));
+          const loadedStaffAssignments = (schedule.staffAssignments ?? []).map((assignment) => ({
+            ...assignment,
+            scheduleWeekId: currentWeekId
+          }));
           const loadedFieldTripByDay = new Map(
             (schedule.fieldTripEvents ?? []).map((event) => [event.dayOfWeek, event] as const)
           );
@@ -1290,17 +1317,24 @@ export default function App() {
           setHasLoadedRemote(true);
           setIsWeekInitialized(true);
           setLoadedWeekId(currentWeekId);
+          lastLoadedSchoolIdRef.current = selectedSchoolId;
           return;
         }
-
+        applySnapshot(blankSnapshot);
+        setAuditEvents([]);
+        setHistoryPast([]);
+        setHistoryFuture([]);
+        const isSchoolChange =
+          lastLoadedSchoolIdRef.current !== null && lastLoadedSchoolIdRef.current !== selectedSchoolId;
         setPendingWeekInitialization({
           weekId: currentWeekId,
           weekLabel: currentWeekLabel,
           startDate: currentWeekStartDateIso,
           previousWeekStartDate,
-          copySourceSnapshot: sourceSnapshot,
-          copySourceAuditEvents: sourceAudit
+          copySourceSnapshot: isSchoolChange ? blankSnapshot : sourceSnapshot,
+          copySourceAuditEvents: isSchoolChange ? [] : sourceAudit
         });
+        lastLoadedSchoolIdRef.current = selectedSchoolId;
       } catch (error) {
         failApiAction("Schedule load failed");
         // eslint-disable-next-line no-console

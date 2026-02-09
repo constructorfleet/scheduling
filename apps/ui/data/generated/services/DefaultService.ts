@@ -7,6 +7,7 @@ import type { GenericOk } from '../models/GenericOk';
 import type { HealthResponse } from '../models/HealthResponse';
 import type { LoginPayload } from '../models/LoginPayload';
 import type { MeResponse } from '../models/MeResponse';
+import type { PublicDistrictsResponse } from '../models/PublicDistrictsResponse';
 import type { ScheduleSavePayload } from '../models/ScheduleSavePayload';
 import type { ScheduleWeekResponse } from '../models/ScheduleWeekResponse';
 import type { SettingsPayload } from '../models/SettingsPayload';
@@ -63,6 +64,17 @@ export class DefaultService {
             headers: {
                 'x-csrf-token': xCsrfToken,
             },
+        });
+    }
+    /**
+     * List districts and schools for login
+     * @returns PublicDistrictsResponse District list
+     * @throws ApiError
+     */
+    public static getApiPublicDistricts(): CancelablePromise<PublicDistrictsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/public/districts',
         });
     }
     /**

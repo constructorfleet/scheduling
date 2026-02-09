@@ -56,6 +56,9 @@ describe("App week-aware navigation", () => {
   const fetchScheduleMock = apiClient.fetchSchedule as jest.MockedFunction<typeof apiClient.fetchSchedule>;
   const saveScheduleMock = apiClient.saveSchedule as jest.MockedFunction<typeof apiClient.saveSchedule>;
   const fetchAuthMeMock = apiClient.fetchAuthMe as jest.MockedFunction<typeof apiClient.fetchAuthMe>;
+  const fetchPublicDistrictsMock = apiClient.fetchPublicDistricts as jest.MockedFunction<
+    typeof apiClient.fetchPublicDistricts
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -105,6 +108,7 @@ describe("App week-aware navigation", () => {
       return null;
     });
     saveScheduleMock.mockResolvedValue({ ok: true } as Awaited<ReturnType<typeof apiClient.saveSchedule>>);
+    fetchPublicDistrictsMock.mockResolvedValue({ districts: [] });
   });
 
   it("does not autosave into a new week before the week is initialized", async () => {
