@@ -276,28 +276,31 @@ export default function ScheduleTypesSection({
               }}
             >
               <AnimatePresence initial={false}>
-              {validateTimeWindows(type.timeWindows).length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, maxHeight: 0 }}
-                  animate={{ opacity: 1, maxHeight: "200px" }}
-                  exit={{ opacity: 0, maxHeight: 0 }}
-                  transition={{ duration: 0.15, ease: "easeInOut" }}
-                  style={{
-                    background: "#fee2e2",
-                    border: "1px solid #fecaca",
-                    borderRadius: 8,
-                    padding: "0.5rem",
-                    marginBottom: "0.75rem",
-                    color: "#991b1b",
-                    fontSize: "0.875rem",
-                    overflow: "hidden"
-                  }}
-                >
-                  {validateTimeWindows(type.timeWindows).map((err, i) => (
-                    <div key={i}>{err}</div>
-                  ))}
-                </motion.div>
-              )}
+              {(() => {
+                const windowErrors = validateTimeWindows(type.timeWindows);
+                return windowErrors.length > 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, maxHeight: 0 }}
+                    animate={{ opacity: 1, maxHeight: "200px" }}
+                    exit={{ opacity: 0, maxHeight: 0 }}
+                    transition={{ duration: 0.15, ease: "easeInOut" }}
+                    style={{
+                      background: "#fee2e2",
+                      border: "1px solid #fecaca",
+                      borderRadius: 8,
+                      padding: "0.5rem",
+                      marginBottom: "0.75rem",
+                      color: "#991b1b",
+                      fontSize: "0.875rem",
+                      overflow: "hidden"
+                    }}
+                  >
+                    {windowErrors.map((err, i) => (
+                      <div key={i}>{err}</div>
+                    ))}
+                  </motion.div>
+                ) : null;
+              })()}
               </AnimatePresence>
 
               {(type.timeWindows || []).map((window, windowIdx) => (
