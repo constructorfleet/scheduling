@@ -1,6 +1,7 @@
 import type { Employee } from "@core/domain/types";
 import type { DayOfWeek, EmployeeAvailabilityDay, EmployeeTimeOffRequest } from "@core/domain/types";
 import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { colors } from "../../theme";
 
 interface EmployeesSectionProps {
@@ -106,20 +107,26 @@ export default function EmployeesSection({
         <span style={{ textAlign: "center", width: "100%" }}>Max hours/week</span>
         <span />
       </div>
+      <AnimatePresence initial={false}>
       {draftEmployees.map((employee, index) => {
         const isExpanded = expandedSet.has(employee.id);
         const availabilityDays = ensureAvailabilityDays(employee);
         const daysOff = employee.requestedDaysOff ?? [];
         return (
-          <div
+          <motion.div
             key={employee.id}
+            initial={{ opacity: 0, maxHeight: 0 }}
+            animate={{ opacity: 1, maxHeight: "5000px" }}
+            exit={{ opacity: 0, maxHeight: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
             style={{
               border: "1px solid #e5e7eb",
               borderRadius: 14,
               padding: "0.75rem",
               display: "flex",
               flexDirection: "column",
-              gap: "0.75rem"
+              gap: "0.75rem",
+              overflow: "hidden"
             }}
           >
             <div
@@ -270,8 +277,13 @@ export default function EmployeesSection({
               ))}
             </div>
 
+            <AnimatePresence initial={false}>
             {isExpanded && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, maxHeight: 0 }}
+                animate={{ opacity: 1, maxHeight: "4000px" }}
+                exit={{ opacity: 0, maxHeight: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
                 style={{
                   border: "1px solid #e2e8f0",
                   borderRadius: 12,
@@ -279,7 +291,8 @@ export default function EmployeesSection({
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.75rem",
-                  background: colors.surfaceAlt
+                  background: colors.surfaceAlt,
+                  overflow: "hidden"
                 }}
               >
                 <h4 style={{ margin: 0, fontSize: "0.9rem" }}>Availability (up to 3 blocks/day)</h4>
@@ -295,10 +308,15 @@ export default function EmployeesSection({
                   >
                     <strong style={{ fontSize: "0.8rem", paddingTop: "0.4rem" }}>{dayLabels[day.dayOfWeek]}</strong>
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                      <AnimatePresence initial={false}>
                       {day.blocks.map((block, blockIndex) => (
-                        <div
+                        <motion.div
                           key={`${employee.id}-${day.dayOfWeek}-${blockIndex}`}
-                          style={{ display: "flex", gap: "0.35rem", alignItems: "center" }}
+                          initial={{ opacity: 0, maxHeight: 0 }}
+                          animate={{ opacity: 1, maxHeight: "100px" }}
+                          exit={{ opacity: 0, maxHeight: 0 }}
+                          transition={{ duration: 0.15, ease: "easeInOut" }}
+                          style={{ display: "flex", gap: "0.35rem", alignItems: "center", overflow: "hidden" }}
                         >
                           <input
                             type="time"
@@ -352,8 +370,9 @@ export default function EmployeesSection({
                           >
                             Remove
                           </button>
-                        </div>
+                        </motion.div>
                       ))}
+                      </AnimatePresence>
                     </div>
                     <button
                       type="button"
@@ -382,13 +401,15 @@ export default function EmployeesSection({
                 ))}
 
                 <h4 style={{ margin: "0.5rem 0 0", fontSize: "0.9rem" }}>Requested time off</h4>
-                {daysOff.length === 0 && (
-                  <p style={{ margin: 0, color: "#64748b", fontSize: "0.8rem" }}>No requested days off.</p>
-                )}
+                <AnimatePresence initial={false}>
                 {daysOff.map((request, requestIndex) => (
-                  <div
+                  <motion.div
                     key={request.id}
-                    style={{ display: "grid", gridTemplateColumns: "150px 150px 1fr auto", gap: "0.45rem" }}
+                    initial={{ opacity: 0, maxHeight: 0 }}
+                    animate={{ opacity: 1, maxHeight: "100px" }}
+                    exit={{ opacity: 0, maxHeight: 0 }}
+                    transition={{ duration: 0.15, ease: "easeInOut" }}
+                    style={{ display: "grid", gridTemplateColumns: "150px 150px 1fr auto", gap: "0.45rem", overflow: "hidden" }}
                   >
                     <input
                       type="date"
@@ -456,8 +477,9 @@ export default function EmployeesSection({
                     >
                       Remove
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
+                </AnimatePresence>
                 <button
                   type="button"
                   onClick={() => {
@@ -487,11 +509,13 @@ export default function EmployeesSection({
                 >
                   Add time off
                 </button>
-              </div>
+              </motion.div>
             )}
-          </div>
+            </AnimatePresence>
+          </motion.div>
         );
       })}
+      </AnimatePresence>
       <button
         type="button"
         onClick={onAdd}

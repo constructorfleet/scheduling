@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import type { FieldTripType } from "@core/domain/types";
 
 interface FieldTripsSectionProps {
@@ -57,10 +58,15 @@ export default function FieldTripsSection({
         </div>
         <span />
       </div>
+      <AnimatePresence initial={false}>
       {draftFieldTrips.map((trip, index) => {
         return (
-          <div
+          <motion.div
             key={trip.id}
+            initial={{ opacity: 0, maxHeight: 0 }}
+            animate={{ opacity: 1, maxHeight: "200px" }}
+            exit={{ opacity: 0, maxHeight: 0 }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
             style={{
               border: "1px solid #e5e7eb",
               borderRadius: 14,
@@ -68,7 +74,8 @@ export default function FieldTripsSection({
               display: "grid",
               gap: "0.75rem",
               gridTemplateColumns: "1.2fr 200px 200px 88px",
-              alignItems: "center"
+              alignItems: "center",
+              overflow: "hidden"
             }}
           >
             <input
@@ -194,9 +201,10 @@ export default function FieldTripsSection({
             >
               Remove
             </button>
-          </div>
+          </motion.div>
         );
       })}
+      </AnimatePresence>
       <button
         type="button"
         onClick={onAdd}

@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import type { JobTitleSetting } from "../SettingsPanel";
 
 interface JobTitlesSectionProps {
@@ -45,16 +46,22 @@ export default function JobTitlesSection({
         </div>
         <span />
       </div>
+      <AnimatePresence initial={false}>
       {draftJobTitles.map((title, index) => (
-        <div
+        <motion.div
           key={title.id}
+          initial={{ opacity: 0, maxHeight: 0 }}
+          animate={{ opacity: 1, maxHeight: "200px" }}
+          exit={{ opacity: 0, maxHeight: 0 }}
+          transition={{ duration: 0.15, ease: "easeInOut" }}
           style={{
             border: "1px solid #e5e7eb",
             borderRadius: 14,
             padding: "0.75rem",
             display: "grid",
             gap: "0.75rem",
-            gridTemplateColumns: "1fr 180px 220px 88px"
+            gridTemplateColumns: "1fr 180px 220px 88px",
+            overflow: "hidden"
           }}
         >
           <input
@@ -124,8 +131,9 @@ export default function JobTitlesSection({
           >
             Remove
           </button>
-        </div>
+        </motion.div>
       ))}
+      </AnimatePresence>
       <button
         type="button"
         onClick={onAdd}
