@@ -1158,6 +1158,91 @@ describe("RulesEngine", () => {
         expect(violations.some((violation) => violation.ruleId === "cpr-current-required")).toBe(true);
     });
 
+    test("flags on-call assignments that conflict with active time blocks on the same day", () => {
+        const day = createScheduleDay("day-on-call-conflict", { dayOfWeek: "mon" });
+        const blockOnCall = createSegmentBlock("block-on-call-conflict", {
+            dayOfWeek: "mon",
+            startTime: "00:00",
+            endTime: "23:59",
+            scheduleDayId: day.id
+        });
+        const blockRegular = createSegmentBlock("block-on-call-regular", {
+            dayOfWeek: "mon",
+            startTime: "09:00",
+            endTime: "12:00",
+            scheduleDayId: day.id
+        });
+        const employee = createEmployee("emp-on-call-conflict");
+        const onCallAssignment = createAssignment("assign-on-call", blockOnCall.id, employee.id, {
+            startTime: "00:00",
+            endTime: "23:59",
+            isOnCall: true
+        });
+        const regularAssignment = createAssignment("assign-regular", blockRegular.id, employee.id, {
+            startTime: "09:00",
+            endTime: "12:00",
+            status: "scheduled"
+        });
+        const completedRegularAssignment = createAssignment("assign-regular-completed", blockRegular.id, employee.id, {
+            startTime: "13:00",
+            endTime: "14:00",
+            status: "completed"
+        });
+        const context: RulesContext = withDefaultScheduleInfo({
+            scheduleDays: [ day ],
+            segmentBlocks: [ blockOnCall, blockRegular ],
+            staffAssignments: [ onCallAssignment, regularAssignment, completedRegularAssignment ],
+            employees: [ employee ],
+            fieldTripEvents: [],
+            fieldTripTypes: []
+        });
+
+        const violations = engine.evaluate(context).filter((violation) => violation.ruleId === "on-call-exclusivity");
+        expect(violations.length).toBeGreaterThanOrEqual(2);
+        expect(violations.some((violation) => violation.target.id === "assign-on-call")).toBe(true);
+        expect(violations.some((violation) => violation.target.id === "assign-regular")).toBe(true);
+        expect(violations.some((violation) => violation.target.id === "assign-regular-completed")).toBe(false);
+    });
+
+    test("flags active 1:1 assignments without a student name and ignores completed assignments", () => {
+        const day = createScheduleDay("day-1on1", { dayOfWeek: "tue" });
+        const block = createSegmentBlock("block-1on1", {
+            dayOfWeek: "tue",
+            startTime: "10:00",
+            endTime: "12:00",
+            scheduleDayId: day.id
+        });
+        const employee = createEmployee("emp-1on1", { name: "Casey Tester" });
+        const activeMissingName = createAssignment("assign-1on1-missing", block.id, employee.id, {
+            is1on1: true,
+            studentName: "   ",
+            status: "scheduled"
+        });
+        const completedMissingName = createAssignment("assign-1on1-completed", block.id, employee.id, {
+            is1on1: true,
+            studentName: "",
+            status: "completed"
+        });
+        const activeNamed = createAssignment("assign-1on1-valid", block.id, employee.id, {
+            is1on1: true,
+            studentName: "Avery Student",
+            status: "scheduled"
+        });
+        const context: RulesContext = withDefaultScheduleInfo({
+            scheduleDays: [ day ],
+            segmentBlocks: [ block ],
+            staffAssignments: [ activeMissingName, completedMissingName, activeNamed ],
+            employees: [ employee ],
+            fieldTripEvents: [],
+            fieldTripTypes: []
+        });
+
+        const violations = engine.evaluate(context).filter((violation) => violation.ruleId === "one-on-one-student-name");
+        expect(violations).toHaveLength(1);
+        expect(violations[ 0 ].target.id).toBe("assign-1on1-missing");
+        expect(violations[ 0 ].message).toContain("without student name");
+    });
+
     describe("Time Window Ratios", () => {
         test("uses time window ratio when interval is within time window", () => {
             const day = createScheduleDay("day-tw", {
@@ -1195,6 +1280,15 @@ describe("RulesEngine", () => {
             // So 1 staff should violate with 1:10 ratio
             expect(ratioViolations.length).toBeGreaterThan(0);
             expect(ratioViolations.some((v) => v.message.includes("09:00-15:00"))).toBe(true);
+            const windowViolation = ratioViolations.find(
+                (v) =>
+                    v.target.metadata?.startTime === "09:00" &&
+                    v.target.metadata?.endTime === "15:00"
+            );
+            expect(windowViolation).toBeDefined();
+            expect(windowViolation?.target.metadata?.ratioSource).toBe("timeWindow");
+            expect(windowViolation?.target.metadata?.ratioChildrenPerStaff).toBe(10);
+            expect(windowViolation?.message).toContain("from time window override");
         });
 
         test("uses default ratio when interval is outside time windows", () => {

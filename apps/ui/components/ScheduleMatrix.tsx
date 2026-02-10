@@ -34,7 +34,12 @@ interface ScheduleMatrixProps {
   onEnrollmentChange: (dayId: string, enrollment: number | undefined) => void;
   onScheduleTypeChange: (dayId: string, scheduleType: ScheduleType | undefined) => void;
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
-  onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
+  onUpdateAssignmentTime: (
+    assignmentId: string,
+    startTime: string,
+    endTime: string,
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+  ) => void;
   onDeleteAssignment: (assignmentId: string) => void;
   onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean; is1on1?: boolean; studentName?: string }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
@@ -810,7 +815,10 @@ export default function ScheduleMatrix({
                                   dayOfWeek: day,
                                   startTime: block.startTime,
                                   endTime: block.endTime,
-                                  isNew: false
+                                  isNew: false,
+                                  isOnCall: block.isOnCall,
+                                  is1on1: block.is1on1,
+                                  studentName: block.studentName
                                 });
                               }}
                               title={availabilityMessage ?? operatingHoursWarning ?? undefined}
@@ -980,13 +988,25 @@ export default function ScheduleMatrix({
                                       type="button"
                                       onClick={(event) => {
                                         event.stopPropagation();
-                                        if (!editing?.startTime || !editing?.endTime) {
+                                        if (!editing) {
+                                          return;
+                                        }
+                                        if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
+                                          return;
+                                        }
+                                        if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
                                           return;
                                         }
                                         if (overlapMessage) {
                                           return;
                                         }
-                                        onUpdateAssignmentTime(block.id, editing.startTime, editing.endTime);
+                                        const nextStartTime = editing.isOnCall ? "00:00" : editing.startTime;
+                                        const nextEndTime = editing.isOnCall ? "23:59" : editing.endTime;
+                                        onUpdateAssignmentTime(block.id, nextStartTime, nextEndTime, {
+                                          isOnCall: editing.isOnCall,
+                                          is1on1: editing.is1on1,
+                                          studentName: editing.studentName
+                                        });
                                         setEditing(null);
                                       }}
                                       onPointerDown={(event) => event.stopPropagation()}

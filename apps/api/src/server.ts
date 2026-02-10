@@ -1651,8 +1651,11 @@ const buildServer = async () => {
 
                         for (const window of type.timeWindows) {
                             if (window.id) {
-                                await tx.scheduleTypeTimeWindow.update({
-                                    where: { id: window.id },
+                                const updateResult = await tx.scheduleTypeTimeWindow.updateMany({
+                                    where: {
+                                        id: window.id,
+                                        scheduleTypeId: upsertedType.id
+                                    },
                                     data: {
                                         startTime: window.startTime,
                                         endTime: window.endTime,
@@ -1660,6 +1663,11 @@ const buildServer = async () => {
                                         ratioStudents: window.ratioStudents
                                     }
                                 });
+                                if (updateResult.count !== 1) {
+                                    throw new Error(
+                                        `Time window ${ window.id } does not belong to schedule type ${ upsertedType.id }`
+                                    );
+                                }
                                 keptWindowIds.add(window.id);
                             } else {
                                 const created = await tx.scheduleTypeTimeWindow.create({

@@ -84,12 +84,14 @@ const normalizeChildrenPerStaff = (value: number) => {
     return Math.max(1, Math.ceil(value));
 };
 
+type RatioSource = "fieldTrip" | "timeWindow" | "scheduleType";
+
 const findTimeWindowRatio = (
     context: RulesContext,
     scheduleTypeValue: string,
     intervalStartMinutes: number,
     intervalEndMinutes: number
-): number | undefined => {
+): { childrenPerStaff: number; source: RatioSource; } | undefined => {
     const timeWindows = context.scheduleTypeTimeWindows;
     if (!timeWindows || timeWindows.length === 0) {
         return undefined;
@@ -109,7 +111,10 @@ const findTimeWindowRatio = (
         const windowEnd = parseTimeToMinutes(window.endTime);
 
         if (intervalStartMinutes >= windowStart && intervalEndMinutes <= windowEnd) {
-            return window.ratioStudents / window.ratioAdults;
+            return {
+                childrenPerStaff: window.ratioStudents / window.ratioAdults,
+                source: "timeWindow"
+            };
         }
     }
 
@@ -419,6 +424,8 @@ export const ratioSegmentRule: RuleDefinition = {
                 minStaff: number;
                 assigned: number;
                 effectiveChildCount: number;
+                ratioChildrenPerStaff: number;
+                ratioSource: RatioSource;
             }> = [];
             for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
                 const start = sortedBoundaries[ index ];
@@ -435,19 +442,23 @@ export const ratioSegmentRule: RuleDefinition = {
                 }
                 // Three-tier priority: FieldTrip > TimeWindow > Default
                 let normalizedChildrenPerStaff: number;
+                let ratioSource: RatioSource;
                 if (hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd) {
                     // Priority 1: Field trip ratio (highest)
                     normalizedChildrenPerStaff = normalizedFieldTripChildrenPerStaff;
+                    ratioSource = "fieldTrip";
                 } else {
                     // Priority 2: Check for time window ratio
                     const timeWindowRatio = scheduleType
                         ? findTimeWindowRatio(context, scheduleType, start, end)
                         : undefined;
                     if (timeWindowRatio !== undefined) {
-                        normalizedChildrenPerStaff = normalizeChildrenPerStaff(timeWindowRatio);
+                        normalizedChildrenPerStaff = normalizeChildrenPerStaff(timeWindowRatio.childrenPerStaff);
+                        ratioSource = timeWindowRatio.source;
                     } else {
                         // Priority 3: Default schedule type ratio (fallback)
                         normalizedChildrenPerStaff = normalizedScheduleChildrenPerStaff;
+                        ratioSource = "scheduleType";
                     }
                 }
                 // Subtract students in 1:1 assignments during this interval
@@ -472,7 +483,16 @@ export const ratioSegmentRule: RuleDefinition = {
                         .map((assignment) => assignment.employeeId)
                 ).size;
                 if (assigned < required) {
-                    failingIntervals.push({ start, end, required, minStaff, assigned, effectiveChildCount });
+                    failingIntervals.push({
+                        start,
+                        end,
+                        required,
+                        minStaff,
+                        assigned,
+                        effectiveChildCount,
+                        ratioChildrenPerStaff: normalizedChildrenPerStaff,
+                        ratioSource
+                    });
                 }
             }
             if (failingIntervals.length === 0) {
@@ -487,7 +507,9 @@ export const ratioSegmentRule: RuleDefinition = {
                     previous.required === interval.required &&
                     previous.minStaff === interval.minStaff &&
                     previous.assigned === interval.assigned &&
-                    previous.effectiveChildCount === interval.effectiveChildCount
+                    previous.effectiveChildCount === interval.effectiveChildCount &&
+                    previous.ratioChildrenPerStaff === interval.ratioChildrenPerStaff &&
+                    previous.ratioSource === interval.ratioSource
                 ) {
                     previous.end = interval.end;
                     return;
@@ -508,16 +530,15 @@ export const ratioSegmentRule: RuleDefinition = {
                             .filter((segmentBlockId) => Boolean(segmentBlockId))
                     )
                 );
-                const useFieldTripRatio = hasFieldTripWindow &&
-                    interval.start >= fieldTripWindowStart &&
-                    interval.end <= fieldTripWindowEnd;
-                const normalizedChildrenPerStaff = useFieldTripRatio
-                    ? normalizedFieldTripChildrenPerStaff
-                    : normalizedScheduleChildrenPerStaff;
-                const sourceLabel = useFieldTripRatio ? "field trip override" : "schedule type";
+                const sourceLabelByType: Record<RatioSource, string> = {
+                    fieldTrip: "field trip override",
+                    timeWindow: "time window override",
+                    scheduleType: "schedule type"
+                };
+                const sourceLabel = sourceLabelByType[ interval.ratioSource ];
                 const message =
                     `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
-                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ interval.effectiveChildCount }) ` +
+                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ interval.ratioChildrenPerStaff } from ${ sourceLabel }, children ${ interval.effectiveChildCount }) ` +
                     `but only ${ interval.assigned } assigned`;
                 violations.push(
                     buildViolation(
@@ -530,11 +551,11 @@ export const ratioSegmentRule: RuleDefinition = {
                         {
                             dayOfWeek: day.dayOfWeek,
                             childCount: interval.effectiveChildCount,
-                            ratioSource: useFieldTripRatio ? "fieldTrip" : "scheduleType",
+                            ratioSource: interval.ratioSource,
                             required: interval.required,
                             actual: interval.assigned,
                             minStaff: interval.minStaff,
-                            ratioChildrenPerStaff: normalizedChildrenPerStaff,
+                            ratioChildrenPerStaff: interval.ratioChildrenPerStaff,
                             startTime: formatMinutesAsTime(interval.start),
                             endTime: formatMinutesAsTime(interval.end),
                             relatedSegmentBlockIds
@@ -1468,6 +1489,7 @@ export const onCallExclusivityRule: RuleDefinition = {
         // Build map: employeeId:dayOfWeek -> on-call assignment
         const onCallByEmployeeDay = new Map<string, StaffAssignment>();
         context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
             .filter((assignment) => assignment.isOnCall)
             .forEach((assignment) => {
                 const dayOfWeek = getDayOfWeekForAssignment(context, assignment);

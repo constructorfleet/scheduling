@@ -2238,7 +2238,12 @@ export default function App() {
     };
   }, [handleRedo, handleUndo]);
 
-  const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
+  const handleUpdateAssignmentTime = (
+    assignmentId: string,
+    startTime: string,
+    endTime: string,
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+  ) => {
     if (!canEditSchedule) {
       setAuthMessage("You do not have permission to edit assignments.");
       return;
@@ -2252,10 +2257,27 @@ export default function App() {
     applyScheduleChange(
       (current) => ({
         staffAssignments: current.staffAssignments.map((assignment) =>
-          assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
+          assignment.id === assignmentId
+            ? {
+                ...assignment,
+                startTime,
+                endTime,
+                isOnCall: options?.isOnCall ?? assignment.isOnCall,
+                is1on1: options?.is1on1 ?? assignment.is1on1,
+                studentName:
+                  options?.is1on1 === true
+                    ? options.studentName ?? assignment.studentName
+                    : options?.is1on1 === false
+                      ? undefined
+                      : assignment.studentName
+              }
+            : assignment
         )
       }),
-      { action: "Updated assignment time", notes: `${employeeName}${dayName ? ` (${dayName})` : ""}: ${startTime}-${endTime}` }
+      {
+        action: "Updated assignment",
+        notes: `${employeeName}${dayName ? ` (${dayName})` : ""}: ${startTime}-${endTime}`
+      }
     );
   };
 
