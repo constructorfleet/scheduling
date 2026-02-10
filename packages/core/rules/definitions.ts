@@ -938,7 +938,7 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                             "StaffAssignment",
                             assignment.id,
                             citationId,
-                            "error",
+                            "warning",
                             {
                                 operatingHoursId: operatingHours.id,
                                 startTime: assignment.startTime,
@@ -957,7 +957,7 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                             "StaffAssignment",
                             assignment.id,
                             citationId,
-                            "error",
+                            "warning",
                             {
                                 operatingHoursId: operatingHours.id,
                                 endTime: assignment.endTime,
