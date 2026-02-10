@@ -1442,7 +1442,11 @@ const buildServer = async () => {
         const school = await prisma.school.findUnique({
             where: { id: schoolId },
             include: {
-                scheduleTypes: true,
+                scheduleTypes: {
+                    include: {
+                        timeWindows: true
+                    }
+                },
                 jobTitles: true,
                 employees: true,
                 operatingHours: true,
@@ -1506,6 +1510,13 @@ const buildServer = async () => {
                 label: string;
                 ratio: { adults: number; students: number; };
                 description?: string;
+                timeWindows?: Array<{
+                    id?: string;
+                    startTime: string;
+                    endTime: string;
+                    ratioAdults: number;
+                    ratioStudents: number;
+                }>;
             }>;
             jobTitles?: Array<{
                 title: string;
@@ -1607,7 +1618,7 @@ const buildServer = async () => {
 
             if (payload.scheduleTypes?.length) {
                 for (const type of payload.scheduleTypes) {
-                    await tx.scheduleType.upsert({
+                    const upsertedType = await tx.scheduleType.upsert({
                         where: {
                             schoolId_value: {
                                 schoolId,
@@ -1629,6 +1640,59 @@ const buildServer = async () => {
                             description: type.description ?? null
                         }
                     });
+
+                    // Handle time windows
+                    if (Array.isArray(type.timeWindows)) {
+                        const existingWindows = await tx.scheduleTypeTimeWindow.findMany({
+                            where: { scheduleTypeId: upsertedType.id }
+                        });
+
+                        const keptWindowIds = new Set<string>();
+
+                        for (const window of type.timeWindows) {
+                            if (window.id) {
+                                const updateResult = await tx.scheduleTypeTimeWindow.updateMany({
+                                    where: {
+                                        id: window.id,
+                                        scheduleTypeId: upsertedType.id
+                                    },
+                                    data: {
+                                        startTime: window.startTime,
+                                        endTime: window.endTime,
+                                        ratioAdults: window.ratioAdults,
+                                        ratioStudents: window.ratioStudents
+                                    }
+                                });
+                                if (updateResult.count !== 1) {
+                                    throw new Error(
+                                        `Time window ${ window.id } does not belong to schedule type ${ upsertedType.id }`
+                                    );
+                                }
+                                keptWindowIds.add(window.id);
+                            } else {
+                                const created = await tx.scheduleTypeTimeWindow.create({
+                                    data: {
+                                        scheduleTypeId: upsertedType.id,
+                                        startTime: window.startTime,
+                                        endTime: window.endTime,
+                                        ratioAdults: window.ratioAdults,
+                                        ratioStudents: window.ratioStudents
+                                    }
+                                });
+                                keptWindowIds.add(created.id);
+                            }
+                        }
+
+                        const windowsToDelete = existingWindows
+                            .filter(w => !keptWindowIds.has(w.id))
+                            .map(w => w.id);
+
+                        if (windowsToDelete.length > 0) {
+                            await tx.scheduleTypeTimeWindow.deleteMany({
+                                where: { id: { in: windowsToDelete } }
+                            });
+                        }
+                    }
                 }
             }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { DayOfWeek, FieldTripType, Employee, ScheduleType } from "@core/domain/types";
 import { colors, shadows } from "../theme";
 import {
@@ -422,15 +422,18 @@ export default function SettingsPanel({
             { id: "jobTitles", label: "Job titles" },
             { id: "employees", label: "Employees" }
           ] as { id: SettingsTab; label: string }[]).map((tab) => (
-            <button
+            <motion.button
               key={tab.id}
               type="button"
               onClick={() => handleTabChange(tab.id)}
+              animate={{
+                background: activeTab === tab.id ? "#bfdbfe" : "transparent",
+                color: activeTab === tab.id ? "#1d4ed8" : "#475569"
+              }}
+              transition={{ duration: 0.2 }}
               style={{
                 padding: "0.75rem 1.25rem",
                 border: "none",
-                background: activeTab === tab.id ? "#bfdbfe" : "transparent",
-                color: activeTab === tab.id ? "#1d4ed8" : "#475569",
                 fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
@@ -438,7 +441,7 @@ export default function SettingsPanel({
               }}
             >
               {tab.label}
-            </button>
+            </motion.button>
           ))}
           <div style={{ marginLeft: "auto", paddingRight: "0.75rem", display: "inline-flex", alignItems: "center" }}>
             <HelpIconButton
@@ -458,40 +461,65 @@ export default function SettingsPanel({
             flex: 1
           }}
         >
-          {tabWarning && (
-            <div style={{ border: "1px solid #fca5a5", background: "#fecaca", color: "#991b1b", padding: "0.5rem 0.75rem", borderRadius: 10 }}>
-              {tabWarning}
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            {tabWarning && (
+              <motion.div
+                key="tab-warning"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                style={{ border: "1px solid #fca5a5", background: "#fecaca", color: "#991b1b", padding: "0.5rem 0.75rem", borderRadius: 10, overflow: "hidden" }}
+              >
+                {tabWarning}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
           {activeTab === "school" && (
-            <SchoolSettingsSection
-              draftSchoolName={draftSchoolName}
-              draftSchoolRules={draftSchoolRules}
-              draftClosedDays={draftClosedDays}
-              allDays={allDays}
-              onSchoolNameChange={(value) => {
-                setDraftSchoolName(value);
-                markDirty("school");
-              }}
-              onSchoolRulesChange={(next) => {
-                setDraftSchoolRules(next);
-                markDirty("school");
-              }}
-              onClosedDaysChange={(next) => {
-                setDraftClosedDays(next);
-                markDirty("school");
-              }}
-              onSave={() => {
-                onUpdateSchoolName(draftSchoolName);
-                onUpdateClosedDays(draftClosedDays);
-                onUpdateSchoolRules(draftSchoolRules);
-                resetDirty("school");
-                setTabWarning(null);
-              }}
-              canSave={dirtyTabs.school}
-            />
+            <motion.div
+              key="school-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SchoolSettingsSection
+                draftSchoolName={draftSchoolName}
+                draftSchoolRules={draftSchoolRules}
+                draftClosedDays={draftClosedDays}
+                allDays={allDays}
+                onSchoolNameChange={(value) => {
+                  setDraftSchoolName(value);
+                  markDirty("school");
+                }}
+                onSchoolRulesChange={(next) => {
+                  setDraftSchoolRules(next);
+                  markDirty("school");
+                }}
+                onClosedDaysChange={(next) => {
+                  setDraftClosedDays(next);
+                  markDirty("school");
+                }}
+                onSave={() => {
+                  onUpdateSchoolName(draftSchoolName);
+                  onUpdateClosedDays(draftClosedDays);
+                  onUpdateSchoolRules(draftSchoolRules);
+                  resetDirty("school");
+                  setTabWarning(null);
+                }}
+                canSave={dirtyTabs.school}
+              />
+            </motion.div>
           )}
           {activeTab === "scheduleTypes" && (
+            <motion.div
+              key="scheduleTypes-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
             <ScheduleTypesSection
               draftScheduleTypes={draftScheduleTypes}
               onChange={(next) => {
@@ -513,9 +541,17 @@ export default function SettingsPanel({
               }}
               canSave={dirtyTabs.scheduleTypes}
             />
+            </motion.div>
           )}
 
           {activeTab === "operatingHours" && (
+            <motion.div
+              key="operatingHours-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
             <OperatingHoursSection
               draftOperatingHours={draftOperatingHours}
               draftScheduleTypes={operatingScheduleTypeOptions}
@@ -552,9 +588,17 @@ export default function SettingsPanel({
               }}
               canSave={canSaveOperatingHours}
             />
+            </motion.div>
           )}
 
           {activeTab === "fieldTrips" && (
+            <motion.div
+              key="fieldTrips-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
             <FieldTripsSection
               draftFieldTrips={draftFieldTrips}
               onChange={(next) => {
@@ -576,9 +620,17 @@ export default function SettingsPanel({
               }}
               canSave={dirtyTabs.fieldTrips}
             />
+            </motion.div>
           )}
 
           {activeTab === "jobTitles" && (
+            <motion.div
+              key="jobTitles-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
             <JobTitlesSection
               draftJobTitles={draftJobTitles}
               onChange={(next) => {
@@ -600,9 +652,17 @@ export default function SettingsPanel({
               }}
               canSave={dirtyTabs.jobTitles}
             />
+            </motion.div>
           )}
 
           {activeTab === "employees" && (
+            <motion.div
+              key="employees-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
             <EmployeesSection
               draftEmployees={draftEmployees}
               jobTitleOptions={jobTitleOptions}
@@ -633,7 +693,9 @@ export default function SettingsPanel({
               }}
               canSave={dirtyTabs.employees}
             />
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
         <div
           style={{
@@ -646,6 +708,40 @@ export default function SettingsPanel({
             gap: "0.75rem"
           }}
         >
+          <button
+            type="button"
+            onClick={() => {
+              // Reset draft values to original values for the active tab
+              if (activeTab === "school") {
+                setDraftSchoolName(schoolName);
+                setDraftClosedDays(closedDays);
+                setDraftSchoolRules(schoolRules);
+              } else if (activeTab === "scheduleTypes") {
+                setDraftScheduleTypes(scheduleTypes);
+              } else if (activeTab === "operatingHours") {
+                setDraftOperatingHours(operatingHoursConfig);
+              } else if (activeTab === "fieldTrips") {
+                setDraftFieldTrips(fieldTripTypes);
+              } else if (activeTab === "jobTitles") {
+                setDraftJobTitles(jobTitles);
+              } else if (activeTab === "employees") {
+                setDraftEmployees(employees);
+              }
+              resetDirty(activeTab);
+              setTabWarning(null);
+            }}
+            disabled={!canSaveActiveTab}
+            style={{
+              borderRadius: 999,
+              border: "1px solid #cbd5e1",
+              background: canSaveActiveTab ? "#ffffff" : "#f1f5f9",
+              color: canSaveActiveTab ? "#475569" : "#94a3b8",
+              padding: "0.45rem 1rem",
+              cursor: canSaveActiveTab ? "pointer" : "not-allowed"
+            }}
+          >
+            Reset
+          </button>
           <button
             type="button"
             onClick={saveActiveTab}

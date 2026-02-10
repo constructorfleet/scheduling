@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   DayOfWeek,
   Employee,
@@ -34,10 +34,16 @@ interface ScheduleMatrixProps {
   onEnrollmentChange: (dayId: string, enrollment: number | undefined) => void;
   onScheduleTypeChange: (dayId: string, scheduleType: ScheduleType | undefined) => void;
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
-  onUpdateAssignmentTime: (assignmentId: string, startTime: string, endTime: string) => void;
+  onUpdateAssignmentTime: (
+    assignmentId: string,
+    startTime: string,
+    endTime: string,
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+  ) => void;
   onDeleteAssignment: (assignmentId: string) => void;
-  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string }) => void;
+  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean; is1on1?: boolean; studentName?: string }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
+  onDayClick: (dayOfWeek: DayOfWeek) => void;
   focusedSegmentIds?: string[] | null;
   onOpenHelpTopic?: (topicId: HelpTopicId) => void;
 }
@@ -110,7 +116,8 @@ export default function ScheduleMatrix({
   onCreateAssignment,
   onReassignUnlinkedStaff,
   focusedSegmentIds,
-  onOpenHelpTopic
+  onOpenHelpTopic,
+  onDayClick
 }: ScheduleMatrixProps) {
   const focusedSet = useMemo(() => new Set(focusedSegmentIds ?? []), [focusedSegmentIds]);
   const primaryFocusedSegmentId = focusedSegmentIds?.[0] ?? null;
@@ -132,6 +139,9 @@ export default function ScheduleMatrix({
     startTime: string;
     endTime: string;
     isNew: boolean;
+    isOnCall?: boolean;
+    is1on1?: boolean;
+    studentName?: string;
   } | null>(null);
   const [reassignmentTargetBySource, setReassignmentTargetBySource] = useState<Record<string, string>>({});
   const openerWindowMinutes = 15;
@@ -268,6 +278,35 @@ export default function ScheduleMatrix({
     return `Outside availability (${labels.join(", ")})`;
   };
 
+  const getOperatingHoursWarningMessage = (
+    day: DayOfWeek,
+    startTime: string,
+    endTime: string
+  ) => {
+    const operatingHours = operatingHoursByDay[day];
+    if (!operatingHours) {
+      return null;
+    }
+    const start = parseTimeToMinutes(startTime);
+    const end = parseTimeToMinutes(endTime);
+    const openMinutes = parseTimeToMinutes(operatingHours.open);
+    const closeMinutes = parseTimeToMinutes(operatingHours.close);
+
+    const startsBefore = start < openMinutes;
+    const endsAfter = end > closeMinutes;
+
+    if (startsBefore && endsAfter) {
+      return `Starts before open (${formatTime(operatingHours.open)}) and ends after close (${formatTime(operatingHours.close)})`;
+    }
+    if (startsBefore) {
+      return `Starts before operating hours (${formatTime(operatingHours.open)})`;
+    }
+    if (endsAfter) {
+      return `Ends after operating hours (${formatTime(operatingHours.close)})`;
+    }
+    return null;
+  };
+
   useEffect(() => {
     if (!primaryFocusedSegmentId) return;
     const focusedSegment = segmentById[primaryFocusedSegmentId];
@@ -374,7 +413,31 @@ export default function ScheduleMatrix({
                   }}
                 >
                   <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-                    <span style={{ fontWeight: 700 }}>{dayDisplayNames[day]}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ fontWeight: 700 }}>{dayDisplayNames[day]}</span>
+                      {!closedDay && dayMeta && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDayClick(day);
+                          }}
+                          title="View coverage report"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: "0.25rem",
+                            display: "flex",
+                            alignItems: "center",
+                            color: "#3b82f6",
+                            fontSize: "1rem"
+                          }}
+                        >
+                          📊
+                        </button>
+                      )}
+                    </div>
                     <span style={{ fontSize: "0.7rem", color: "#64748b", fontWeight: 600 }}>
                       {formatDateLabel(dayMeta?.date)}
                     </span>
@@ -510,7 +573,7 @@ export default function ScheduleMatrix({
               <motion.tr
                 key={member.id}
                 layout
-                transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
@@ -678,29 +741,43 @@ export default function ScheduleMatrix({
                             block.startTime,
                             block.endTime
                           );
+                          const operatingHoursWarning = getOperatingHoursWarningMessage(
+                            day,
+                            block.startTime,
+                            block.endTime
+                          );
+                          const isOnCall = block.isOnCall || (block.startTime === "00:00" && block.endTime === "23:59");
+                          const is1on1 = block.is1on1;
                           const isOpener = operatingWindow
-                            ? Math.abs(parseTimeToMinutes(block.startTime) - operatingWindow.open) <=
-                              openerWindowMinutes
+                            ? parseTimeToMinutes(block.startTime) <= operatingWindow.open + openerWindowMinutes
                             : false;
                           const isCloser = operatingWindow
-                            ? Math.abs(parseTimeToMinutes(block.endTime) - operatingWindow.close) <=
-                              closerWindowMinutes
+                            ? parseTimeToMinutes(block.endTime) >= operatingWindow.close - closerWindowMinutes
                             : false;
-                          const blockBackground = isOpener && isCloser
-                            ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
-                            : isOpener
-                              ? "rgba(0, 96, 250, 0.25)"
-                              : isCloser
-                                ? "rgba(132, 0, 255, 0.25)"
-                                : "#ecfeff";
-                          const blockBorder = isOpener || isCloser ? "1px solid rgba(79,70,229,0.5)" : "1px solid #bae6fd";
+                          const blockBackground = is1on1
+                            ? "rgba(16, 185, 129, 0.25)"
+                            : isOnCall
+                              ? "rgba(251, 191, 36, 0.25)"
+                              : isOpener && isCloser
+                                ? "linear-gradient(135deg, rgba(59,130,246,0.22), rgba(147,51,234,0.22))"
+                                : isOpener
+                                  ? "rgba(0, 96, 250, 0.25)"
+                                  : isCloser
+                                    ? "rgba(132, 0, 255, 0.25)"
+                                    : "#ecfeff";
+                          const blockBorder = is1on1
+                            ? "2px solid rgba(16, 185, 129, 0.6)"
+                            : isOnCall
+                              ? "2px solid rgba(251, 191, 36, 0.6)"
+                              : isOpener || isCloser
+                                ? "1px solid rgba(79,70,229,0.5)"
+                                : "1px solid #bae6fd";
                           const isFocused = focusedSet.has(segmentId);
                           const hasAvailabilityViolation = Boolean(availabilityMessage);
+                          const hasOperatingHoursWarning = Boolean(operatingHoursWarning) && !hasAvailabilityViolation;
 
                           return (
                             <motion.div
-                              layout
-                              transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
                               key={`${member.id}-${day}-${block.id}`}
                               style={{
                                 display: "flex",
@@ -738,10 +815,13 @@ export default function ScheduleMatrix({
                                   dayOfWeek: day,
                                   startTime: block.startTime,
                                   endTime: block.endTime,
-                                  isNew: false
+                                  isNew: false,
+                                  isOnCall: block.isOnCall,
+                                  is1on1: block.is1on1,
+                                  studentName: block.studentName
                                 });
                               }}
-                              title={availabilityMessage ?? undefined}
+                              title={availabilityMessage ?? operatingHoursWarning ?? undefined}
                             >
                               {hasAvailabilityViolation && (
                                 <span
@@ -765,107 +845,287 @@ export default function ScheduleMatrix({
                                   ?
                                 </span>
                               )}
+                              {hasOperatingHoursWarning && (
+                                <span
+                                  style={{
+                                    position: "absolute",
+                                    top: 4,
+                                    right: 4,
+                                    width: 16,
+                                    height: 16,
+                                    borderRadius: "50%",
+                                    border: "1px solid #f97316",
+                                    background: colors.surface,
+                                    color: "#f97316",
+                                    fontSize: "0.65rem",
+                                    fontWeight: 700,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                  }}
+                                >
+                                  !
+                                </span>
+                              )}
+                              <AnimatePresence mode="wait" initial={false}>
                               {editing?.assignmentId === block.id ? (
-                                <>
-                                  <input
-                                    type="time"
-                                    value={editing.startTime}
-                                    onChange={(event) =>
-                                      setEditing((prev) =>
-                                        prev ? { ...prev, startTime: event.target.value } : prev
-                                      )
-                                    }
-                                    onClick={(event) => event.stopPropagation()}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 6,
-                                      border: "1px solid #cbd5f5",
-                                      padding: "0.2rem 0.3rem",
-                                      fontSize: "0.7rem"
-                                    }}
-                                  />
-                                  <input
-                                    type="time"
-                                    value={editing.endTime}
-                                    onChange={(event) =>
-                                      setEditing((prev) =>
-                                        prev ? { ...prev, endTime: event.target.value } : prev
-                                      )
-                                    }
-                                    onClick={(event) => event.stopPropagation()}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 6,
-                                      border: "1px solid #cbd5f5",
-                                      padding: "0.2rem 0.3rem",
-                                      fontSize: "0.7rem"
-                                    }}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      if (!editing?.startTime || !editing?.endTime) {
-                                        return;
-                                      }
-                                      if (overlapMessage) {
-                                        return;
-                                      }
-                                      onUpdateAssignmentTime(block.id, editing.startTime, editing.endTime);
-                                      setEditing(null);
-                                    }}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 999,
-                                      border: "none",
-                                      background: overlapMessage ? "#94a3b8" : "#2563eb",
-                                      color: "#fff",
-                                      padding: "0.15rem 0.6rem",
-                                      fontSize: "0.7rem",
-                                      alignSelf: "flex-start",
-                                      cursor: overlapMessage ? "not-allowed" : "pointer"
-                                    }}
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      onDeleteAssignment(block.id);
-                                      setEditing(null);
-                                    }}
-                                    onPointerDown={(event) => event.stopPropagation()}
-                                    style={{
-                                      borderRadius: 999,
-                                      border: "1px solid #fecaca",
-                                      background: "#fee2e2",
-                                      color: "#b91c1c",
-                                      padding: "0.15rem 0.6rem",
-                                      fontSize: "0.7rem",
-                                      alignSelf: "flex-start",
-                                      cursor: "pointer"
-                                    }}
-                                  >
-                                    Delete
-                                  </button>
+                                <motion.div
+                                  key="editing"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}
+                                >
+                                  {!editing.isOnCall && !editing.is1on1 && (
+                                    <>
+                                      <input
+                                        type="time"
+                                        value={editing.startTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, startTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid #cbd5f5",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="time"
+                                        value={editing.endTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, endTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid #cbd5f5",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                  {editing.isOnCall && (
+                                    <div
+                                      style={{
+                                        fontSize: "0.85rem",
+                                        fontWeight: 700,
+                                        color: "rgba(180, 83, 9, 1)",
+                                        textAlign: "center"
+                                      }}
+                                    >
+                                      ON CALL (All Day)
+                                    </div>
+                                  )}
+                                  {editing.is1on1 && (
+                                    <>
+                                      <input
+                                        type="time"
+                                        value={editing.startTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, startTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="time"
+                                        value={editing.endTime}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, endTime: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                      <input
+                                        type="text"
+                                        value={editing.studentName ?? ""}
+                                        onChange={(event) =>
+                                          setEditing((prev) =>
+                                            prev ? { ...prev, studentName: event.target.value } : prev
+                                          )
+                                        }
+                                        onClick={(event) => event.stopPropagation()}
+                                        onPointerDown={(event) => event.stopPropagation()}
+                                        placeholder="Student name"
+                                        style={{
+                                          borderRadius: 6,
+                                          border: "1px solid rgba(16, 185, 129, 0.6)",
+                                          padding: "0.2rem 0.3rem",
+                                          fontSize: "0.7rem"
+                                        }}
+                                      />
+                                    </>
+                                  )}
+                                  <div style={{ display: "flex", gap: "0.25rem" }}>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        if (!editing) {
+                                          return;
+                                        }
+                                        if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
+                                          return;
+                                        }
+                                        if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
+                                          return;
+                                        }
+                                        if (overlapMessage) {
+                                          return;
+                                        }
+                                        const nextStartTime = editing.isOnCall ? "00:00" : editing.startTime;
+                                        const nextEndTime = editing.isOnCall ? "23:59" : editing.endTime;
+                                        onUpdateAssignmentTime(block.id, nextStartTime, nextEndTime, {
+                                          isOnCall: editing.isOnCall,
+                                          is1on1: editing.is1on1,
+                                          studentName: editing.studentName
+                                        });
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "none",
+                                        background: overlapMessage ? "#94a3b8" : "#2563eb",
+                                        color: "#fff",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: overlapMessage ? "not-allowed" : "pointer"
+                                      }}
+                                    >
+                                      Save
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "1px solid #cbd5e1",
+                                        background: "#f1f5f9",
+                                        color: "#475569",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: "pointer"
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        onDeleteAssignment(block.id);
+                                        setEditing(null);
+                                      }}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "1px solid #fecaca",
+                                        background: "#fee2e2",
+                                        color: "#b91c1c",
+                                        padding: "0.15rem 0.6rem",
+                                        fontSize: "0.7rem",
+                                        cursor: "pointer"
+                                      }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
                                   {overlapMessage && (
                                     <span style={{ fontSize: "0.7rem", color: "#b91c1c" }}>{overlapMessage}</span>
                                   )}
-                                </>
+                                </motion.div>
                               ) : (
-                                <>
-                                  <span>{formatTime(block.startTime)}</span>
-                                  <span>{formatTime(block.endTime)}</span>
-                                </>
+                                <motion.div
+                                  key="display"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.15 }}
+                                  style={{ display: "flex", flexDirection: "column", gap: "0.25rem", width: "100%" }}
+                                >
+                                  {is1on1 ? (
+                                    <>
+                                      <div
+                                        style={{
+                                          fontSize: "0.75rem",
+                                          fontWeight: 700,
+                                          color: "rgba(5, 150, 105, 1)",
+                                          textAlign: "center"
+                                        }}
+                                      >
+                                        1:1 - {block.studentName || "Unknown"}
+                                      </div>
+                                      <div style={{ fontSize: "0.65rem", color: "#64748b", textAlign: "center" }}>
+                                        {formatTime(block.startTime)} - {formatTime(block.endTime)}
+                                      </div>
+                                    </>
+                                  ) : isOnCall ? (
+                                    <div
+                                      style={{
+                                        fontSize: "0.85rem",
+                                        fontWeight: 700,
+                                        color: "rgba(180, 83, 9, 1)",
+                                        textAlign: "center",
+                                        padding: "0.25rem 0"
+                                      }}
+                                    >
+                                      ON CALL
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <span>{formatTime(block.startTime)}</span>
+                                      <span>{formatTime(block.endTime)}</span>
+                                    </>
+                                  )}
+                                  <span style={{ fontSize: "0.7rem", color: "#64748b" }}>
+                                    {isOnCall
+                                      ? "All day"
+                                      : is1on1
+                                        ? `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`
+                                        : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
+                                  </span>
+                                </motion.div>
                               )}
+                              </AnimatePresence>
                             </motion.div>
                           );
                         })}
                         {canCreateAssignment && dayHours < member.maxHoursPerDay && (
                           <motion.button
                             layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
                             type="button"
                             onClick={() => {
                               const defaultStart = operatingWindow
@@ -904,6 +1164,70 @@ export default function ScheduleMatrix({
                             Add block
                           </motion.button>
                         )}
+                        {canCreateAssignment && dayHours < member.maxHoursPerDay && (
+                          <motion.button
+                            layout
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
+                            type="button"
+                            onClick={() => {
+                              setEditing({
+                                employeeId: member.id,
+                                dayOfWeek: day,
+                                startTime: "00:00",
+                                endTime: "23:59",
+                                isNew: true,
+                                isOnCall: true
+                              });
+                            }}
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(251, 191, 36, 0.6)",
+                              background: "rgba(251, 191, 36, 0.15)",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: colors.textPrimary,
+                              padding: "0.3rem 0.7rem",
+                              cursor: "pointer",
+                            }}
+                          >
+                            On call
+                          </motion.button>
+                        )}
+                        {canCreateAssignment && dayHours < member.maxHoursPerDay && (
+                          <motion.button
+                            layout
+                            transition={{ layout: { type: "spring", stiffness: 500, damping: 50 } }}
+                            type="button"
+                            onClick={() => {
+                              const defaultStart = operatingWindow
+                                ? `${Math.floor(operatingWindow.open / 60).toString().padStart(2, "0")}:${(operatingWindow.open % 60).toString().padStart(2, "0")}`
+                                : "08:00";
+                              const defaultEnd = operatingWindow
+                                ? `${Math.floor((operatingWindow.open + 60) / 60).toString().padStart(2, "0")}:${((operatingWindow.open + 60) % 60).toString().padStart(2, "0")}`
+                                : "09:00";
+                              setEditing({
+                                employeeId: member.id,
+                                dayOfWeek: day,
+                                startTime: defaultStart,
+                                endTime: defaultEnd,
+                                isNew: true,
+                                is1on1: true
+                              });
+                            }}
+                            style={{
+                              borderRadius: 999,
+                              border: "1px solid rgba(16, 185, 129, 0.6)",
+                              background: "rgba(16, 185, 129, 0.15)",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: colors.textPrimary,
+                              padding: "0.3rem 0.7rem",
+                              cursor: "pointer",
+                            }}
+                          >
+                            1:1
+                          </motion.button>
+                        )}
                         {!closedDay && !canCreateAssignment && (
                           <span style={{ fontSize: "0.7rem", color: "#b91c1c", fontWeight: 600 }}>
                             {hasRequestedDayOff
@@ -913,13 +1237,17 @@ export default function ScheduleMatrix({
                                 : "Unavailable"}
                           </span>
                         )}
+                        <AnimatePresence mode="wait">
                         {!closedDay &&
                           editing?.isNew &&
                           editing.employeeId === member.id &&
                           editing.dayOfWeek === day && (
                           <motion.div
-                            layout
-                            transition={{ layout: { type: "tween", duration: 0.2, ease: "linear" } }}
+                            key="new-assignment"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
                             style={{
                               display: "flex",
                               flexDirection: "column",
@@ -927,7 +1255,8 @@ export default function ScheduleMatrix({
                               padding: "0.25rem 0.4rem",
                               borderRadius: 8,
                               background: "#fed7aa",
-                              border: "1px solid #fed7aa"
+                              border: "1px solid #fed7aa",
+                              overflow: "hidden"
                             }}
                           >
                             {(() => {
@@ -935,76 +1264,173 @@ export default function ScheduleMatrix({
                                 return null;
                               }
                               const overlapMessage = getOverlapMessage(editing);
+                              const newAssignmentOperatingHoursWarning = getOperatingHoursWarningMessage(
+                                editing.dayOfWeek,
+                                editing.startTime,
+                                editing.endTime
+                              );
                               return (
                                 <>
-                            <input
-                              type="time"
-                              value={editing.startTime}
-                              onChange={(event) =>
-                                setEditing((prev) =>
-                                  prev ? { ...prev, startTime: event.target.value } : prev
-                                )
-                              }
-                              style={{
-                                borderRadius: 6,
-                                border: "1px solid #cbd5f5",
-                                padding: "0.2rem 0.3rem",
-                                fontSize: "0.7rem"
-                              }}
-                            />
-                            <input
-                              type="time"
-                              value={editing.endTime}
-                              onChange={(event) =>
-                                setEditing((prev) =>
-                                  prev ? { ...prev, endTime: event.target.value } : prev
-                                )
-                              }
-                              style={{
-                                borderRadius: 6,
-                                border: "1px solid #cbd5f5",
-                                padding: "0.2rem 0.3rem",
-                                fontSize: "0.7rem"
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!editing.startTime || !editing.endTime) {
-                                  return;
-                                }
-                                if (overlapMessage) {
-                                  return;
-                                }
-                                onCreateAssignment({
-                                  employeeId: editing.employeeId,
-                                  dayOfWeek: editing.dayOfWeek,
-                                  startTime: editing.startTime,
-                                  endTime: editing.endTime
-                                });
-                                setEditing(null);
-                              }}
-                              style={{
-                                borderRadius: 999,
-                                border: "none",
-                                background: overlapMessage ? "#94a3b8" : "#2563eb",
-                                color: "#fff",
-                                padding: "0.15rem 0.6rem",
-                                fontSize: "0.7rem",
-                                alignSelf: "flex-start",
-                                cursor: overlapMessage ? "not-allowed" : "pointer"
-                              }}
-                            >
-                              Save
-                            </button>
+                            {!editing.isOnCall && !editing.is1on1 && (
+                              <>
+                                <input
+                                  type="time"
+                                  value={editing.startTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, startTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid #cbd5f5",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="time"
+                                  value={editing.endTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, endTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid #cbd5f5",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                              </>
+                            )}
+                            {editing.isOnCall && (
+                              <div
+                                style={{
+                                  fontSize: "0.85rem",
+                                  fontWeight: 700,
+                                  color: "rgba(180, 83, 9, 1)",
+                                  textAlign: "center"
+                                }}
+                              >
+                                ON CALL (All Day)
+                              </div>
+                            )}
+                            {editing.is1on1 && (
+                              <>
+                                <input
+                                  type="time"
+                                  value={editing.startTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, startTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="time"
+                                  value={editing.endTime}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, endTime: event.target.value } : prev
+                                    )
+                                  }
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                                <input
+                                  type="text"
+                                  value={editing.studentName ?? ""}
+                                  onChange={(event) =>
+                                    setEditing((prev) =>
+                                      prev ? { ...prev, studentName: event.target.value } : prev
+                                    )
+                                  }
+                                  placeholder="Student name"
+                                  style={{
+                                    borderRadius: 6,
+                                    border: "1px solid rgba(16, 185, 129, 0.6)",
+                                    padding: "0.2rem 0.3rem",
+                                    fontSize: "0.7rem"
+                                  }}
+                                />
+                              </>
+                            )}
+                            <div style={{ display: "flex", gap: "0.25rem" }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!editing.isOnCall && (!editing.startTime || !editing.endTime)) {
+                                    return;
+                                  }
+                                  if (editing.is1on1 && (!editing.studentName || editing.studentName.trim() === "")) {
+                                    return;
+                                  }
+                                  if (overlapMessage) {
+                                    return;
+                                  }
+                                  onCreateAssignment({
+                                    employeeId: editing.employeeId,
+                                    dayOfWeek: editing.dayOfWeek,
+                                    startTime: editing.isOnCall ? "00:00" : editing.startTime,
+                                    endTime: editing.isOnCall ? "23:59" : editing.endTime,
+                                    isOnCall: editing.isOnCall,
+                                    is1on1: editing.is1on1,
+                                    studentName: editing.studentName
+                                  });
+                                  setEditing(null);
+                                }}
+                                style={{
+                                  borderRadius: 999,
+                                  border: "none",
+                                  background: overlapMessage ? "#94a3b8" : "#2563eb",
+                                  color: "#fff",
+                                  padding: "0.15rem 0.6rem",
+                                  fontSize: "0.7rem",
+                                  cursor: overlapMessage ? "not-allowed" : "pointer"
+                                }}
+                              >
+                                Save
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditing(null)}
+                                style={{
+                                  borderRadius: 999,
+                                  border: "1px solid #cbd5e1",
+                                  background: "#f1f5f9",
+                                  color: "#475569",
+                                  padding: "0.15rem 0.6rem",
+                                  fontSize: "0.7rem",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
                             {overlapMessage && (
                               <span style={{ fontSize: "0.7rem", color: "#b91c1c" }}>{overlapMessage}</span>
+                            )}
+                            {newAssignmentOperatingHoursWarning && (
+                              <span style={{ fontSize: "0.7rem", color: "#f97316" }}>⚠️ {newAssignmentOperatingHoursWarning}</span>
                             )}
                             </>
                               );
                             })()}
                           </motion.div>
                           )}
+                        </AnimatePresence>
                         {!closedDay && !hasRequestedDayOff && availabilityLabels.length > 0 && (
                           <div
                             style={{

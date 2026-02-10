@@ -152,6 +152,15 @@ exports.Prisma.ScheduleTypeScalarFieldEnum = {
   description: 'description'
 };
 
+exports.Prisma.ScheduleTypeTimeWindowScalarFieldEnum = {
+  id: 'id',
+  scheduleTypeId: 'scheduleTypeId',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  ratioAdults: 'ratioAdults',
+  ratioStudents: 'ratioStudents'
+};
+
 exports.Prisma.JobTitleScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
@@ -257,7 +266,10 @@ exports.Prisma.StaffAssignmentScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   status: 'status',
-  notes: 'notes'
+  notes: 'notes',
+  isOnCall: 'isOnCall',
+  is1on1: 'is1on1',
+  studentName: 'studentName'
 };
 
 exports.Prisma.AuditEventScalarFieldEnum = {
@@ -381,6 +393,7 @@ exports.Prisma.ModelName = {
   District: 'District',
   School: 'School',
   ScheduleType: 'ScheduleType',
+  ScheduleTypeTimeWindow: 'ScheduleTypeTimeWindow',
   JobTitle: 'JobTitle',
   Employee: 'Employee',
   OperatingHours: 'OperatingHours',

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import WeekNavigationBanner from "./components/WeekNavigationBanner";
-import { FieldTripSelection } from "./components/DayMetadataStrip";
+import { FieldTripSelection, ScheduleTypeOption } from "./components/DayMetadataStrip";
 import ScheduleMatrix from "./components/ScheduleMatrix";
 import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
@@ -14,6 +14,7 @@ import InviteAccept from "./components/InviteAccept";
 import PasswordReset from "./components/PasswordReset";
 import AutoScheduleModal, { type AutoScheduleState } from "./components/AutoScheduleModal";
 import WeekInitializationModal from "./components/WeekInitializationModal";
+import CoverageVisualizerModal from "./components/CoverageVisualizerModal";
 import AppShell from "./components/AppShell";
 import EmployeeScheduleView from "./components/EmployeeScheduleView";
 import { useUserManagement } from "./hooks/useUserManagement";
@@ -55,7 +56,7 @@ import type {
   ScheduleTypePayload as ScheduleTypePayloadModel
 } from "./data/generated";
 import { createRulesEngine } from "@core/rules/engine";
-import type { RuleViolation as EngineRuleViolation, RulesContext } from "@core/rules/types";
+import type { RuleViolation as EngineRuleViolation, RulesContext, ScheduleTypeTimeWindow } from "@core/rules/types";
 import {
   deleteScheduleAssignments,
   deleteScheduleAssignment,
@@ -135,7 +136,7 @@ const DAY_OF_WEEK_INDEX: Record<DayOfWeek, number> = {
 const isDayOfWeek = (value: string): value is DayOfWeek =>
   DAY_OF_WEEK_VALUES.includes(value as DayOfWeek);
 const CLOSED_SCHEDULE_TYPE = "closed" as ScheduleType;
-const CLOSED_SCHEDULE_TYPE_OPTION = {
+const CLOSED_SCHEDULE_TYPE_OPTION: ScheduleTypeOption = {
   value: CLOSED_SCHEDULE_TYPE,
   label: "Closed",
   ratio: { adults: 1, students: 1 },
@@ -338,6 +339,7 @@ export default function App() {
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [settingsCloseAttempt, setSettingsCloseAttempt] = useState(0);
   const [closedDaysState, setClosedDaysState] = useState<DayOfWeek[]>([]);
+  const [coverageModalDay, setCoverageModalDay] = useState<DayOfWeek | null>(null);
   const [schoolRulesState, setSchoolRulesState] = useState<SchoolRules>({
     openerCount: 0,
     closerCount: 0,
@@ -926,6 +928,26 @@ export default function App() {
     }, {});
   }, [scheduleTypeOptionsState]);
 
+  const scheduleTypeTimeWindows = useMemo(() => {
+    const windows: ScheduleTypeTimeWindow[] = [];
+    scheduleTypeOptionsState.forEach((option: ScheduleTypeOption) => {
+      if (option.timeWindows) {
+        option.timeWindows.forEach((window: NonNullable<ScheduleTypeOption['timeWindows']>[number]) => {
+          windows.push({
+            id: window.id || '',
+            scheduleTypeId: '',
+            scheduleTypeValue: option.value,
+            startTime: window.startTime,
+            endTime: window.endTime,
+            ratioAdults: window.ratioAdults,
+            ratioStudents: window.ratioStudents
+          });
+        });
+      }
+    });
+    return windows;
+  }, [scheduleTypeOptionsState]);
+
   const derivedOperatingHours = useMemo<OperatingHours[]>(() => {
     return weekDaySequence
       .map((day) => {
@@ -969,12 +991,14 @@ export default function App() {
       };
     }
     if ("scheduleTypes" in overrides) {
-      payload.scheduleTypes = (overrides.scheduleTypes ?? scheduleTypeOptionsState).map((type) => ({
+      const scheduleTypes = overrides.scheduleTypes ?? scheduleTypeOptionsState;
+      payload.scheduleTypes = scheduleTypes.map((type): ScheduleTypePayloadModel => ({
         value: type.value,
         label: type.label,
         ratio: type.ratio,
-        description: type.description
-      })) as ScheduleTypePayloadModel[];
+        description: type.description,
+        timeWindows: type.timeWindows
+      }));
     }
     if ("jobTitles" in overrides) {
       payload.jobTitles = overrides.jobTitles ?? jobTitlesState;
@@ -1288,7 +1312,8 @@ export default function App() {
                   adults: type.ratioAdults ?? 1,
                   students: type.ratioStudents ?? 1
                 },
-                description: type.description ?? ""
+                description: type.description ?? "",
+                timeWindows: type.timeWindows
               }))
             )
           );
@@ -1697,6 +1722,7 @@ export default function App() {
       scheduleDays: scheduleDaysState,
       operatingHours: derivedOperatingHours,
       scheduleTypeRatios: ratioByScheduleType,
+      scheduleTypeTimeWindows,
       schoolRules: schoolRulesState,
       jobTitleRules
     };
@@ -1714,6 +1740,7 @@ export default function App() {
     schoolRulesState,
     jobTitleRules,
     ratioByScheduleType,
+    scheduleTypeTimeWindows,
     isViewer
   ]);
 
@@ -2119,6 +2146,10 @@ export default function App() {
     );
   };
 
+  const handleDayClick = (dayOfWeek: DayOfWeek) => {
+    setCoverageModalDay(dayOfWeek);
+  };
+
   const handleStepAction = (stepId: string) => {
     if (stepId === "schedule") {
       setShowViolationNavigator(true);
@@ -2207,7 +2238,12 @@ export default function App() {
     };
   }, [handleRedo, handleUndo]);
 
-  const handleUpdateAssignmentTime = (assignmentId: string, startTime: string, endTime: string) => {
+  const handleUpdateAssignmentTime = (
+    assignmentId: string,
+    startTime: string,
+    endTime: string,
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+  ) => {
     if (!canEditSchedule) {
       setAuthMessage("You do not have permission to edit assignments.");
       return;
@@ -2221,10 +2257,27 @@ export default function App() {
     applyScheduleChange(
       (current) => ({
         staffAssignments: current.staffAssignments.map((assignment) =>
-          assignment.id === assignmentId ? { ...assignment, startTime, endTime } : assignment
+          assignment.id === assignmentId
+            ? {
+                ...assignment,
+                startTime,
+                endTime,
+                isOnCall: options?.isOnCall ?? assignment.isOnCall,
+                is1on1: options?.is1on1 ?? assignment.is1on1,
+                studentName:
+                  options?.is1on1 === true
+                    ? options.studentName ?? assignment.studentName
+                    : options?.is1on1 === false
+                      ? undefined
+                      : assignment.studentName
+              }
+            : assignment
         )
       }),
-      { action: "Updated assignment time", notes: `${employeeName}${dayName ? ` (${dayName})` : ""}: ${startTime}-${endTime}` }
+      {
+        action: "Updated assignment",
+        notes: `${employeeName}${dayName ? ` (${dayName})` : ""}: ${startTime}-${endTime}`
+      }
     );
   };
 
@@ -2645,7 +2698,7 @@ export default function App() {
             onUpdateAssignmentTime={handleUpdateAssignmentTime}
             onDeleteAssignment={handleDeleteAssignment}
             onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
-            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime }) => {
+            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall, is1on1, studentName }) => {
               if (!canEditSchedule) {
                 setAuthMessage("You do not have permission to edit assignments.");
                 return;
@@ -2691,7 +2744,10 @@ export default function App() {
                       assignmentSource: "manual_adjustment" as const,
                       startTime,
                       endTime,
-                      status: "scheduled" as const
+                      status: "scheduled" as const,
+                      isOnCall: isOnCall ?? false,
+                      is1on1: is1on1 ?? false,
+                      studentName: studentName ?? undefined
                     }
                   ];
                   return {
@@ -2700,13 +2756,24 @@ export default function App() {
                   };
                 },
                 {
-                  action: "Created assignment",
-                  notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]}): ${startTime}-${endTime}`
+                  action: is1on1
+                    ? "Created 1:1 assignment"
+                    : isOnCall
+                      ? "Created on-call assignment"
+                      : "Created assignment",
+                  notes: `${employeeNameById.get(employeeId) ?? employeeId} (${dayDisplayNames[dayOfWeek]})${
+                    is1on1
+                      ? ` - 1:1 with ${studentName ?? "Unknown"}: ${startTime}-${endTime}`
+                      : isOnCall
+                        ? " - ON CALL"
+                        : `: ${startTime}-${endTime}`
+                  }`
                 }
               );
             }}
             focusedSegmentIds={focusedSegmentIds}
             onOpenHelpTopic={openHelpTopic}
+            onDayClick={handleDayClick}
           />
         ) : (
           <EmployeeScheduleView
@@ -2744,6 +2811,29 @@ export default function App() {
                 isOpen={showAuditTimeline}
                 onClose={() => setShowAuditTimeline(false)}
                 onOpenHelpTopic={openHelpTopic}
+              />
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {coverageModalDay && (
+              <CoverageVisualizerModal
+                isOpen={Boolean(coverageModalDay)}
+                onClose={() => setCoverageModalDay(null)}
+                dayOfWeek={coverageModalDay}
+                day={scheduleDaysState.find(d => d.dayOfWeek === coverageModalDay)!}
+                operatingHours={operatingHoursByDay[coverageModalDay]!}
+                assignments={staffAssignmentsState.filter(a => {
+                  const block = segmentBlocksState.find(sb => sb.id === a.segmentBlockId);
+                  return block?.dayOfWeek === coverageModalDay;
+                })}
+                employees={employeesDerived}
+                scheduleTypeRatios={ratioByScheduleType}
+                scheduleTypeTimeWindows={scheduleTypeTimeWindows}
+                schoolRules={schoolRulesState}
+                fieldTripEvent={fieldTripEventsByDay[coverageModalDay]}
+                fieldTripType={fieldTripTypesState.find(ft =>
+                  ft.id === fieldTripEventsByDay[coverageModalDay]?.fieldTripTypeId
+                )}
               />
             )}
           </AnimatePresence>

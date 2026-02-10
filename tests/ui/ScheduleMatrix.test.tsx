@@ -131,6 +131,7 @@ const renderMatrix = (overrides?: Partial<{
       onDeleteAssignment={jest.fn()}
       onCreateAssignment={onCreateAssignment}
       onReassignUnlinkedStaff={jest.fn()}
+      onDayClick={jest.fn()}
     />
   );
   return { onCreateAssignment, onUpdateAssignmentTime };
@@ -181,6 +182,7 @@ describe("ScheduleMatrix", () => {
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={jest.fn()}
         focusedSegmentIds={["segment-mon-open"]}
+        onDayClick={jest.fn()}
       />
     );
 
@@ -282,6 +284,7 @@ describe("ScheduleMatrix", () => {
         onDeleteAssignment={onDeleteAssignment}
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={jest.fn()}
+        onDayClick={jest.fn()}
       />
     );
     const block = screen.getByText("7:00 AM");
@@ -471,6 +474,7 @@ describe("ScheduleMatrix", () => {
         onDeleteAssignment={jest.fn()}
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={onReassignUnlinkedStaff}
+        onDayClick={jest.fn()}
       />
     );
 

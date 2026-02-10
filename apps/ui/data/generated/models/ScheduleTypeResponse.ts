@@ -10,5 +10,13 @@ export type ScheduleTypeResponse = {
     ratioAdults: number;
     ratioStudents: number;
     description?: string;
+    timeWindows?: Array<{
+        id: string;
+        scheduleTypeId: string;
+        startTime: string;
+        endTime: string;
+        ratioAdults: number;
+        ratioStudents: number;
+    }>;
 };
 

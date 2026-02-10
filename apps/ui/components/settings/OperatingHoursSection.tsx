@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import type { DayOfWeek, ScheduleType } from "@core/domain/types";
 import type { OperatingHoursConfig } from "../SettingsPanel";
 import type { ScheduleTypeOption } from "../DayMetadataStrip";
@@ -61,6 +62,7 @@ export default function OperatingHoursSection({
         </div>
         <span />
       </div>
+      <AnimatePresence initial={false}>
       {draftOperatingHours.map((entry, index) => {
         const usedDays = new Set<DayOfWeek>();
         draftOperatingHours.forEach((other, otherIndex) => {
@@ -70,15 +72,20 @@ export default function OperatingHoursSection({
         });
 
         return (
-          <div
+          <motion.div
             key={entry.id}
+            initial={{ opacity: 0, maxHeight: 0 }}
+            animate={{ opacity: 1, maxHeight: "200px" }}
+            exit={{ opacity: 0, maxHeight: 0 }}
+            transition={{ duration: 0.15, ease: "easeInOut" }}
             style={{
               border: "1px solid #e5e7eb",
               borderRadius: 14,
               padding: "0.75rem",
               display: "grid",
               gap: "0.75rem",
-              gridTemplateColumns: "160px 1.5fr 1fr 1fr 96px"
+              gridTemplateColumns: "160px 1.5fr 1fr 1fr 96px",
+              overflow: "hidden"
             }}
           >
             <select
@@ -177,24 +184,32 @@ export default function OperatingHoursSection({
             >
               Remove
             </button>
-          </div>
+          </motion.div>
         );
       })}
+      </AnimatePresence>
+      <AnimatePresence initial={false}>
       {operatingHoursOverlap.length > 0 && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, maxHeight: 0 }}
+          animate={{ opacity: 1, maxHeight: "200px" }}
+          exit={{ opacity: 0, maxHeight: 0 }}
+          transition={{ duration: 0.15, ease: "easeInOut" }}
           style={{
             border: "1px solid #fecaca",
             background: "#fee2e2",
             color: "#b91c1c",
             padding: "0.5rem 0.75rem",
-            borderRadius: 10
+            borderRadius: 10,
+            overflow: "hidden"
           }}
         >
           {operatingHoursOverlap.map((message) => (
             <div key={message}>{message}</div>
           ))}
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
       <button
         type="button"
         onClick={onAdd}

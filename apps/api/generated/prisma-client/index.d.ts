@@ -29,6 +29,11 @@ export type School = $Result.DefaultSelection<Prisma.$SchoolPayload>
  */
 export type ScheduleType = $Result.DefaultSelection<Prisma.$ScheduleTypePayload>
 /**
+ * Model ScheduleTypeTimeWindow
+ * 
+ */
+export type ScheduleTypeTimeWindow = $Result.DefaultSelection<Prisma.$ScheduleTypeTimeWindowPayload>
+/**
  * Model JobTitle
  * 
  */
@@ -283,6 +288,16 @@ export class PrismaClient<
     * ```
     */
   get scheduleType(): Prisma.ScheduleTypeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.scheduleTypeTimeWindow`: Exposes CRUD operations for the **ScheduleTypeTimeWindow** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ScheduleTypeTimeWindows
+    * const scheduleTypeTimeWindows = await prisma.scheduleTypeTimeWindow.findMany()
+    * ```
+    */
+  get scheduleTypeTimeWindow(): Prisma.ScheduleTypeTimeWindowDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.jobTitle`: Exposes CRUD operations for the **JobTitle** model.
@@ -870,6 +885,7 @@ export namespace Prisma {
     District: 'District',
     School: 'School',
     ScheduleType: 'ScheduleType',
+    ScheduleTypeTimeWindow: 'ScheduleTypeTimeWindow',
     JobTitle: 'JobTitle',
     Employee: 'Employee',
     OperatingHours: 'OperatingHours',
@@ -900,7 +916,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "district" | "school" | "scheduleType" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "userInvite" | "districtMembership" | "schoolMembership" | "session"
+      modelProps: "district" | "school" | "scheduleType" | "scheduleTypeTimeWindow" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "userInvite" | "districtMembership" | "schoolMembership" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1123,6 +1139,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ScheduleTypeCountArgs<ExtArgs>
             result: $Utils.Optional<ScheduleTypeCountAggregateOutputType> | number
+          }
+        }
+      }
+      ScheduleTypeTimeWindow: {
+        payload: Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>
+        fields: Prisma.ScheduleTypeTimeWindowFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ScheduleTypeTimeWindowFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ScheduleTypeTimeWindowFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          findFirst: {
+            args: Prisma.ScheduleTypeTimeWindowFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ScheduleTypeTimeWindowFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          findMany: {
+            args: Prisma.ScheduleTypeTimeWindowFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>[]
+          }
+          create: {
+            args: Prisma.ScheduleTypeTimeWindowCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          createMany: {
+            args: Prisma.ScheduleTypeTimeWindowCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ScheduleTypeTimeWindowCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>[]
+          }
+          delete: {
+            args: Prisma.ScheduleTypeTimeWindowDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          update: {
+            args: Prisma.ScheduleTypeTimeWindowUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          deleteMany: {
+            args: Prisma.ScheduleTypeTimeWindowDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ScheduleTypeTimeWindowUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ScheduleTypeTimeWindowUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>[]
+          }
+          upsert: {
+            args: Prisma.ScheduleTypeTimeWindowUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ScheduleTypeTimeWindowPayload>
+          }
+          aggregate: {
+            args: Prisma.ScheduleTypeTimeWindowAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateScheduleTypeTimeWindow>
+          }
+          groupBy: {
+            args: Prisma.ScheduleTypeTimeWindowGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleTypeTimeWindowGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ScheduleTypeTimeWindowCountArgs<ExtArgs>
+            result: $Utils.Optional<ScheduleTypeTimeWindowCountAggregateOutputType> | number
           }
         }
       }
@@ -2347,6 +2437,7 @@ export namespace Prisma {
     district?: DistrictOmit
     school?: SchoolOmit
     scheduleType?: ScheduleTypeOmit
+    scheduleTypeTimeWindow?: ScheduleTypeTimeWindowOmit
     jobTitle?: JobTitleOmit
     employee?: EmployeeOmit
     operatingHours?: OperatingHoursOmit
@@ -2577,6 +2668,37 @@ export namespace Prisma {
    */
   export type SchoolCountOutputTypeCountInvitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserInviteWhereInput
+  }
+
+
+  /**
+   * Count Type ScheduleTypeCountOutputType
+   */
+
+  export type ScheduleTypeCountOutputType = {
+    timeWindows: number
+  }
+
+  export type ScheduleTypeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    timeWindows?: boolean | ScheduleTypeCountOutputTypeCountTimeWindowsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ScheduleTypeCountOutputType without action
+   */
+  export type ScheduleTypeCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeCountOutputType
+     */
+    select?: ScheduleTypeCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleTypeCountOutputType without action
+   */
+  export type ScheduleTypeCountOutputTypeCountTimeWindowsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleTypeTimeWindowWhereInput
   }
 
 
@@ -5516,6 +5638,8 @@ export namespace Prisma {
     ratioStudents?: boolean
     description?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    timeWindows?: boolean | ScheduleType$timeWindowsArgs<ExtArgs>
+    _count?: boolean | ScheduleTypeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["scheduleType"]>
 
   export type ScheduleTypeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -5553,6 +5677,8 @@ export namespace Prisma {
   export type ScheduleTypeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "value" | "label" | "ratioAdults" | "ratioStudents" | "description", ExtArgs["result"]["scheduleType"]>
   export type ScheduleTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
+    timeWindows?: boolean | ScheduleType$timeWindowsArgs<ExtArgs>
+    _count?: boolean | ScheduleTypeCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ScheduleTypeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
@@ -5565,6 +5691,7 @@ export namespace Prisma {
     name: "ScheduleType"
     objects: {
       school: Prisma.$SchoolPayload<ExtArgs>
+      timeWindows: Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5969,6 +6096,7 @@ export namespace Prisma {
   export interface Prisma__ScheduleTypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    timeWindows<T extends ScheduleType$timeWindowsArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleType$timeWindowsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6401,6 +6529,30 @@ export namespace Prisma {
   }
 
   /**
+   * ScheduleType.timeWindows
+   */
+  export type ScheduleType$timeWindowsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    where?: ScheduleTypeTimeWindowWhereInput
+    orderBy?: ScheduleTypeTimeWindowOrderByWithRelationInput | ScheduleTypeTimeWindowOrderByWithRelationInput[]
+    cursor?: ScheduleTypeTimeWindowWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ScheduleTypeTimeWindowScalarFieldEnum | ScheduleTypeTimeWindowScalarFieldEnum[]
+  }
+
+  /**
    * ScheduleType without action
    */
   export type ScheduleTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6416,6 +6568,1115 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ScheduleTypeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ScheduleTypeTimeWindow
+   */
+
+  export type AggregateScheduleTypeTimeWindow = {
+    _count: ScheduleTypeTimeWindowCountAggregateOutputType | null
+    _avg: ScheduleTypeTimeWindowAvgAggregateOutputType | null
+    _sum: ScheduleTypeTimeWindowSumAggregateOutputType | null
+    _min: ScheduleTypeTimeWindowMinAggregateOutputType | null
+    _max: ScheduleTypeTimeWindowMaxAggregateOutputType | null
+  }
+
+  export type ScheduleTypeTimeWindowAvgAggregateOutputType = {
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeTimeWindowSumAggregateOutputType = {
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeTimeWindowMinAggregateOutputType = {
+    id: string | null
+    scheduleTypeId: string | null
+    startTime: string | null
+    endTime: string | null
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeTimeWindowMaxAggregateOutputType = {
+    id: string | null
+    scheduleTypeId: string | null
+    startTime: string | null
+    endTime: string | null
+    ratioAdults: number | null
+    ratioStudents: number | null
+  }
+
+  export type ScheduleTypeTimeWindowCountAggregateOutputType = {
+    id: number
+    scheduleTypeId: number
+    startTime: number
+    endTime: number
+    ratioAdults: number
+    ratioStudents: number
+    _all: number
+  }
+
+
+  export type ScheduleTypeTimeWindowAvgAggregateInputType = {
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeTimeWindowSumAggregateInputType = {
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeTimeWindowMinAggregateInputType = {
+    id?: true
+    scheduleTypeId?: true
+    startTime?: true
+    endTime?: true
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeTimeWindowMaxAggregateInputType = {
+    id?: true
+    scheduleTypeId?: true
+    startTime?: true
+    endTime?: true
+    ratioAdults?: true
+    ratioStudents?: true
+  }
+
+  export type ScheduleTypeTimeWindowCountAggregateInputType = {
+    id?: true
+    scheduleTypeId?: true
+    startTime?: true
+    endTime?: true
+    ratioAdults?: true
+    ratioStudents?: true
+    _all?: true
+  }
+
+  export type ScheduleTypeTimeWindowAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleTypeTimeWindow to aggregate.
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypeTimeWindows to fetch.
+     */
+    orderBy?: ScheduleTypeTimeWindowOrderByWithRelationInput | ScheduleTypeTimeWindowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ScheduleTypeTimeWindowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypeTimeWindows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypeTimeWindows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ScheduleTypeTimeWindows
+    **/
+    _count?: true | ScheduleTypeTimeWindowCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ScheduleTypeTimeWindowAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ScheduleTypeTimeWindowSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ScheduleTypeTimeWindowMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ScheduleTypeTimeWindowMaxAggregateInputType
+  }
+
+  export type GetScheduleTypeTimeWindowAggregateType<T extends ScheduleTypeTimeWindowAggregateArgs> = {
+        [P in keyof T & keyof AggregateScheduleTypeTimeWindow]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateScheduleTypeTimeWindow[P]>
+      : GetScalarType<T[P], AggregateScheduleTypeTimeWindow[P]>
+  }
+
+
+
+
+  export type ScheduleTypeTimeWindowGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ScheduleTypeTimeWindowWhereInput
+    orderBy?: ScheduleTypeTimeWindowOrderByWithAggregationInput | ScheduleTypeTimeWindowOrderByWithAggregationInput[]
+    by: ScheduleTypeTimeWindowScalarFieldEnum[] | ScheduleTypeTimeWindowScalarFieldEnum
+    having?: ScheduleTypeTimeWindowScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ScheduleTypeTimeWindowCountAggregateInputType | true
+    _avg?: ScheduleTypeTimeWindowAvgAggregateInputType
+    _sum?: ScheduleTypeTimeWindowSumAggregateInputType
+    _min?: ScheduleTypeTimeWindowMinAggregateInputType
+    _max?: ScheduleTypeTimeWindowMaxAggregateInputType
+  }
+
+  export type ScheduleTypeTimeWindowGroupByOutputType = {
+    id: string
+    scheduleTypeId: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+    _count: ScheduleTypeTimeWindowCountAggregateOutputType | null
+    _avg: ScheduleTypeTimeWindowAvgAggregateOutputType | null
+    _sum: ScheduleTypeTimeWindowSumAggregateOutputType | null
+    _min: ScheduleTypeTimeWindowMinAggregateOutputType | null
+    _max: ScheduleTypeTimeWindowMaxAggregateOutputType | null
+  }
+
+  type GetScheduleTypeTimeWindowGroupByPayload<T extends ScheduleTypeTimeWindowGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ScheduleTypeTimeWindowGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ScheduleTypeTimeWindowGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ScheduleTypeTimeWindowGroupByOutputType[P]>
+            : GetScalarType<T[P], ScheduleTypeTimeWindowGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ScheduleTypeTimeWindowSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleTypeId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleTypeTimeWindow"]>
+
+  export type ScheduleTypeTimeWindowSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleTypeId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleTypeTimeWindow"]>
+
+  export type ScheduleTypeTimeWindowSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    scheduleTypeId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["scheduleTypeTimeWindow"]>
+
+  export type ScheduleTypeTimeWindowSelectScalar = {
+    id?: boolean
+    scheduleTypeId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    ratioAdults?: boolean
+    ratioStudents?: boolean
+  }
+
+  export type ScheduleTypeTimeWindowOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleTypeId" | "startTime" | "endTime" | "ratioAdults" | "ratioStudents", ExtArgs["result"]["scheduleTypeTimeWindow"]>
+  export type ScheduleTypeTimeWindowInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }
+  export type ScheduleTypeTimeWindowIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }
+  export type ScheduleTypeTimeWindowIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    scheduleType?: boolean | ScheduleTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ScheduleTypeTimeWindowPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ScheduleTypeTimeWindow"
+    objects: {
+      scheduleType: Prisma.$ScheduleTypePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      scheduleTypeId: string
+      startTime: string
+      endTime: string
+      ratioAdults: number
+      ratioStudents: number
+    }, ExtArgs["result"]["scheduleTypeTimeWindow"]>
+    composites: {}
+  }
+
+  type ScheduleTypeTimeWindowGetPayload<S extends boolean | null | undefined | ScheduleTypeTimeWindowDefaultArgs> = $Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload, S>
+
+  type ScheduleTypeTimeWindowCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ScheduleTypeTimeWindowFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ScheduleTypeTimeWindowCountAggregateInputType | true
+    }
+
+  export interface ScheduleTypeTimeWindowDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ScheduleTypeTimeWindow'], meta: { name: 'ScheduleTypeTimeWindow' } }
+    /**
+     * Find zero or one ScheduleTypeTimeWindow that matches the filter.
+     * @param {ScheduleTypeTimeWindowFindUniqueArgs} args - Arguments to find a ScheduleTypeTimeWindow
+     * @example
+     * // Get one ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ScheduleTypeTimeWindowFindUniqueArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowFindUniqueArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ScheduleTypeTimeWindow that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ScheduleTypeTimeWindowFindUniqueOrThrowArgs} args - Arguments to find a ScheduleTypeTimeWindow
+     * @example
+     * // Get one ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ScheduleTypeTimeWindowFindUniqueOrThrowArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleTypeTimeWindow that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowFindFirstArgs} args - Arguments to find a ScheduleTypeTimeWindow
+     * @example
+     * // Get one ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ScheduleTypeTimeWindowFindFirstArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowFindFirstArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ScheduleTypeTimeWindow that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowFindFirstOrThrowArgs} args - Arguments to find a ScheduleTypeTimeWindow
+     * @example
+     * // Get one ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ScheduleTypeTimeWindowFindFirstOrThrowArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowFindFirstOrThrowArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ScheduleTypeTimeWindows that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindows = await prisma.scheduleTypeTimeWindow.findMany()
+     * 
+     * // Get first 10 ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindows = await prisma.scheduleTypeTimeWindow.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const scheduleTypeTimeWindowWithIdOnly = await prisma.scheduleTypeTimeWindow.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ScheduleTypeTimeWindowFindManyArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ScheduleTypeTimeWindow.
+     * @param {ScheduleTypeTimeWindowCreateArgs} args - Arguments to create a ScheduleTypeTimeWindow.
+     * @example
+     * // Create one ScheduleTypeTimeWindow
+     * const ScheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.create({
+     *   data: {
+     *     // ... data to create a ScheduleTypeTimeWindow
+     *   }
+     * })
+     * 
+     */
+    create<T extends ScheduleTypeTimeWindowCreateArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowCreateArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ScheduleTypeTimeWindows.
+     * @param {ScheduleTypeTimeWindowCreateManyArgs} args - Arguments to create many ScheduleTypeTimeWindows.
+     * @example
+     * // Create many ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ScheduleTypeTimeWindowCreateManyArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ScheduleTypeTimeWindows and returns the data saved in the database.
+     * @param {ScheduleTypeTimeWindowCreateManyAndReturnArgs} args - Arguments to create many ScheduleTypeTimeWindows.
+     * @example
+     * // Create many ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ScheduleTypeTimeWindows and only return the `id`
+     * const scheduleTypeTimeWindowWithIdOnly = await prisma.scheduleTypeTimeWindow.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ScheduleTypeTimeWindowCreateManyAndReturnArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ScheduleTypeTimeWindow.
+     * @param {ScheduleTypeTimeWindowDeleteArgs} args - Arguments to delete one ScheduleTypeTimeWindow.
+     * @example
+     * // Delete one ScheduleTypeTimeWindow
+     * const ScheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.delete({
+     *   where: {
+     *     // ... filter to delete one ScheduleTypeTimeWindow
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ScheduleTypeTimeWindowDeleteArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowDeleteArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ScheduleTypeTimeWindow.
+     * @param {ScheduleTypeTimeWindowUpdateArgs} args - Arguments to update one ScheduleTypeTimeWindow.
+     * @example
+     * // Update one ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ScheduleTypeTimeWindowUpdateArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowUpdateArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ScheduleTypeTimeWindows.
+     * @param {ScheduleTypeTimeWindowDeleteManyArgs} args - Arguments to filter ScheduleTypeTimeWindows to delete.
+     * @example
+     * // Delete a few ScheduleTypeTimeWindows
+     * const { count } = await prisma.scheduleTypeTimeWindow.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ScheduleTypeTimeWindowDeleteManyArgs>(args?: SelectSubset<T, ScheduleTypeTimeWindowDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleTypeTimeWindows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ScheduleTypeTimeWindowUpdateManyArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ScheduleTypeTimeWindows and returns the data updated in the database.
+     * @param {ScheduleTypeTimeWindowUpdateManyAndReturnArgs} args - Arguments to update many ScheduleTypeTimeWindows.
+     * @example
+     * // Update many ScheduleTypeTimeWindows
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ScheduleTypeTimeWindows and only return the `id`
+     * const scheduleTypeTimeWindowWithIdOnly = await prisma.scheduleTypeTimeWindow.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ScheduleTypeTimeWindowUpdateManyAndReturnArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ScheduleTypeTimeWindow.
+     * @param {ScheduleTypeTimeWindowUpsertArgs} args - Arguments to update or create a ScheduleTypeTimeWindow.
+     * @example
+     * // Update or create a ScheduleTypeTimeWindow
+     * const scheduleTypeTimeWindow = await prisma.scheduleTypeTimeWindow.upsert({
+     *   create: {
+     *     // ... data to create a ScheduleTypeTimeWindow
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ScheduleTypeTimeWindow we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ScheduleTypeTimeWindowUpsertArgs>(args: SelectSubset<T, ScheduleTypeTimeWindowUpsertArgs<ExtArgs>>): Prisma__ScheduleTypeTimeWindowClient<$Result.GetResult<Prisma.$ScheduleTypeTimeWindowPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ScheduleTypeTimeWindows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowCountArgs} args - Arguments to filter ScheduleTypeTimeWindows to count.
+     * @example
+     * // Count the number of ScheduleTypeTimeWindows
+     * const count = await prisma.scheduleTypeTimeWindow.count({
+     *   where: {
+     *     // ... the filter for the ScheduleTypeTimeWindows we want to count
+     *   }
+     * })
+    **/
+    count<T extends ScheduleTypeTimeWindowCountArgs>(
+      args?: Subset<T, ScheduleTypeTimeWindowCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ScheduleTypeTimeWindowCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ScheduleTypeTimeWindow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ScheduleTypeTimeWindowAggregateArgs>(args: Subset<T, ScheduleTypeTimeWindowAggregateArgs>): Prisma.PrismaPromise<GetScheduleTypeTimeWindowAggregateType<T>>
+
+    /**
+     * Group by ScheduleTypeTimeWindow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ScheduleTypeTimeWindowGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ScheduleTypeTimeWindowGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ScheduleTypeTimeWindowGroupByArgs['orderBy'] }
+        : { orderBy?: ScheduleTypeTimeWindowGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ScheduleTypeTimeWindowGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetScheduleTypeTimeWindowGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ScheduleTypeTimeWindow model
+   */
+  readonly fields: ScheduleTypeTimeWindowFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ScheduleTypeTimeWindow.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ScheduleTypeTimeWindowClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    scheduleType<T extends ScheduleTypeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ScheduleTypeDefaultArgs<ExtArgs>>): Prisma__ScheduleTypeClient<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ScheduleTypeTimeWindow model
+   */
+  interface ScheduleTypeTimeWindowFieldRefs {
+    readonly id: FieldRef<"ScheduleTypeTimeWindow", 'String'>
+    readonly scheduleTypeId: FieldRef<"ScheduleTypeTimeWindow", 'String'>
+    readonly startTime: FieldRef<"ScheduleTypeTimeWindow", 'String'>
+    readonly endTime: FieldRef<"ScheduleTypeTimeWindow", 'String'>
+    readonly ratioAdults: FieldRef<"ScheduleTypeTimeWindow", 'Int'>
+    readonly ratioStudents: FieldRef<"ScheduleTypeTimeWindow", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ScheduleTypeTimeWindow findUnique
+   */
+  export type ScheduleTypeTimeWindowFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypeTimeWindow to fetch.
+     */
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+  }
+
+  /**
+   * ScheduleTypeTimeWindow findUniqueOrThrow
+   */
+  export type ScheduleTypeTimeWindowFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypeTimeWindow to fetch.
+     */
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+  }
+
+  /**
+   * ScheduleTypeTimeWindow findFirst
+   */
+  export type ScheduleTypeTimeWindowFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypeTimeWindow to fetch.
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypeTimeWindows to fetch.
+     */
+    orderBy?: ScheduleTypeTimeWindowOrderByWithRelationInput | ScheduleTypeTimeWindowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleTypeTimeWindows.
+     */
+    cursor?: ScheduleTypeTimeWindowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypeTimeWindows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypeTimeWindows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleTypeTimeWindows.
+     */
+    distinct?: ScheduleTypeTimeWindowScalarFieldEnum | ScheduleTypeTimeWindowScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleTypeTimeWindow findFirstOrThrow
+   */
+  export type ScheduleTypeTimeWindowFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypeTimeWindow to fetch.
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypeTimeWindows to fetch.
+     */
+    orderBy?: ScheduleTypeTimeWindowOrderByWithRelationInput | ScheduleTypeTimeWindowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ScheduleTypeTimeWindows.
+     */
+    cursor?: ScheduleTypeTimeWindowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypeTimeWindows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypeTimeWindows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ScheduleTypeTimeWindows.
+     */
+    distinct?: ScheduleTypeTimeWindowScalarFieldEnum | ScheduleTypeTimeWindowScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleTypeTimeWindow findMany
+   */
+  export type ScheduleTypeTimeWindowFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter, which ScheduleTypeTimeWindows to fetch.
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ScheduleTypeTimeWindows to fetch.
+     */
+    orderBy?: ScheduleTypeTimeWindowOrderByWithRelationInput | ScheduleTypeTimeWindowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ScheduleTypeTimeWindows.
+     */
+    cursor?: ScheduleTypeTimeWindowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ScheduleTypeTimeWindows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ScheduleTypeTimeWindows.
+     */
+    skip?: number
+    distinct?: ScheduleTypeTimeWindowScalarFieldEnum | ScheduleTypeTimeWindowScalarFieldEnum[]
+  }
+
+  /**
+   * ScheduleTypeTimeWindow create
+   */
+  export type ScheduleTypeTimeWindowCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ScheduleTypeTimeWindow.
+     */
+    data: XOR<ScheduleTypeTimeWindowCreateInput, ScheduleTypeTimeWindowUncheckedCreateInput>
+  }
+
+  /**
+   * ScheduleTypeTimeWindow createMany
+   */
+  export type ScheduleTypeTimeWindowCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ScheduleTypeTimeWindows.
+     */
+    data: ScheduleTypeTimeWindowCreateManyInput | ScheduleTypeTimeWindowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ScheduleTypeTimeWindow createManyAndReturn
+   */
+  export type ScheduleTypeTimeWindowCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * The data used to create many ScheduleTypeTimeWindows.
+     */
+    data: ScheduleTypeTimeWindowCreateManyInput | ScheduleTypeTimeWindowCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleTypeTimeWindow update
+   */
+  export type ScheduleTypeTimeWindowUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ScheduleTypeTimeWindow.
+     */
+    data: XOR<ScheduleTypeTimeWindowUpdateInput, ScheduleTypeTimeWindowUncheckedUpdateInput>
+    /**
+     * Choose, which ScheduleTypeTimeWindow to update.
+     */
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+  }
+
+  /**
+   * ScheduleTypeTimeWindow updateMany
+   */
+  export type ScheduleTypeTimeWindowUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ScheduleTypeTimeWindows.
+     */
+    data: XOR<ScheduleTypeTimeWindowUpdateManyMutationInput, ScheduleTypeTimeWindowUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleTypeTimeWindows to update
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * Limit how many ScheduleTypeTimeWindows to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleTypeTimeWindow updateManyAndReturn
+   */
+  export type ScheduleTypeTimeWindowUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * The data used to update ScheduleTypeTimeWindows.
+     */
+    data: XOR<ScheduleTypeTimeWindowUpdateManyMutationInput, ScheduleTypeTimeWindowUncheckedUpdateManyInput>
+    /**
+     * Filter which ScheduleTypeTimeWindows to update
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * Limit how many ScheduleTypeTimeWindows to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ScheduleTypeTimeWindow upsert
+   */
+  export type ScheduleTypeTimeWindowUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ScheduleTypeTimeWindow to update in case it exists.
+     */
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+    /**
+     * In case the ScheduleTypeTimeWindow found by the `where` argument doesn't exist, create a new ScheduleTypeTimeWindow with this data.
+     */
+    create: XOR<ScheduleTypeTimeWindowCreateInput, ScheduleTypeTimeWindowUncheckedCreateInput>
+    /**
+     * In case the ScheduleTypeTimeWindow was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ScheduleTypeTimeWindowUpdateInput, ScheduleTypeTimeWindowUncheckedUpdateInput>
+  }
+
+  /**
+   * ScheduleTypeTimeWindow delete
+   */
+  export type ScheduleTypeTimeWindowDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
+    /**
+     * Filter which ScheduleTypeTimeWindow to delete.
+     */
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+  }
+
+  /**
+   * ScheduleTypeTimeWindow deleteMany
+   */
+  export type ScheduleTypeTimeWindowDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ScheduleTypeTimeWindows to delete
+     */
+    where?: ScheduleTypeTimeWindowWhereInput
+    /**
+     * Limit how many ScheduleTypeTimeWindows to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ScheduleTypeTimeWindow without action
+   */
+  export type ScheduleTypeTimeWindowDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ScheduleTypeTimeWindow
+     */
+    select?: ScheduleTypeTimeWindowSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ScheduleTypeTimeWindow
+     */
+    omit?: ScheduleTypeTimeWindowOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ScheduleTypeTimeWindowInclude<ExtArgs> | null
   }
 
 
@@ -15673,6 +16934,9 @@ export namespace Prisma {
     endTime: string | null
     status: string | null
     notes: string | null
+    isOnCall: boolean | null
+    is1on1: boolean | null
+    studentName: string | null
   }
 
   export type StaffAssignmentMaxAggregateOutputType = {
@@ -15685,6 +16949,9 @@ export namespace Prisma {
     endTime: string | null
     status: string | null
     notes: string | null
+    isOnCall: boolean | null
+    is1on1: boolean | null
+    studentName: string | null
   }
 
   export type StaffAssignmentCountAggregateOutputType = {
@@ -15697,6 +16964,9 @@ export namespace Prisma {
     endTime: number
     status: number
     notes: number
+    isOnCall: number
+    is1on1: number
+    studentName: number
     _all: number
   }
 
@@ -15711,6 +16981,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
   }
 
   export type StaffAssignmentMaxAggregateInputType = {
@@ -15723,6 +16996,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
   }
 
   export type StaffAssignmentCountAggregateInputType = {
@@ -15735,6 +17011,9 @@ export namespace Prisma {
     endTime?: true
     status?: true
     notes?: true
+    isOnCall?: true
+    is1on1?: true
+    studentName?: true
     _all?: true
   }
 
@@ -15820,6 +17099,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes: string | null
+    isOnCall: boolean
+    is1on1: boolean
+    studentName: string | null
     _count: StaffAssignmentCountAggregateOutputType | null
     _min: StaffAssignmentMinAggregateOutputType | null
     _max: StaffAssignmentMaxAggregateOutputType | null
@@ -15849,6 +17131,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -15863,6 +17148,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -15877,6 +17165,9 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["staffAssignment"]>
@@ -15891,9 +17182,12 @@ export namespace Prisma {
     endTime?: boolean
     status?: boolean
     notes?: boolean
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: boolean
   }
 
-  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes", ExtArgs["result"]["staffAssignment"]>
+  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes" | "isOnCall" | "is1on1" | "studentName", ExtArgs["result"]["staffAssignment"]>
   export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
@@ -15923,6 +17217,9 @@ export namespace Prisma {
       endTime: string
       status: string
       notes: string | null
+      isOnCall: boolean
+      is1on1: boolean
+      studentName: string | null
     }, ExtArgs["result"]["staffAssignment"]>
     composites: {}
   }
@@ -16357,6 +17654,9 @@ export namespace Prisma {
     readonly endTime: FieldRef<"StaffAssignment", 'String'>
     readonly status: FieldRef<"StaffAssignment", 'String'>
     readonly notes: FieldRef<"StaffAssignment", 'String'>
+    readonly isOnCall: FieldRef<"StaffAssignment", 'Boolean'>
+    readonly is1on1: FieldRef<"StaffAssignment", 'Boolean'>
+    readonly studentName: FieldRef<"StaffAssignment", 'String'>
   }
     
 
@@ -23712,6 +25012,18 @@ export namespace Prisma {
   export type ScheduleTypeScalarFieldEnum = (typeof ScheduleTypeScalarFieldEnum)[keyof typeof ScheduleTypeScalarFieldEnum]
 
 
+  export const ScheduleTypeTimeWindowScalarFieldEnum: {
+    id: 'id',
+    scheduleTypeId: 'scheduleTypeId',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    ratioAdults: 'ratioAdults',
+    ratioStudents: 'ratioStudents'
+  };
+
+  export type ScheduleTypeTimeWindowScalarFieldEnum = (typeof ScheduleTypeTimeWindowScalarFieldEnum)[keyof typeof ScheduleTypeTimeWindowScalarFieldEnum]
+
+
   export const JobTitleScalarFieldEnum: {
     id: 'id',
     schoolId: 'schoolId',
@@ -23841,7 +25153,10 @@ export namespace Prisma {
     startTime: 'startTime',
     endTime: 'endTime',
     status: 'status',
-    notes: 'notes'
+    notes: 'notes',
+    isOnCall: 'isOnCall',
+    is1on1: 'is1on1',
+    studentName: 'studentName'
   };
 
   export type StaffAssignmentScalarFieldEnum = (typeof StaffAssignmentScalarFieldEnum)[keyof typeof StaffAssignmentScalarFieldEnum]
@@ -24284,6 +25599,7 @@ export namespace Prisma {
     ratioStudents?: IntFilter<"ScheduleType"> | number
     description?: StringNullableFilter<"ScheduleType"> | string | null
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    timeWindows?: ScheduleTypeTimeWindowListRelationFilter
   }
 
   export type ScheduleTypeOrderByWithRelationInput = {
@@ -24295,6 +25611,7 @@ export namespace Prisma {
     ratioStudents?: SortOrder
     description?: SortOrderInput | SortOrder
     school?: SchoolOrderByWithRelationInput
+    timeWindows?: ScheduleTypeTimeWindowOrderByRelationAggregateInput
   }
 
   export type ScheduleTypeWhereUniqueInput = Prisma.AtLeast<{
@@ -24310,6 +25627,7 @@ export namespace Prisma {
     ratioStudents?: IntFilter<"ScheduleType"> | number
     description?: StringNullableFilter<"ScheduleType"> | string | null
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+    timeWindows?: ScheduleTypeTimeWindowListRelationFilter
   }, "id" | "schoolId_value">
 
   export type ScheduleTypeOrderByWithAggregationInput = {
@@ -24338,6 +25656,68 @@ export namespace Prisma {
     ratioAdults?: IntWithAggregatesFilter<"ScheduleType"> | number
     ratioStudents?: IntWithAggregatesFilter<"ScheduleType"> | number
     description?: StringNullableWithAggregatesFilter<"ScheduleType"> | string | null
+  }
+
+  export type ScheduleTypeTimeWindowWhereInput = {
+    AND?: ScheduleTypeTimeWindowWhereInput | ScheduleTypeTimeWindowWhereInput[]
+    OR?: ScheduleTypeTimeWindowWhereInput[]
+    NOT?: ScheduleTypeTimeWindowWhereInput | ScheduleTypeTimeWindowWhereInput[]
+    id?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    scheduleTypeId?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    startTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    endTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    ratioAdults?: IntFilter<"ScheduleTypeTimeWindow"> | number
+    ratioStudents?: IntFilter<"ScheduleTypeTimeWindow"> | number
+    scheduleType?: XOR<ScheduleTypeScalarRelationFilter, ScheduleTypeWhereInput>
+  }
+
+  export type ScheduleTypeTimeWindowOrderByWithRelationInput = {
+    id?: SortOrder
+    scheduleTypeId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    scheduleType?: ScheduleTypeOrderByWithRelationInput
+  }
+
+  export type ScheduleTypeTimeWindowWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ScheduleTypeTimeWindowWhereInput | ScheduleTypeTimeWindowWhereInput[]
+    OR?: ScheduleTypeTimeWindowWhereInput[]
+    NOT?: ScheduleTypeTimeWindowWhereInput | ScheduleTypeTimeWindowWhereInput[]
+    scheduleTypeId?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    startTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    endTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    ratioAdults?: IntFilter<"ScheduleTypeTimeWindow"> | number
+    ratioStudents?: IntFilter<"ScheduleTypeTimeWindow"> | number
+    scheduleType?: XOR<ScheduleTypeScalarRelationFilter, ScheduleTypeWhereInput>
+  }, "id">
+
+  export type ScheduleTypeTimeWindowOrderByWithAggregationInput = {
+    id?: SortOrder
+    scheduleTypeId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+    _count?: ScheduleTypeTimeWindowCountOrderByAggregateInput
+    _avg?: ScheduleTypeTimeWindowAvgOrderByAggregateInput
+    _max?: ScheduleTypeTimeWindowMaxOrderByAggregateInput
+    _min?: ScheduleTypeTimeWindowMinOrderByAggregateInput
+    _sum?: ScheduleTypeTimeWindowSumOrderByAggregateInput
+  }
+
+  export type ScheduleTypeTimeWindowScalarWhereWithAggregatesInput = {
+    AND?: ScheduleTypeTimeWindowScalarWhereWithAggregatesInput | ScheduleTypeTimeWindowScalarWhereWithAggregatesInput[]
+    OR?: ScheduleTypeTimeWindowScalarWhereWithAggregatesInput[]
+    NOT?: ScheduleTypeTimeWindowScalarWhereWithAggregatesInput | ScheduleTypeTimeWindowScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ScheduleTypeTimeWindow"> | string
+    scheduleTypeId?: StringWithAggregatesFilter<"ScheduleTypeTimeWindow"> | string
+    startTime?: StringWithAggregatesFilter<"ScheduleTypeTimeWindow"> | string
+    endTime?: StringWithAggregatesFilter<"ScheduleTypeTimeWindow"> | string
+    ratioAdults?: IntWithAggregatesFilter<"ScheduleTypeTimeWindow"> | number
+    ratioStudents?: IntWithAggregatesFilter<"ScheduleTypeTimeWindow"> | number
   }
 
   export type JobTitleWhereInput = {
@@ -24985,6 +26365,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
   }
@@ -24999,6 +26382,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrderInput | SortOrder
     scheduleWeek?: ScheduleWeekOrderByWithRelationInput
     segmentBlock?: SegmentBlockOrderByWithRelationInput
   }
@@ -25016,6 +26402,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
     scheduleWeek?: XOR<ScheduleWeekScalarRelationFilter, ScheduleWeekWhereInput>
     segmentBlock?: XOR<SegmentBlockScalarRelationFilter, SegmentBlockWhereInput>
   }, "id">
@@ -25030,6 +26419,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrderInput | SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrderInput | SortOrder
     _count?: StaffAssignmentCountOrderByAggregateInput
     _max?: StaffAssignmentMaxOrderByAggregateInput
     _min?: StaffAssignmentMinOrderByAggregateInput
@@ -25048,6 +26440,9 @@ export namespace Prisma {
     endTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
     status?: StringWithAggregatesFilter<"StaffAssignment"> | string
     notes?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
   }
 
   export type AuditEventWhereInput = {
@@ -25740,6 +27135,7 @@ export namespace Prisma {
     ratioStudents: number
     description?: string | null
     school: SchoolCreateNestedOneWithoutScheduleTypesInput
+    timeWindows?: ScheduleTypeTimeWindowCreateNestedManyWithoutScheduleTypeInput
   }
 
   export type ScheduleTypeUncheckedCreateInput = {
@@ -25750,6 +27146,7 @@ export namespace Prisma {
     ratioAdults: number
     ratioStudents: number
     description?: string | null
+    timeWindows?: ScheduleTypeTimeWindowUncheckedCreateNestedManyWithoutScheduleTypeInput
   }
 
   export type ScheduleTypeUpdateInput = {
@@ -25760,6 +27157,7 @@ export namespace Prisma {
     ratioStudents?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     school?: SchoolUpdateOneRequiredWithoutScheduleTypesNestedInput
+    timeWindows?: ScheduleTypeTimeWindowUpdateManyWithoutScheduleTypeNestedInput
   }
 
   export type ScheduleTypeUncheckedUpdateInput = {
@@ -25770,6 +27168,7 @@ export namespace Prisma {
     ratioAdults?: IntFieldUpdateOperationsInput | number
     ratioStudents?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    timeWindows?: ScheduleTypeTimeWindowUncheckedUpdateManyWithoutScheduleTypeNestedInput
   }
 
   export type ScheduleTypeCreateManyInput = {
@@ -25799,6 +27198,68 @@ export namespace Prisma {
     ratioAdults?: IntFieldUpdateOperationsInput | number
     ratioStudents?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ScheduleTypeTimeWindowCreateInput = {
+    id?: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+    scheduleType: ScheduleTypeCreateNestedOneWithoutTimeWindowsInput
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedCreateInput = {
+    id?: string
+    scheduleTypeId: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+  }
+
+  export type ScheduleTypeTimeWindowUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    scheduleType?: ScheduleTypeUpdateOneRequiredWithoutTimeWindowsNestedInput
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleTypeId?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ScheduleTypeTimeWindowCreateManyInput = {
+    id?: string
+    scheduleTypeId: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+  }
+
+  export type ScheduleTypeTimeWindowUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    scheduleTypeId?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
   }
 
   export type JobTitleCreateInput = {
@@ -26500,6 +27961,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
     segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
   }
@@ -26514,6 +27978,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateInput = {
@@ -26524,6 +27991,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
     segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
@@ -26538,6 +28008,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentCreateManyInput = {
@@ -26550,6 +28023,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateManyMutationInput = {
@@ -26560,6 +28036,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyInput = {
@@ -26572,6 +28051,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditEventCreateInput = {
@@ -27447,9 +28929,19 @@ export namespace Prisma {
     isNot?: SchoolWhereInput
   }
 
+  export type ScheduleTypeTimeWindowListRelationFilter = {
+    every?: ScheduleTypeTimeWindowWhereInput
+    some?: ScheduleTypeTimeWindowWhereInput
+    none?: ScheduleTypeTimeWindowWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type ScheduleTypeTimeWindowOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ScheduleTypeSchoolIdValueCompoundUniqueInput = {
@@ -27513,6 +29005,48 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type ScheduleTypeScalarRelationFilter = {
+    is?: ScheduleTypeWhereInput
+    isNot?: ScheduleTypeWhereInput
+  }
+
+  export type ScheduleTypeTimeWindowCountOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleTypeId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type ScheduleTypeTimeWindowAvgOrderByAggregateInput = {
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type ScheduleTypeTimeWindowMaxOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleTypeId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type ScheduleTypeTimeWindowMinOrderByAggregateInput = {
+    id?: SortOrder
+    scheduleTypeId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
+  }
+
+  export type ScheduleTypeTimeWindowSumOrderByAggregateInput = {
+    ratioAdults?: SortOrder
+    ratioStudents?: SortOrder
   }
 
   export type JobTitleCountOrderByAggregateInput = {
@@ -28015,6 +29549,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type StaffAssignmentMaxOrderByAggregateInput = {
@@ -28027,6 +29564,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type StaffAssignmentMinOrderByAggregateInput = {
@@ -28039,6 +29579,9 @@ export namespace Prisma {
     endTime?: SortOrder
     status?: SortOrder
     notes?: SortOrder
+    isOnCall?: SortOrder
+    is1on1?: SortOrder
+    studentName?: SortOrder
   }
 
   export type AuditEventCountOrderByAggregateInput = {
@@ -28842,6 +30385,20 @@ export namespace Prisma {
     connect?: SchoolWhereUniqueInput
   }
 
+  export type ScheduleTypeTimeWindowCreateNestedManyWithoutScheduleTypeInput = {
+    create?: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput> | ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput[] | ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput[]
+    connectOrCreate?: ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput | ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput[]
+    createMany?: ScheduleTypeTimeWindowCreateManyScheduleTypeInputEnvelope
+    connect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedCreateNestedManyWithoutScheduleTypeInput = {
+    create?: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput> | ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput[] | ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput[]
+    connectOrCreate?: ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput | ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput[]
+    createMany?: ScheduleTypeTimeWindowCreateManyScheduleTypeInputEnvelope
+    connect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+  }
+
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
   }
@@ -28852,6 +30409,48 @@ export namespace Prisma {
     upsert?: SchoolUpsertWithoutScheduleTypesInput
     connect?: SchoolWhereUniqueInput
     update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutScheduleTypesInput, SchoolUpdateWithoutScheduleTypesInput>, SchoolUncheckedUpdateWithoutScheduleTypesInput>
+  }
+
+  export type ScheduleTypeTimeWindowUpdateManyWithoutScheduleTypeNestedInput = {
+    create?: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput> | ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput[] | ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput[]
+    connectOrCreate?: ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput | ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput[]
+    upsert?: ScheduleTypeTimeWindowUpsertWithWhereUniqueWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpsertWithWhereUniqueWithoutScheduleTypeInput[]
+    createMany?: ScheduleTypeTimeWindowCreateManyScheduleTypeInputEnvelope
+    set?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    disconnect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    delete?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    connect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    update?: ScheduleTypeTimeWindowUpdateWithWhereUniqueWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpdateWithWhereUniqueWithoutScheduleTypeInput[]
+    updateMany?: ScheduleTypeTimeWindowUpdateManyWithWhereWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpdateManyWithWhereWithoutScheduleTypeInput[]
+    deleteMany?: ScheduleTypeTimeWindowScalarWhereInput | ScheduleTypeTimeWindowScalarWhereInput[]
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedUpdateManyWithoutScheduleTypeNestedInput = {
+    create?: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput> | ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput[] | ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput[]
+    connectOrCreate?: ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput | ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput[]
+    upsert?: ScheduleTypeTimeWindowUpsertWithWhereUniqueWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpsertWithWhereUniqueWithoutScheduleTypeInput[]
+    createMany?: ScheduleTypeTimeWindowCreateManyScheduleTypeInputEnvelope
+    set?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    disconnect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    delete?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    connect?: ScheduleTypeTimeWindowWhereUniqueInput | ScheduleTypeTimeWindowWhereUniqueInput[]
+    update?: ScheduleTypeTimeWindowUpdateWithWhereUniqueWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpdateWithWhereUniqueWithoutScheduleTypeInput[]
+    updateMany?: ScheduleTypeTimeWindowUpdateManyWithWhereWithoutScheduleTypeInput | ScheduleTypeTimeWindowUpdateManyWithWhereWithoutScheduleTypeInput[]
+    deleteMany?: ScheduleTypeTimeWindowScalarWhereInput | ScheduleTypeTimeWindowScalarWhereInput[]
+  }
+
+  export type ScheduleTypeCreateNestedOneWithoutTimeWindowsInput = {
+    create?: XOR<ScheduleTypeCreateWithoutTimeWindowsInput, ScheduleTypeUncheckedCreateWithoutTimeWindowsInput>
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutTimeWindowsInput
+    connect?: ScheduleTypeWhereUniqueInput
+  }
+
+  export type ScheduleTypeUpdateOneRequiredWithoutTimeWindowsNestedInput = {
+    create?: XOR<ScheduleTypeCreateWithoutTimeWindowsInput, ScheduleTypeUncheckedCreateWithoutTimeWindowsInput>
+    connectOrCreate?: ScheduleTypeCreateOrConnectWithoutTimeWindowsInput
+    upsert?: ScheduleTypeUpsertWithoutTimeWindowsInput
+    connect?: ScheduleTypeWhereUniqueInput
+    update?: XOR<XOR<ScheduleTypeUpdateToOneWithWhereWithoutTimeWindowsInput, ScheduleTypeUpdateWithoutTimeWindowsInput>, ScheduleTypeUncheckedUpdateWithoutTimeWindowsInput>
   }
 
   export type SchoolCreateNestedOneWithoutJobTitlesInput = {
@@ -30128,6 +31727,7 @@ export namespace Prisma {
     ratioAdults: number
     ratioStudents: number
     description?: string | null
+    timeWindows?: ScheduleTypeTimeWindowCreateNestedManyWithoutScheduleTypeInput
   }
 
   export type ScheduleTypeUncheckedCreateWithoutSchoolInput = {
@@ -30137,6 +31737,7 @@ export namespace Prisma {
     ratioAdults: number
     ratioStudents: number
     description?: string | null
+    timeWindows?: ScheduleTypeTimeWindowUncheckedCreateNestedManyWithoutScheduleTypeInput
   }
 
   export type ScheduleTypeCreateOrConnectWithoutSchoolInput = {
@@ -30709,6 +32310,32 @@ export namespace Prisma {
     create: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
   }
 
+  export type ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput = {
+    id?: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput = {
+    id?: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+  }
+
+  export type ScheduleTypeTimeWindowCreateOrConnectWithoutScheduleTypeInput = {
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+    create: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput>
+  }
+
+  export type ScheduleTypeTimeWindowCreateManyScheduleTypeInputEnvelope = {
+    data: ScheduleTypeTimeWindowCreateManyScheduleTypeInput | ScheduleTypeTimeWindowCreateManyScheduleTypeInput[]
+    skipDuplicates?: boolean
+  }
+
   export type SchoolUpsertWithoutScheduleTypesInput = {
     update: XOR<SchoolUpdateWithoutScheduleTypesInput, SchoolUncheckedUpdateWithoutScheduleTypesInput>
     create: XOR<SchoolCreateWithoutScheduleTypesInput, SchoolUncheckedCreateWithoutScheduleTypesInput>
@@ -30762,6 +32389,90 @@ export namespace Prisma {
     scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
     memberships?: SchoolMembershipUncheckedUpdateManyWithoutSchoolNestedInput
     invites?: UserInviteUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
+  export type ScheduleTypeTimeWindowUpsertWithWhereUniqueWithoutScheduleTypeInput = {
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+    update: XOR<ScheduleTypeTimeWindowUpdateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedUpdateWithoutScheduleTypeInput>
+    create: XOR<ScheduleTypeTimeWindowCreateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedCreateWithoutScheduleTypeInput>
+  }
+
+  export type ScheduleTypeTimeWindowUpdateWithWhereUniqueWithoutScheduleTypeInput = {
+    where: ScheduleTypeTimeWindowWhereUniqueInput
+    data: XOR<ScheduleTypeTimeWindowUpdateWithoutScheduleTypeInput, ScheduleTypeTimeWindowUncheckedUpdateWithoutScheduleTypeInput>
+  }
+
+  export type ScheduleTypeTimeWindowUpdateManyWithWhereWithoutScheduleTypeInput = {
+    where: ScheduleTypeTimeWindowScalarWhereInput
+    data: XOR<ScheduleTypeTimeWindowUpdateManyMutationInput, ScheduleTypeTimeWindowUncheckedUpdateManyWithoutScheduleTypeInput>
+  }
+
+  export type ScheduleTypeTimeWindowScalarWhereInput = {
+    AND?: ScheduleTypeTimeWindowScalarWhereInput | ScheduleTypeTimeWindowScalarWhereInput[]
+    OR?: ScheduleTypeTimeWindowScalarWhereInput[]
+    NOT?: ScheduleTypeTimeWindowScalarWhereInput | ScheduleTypeTimeWindowScalarWhereInput[]
+    id?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    scheduleTypeId?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    startTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    endTime?: StringFilter<"ScheduleTypeTimeWindow"> | string
+    ratioAdults?: IntFilter<"ScheduleTypeTimeWindow"> | number
+    ratioStudents?: IntFilter<"ScheduleTypeTimeWindow"> | number
+  }
+
+  export type ScheduleTypeCreateWithoutTimeWindowsInput = {
+    id?: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+    school: SchoolCreateNestedOneWithoutScheduleTypesInput
+  }
+
+  export type ScheduleTypeUncheckedCreateWithoutTimeWindowsInput = {
+    id?: string
+    schoolId: string
+    value: string
+    label: string
+    ratioAdults: number
+    ratioStudents: number
+    description?: string | null
+  }
+
+  export type ScheduleTypeCreateOrConnectWithoutTimeWindowsInput = {
+    where: ScheduleTypeWhereUniqueInput
+    create: XOR<ScheduleTypeCreateWithoutTimeWindowsInput, ScheduleTypeUncheckedCreateWithoutTimeWindowsInput>
+  }
+
+  export type ScheduleTypeUpsertWithoutTimeWindowsInput = {
+    update: XOR<ScheduleTypeUpdateWithoutTimeWindowsInput, ScheduleTypeUncheckedUpdateWithoutTimeWindowsInput>
+    create: XOR<ScheduleTypeCreateWithoutTimeWindowsInput, ScheduleTypeUncheckedCreateWithoutTimeWindowsInput>
+    where?: ScheduleTypeWhereInput
+  }
+
+  export type ScheduleTypeUpdateToOneWithWhereWithoutTimeWindowsInput = {
+    where?: ScheduleTypeWhereInput
+    data: XOR<ScheduleTypeUpdateWithoutTimeWindowsInput, ScheduleTypeUncheckedUpdateWithoutTimeWindowsInput>
+  }
+
+  export type ScheduleTypeUpdateWithoutTimeWindowsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    school?: SchoolUpdateOneRequiredWithoutScheduleTypesNestedInput
+  }
+
+  export type ScheduleTypeUncheckedUpdateWithoutTimeWindowsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SchoolCreateWithoutJobTitlesInput = {
@@ -31415,6 +33126,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     segmentBlock: SegmentBlockCreateNestedOneWithoutStaffAssignmentsInput
   }
 
@@ -31427,6 +33141,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentCreateOrConnectWithoutScheduleWeekInput = {
@@ -31655,6 +33372,9 @@ export namespace Prisma {
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
+    isOnCall?: BoolFilter<"StaffAssignment"> | boolean
+    is1on1?: BoolFilter<"StaffAssignment"> | boolean
+    studentName?: StringNullableFilter<"StaffAssignment"> | string | null
   }
 
   export type FieldTripEventUpsertWithWhereUniqueWithoutScheduleWeekInput = {
@@ -31906,6 +33626,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
     scheduleWeek: ScheduleWeekCreateNestedOneWithoutStaffAssignmentsInput
   }
 
@@ -31918,6 +33641,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentCreateOrConnectWithoutSegmentBlockInput = {
@@ -33306,6 +35032,7 @@ export namespace Prisma {
     ratioAdults?: IntFieldUpdateOperationsInput | number
     ratioStudents?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    timeWindows?: ScheduleTypeTimeWindowUpdateManyWithoutScheduleTypeNestedInput
   }
 
   export type ScheduleTypeUncheckedUpdateWithoutSchoolInput = {
@@ -33315,6 +35042,7 @@ export namespace Prisma {
     ratioAdults?: IntFieldUpdateOperationsInput | number
     ratioStudents?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    timeWindows?: ScheduleTypeTimeWindowUncheckedUpdateManyWithoutScheduleTypeNestedInput
   }
 
   export type ScheduleTypeUncheckedUpdateManyWithoutSchoolInput = {
@@ -33566,6 +35294,38 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ScheduleTypeTimeWindowCreateManyScheduleTypeInput = {
+    id?: string
+    startTime: string
+    endTime: string
+    ratioAdults: number
+    ratioStudents: number
+  }
+
+  export type ScheduleTypeTimeWindowUpdateWithoutScheduleTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedUpdateWithoutScheduleTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ScheduleTypeTimeWindowUncheckedUpdateManyWithoutScheduleTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    ratioAdults?: IntFieldUpdateOperationsInput | number
+    ratioStudents?: IntFieldUpdateOperationsInput | number
+  }
+
   export type EmployeeCreateManyJobTitleRecordInput = {
     id?: string
     schoolId: string
@@ -33667,6 +35427,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type FieldTripEventCreateManyScheduleWeekInput = {
@@ -33775,6 +35538,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     segmentBlock?: SegmentBlockUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
 
@@ -33787,6 +35553,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyWithoutScheduleWeekInput = {
@@ -33798,6 +35567,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type FieldTripEventUpdateWithoutScheduleWeekInput = {
@@ -33881,6 +35653,9 @@ export namespace Prisma {
     endTime: string
     status: string
     notes?: string | null
+    isOnCall?: boolean
+    is1on1?: boolean
+    studentName?: string | null
   }
 
   export type StaffAssignmentUpdateWithoutSegmentBlockInput = {
@@ -33891,6 +35666,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
     scheduleWeek?: ScheduleWeekUpdateOneRequiredWithoutStaffAssignmentsNestedInput
   }
 
@@ -33903,6 +35681,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StaffAssignmentUncheckedUpdateManyWithoutSegmentBlockInput = {
@@ -33914,6 +35695,9 @@ export namespace Prisma {
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    isOnCall?: BoolFieldUpdateOperationsInput | boolean
+    is1on1?: BoolFieldUpdateOperationsInput | boolean
+    studentName?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DistrictMembershipCreateManyUserInput = {

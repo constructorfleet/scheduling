@@ -11,6 +11,7 @@ import {
 } from "./utils";
 import type { RulesContext, RuleViolation } from "./types";
 import type { DayOfWeek, StaffAssignment } from "../domain/types";
+import { count1on1StudentsInInterval } from "../domain/constants";
 
 const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "ratio-segment": "policy-ratio",
@@ -24,7 +25,9 @@ const DEFAULT_POLICY_CITATIONS: Record<string, string> = {
     "employee-availability": "policy-coverage",
     "open-close-coverage": "policy-open-close",
     "medical-delegated-coverage": "policy-med-delegated",
-    "cpr-current-required": "policy-cpr-current"
+    "cpr-current-required": "policy-cpr-current",
+    "on-call-exclusivity": "policy-on-call",
+    "one-on-one-student-name": "policy-1on1"
 };
 
 const buildViolation = (
@@ -81,6 +84,43 @@ const normalizeChildrenPerStaff = (value: number) => {
     return Math.max(1, Math.ceil(value));
 };
 
+type RatioSource = "fieldTrip" | "timeWindow" | "scheduleType";
+
+const findTimeWindowRatio = (
+    context: RulesContext,
+    scheduleTypeValue: string,
+    intervalStartMinutes: number,
+    intervalEndMinutes: number
+): { childrenPerStaff: number; source: RatioSource; } | undefined => {
+    const timeWindows = context.scheduleTypeTimeWindows;
+    if (!timeWindows || timeWindows.length === 0) {
+        return undefined;
+    }
+
+    const relevantWindows = timeWindows.filter(
+        w => w.scheduleTypeValue === scheduleTypeValue
+    );
+
+    if (relevantWindows.length === 0) {
+        return undefined;
+    }
+
+    // Find window that fully contains this interval
+    for (const window of relevantWindows) {
+        const windowStart = parseTimeToMinutes(window.startTime);
+        const windowEnd = parseTimeToMinutes(window.endTime);
+
+        if (intervalStartMinutes >= windowStart && intervalEndMinutes <= windowEnd) {
+            return {
+                childrenPerStaff: window.ratioStudents / window.ratioAdults,
+                source: "timeWindow"
+            };
+        }
+    }
+
+    return undefined;
+};
+
 type DayAssignmentWithEmployee = {
     assignment: StaffAssignment;
     employee: NonNullable<ReturnType<typeof getEmployeeById>>;
@@ -100,6 +140,8 @@ const getActiveAssignmentsForDay = (
 ): DayAssignmentWithEmployee[] =>
     context.staffAssignments
         .filter((assignment) => assignment.status !== "completed")
+        .filter((assignment) => !assignment.isOnCall)
+        .filter((assignment) => !assignment.is1on1)
         .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === dayOfWeek)
         .map((assignment) => {
             const employee = getEmployeeById(context, assignment.employeeId);
@@ -302,7 +344,7 @@ export const ratioSegmentRule: RuleDefinition = {
                 return;
             }
             const scheduleType = day.scheduleType;
-            const effectiveChildCount =
+            const baseEnrollment =
                 typeof day.enrollmentCount === "number"
                     ? day.enrollmentCount
                     : 0;
@@ -343,6 +385,8 @@ export const ratioSegmentRule: RuleDefinition = {
             const closerWindowStart = closeMinutes - schoolRules.closerWindowMinutes;
             const dayAssignments = context.staffAssignments
                 .filter((assignment) => assignment.status !== "completed")
+                .filter((assignment) => !assignment.isOnCall)
+                .filter((assignment) => !assignment.is1on1)
                 .filter((assignment) => getDayOfWeekForAssignment(context, assignment) === day.dayOfWeek)
                 .filter((assignment) => Boolean(getEmployeeById(context, assignment.employeeId)));
             const boundaries = new Set<number>([ openMinutes, closeMinutes ]);
@@ -350,6 +394,19 @@ export const ratioSegmentRule: RuleDefinition = {
                 boundaries.add(fieldTripWindowStart);
                 boundaries.add(fieldTripWindowEnd);
             }
+            // Add time window boundaries
+            const scheduleTypeWindows = (context.scheduleTypeTimeWindows || [])
+                .filter(w => w.scheduleTypeValue === scheduleType);
+            scheduleTypeWindows.forEach(window => {
+                const windowStart = parseTimeToMinutes(window.startTime);
+                const windowEnd = parseTimeToMinutes(window.endTime);
+                if (windowStart >= openMinutes && windowStart <= closeMinutes) {
+                    boundaries.add(windowStart);
+                }
+                if (windowEnd >= openMinutes && windowEnd <= closeMinutes) {
+                    boundaries.add(windowEnd);
+                }
+            });
             dayAssignments.forEach((assignment) => {
                 const start = parseTimeToMinutes(assignment.startTime);
                 const end = parseTimeToMinutes(assignment.endTime);
@@ -366,6 +423,9 @@ export const ratioSegmentRule: RuleDefinition = {
                 required: number;
                 minStaff: number;
                 assigned: number;
+                effectiveChildCount: number;
+                ratioChildrenPerStaff: number;
+                ratioSource: RatioSource;
             }> = [];
             for (let index = 0; index < sortedBoundaries.length - 1; index += 1) {
                 const start = sortedBoundaries[ index ];
@@ -380,10 +440,37 @@ export const ratioSegmentRule: RuleDefinition = {
                 if (schoolRules.closerCount > 0 && start < closeMinutes && end > closerWindowStart) {
                     minStaff = Math.max(minStaff, schoolRules.closerCount);
                 }
-                const useFieldTripRatio = hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd;
-                const normalizedChildrenPerStaff = useFieldTripRatio
-                    ? normalizedFieldTripChildrenPerStaff
-                    : normalizedScheduleChildrenPerStaff;
+                // Three-tier priority: FieldTrip > TimeWindow > Default
+                let normalizedChildrenPerStaff: number;
+                let ratioSource: RatioSource;
+                if (hasFieldTripWindow && start >= fieldTripWindowStart && end <= fieldTripWindowEnd) {
+                    // Priority 1: Field trip ratio (highest)
+                    normalizedChildrenPerStaff = normalizedFieldTripChildrenPerStaff;
+                    ratioSource = "fieldTrip";
+                } else {
+                    // Priority 2: Check for time window ratio
+                    const timeWindowRatio = scheduleType
+                        ? findTimeWindowRatio(context, scheduleType, start, end)
+                        : undefined;
+                    if (timeWindowRatio !== undefined) {
+                        normalizedChildrenPerStaff = normalizeChildrenPerStaff(timeWindowRatio.childrenPerStaff);
+                        ratioSource = timeWindowRatio.source;
+                    } else {
+                        // Priority 3: Default schedule type ratio (fallback)
+                        normalizedChildrenPerStaff = normalizedScheduleChildrenPerStaff;
+                        ratioSource = "scheduleType";
+                    }
+                }
+                // Subtract students in 1:1 assignments during this interval
+                const studentsIn1on1 = count1on1StudentsInInterval(
+                    context.staffAssignments,
+                    day.dayOfWeek,
+                    start,
+                    end,
+                    (assignment) => getDayOfWeekForAssignment(context, assignment),
+                    parseTimeToMinutes
+                );
+                const effectiveChildCount = Math.max(0, baseEnrollment - studentsIn1on1);
                 const requiredFromRatio = Math.ceil(effectiveChildCount / normalizedChildrenPerStaff);
                 const required = Math.max(minStaff, requiredFromRatio);
                 const assigned = new Set(
@@ -396,7 +483,16 @@ export const ratioSegmentRule: RuleDefinition = {
                         .map((assignment) => assignment.employeeId)
                 ).size;
                 if (assigned < required) {
-                    failingIntervals.push({ start, end, required, minStaff, assigned });
+                    failingIntervals.push({
+                        start,
+                        end,
+                        required,
+                        minStaff,
+                        assigned,
+                        effectiveChildCount,
+                        ratioChildrenPerStaff: normalizedChildrenPerStaff,
+                        ratioSource
+                    });
                 }
             }
             if (failingIntervals.length === 0) {
@@ -410,7 +506,10 @@ export const ratioSegmentRule: RuleDefinition = {
                     previous.end === interval.start &&
                     previous.required === interval.required &&
                     previous.minStaff === interval.minStaff &&
-                    previous.assigned === interval.assigned
+                    previous.assigned === interval.assigned &&
+                    previous.effectiveChildCount === interval.effectiveChildCount &&
+                    previous.ratioChildrenPerStaff === interval.ratioChildrenPerStaff &&
+                    previous.ratioSource === interval.ratioSource
                 ) {
                     previous.end = interval.end;
                     return;
@@ -431,16 +530,15 @@ export const ratioSegmentRule: RuleDefinition = {
                             .filter((segmentBlockId) => Boolean(segmentBlockId))
                     )
                 );
-                const useFieldTripRatio = hasFieldTripWindow &&
-                    interval.start >= fieldTripWindowStart &&
-                    interval.end <= fieldTripWindowEnd;
-                const normalizedChildrenPerStaff = useFieldTripRatio
-                    ? normalizedFieldTripChildrenPerStaff
-                    : normalizedScheduleChildrenPerStaff;
-                const sourceLabel = useFieldTripRatio ? "field trip override" : "schedule type";
+                const sourceLabelByType: Record<RatioSource, string> = {
+                    fieldTrip: "field trip override",
+                    timeWindow: "time window override",
+                    scheduleType: "schedule type"
+                };
+                const sourceLabel = sourceLabelByType[ interval.ratioSource ];
                 const message =
                     `${ day.dayOfWeek.toUpperCase() } ${ formatMinutesAsTime(interval.start) }-${ formatMinutesAsTime(interval.end) } ` +
-                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ normalizedChildrenPerStaff } from ${ sourceLabel }, children ${ effectiveChildCount }) ` +
+                    `requires ${ interval.required } staff (min ${ interval.minStaff }, ratio ${ interval.ratioChildrenPerStaff } from ${ sourceLabel }, children ${ interval.effectiveChildCount }) ` +
                     `but only ${ interval.assigned } assigned`;
                 violations.push(
                     buildViolation(
@@ -452,12 +550,12 @@ export const ratioSegmentRule: RuleDefinition = {
                         "error",
                         {
                             dayOfWeek: day.dayOfWeek,
-                            childCount: effectiveChildCount,
-                            ratioSource: useFieldTripRatio ? "fieldTrip" : "scheduleType",
+                            childCount: interval.effectiveChildCount,
+                            ratioSource: interval.ratioSource,
                             required: interval.required,
                             actual: interval.assigned,
                             minStaff: interval.minStaff,
-                            ratioChildrenPerStaff: normalizedChildrenPerStaff,
+                            ratioChildrenPerStaff: interval.ratioChildrenPerStaff,
                             startTime: formatMinutesAsTime(interval.start),
                             endTime: formatMinutesAsTime(interval.end),
                             relatedSegmentBlockIds
@@ -861,7 +959,7 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                             "StaffAssignment",
                             assignment.id,
                             citationId,
-                            "error",
+                            "warning",
                             {
                                 operatingHoursId: operatingHours.id,
                                 startTime: assignment.startTime,
@@ -880,7 +978,7 @@ export const segmentBlockTimelineRule: RuleDefinition = {
                             "StaffAssignment",
                             assignment.id,
                             citationId,
-                            "error",
+                            "warning",
                             {
                                 operatingHoursId: operatingHours.id,
                                 endTime: assignment.endTime,
@@ -1377,6 +1475,124 @@ export const cprCurrentRequiredRule: RuleDefinition = {
     }
 };
 
+export const onCallExclusivityRule: RuleDefinition = {
+    id: "on-call-exclusivity",
+    description: "Ensures employees on-call for a day cannot have regular time block assignments",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "on-call-exclusivity",
+            DEFAULT_POLICY_CITATIONS["on-call-exclusivity"] || "policy-on-call"
+        );
+
+        // Build map: employeeId:dayOfWeek -> on-call assignment
+        const onCallByEmployeeDay = new Map<string, StaffAssignment>();
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .filter((assignment) => assignment.isOnCall)
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (dayOfWeek) {
+                    const key = `${assignment.employeeId}:${dayOfWeek}`;
+                    onCallByEmployeeDay.set(key, assignment);
+                }
+            });
+
+        // Check all assignments for conflicts
+        context.staffAssignments
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+                if (!dayOfWeek) return;
+
+                const employee = getEmployeeById(context, assignment.employeeId);
+                if (!employee) return;
+
+                const key = `${assignment.employeeId}:${dayOfWeek}`;
+                const onCallAssignment = onCallByEmployeeDay.get(key);
+
+                // If on-call, check for conflicting regular assignments
+                if (assignment.isOnCall) {
+                    const regularAssignments = context.staffAssignments.filter(
+                        (other) =>
+                            !other.isOnCall &&
+                            other.employeeId === assignment.employeeId &&
+                            getDayOfWeekForAssignment(context, other) === dayOfWeek &&
+                            other.status !== "completed"
+                    );
+
+                    if (regularAssignments.length > 0) {
+                        violations.push(
+                            buildViolation(
+                                "on-call-exclusivity",
+                                `${employee.name} is on-call for ${dayOfWeek.toUpperCase()} and cannot have regular time blocks`,
+                                "StaffAssignment",
+                                assignment.id,
+                                citationId,
+                                "error",
+                                { employeeId: employee.id, employeeName: employee.name, dayOfWeek }
+                            )
+                        );
+                    }
+                }
+                // If regular assignment, check for on-call conflict
+                else if (onCallAssignment) {
+                    violations.push(
+                        buildViolation(
+                            "on-call-exclusivity",
+                            `${employee.name} cannot have time blocks on ${dayOfWeek.toUpperCase()} while on-call`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            { employeeId: employee.id, employeeName: employee.name, dayOfWeek }
+                        )
+                    );
+                }
+            });
+
+        return violations;
+    }
+};
+
+export const oneOnOneStudentNameRule: RuleDefinition = {
+    id: "one-on-one-student-name",
+    description: "Ensures 1:1 assignments have a student name specified",
+    evaluate: (context: RulesContext) => {
+        const violations: RuleViolation[] = [];
+        const citationId = getCitationId(
+            context,
+            "one-on-one-student-name",
+            DEFAULT_POLICY_CITATIONS["one-on-one-student-name"] || "policy-1on1"
+        );
+
+        context.staffAssignments
+            .filter((assignment) => assignment.is1on1)
+            .filter((assignment) => assignment.status !== "completed")
+            .forEach((assignment) => {
+                if (!assignment.studentName || assignment.studentName.trim() === "") {
+                    const employee = getEmployeeById(context, assignment.employeeId);
+                    const dayOfWeek = getDayOfWeekForAssignment(context, assignment);
+
+                    violations.push(
+                        buildViolation(
+                            "one-on-one-student-name",
+                            `${employee?.name ?? "Staff member"} has 1:1 assignment on ${dayOfWeek?.toUpperCase()} without student name`,
+                            "StaffAssignment",
+                            assignment.id,
+                            citationId,
+                            "error",
+                            { employeeId: employee?.id, dayOfWeek }
+                        )
+                    );
+                }
+            });
+
+        return violations;
+    }
+};
+
 export const fieldTripEventIntegrityRule: RuleDefinition = {
     id: "field-trip-event",
     description:
@@ -1519,6 +1735,8 @@ export const DEFAULT_RULE_DEFINITIONS: RuleDefinition[] = [
     openCloseCoverageRule,
     medicalDelegatedCoverageRule,
     cprCurrentRequiredRule,
+    onCallExclusivityRule,
+    oneOnOneStudentNameRule,
     fieldTripEventIntegrityRule,
     fieldTripRatiosRule
 ];
