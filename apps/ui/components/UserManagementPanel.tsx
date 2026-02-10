@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { colors, shadows } from "../theme";
 import type { Role } from "../data/generated";
 import type { AdminInviteRecord, AdminUserRecord, UserManagementScope } from "../data/apiClient";
@@ -471,8 +471,16 @@ export default function UserManagementPanel({
               <p style={{ margin: 0, padding: "0.8rem", color: "#475569" }}>No users found for this scope.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column" }}>
+                <AnimatePresence initial={false}>
                 {users.map((user) => (
-                  <article key={user.id} style={{ padding: "0.7rem 0.8rem", borderTop: "1px solid #f1f5f9" }}>
+                  <motion.article
+                    key={user.id}
+                    initial={{ opacity: 0, maxHeight: 0 }}
+                    animate={{ opacity: 1, maxHeight: "200px" }}
+                    exit={{ opacity: 0, maxHeight: 0 }}
+                    transition={{ duration: 0.15, ease: "easeInOut" }}
+                    style={{ padding: "0.7rem 0.8rem", borderTop: "1px solid #f1f5f9", overflow: "hidden" }}
+                  >
                     <div style={{ display: "flex", justifyContent: "space-between", gap: "0.6rem", flexWrap: "wrap" }}>
                       <div>
                         <strong style={{ color: "#0f172a" }}>{user.displayName || user.email}</strong>
@@ -511,8 +519,9 @@ export default function UserManagementPanel({
                         </button>
                       </div>
                     </div>
-                  </article>
+                  </motion.article>
                 ))}
+                </AnimatePresence>
               </div>
             )}
           </div>
@@ -529,8 +538,16 @@ export default function UserManagementPanel({
               <p style={{ margin: 0, padding: "0.8rem", color: "#475569" }}>No invites yet.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column" }}>
+                <AnimatePresence initial={false}>
                 {invites.map((invite) => (
-                  <article key={invite.id} style={{ padding: "0.7rem 0.8rem", borderTop: "1px solid #f1f5f9" }}>
+                  <motion.article
+                    key={invite.id}
+                    initial={{ opacity: 0, maxHeight: 0 }}
+                    animate={{ opacity: 1, maxHeight: "300px" }}
+                    exit={{ opacity: 0, maxHeight: 0 }}
+                    transition={{ duration: 0.15, ease: "easeInOut" }}
+                    style={{ padding: "0.7rem 0.8rem", borderTop: "1px solid #f1f5f9", overflow: "hidden" }}
+                  >
                     <div style={{ display: "flex", justifyContent: "space-between", gap: "0.6rem", flexWrap: "wrap" }}>
                       <div>
                         <strong style={{ color: "#0f172a" }}>{invite.displayName || invite.email}</strong>
@@ -618,8 +635,9 @@ export default function UserManagementPanel({
                         )}
                       </div>
                     </div>
-                  </article>
+                  </motion.article>
                 ))}
+                </AnimatePresence>
               </div>
             )}
           </div>

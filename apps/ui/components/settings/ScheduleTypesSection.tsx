@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { ScheduleTypeOption } from "../DayMetadataStrip";
 
 interface ScheduleTypesSectionProps {
@@ -126,8 +127,18 @@ export default function ScheduleTypesSection({
         </div>
         <span />
       </div>
-      {draftScheduleTypes.map((type, index) => (
-        <div key={`${type.value}-${index}`} style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <AnimatePresence initial={false}>
+      {draftScheduleTypes
+        .filter(type => type.value.trim() !== "closed") // Don't allow editing the "closed" type
+        .map((type, index) => (
+        <motion.div
+          key={`${type.value}-${index}`}
+          initial={{ opacity: 0, maxHeight: 0 }}
+          animate={{ opacity: 1, maxHeight: "1000px" }}
+          exit={{ opacity: 0, maxHeight: 0 }}
+          transition={{ duration: 0.15, ease: "easeInOut" }}
+          style={{ display: "flex", flexDirection: "column", gap: "0.5rem", overflow: "hidden" }}
+        >
           <div
             style={{
               border: "1px solid #e5e7eb",
@@ -249,28 +260,45 @@ export default function ScheduleTypesSection({
             {expandedScheduleTypes.has(type.value) ? "▼" : "▶"} Configure time window ratios ({(type.timeWindows || []).length} windows)
           </button>
 
+          <AnimatePresence initial={false}>
           {expandedScheduleTypes.has(type.value) && (
-            <div style={{
-              marginTop: "0.75rem",
-              padding: "0.75rem",
-              background: "#f9fafb",
-              borderRadius: 8
-            }}>
+            <motion.div
+              initial={{ opacity: 0, maxHeight: 0 }}
+              animate={{ opacity: 1, maxHeight: "500px" }}
+              exit={{ opacity: 0, maxHeight: 0 }}
+              transition={{ duration: 0.15, ease: "easeInOut" }}
+              style={{
+                marginTop: "0.75rem",
+                padding: "0.75rem",
+                background: "#f9fafb",
+                borderRadius: 8,
+                overflow: "hidden"
+              }}
+            >
+              <AnimatePresence initial={false}>
               {validateTimeWindows(type.timeWindows).length > 0 && (
-                <div style={{
-                  background: "#fee2e2",
-                  border: "1px solid #fecaca",
-                  borderRadius: 8,
-                  padding: "0.5rem",
-                  marginBottom: "0.75rem",
-                  color: "#991b1b",
-                  fontSize: "0.875rem"
-                }}>
+                <motion.div
+                  initial={{ opacity: 0, maxHeight: 0 }}
+                  animate={{ opacity: 1, maxHeight: "200px" }}
+                  exit={{ opacity: 0, maxHeight: 0 }}
+                  transition={{ duration: 0.15, ease: "easeInOut" }}
+                  style={{
+                    background: "#fee2e2",
+                    border: "1px solid #fecaca",
+                    borderRadius: 8,
+                    padding: "0.5rem",
+                    marginBottom: "0.75rem",
+                    color: "#991b1b",
+                    fontSize: "0.875rem",
+                    overflow: "hidden"
+                  }}
+                >
                   {validateTimeWindows(type.timeWindows).map((err, i) => (
                     <div key={i}>{err}</div>
                   ))}
-                </div>
+                </motion.div>
               )}
+              </AnimatePresence>
 
               {(type.timeWindows || []).map((window, windowIdx) => (
                 <div key={windowIdx} style={{
@@ -361,11 +389,13 @@ export default function ScheduleTypesSection({
               >
                 + Add time window
               </button>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
-      </div>
+        </motion.div>
       ))}
+      </AnimatePresence>
       <button
         type="button"
         onClick={onAdd}
