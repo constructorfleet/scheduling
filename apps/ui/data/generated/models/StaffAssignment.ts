@@ -11,6 +11,7 @@ export type StaffAssignment = {
     startTime: string;
     endTime: string;
     status: 'scheduled' | 'active' | 'on_break' | 'completed';
+    role?: string;
     notes?: string;
 };
 

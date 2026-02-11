@@ -7,6 +7,7 @@ import { colors } from "../../theme";
 interface EmployeesSectionProps {
   draftEmployees: Employee[];
   jobTitleOptions: string[];
+  roleOptions: string[];
   onChange: (next: Employee[]) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
@@ -17,6 +18,7 @@ interface EmployeesSectionProps {
 export default function EmployeesSection({
   draftEmployees,
   jobTitleOptions,
+  roleOptions,
   onChange,
   onAdd,
   onRemove,
@@ -83,12 +85,23 @@ export default function EmployeesSection({
     return { ...employee, requestedDaysOff: updater(employee.requestedDaysOff ?? []) };
   };
 
+  const normalizeRoles = (roles: string[] | undefined) => {
+    const unique = new Set<string>();
+    (roles ?? []).forEach((role) => {
+      const trimmed = role.trim();
+      if (trimmed) {
+        unique.add(trimmed);
+      }
+    });
+    return Array.from(unique);
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr .15fr .15fr 165px",
+          gridTemplateColumns: "1.1fr 1.35fr 1fr .9fr 1fr .15fr .15fr 165px",
           gap: "0.75rem",
           fontSize: "0.75rem",
           color: "#6b7280",
@@ -103,6 +116,7 @@ export default function EmployeesSection({
         <span style={{ textAlign: "center", width: "100%" }}>Email</span>
         <span style={{ textAlign: "center", width: "100%" }}>Phone</span>
         <span style={{ textAlign: "center", width: "100%" }}>Job title</span>
+        <span style={{ textAlign: "center", width: "100%" }}>Roles</span>
         <span style={{ textAlign: "center", width: "100%" }}>Max hours/day</span>
         <span style={{ textAlign: "center", width: "100%" }}>Max hours/week</span>
         <span />
@@ -133,7 +147,7 @@ export default function EmployeesSection({
               style={{
                 display: "grid",
                 gap: "0.75rem",
-                gridTemplateColumns: "1.1fr 1.4fr 1.1fr 1fr .15fr .15fr 170px",
+                gridTemplateColumns: "1.1fr 1.35fr 1fr .9fr 1fr .15fr .15fr 170px",
                 paddingLeft: "0.75rem",
                 paddingRight: "0.75rem",
                 boxSizing: "border-box",
@@ -195,6 +209,59 @@ export default function EmployeesSection({
                   </option>
                 ))}
               </select>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                  {normalizeRoles(employee.roles).map((role) => (
+                    <button
+                      key={`${employee.id}-${role}`}
+                      type="button"
+                      onClick={() => {
+                        setEmployee(index, {
+                          ...employee,
+                          roles: normalizeRoles(employee.roles).filter((existingRole) => existingRole !== role)
+                        });
+                      }}
+                      style={{
+                        borderRadius: 999,
+                        border: "1px solid #bfdbfe",
+                        background: "#eff6ff",
+                        color: "#1d4ed8",
+                        padding: "0.12rem 0.5rem",
+                        fontSize: "0.7rem"
+                      }}
+                      title="Remove role"
+                    >
+                      {role} x
+                    </button>
+                  ))}
+                </div>
+                <select
+                  value=""
+                  onChange={(event) => {
+                    const selectedRole = event.target.value;
+                    if (!selectedRole) {
+                      return;
+                    }
+                    const currentRoles = normalizeRoles(employee.roles);
+                    if (currentRoles.includes(selectedRole)) {
+                      return;
+                    }
+                    setEmployee(index, { ...employee, roles: [...currentRoles, selectedRole] });
+                  }}
+                  style={{
+                    borderRadius: 8,
+                    border: "1px solid #d1d5db",
+                    padding: "0.3rem 0.45rem"
+                  }}
+                >
+                  <option value="">Add role</option>
+                  {roleOptions.map((roleOption) => (
+                    <option key={`${employee.id}-${roleOption}`} value={roleOption}>
+                      {roleOption}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <input
                 type="number"
                 min={1}

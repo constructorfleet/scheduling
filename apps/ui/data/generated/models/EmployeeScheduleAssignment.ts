@@ -6,6 +6,7 @@ export type EmployeeScheduleAssignment = {
     id: string;
     segmentBlockId: string;
     employeeId: string;
+    role?: string;
     startTime: string;
     endTime: string;
 };

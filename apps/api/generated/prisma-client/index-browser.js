@@ -142,6 +142,14 @@ exports.Prisma.SchoolScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.RoleSettingScalarFieldEnum = {
+  id: 'id',
+  schoolId: 'schoolId',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ScheduleTypeScalarFieldEnum = {
   id: 'id',
   schoolId: 'schoolId',
@@ -184,7 +192,8 @@ exports.Prisma.EmployeeScalarFieldEnum = {
   cprCurrent: 'cprCurrent',
   notes: 'notes',
   availability: 'availability',
-  requestedDaysOff: 'requestedDaysOff'
+  requestedDaysOff: 'requestedDaysOff',
+  roles: 'roles'
 };
 
 exports.Prisma.OperatingHoursScalarFieldEnum = {
@@ -266,6 +275,7 @@ exports.Prisma.StaffAssignmentScalarFieldEnum = {
   startTime: 'startTime',
   endTime: 'endTime',
   status: 'status',
+  role: 'role',
   notes: 'notes',
   isOnCall: 'isOnCall',
   is1on1: 'is1on1',
@@ -392,6 +402,7 @@ exports.Role = exports.$Enums.Role = {
 exports.Prisma.ModelName = {
   District: 'District',
   School: 'School',
+  RoleSetting: 'RoleSetting',
   ScheduleType: 'ScheduleType',
   ScheduleTypeTimeWindow: 'ScheduleTypeTimeWindow',
   JobTitle: 'JobTitle',

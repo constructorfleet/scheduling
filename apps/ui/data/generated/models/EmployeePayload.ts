@@ -17,6 +17,7 @@ export type EmployeePayload = {
     medicallyDelegated: boolean;
     cprCurrent: boolean;
     notes?: string;
+    roles?: Array<string>;
     availability?: Array<EmployeeAvailabilityDay>;
     requestedDaysOff?: Array<EmployeeTimeOffRequest>;
 };

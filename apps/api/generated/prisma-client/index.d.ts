@@ -24,6 +24,11 @@ export type District = $Result.DefaultSelection<Prisma.$DistrictPayload>
  */
 export type School = $Result.DefaultSelection<Prisma.$SchoolPayload>
 /**
+ * Model RoleSetting
+ * 
+ */
+export type RoleSetting = $Result.DefaultSelection<Prisma.$RoleSettingPayload>
+/**
  * Model ScheduleType
  * 
  */
@@ -278,6 +283,16 @@ export class PrismaClient<
     * ```
     */
   get school(): Prisma.SchoolDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.roleSetting`: Exposes CRUD operations for the **RoleSetting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RoleSettings
+    * const roleSettings = await prisma.roleSetting.findMany()
+    * ```
+    */
+  get roleSetting(): Prisma.RoleSettingDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.scheduleType`: Exposes CRUD operations for the **ScheduleType** model.
@@ -884,6 +899,7 @@ export namespace Prisma {
   export const ModelName: {
     District: 'District',
     School: 'School',
+    RoleSetting: 'RoleSetting',
     ScheduleType: 'ScheduleType',
     ScheduleTypeTimeWindow: 'ScheduleTypeTimeWindow',
     JobTitle: 'JobTitle',
@@ -916,7 +932,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "district" | "school" | "scheduleType" | "scheduleTypeTimeWindow" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "userInvite" | "districtMembership" | "schoolMembership" | "session"
+      modelProps: "district" | "school" | "roleSetting" | "scheduleType" | "scheduleTypeTimeWindow" | "jobTitle" | "employee" | "operatingHours" | "fieldTripType" | "scheduleWeek" | "scheduleDay" | "fieldTripEvent" | "segmentBlock" | "staffAssignment" | "auditEvent" | "user" | "userInvite" | "districtMembership" | "schoolMembership" | "session"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1065,6 +1081,80 @@ export namespace Prisma {
           count: {
             args: Prisma.SchoolCountArgs<ExtArgs>
             result: $Utils.Optional<SchoolCountAggregateOutputType> | number
+          }
+        }
+      }
+      RoleSetting: {
+        payload: Prisma.$RoleSettingPayload<ExtArgs>
+        fields: Prisma.RoleSettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RoleSettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RoleSettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          findFirst: {
+            args: Prisma.RoleSettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RoleSettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          findMany: {
+            args: Prisma.RoleSettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>[]
+          }
+          create: {
+            args: Prisma.RoleSettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          createMany: {
+            args: Prisma.RoleSettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RoleSettingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>[]
+          }
+          delete: {
+            args: Prisma.RoleSettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          update: {
+            args: Prisma.RoleSettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.RoleSettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RoleSettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.RoleSettingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>[]
+          }
+          upsert: {
+            args: Prisma.RoleSettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RoleSettingPayload>
+          }
+          aggregate: {
+            args: Prisma.RoleSettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRoleSetting>
+          }
+          groupBy: {
+            args: Prisma.RoleSettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RoleSettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RoleSettingCountArgs<ExtArgs>
+            result: $Utils.Optional<RoleSettingCountAggregateOutputType> | number
           }
         }
       }
@@ -2436,6 +2526,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     district?: DistrictOmit
     school?: SchoolOmit
+    roleSetting?: RoleSettingOmit
     scheduleType?: ScheduleTypeOmit
     scheduleTypeTimeWindow?: ScheduleTypeTimeWindowOmit
     jobTitle?: JobTitleOmit
@@ -2584,6 +2675,7 @@ export namespace Prisma {
   export type SchoolCountOutputType = {
     scheduleTypes: number
     jobTitles: number
+    roleSettings: number
     employees: number
     operatingHours: number
     fieldTripTypes: number
@@ -2595,6 +2687,7 @@ export namespace Prisma {
   export type SchoolCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleTypes?: boolean | SchoolCountOutputTypeCountScheduleTypesArgs
     jobTitles?: boolean | SchoolCountOutputTypeCountJobTitlesArgs
+    roleSettings?: boolean | SchoolCountOutputTypeCountRoleSettingsArgs
     employees?: boolean | SchoolCountOutputTypeCountEmployeesArgs
     operatingHours?: boolean | SchoolCountOutputTypeCountOperatingHoursArgs
     fieldTripTypes?: boolean | SchoolCountOutputTypeCountFieldTripTypesArgs
@@ -2626,6 +2719,13 @@ export namespace Prisma {
    */
   export type SchoolCountOutputTypeCountJobTitlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: JobTitleWhereInput
+  }
+
+  /**
+   * SchoolCountOutputType without action
+   */
+  export type SchoolCountOutputTypeCountRoleSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleSettingWhereInput
   }
 
   /**
@@ -4266,6 +4366,7 @@ export namespace Prisma {
     updatedAt?: boolean
     scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
     jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
+    roleSettings?: boolean | School$roleSettingsArgs<ExtArgs>
     employees?: boolean | School$employeesArgs<ExtArgs>
     operatingHours?: boolean | School$operatingHoursArgs<ExtArgs>
     fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
@@ -4327,6 +4428,7 @@ export namespace Prisma {
   export type SchoolInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleTypes?: boolean | School$scheduleTypesArgs<ExtArgs>
     jobTitles?: boolean | School$jobTitlesArgs<ExtArgs>
+    roleSettings?: boolean | School$roleSettingsArgs<ExtArgs>
     employees?: boolean | School$employeesArgs<ExtArgs>
     operatingHours?: boolean | School$operatingHoursArgs<ExtArgs>
     fieldTripTypes?: boolean | School$fieldTripTypesArgs<ExtArgs>
@@ -4348,6 +4450,7 @@ export namespace Prisma {
     objects: {
       scheduleTypes: Prisma.$ScheduleTypePayload<ExtArgs>[]
       jobTitles: Prisma.$JobTitlePayload<ExtArgs>[]
+      roleSettings: Prisma.$RoleSettingPayload<ExtArgs>[]
       employees: Prisma.$EmployeePayload<ExtArgs>[]
       operatingHours: Prisma.$OperatingHoursPayload<ExtArgs>[]
       fieldTripTypes: Prisma.$FieldTripTypePayload<ExtArgs>[]
@@ -4765,6 +4868,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     scheduleTypes<T extends School$scheduleTypesArgs<ExtArgs> = {}>(args?: Subset<T, School$scheduleTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ScheduleTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     jobTitles<T extends School$jobTitlesArgs<ExtArgs> = {}>(args?: Subset<T, School$jobTitlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobTitlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    roleSettings<T extends School$roleSettingsArgs<ExtArgs> = {}>(args?: Subset<T, School$roleSettingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     employees<T extends School$employeesArgs<ExtArgs> = {}>(args?: Subset<T, School$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     operatingHours<T extends School$operatingHoursArgs<ExtArgs> = {}>(args?: Subset<T, School$operatingHoursArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperatingHoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fieldTripTypes<T extends School$fieldTripTypesArgs<ExtArgs> = {}>(args?: Subset<T, School$fieldTripTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FieldTripTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5257,6 +5361,30 @@ export namespace Prisma {
   }
 
   /**
+   * School.roleSettings
+   */
+  export type School$roleSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    where?: RoleSettingWhereInput
+    orderBy?: RoleSettingOrderByWithRelationInput | RoleSettingOrderByWithRelationInput[]
+    cursor?: RoleSettingWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RoleSettingScalarFieldEnum | RoleSettingScalarFieldEnum[]
+  }
+
+  /**
    * School.employees
    */
   export type School$employeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5416,6 +5544,1064 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SchoolInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RoleSetting
+   */
+
+  export type AggregateRoleSetting = {
+    _count: RoleSettingCountAggregateOutputType | null
+    _min: RoleSettingMinAggregateOutputType | null
+    _max: RoleSettingMaxAggregateOutputType | null
+  }
+
+  export type RoleSettingMinAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleSettingMaxAggregateOutputType = {
+    id: string | null
+    schoolId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RoleSettingCountAggregateOutputType = {
+    id: number
+    schoolId: number
+    name: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RoleSettingMinAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleSettingMaxAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RoleSettingCountAggregateInputType = {
+    id?: true
+    schoolId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RoleSettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleSetting to aggregate.
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleSettings to fetch.
+     */
+    orderBy?: RoleSettingOrderByWithRelationInput | RoleSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RoleSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RoleSettings
+    **/
+    _count?: true | RoleSettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RoleSettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RoleSettingMaxAggregateInputType
+  }
+
+  export type GetRoleSettingAggregateType<T extends RoleSettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateRoleSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRoleSetting[P]>
+      : GetScalarType<T[P], AggregateRoleSetting[P]>
+  }
+
+
+
+
+  export type RoleSettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleSettingWhereInput
+    orderBy?: RoleSettingOrderByWithAggregationInput | RoleSettingOrderByWithAggregationInput[]
+    by: RoleSettingScalarFieldEnum[] | RoleSettingScalarFieldEnum
+    having?: RoleSettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RoleSettingCountAggregateInputType | true
+    _min?: RoleSettingMinAggregateInputType
+    _max?: RoleSettingMaxAggregateInputType
+  }
+
+  export type RoleSettingGroupByOutputType = {
+    id: string
+    schoolId: string
+    name: string
+    createdAt: Date
+    updatedAt: Date
+    _count: RoleSettingCountAggregateOutputType | null
+    _min: RoleSettingMinAggregateOutputType | null
+    _max: RoleSettingMaxAggregateOutputType | null
+  }
+
+  type GetRoleSettingGroupByPayload<T extends RoleSettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RoleSettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RoleSettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RoleSettingGroupByOutputType[P]>
+            : GetScalarType<T[P], RoleSettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RoleSettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleSetting"]>
+
+  export type RoleSettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleSetting"]>
+
+  export type RoleSettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["roleSetting"]>
+
+  export type RoleSettingSelectScalar = {
+    id?: boolean
+    schoolId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RoleSettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["roleSetting"]>
+  export type RoleSettingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type RoleSettingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+  export type RoleSettingIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    school?: boolean | SchoolDefaultArgs<ExtArgs>
+  }
+
+  export type $RoleSettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RoleSetting"
+    objects: {
+      school: Prisma.$SchoolPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      schoolId: string
+      name: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["roleSetting"]>
+    composites: {}
+  }
+
+  type RoleSettingGetPayload<S extends boolean | null | undefined | RoleSettingDefaultArgs> = $Result.GetResult<Prisma.$RoleSettingPayload, S>
+
+  type RoleSettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RoleSettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RoleSettingCountAggregateInputType | true
+    }
+
+  export interface RoleSettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RoleSetting'], meta: { name: 'RoleSetting' } }
+    /**
+     * Find zero or one RoleSetting that matches the filter.
+     * @param {RoleSettingFindUniqueArgs} args - Arguments to find a RoleSetting
+     * @example
+     * // Get one RoleSetting
+     * const roleSetting = await prisma.roleSetting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RoleSettingFindUniqueArgs>(args: SelectSubset<T, RoleSettingFindUniqueArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one RoleSetting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {RoleSettingFindUniqueOrThrowArgs} args - Arguments to find a RoleSetting
+     * @example
+     * // Get one RoleSetting
+     * const roleSetting = await prisma.roleSetting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RoleSettingFindUniqueOrThrowArgs>(args: SelectSubset<T, RoleSettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleSetting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingFindFirstArgs} args - Arguments to find a RoleSetting
+     * @example
+     * // Get one RoleSetting
+     * const roleSetting = await prisma.roleSetting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RoleSettingFindFirstArgs>(args?: SelectSubset<T, RoleSettingFindFirstArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first RoleSetting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingFindFirstOrThrowArgs} args - Arguments to find a RoleSetting
+     * @example
+     * // Get one RoleSetting
+     * const roleSetting = await prisma.roleSetting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RoleSettingFindFirstOrThrowArgs>(args?: SelectSubset<T, RoleSettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more RoleSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RoleSettings
+     * const roleSettings = await prisma.roleSetting.findMany()
+     * 
+     * // Get first 10 RoleSettings
+     * const roleSettings = await prisma.roleSetting.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const roleSettingWithIdOnly = await prisma.roleSetting.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RoleSettingFindManyArgs>(args?: SelectSubset<T, RoleSettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a RoleSetting.
+     * @param {RoleSettingCreateArgs} args - Arguments to create a RoleSetting.
+     * @example
+     * // Create one RoleSetting
+     * const RoleSetting = await prisma.roleSetting.create({
+     *   data: {
+     *     // ... data to create a RoleSetting
+     *   }
+     * })
+     * 
+     */
+    create<T extends RoleSettingCreateArgs>(args: SelectSubset<T, RoleSettingCreateArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many RoleSettings.
+     * @param {RoleSettingCreateManyArgs} args - Arguments to create many RoleSettings.
+     * @example
+     * // Create many RoleSettings
+     * const roleSetting = await prisma.roleSetting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RoleSettingCreateManyArgs>(args?: SelectSubset<T, RoleSettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RoleSettings and returns the data saved in the database.
+     * @param {RoleSettingCreateManyAndReturnArgs} args - Arguments to create many RoleSettings.
+     * @example
+     * // Create many RoleSettings
+     * const roleSetting = await prisma.roleSetting.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RoleSettings and only return the `id`
+     * const roleSettingWithIdOnly = await prisma.roleSetting.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RoleSettingCreateManyAndReturnArgs>(args?: SelectSubset<T, RoleSettingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a RoleSetting.
+     * @param {RoleSettingDeleteArgs} args - Arguments to delete one RoleSetting.
+     * @example
+     * // Delete one RoleSetting
+     * const RoleSetting = await prisma.roleSetting.delete({
+     *   where: {
+     *     // ... filter to delete one RoleSetting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RoleSettingDeleteArgs>(args: SelectSubset<T, RoleSettingDeleteArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one RoleSetting.
+     * @param {RoleSettingUpdateArgs} args - Arguments to update one RoleSetting.
+     * @example
+     * // Update one RoleSetting
+     * const roleSetting = await prisma.roleSetting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RoleSettingUpdateArgs>(args: SelectSubset<T, RoleSettingUpdateArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more RoleSettings.
+     * @param {RoleSettingDeleteManyArgs} args - Arguments to filter RoleSettings to delete.
+     * @example
+     * // Delete a few RoleSettings
+     * const { count } = await prisma.roleSetting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RoleSettingDeleteManyArgs>(args?: SelectSubset<T, RoleSettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RoleSettings
+     * const roleSetting = await prisma.roleSetting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RoleSettingUpdateManyArgs>(args: SelectSubset<T, RoleSettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RoleSettings and returns the data updated in the database.
+     * @param {RoleSettingUpdateManyAndReturnArgs} args - Arguments to update many RoleSettings.
+     * @example
+     * // Update many RoleSettings
+     * const roleSetting = await prisma.roleSetting.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more RoleSettings and only return the `id`
+     * const roleSettingWithIdOnly = await prisma.roleSetting.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends RoleSettingUpdateManyAndReturnArgs>(args: SelectSubset<T, RoleSettingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one RoleSetting.
+     * @param {RoleSettingUpsertArgs} args - Arguments to update or create a RoleSetting.
+     * @example
+     * // Update or create a RoleSetting
+     * const roleSetting = await prisma.roleSetting.upsert({
+     *   create: {
+     *     // ... data to create a RoleSetting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RoleSetting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RoleSettingUpsertArgs>(args: SelectSubset<T, RoleSettingUpsertArgs<ExtArgs>>): Prisma__RoleSettingClient<$Result.GetResult<Prisma.$RoleSettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of RoleSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingCountArgs} args - Arguments to filter RoleSettings to count.
+     * @example
+     * // Count the number of RoleSettings
+     * const count = await prisma.roleSetting.count({
+     *   where: {
+     *     // ... the filter for the RoleSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends RoleSettingCountArgs>(
+      args?: Subset<T, RoleSettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RoleSettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RoleSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RoleSettingAggregateArgs>(args: Subset<T, RoleSettingAggregateArgs>): Prisma.PrismaPromise<GetRoleSettingAggregateType<T>>
+
+    /**
+     * Group by RoleSetting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RoleSettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RoleSettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RoleSettingGroupByArgs['orderBy'] }
+        : { orderBy?: RoleSettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RoleSettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RoleSetting model
+   */
+  readonly fields: RoleSettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RoleSetting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RoleSettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    school<T extends SchoolDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SchoolDefaultArgs<ExtArgs>>): Prisma__SchoolClient<$Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RoleSetting model
+   */
+  interface RoleSettingFieldRefs {
+    readonly id: FieldRef<"RoleSetting", 'String'>
+    readonly schoolId: FieldRef<"RoleSetting", 'String'>
+    readonly name: FieldRef<"RoleSetting", 'String'>
+    readonly createdAt: FieldRef<"RoleSetting", 'DateTime'>
+    readonly updatedAt: FieldRef<"RoleSetting", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RoleSetting findUnique
+   */
+  export type RoleSettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleSetting to fetch.
+     */
+    where: RoleSettingWhereUniqueInput
+  }
+
+  /**
+   * RoleSetting findUniqueOrThrow
+   */
+  export type RoleSettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleSetting to fetch.
+     */
+    where: RoleSettingWhereUniqueInput
+  }
+
+  /**
+   * RoleSetting findFirst
+   */
+  export type RoleSettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleSetting to fetch.
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleSettings to fetch.
+     */
+    orderBy?: RoleSettingOrderByWithRelationInput | RoleSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleSettings.
+     */
+    cursor?: RoleSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleSettings.
+     */
+    distinct?: RoleSettingScalarFieldEnum | RoleSettingScalarFieldEnum[]
+  }
+
+  /**
+   * RoleSetting findFirstOrThrow
+   */
+  export type RoleSettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleSetting to fetch.
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleSettings to fetch.
+     */
+    orderBy?: RoleSettingOrderByWithRelationInput | RoleSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RoleSettings.
+     */
+    cursor?: RoleSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RoleSettings.
+     */
+    distinct?: RoleSettingScalarFieldEnum | RoleSettingScalarFieldEnum[]
+  }
+
+  /**
+   * RoleSetting findMany
+   */
+  export type RoleSettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter, which RoleSettings to fetch.
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RoleSettings to fetch.
+     */
+    orderBy?: RoleSettingOrderByWithRelationInput | RoleSettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RoleSettings.
+     */
+    cursor?: RoleSettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RoleSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RoleSettings.
+     */
+    skip?: number
+    distinct?: RoleSettingScalarFieldEnum | RoleSettingScalarFieldEnum[]
+  }
+
+  /**
+   * RoleSetting create
+   */
+  export type RoleSettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RoleSetting.
+     */
+    data: XOR<RoleSettingCreateInput, RoleSettingUncheckedCreateInput>
+  }
+
+  /**
+   * RoleSetting createMany
+   */
+  export type RoleSettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RoleSettings.
+     */
+    data: RoleSettingCreateManyInput | RoleSettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RoleSetting createManyAndReturn
+   */
+  export type RoleSettingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * The data used to create many RoleSettings.
+     */
+    data: RoleSettingCreateManyInput | RoleSettingCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleSetting update
+   */
+  export type RoleSettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RoleSetting.
+     */
+    data: XOR<RoleSettingUpdateInput, RoleSettingUncheckedUpdateInput>
+    /**
+     * Choose, which RoleSetting to update.
+     */
+    where: RoleSettingWhereUniqueInput
+  }
+
+  /**
+   * RoleSetting updateMany
+   */
+  export type RoleSettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RoleSettings.
+     */
+    data: XOR<RoleSettingUpdateManyMutationInput, RoleSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleSettings to update
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * Limit how many RoleSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleSetting updateManyAndReturn
+   */
+  export type RoleSettingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * The data used to update RoleSettings.
+     */
+    data: XOR<RoleSettingUpdateManyMutationInput, RoleSettingUncheckedUpdateManyInput>
+    /**
+     * Filter which RoleSettings to update
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * Limit how many RoleSettings to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RoleSetting upsert
+   */
+  export type RoleSettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RoleSetting to update in case it exists.
+     */
+    where: RoleSettingWhereUniqueInput
+    /**
+     * In case the RoleSetting found by the `where` argument doesn't exist, create a new RoleSetting with this data.
+     */
+    create: XOR<RoleSettingCreateInput, RoleSettingUncheckedCreateInput>
+    /**
+     * In case the RoleSetting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RoleSettingUpdateInput, RoleSettingUncheckedUpdateInput>
+  }
+
+  /**
+   * RoleSetting delete
+   */
+  export type RoleSettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
+    /**
+     * Filter which RoleSetting to delete.
+     */
+    where: RoleSettingWhereUniqueInput
+  }
+
+  /**
+   * RoleSetting deleteMany
+   */
+  export type RoleSettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RoleSettings to delete
+     */
+    where?: RoleSettingWhereInput
+    /**
+     * Limit how many RoleSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * RoleSetting without action
+   */
+  export type RoleSettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RoleSetting
+     */
+    select?: RoleSettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RoleSetting
+     */
+    omit?: RoleSettingOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RoleSettingInclude<ExtArgs> | null
   }
 
 
@@ -8838,6 +10024,7 @@ export namespace Prisma {
     notes: number
     availability: number
     requestedDaysOff: number
+    roles: number
     _all: number
   }
 
@@ -8900,6 +10087,7 @@ export namespace Prisma {
     notes?: true
     availability?: true
     requestedDaysOff?: true
+    roles?: true
     _all?: true
   }
 
@@ -9005,6 +10193,7 @@ export namespace Prisma {
     notes: string | null
     availability: JsonValue | null
     requestedDaysOff: JsonValue | null
+    roles: string[]
     _count: EmployeeCountAggregateOutputType | null
     _avg: EmployeeAvgAggregateOutputType | null
     _sum: EmployeeSumAggregateOutputType | null
@@ -9042,6 +10231,7 @@ export namespace Prisma {
     notes?: boolean
     availability?: boolean
     requestedDaysOff?: boolean
+    roles?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
     jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
@@ -9062,6 +10252,7 @@ export namespace Prisma {
     notes?: boolean
     availability?: boolean
     requestedDaysOff?: boolean
+    roles?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
     jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
@@ -9082,6 +10273,7 @@ export namespace Prisma {
     notes?: boolean
     availability?: boolean
     requestedDaysOff?: boolean
+    roles?: boolean
     school?: boolean | SchoolDefaultArgs<ExtArgs>
     jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["employee"]>
@@ -9102,9 +10294,10 @@ export namespace Prisma {
     notes?: boolean
     availability?: boolean
     requestedDaysOff?: boolean
+    roles?: boolean
   }
 
-  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "email" | "phone" | "jobTitle" | "jobTitleId" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff", ExtArgs["result"]["employee"]>
+  export type EmployeeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "schoolId" | "name" | "email" | "phone" | "jobTitle" | "jobTitleId" | "maxHoursPerDay" | "maxHoursPerWeek" | "employmentStatus" | "medicallyDelegated" | "cprCurrent" | "notes" | "availability" | "requestedDaysOff" | "roles", ExtArgs["result"]["employee"]>
   export type EmployeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     school?: boolean | SchoolDefaultArgs<ExtArgs>
     jobTitleRecord?: boolean | JobTitleDefaultArgs<ExtArgs>
@@ -9140,6 +10333,7 @@ export namespace Prisma {
       notes: string | null
       availability: Prisma.JsonValue | null
       requestedDaysOff: Prisma.JsonValue | null
+      roles: string[]
     }, ExtArgs["result"]["employee"]>
     composites: {}
   }
@@ -9580,6 +10774,7 @@ export namespace Prisma {
     readonly notes: FieldRef<"Employee", 'String'>
     readonly availability: FieldRef<"Employee", 'Json'>
     readonly requestedDaysOff: FieldRef<"Employee", 'Json'>
+    readonly roles: FieldRef<"Employee", 'String[]'>
   }
     
 
@@ -16933,6 +18128,7 @@ export namespace Prisma {
     startTime: string | null
     endTime: string | null
     status: string | null
+    role: string | null
     notes: string | null
     isOnCall: boolean | null
     is1on1: boolean | null
@@ -16948,6 +18144,7 @@ export namespace Prisma {
     startTime: string | null
     endTime: string | null
     status: string | null
+    role: string | null
     notes: string | null
     isOnCall: boolean | null
     is1on1: boolean | null
@@ -16963,6 +18160,7 @@ export namespace Prisma {
     startTime: number
     endTime: number
     status: number
+    role: number
     notes: number
     isOnCall: number
     is1on1: number
@@ -16980,6 +18178,7 @@ export namespace Prisma {
     startTime?: true
     endTime?: true
     status?: true
+    role?: true
     notes?: true
     isOnCall?: true
     is1on1?: true
@@ -16995,6 +18194,7 @@ export namespace Prisma {
     startTime?: true
     endTime?: true
     status?: true
+    role?: true
     notes?: true
     isOnCall?: true
     is1on1?: true
@@ -17010,6 +18210,7 @@ export namespace Prisma {
     startTime?: true
     endTime?: true
     status?: true
+    role?: true
     notes?: true
     isOnCall?: true
     is1on1?: true
@@ -17098,6 +18299,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role: string | null
     notes: string | null
     isOnCall: boolean
     is1on1: boolean
@@ -17130,6 +18332,7 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     status?: boolean
+    role?: boolean
     notes?: boolean
     isOnCall?: boolean
     is1on1?: boolean
@@ -17147,6 +18350,7 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     status?: boolean
+    role?: boolean
     notes?: boolean
     isOnCall?: boolean
     is1on1?: boolean
@@ -17164,6 +18368,7 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     status?: boolean
+    role?: boolean
     notes?: boolean
     isOnCall?: boolean
     is1on1?: boolean
@@ -17181,13 +18386,14 @@ export namespace Prisma {
     startTime?: boolean
     endTime?: boolean
     status?: boolean
+    role?: boolean
     notes?: boolean
     isOnCall?: boolean
     is1on1?: boolean
     studentName?: boolean
   }
 
-  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "notes" | "isOnCall" | "is1on1" | "studentName", ExtArgs["result"]["staffAssignment"]>
+  export type StaffAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "scheduleWeekId" | "segmentBlockId" | "employeeId" | "assignmentSource" | "startTime" | "endTime" | "status" | "role" | "notes" | "isOnCall" | "is1on1" | "studentName", ExtArgs["result"]["staffAssignment"]>
   export type StaffAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     scheduleWeek?: boolean | ScheduleWeekDefaultArgs<ExtArgs>
     segmentBlock?: boolean | SegmentBlockDefaultArgs<ExtArgs>
@@ -17216,6 +18422,7 @@ export namespace Prisma {
       startTime: string
       endTime: string
       status: string
+      role: string | null
       notes: string | null
       isOnCall: boolean
       is1on1: boolean
@@ -17653,6 +18860,7 @@ export namespace Prisma {
     readonly startTime: FieldRef<"StaffAssignment", 'String'>
     readonly endTime: FieldRef<"StaffAssignment", 'String'>
     readonly status: FieldRef<"StaffAssignment", 'String'>
+    readonly role: FieldRef<"StaffAssignment", 'String'>
     readonly notes: FieldRef<"StaffAssignment", 'String'>
     readonly isOnCall: FieldRef<"StaffAssignment", 'Boolean'>
     readonly is1on1: FieldRef<"StaffAssignment", 'Boolean'>
@@ -24999,6 +26207,17 @@ export namespace Prisma {
   export type SchoolScalarFieldEnum = (typeof SchoolScalarFieldEnum)[keyof typeof SchoolScalarFieldEnum]
 
 
+  export const RoleSettingScalarFieldEnum: {
+    id: 'id',
+    schoolId: 'schoolId',
+    name: 'name',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RoleSettingScalarFieldEnum = (typeof RoleSettingScalarFieldEnum)[keyof typeof RoleSettingScalarFieldEnum]
+
+
   export const ScheduleTypeScalarFieldEnum: {
     id: 'id',
     schoolId: 'schoolId',
@@ -25050,7 +26269,8 @@ export namespace Prisma {
     cprCurrent: 'cprCurrent',
     notes: 'notes',
     availability: 'availability',
-    requestedDaysOff: 'requestedDaysOff'
+    requestedDaysOff: 'requestedDaysOff',
+    roles: 'roles'
   };
 
   export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
@@ -25153,6 +26373,7 @@ export namespace Prisma {
     startTime: 'startTime',
     endTime: 'endTime',
     status: 'status',
+    role: 'role',
     notes: 'notes',
     isOnCall: 'isOnCall',
     is1on1: 'is1on1',
@@ -25489,6 +26710,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"School"> | Date | string
     scheduleTypes?: ScheduleTypeListRelationFilter
     jobTitles?: JobTitleListRelationFilter
+    roleSettings?: RoleSettingListRelationFilter
     employees?: EmployeeListRelationFilter
     operatingHours?: OperatingHoursListRelationFilter
     fieldTripTypes?: FieldTripTypeListRelationFilter
@@ -25513,6 +26735,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     scheduleTypes?: ScheduleTypeOrderByRelationAggregateInput
     jobTitles?: JobTitleOrderByRelationAggregateInput
+    roleSettings?: RoleSettingOrderByRelationAggregateInput
     employees?: EmployeeOrderByRelationAggregateInput
     operatingHours?: OperatingHoursOrderByRelationAggregateInput
     fieldTripTypes?: FieldTripTypeOrderByRelationAggregateInput
@@ -25540,6 +26763,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"School"> | Date | string
     scheduleTypes?: ScheduleTypeListRelationFilter
     jobTitles?: JobTitleListRelationFilter
+    roleSettings?: RoleSettingListRelationFilter
     employees?: EmployeeListRelationFilter
     operatingHours?: OperatingHoursListRelationFilter
     fieldTripTypes?: FieldTripTypeListRelationFilter
@@ -25585,6 +26809,62 @@ export namespace Prisma {
     requireCurrentCpr?: BoolWithAggregatesFilter<"School"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"School"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"School"> | Date | string
+  }
+
+  export type RoleSettingWhereInput = {
+    AND?: RoleSettingWhereInput | RoleSettingWhereInput[]
+    OR?: RoleSettingWhereInput[]
+    NOT?: RoleSettingWhereInput | RoleSettingWhereInput[]
+    id?: StringFilter<"RoleSetting"> | string
+    schoolId?: StringFilter<"RoleSetting"> | string
+    name?: StringFilter<"RoleSetting"> | string
+    createdAt?: DateTimeFilter<"RoleSetting"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleSetting"> | Date | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }
+
+  export type RoleSettingOrderByWithRelationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    school?: SchoolOrderByWithRelationInput
+  }
+
+  export type RoleSettingWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    schoolId_name?: RoleSettingSchoolIdNameCompoundUniqueInput
+    AND?: RoleSettingWhereInput | RoleSettingWhereInput[]
+    OR?: RoleSettingWhereInput[]
+    NOT?: RoleSettingWhereInput | RoleSettingWhereInput[]
+    schoolId?: StringFilter<"RoleSetting"> | string
+    name?: StringFilter<"RoleSetting"> | string
+    createdAt?: DateTimeFilter<"RoleSetting"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleSetting"> | Date | string
+    school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
+  }, "id" | "schoolId_name">
+
+  export type RoleSettingOrderByWithAggregationInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RoleSettingCountOrderByAggregateInput
+    _max?: RoleSettingMaxOrderByAggregateInput
+    _min?: RoleSettingMinOrderByAggregateInput
+  }
+
+  export type RoleSettingScalarWhereWithAggregatesInput = {
+    AND?: RoleSettingScalarWhereWithAggregatesInput | RoleSettingScalarWhereWithAggregatesInput[]
+    OR?: RoleSettingScalarWhereWithAggregatesInput[]
+    NOT?: RoleSettingScalarWhereWithAggregatesInput | RoleSettingScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RoleSetting"> | string
+    schoolId?: StringWithAggregatesFilter<"RoleSetting"> | string
+    name?: StringWithAggregatesFilter<"RoleSetting"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"RoleSetting"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RoleSetting"> | Date | string
   }
 
   export type ScheduleTypeWhereInput = {
@@ -25797,6 +27077,7 @@ export namespace Prisma {
     notes?: StringNullableFilter<"Employee"> | string | null
     availability?: JsonNullableFilter<"Employee">
     requestedDaysOff?: JsonNullableFilter<"Employee">
+    roles?: StringNullableListFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
     jobTitleRecord?: XOR<JobTitleScalarRelationFilter, JobTitleWhereInput>
   }
@@ -25817,6 +27098,7 @@ export namespace Prisma {
     notes?: SortOrderInput | SortOrder
     availability?: SortOrderInput | SortOrder
     requestedDaysOff?: SortOrderInput | SortOrder
+    roles?: SortOrder
     school?: SchoolOrderByWithRelationInput
     jobTitleRecord?: JobTitleOrderByWithRelationInput
   }
@@ -25840,6 +27122,7 @@ export namespace Prisma {
     notes?: StringNullableFilter<"Employee"> | string | null
     availability?: JsonNullableFilter<"Employee">
     requestedDaysOff?: JsonNullableFilter<"Employee">
+    roles?: StringNullableListFilter<"Employee">
     school?: XOR<SchoolScalarRelationFilter, SchoolWhereInput>
     jobTitleRecord?: XOR<JobTitleScalarRelationFilter, JobTitleWhereInput>
   }, "id">
@@ -25860,6 +27143,7 @@ export namespace Prisma {
     notes?: SortOrderInput | SortOrder
     availability?: SortOrderInput | SortOrder
     requestedDaysOff?: SortOrderInput | SortOrder
+    roles?: SortOrder
     _count?: EmployeeCountOrderByAggregateInput
     _avg?: EmployeeAvgOrderByAggregateInput
     _max?: EmployeeMaxOrderByAggregateInput
@@ -25886,6 +27170,7 @@ export namespace Prisma {
     notes?: StringNullableWithAggregatesFilter<"Employee"> | string | null
     availability?: JsonNullableWithAggregatesFilter<"Employee">
     requestedDaysOff?: JsonNullableWithAggregatesFilter<"Employee">
+    roles?: StringNullableListFilter<"Employee">
   }
 
   export type OperatingHoursWhereInput = {
@@ -26364,6 +27649,7 @@ export namespace Prisma {
     startTime?: StringFilter<"StaffAssignment"> | string
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
+    role?: StringNullableFilter<"StaffAssignment"> | string | null
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
     isOnCall?: BoolFilter<"StaffAssignment"> | boolean
     is1on1?: BoolFilter<"StaffAssignment"> | boolean
@@ -26381,6 +27667,7 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    role?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     isOnCall?: SortOrder
     is1on1?: SortOrder
@@ -26401,6 +27688,7 @@ export namespace Prisma {
     startTime?: StringFilter<"StaffAssignment"> | string
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
+    role?: StringNullableFilter<"StaffAssignment"> | string | null
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
     isOnCall?: BoolFilter<"StaffAssignment"> | boolean
     is1on1?: BoolFilter<"StaffAssignment"> | boolean
@@ -26418,6 +27706,7 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    role?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     isOnCall?: SortOrder
     is1on1?: SortOrder
@@ -26439,6 +27728,7 @@ export namespace Prisma {
     startTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
     endTime?: StringWithAggregatesFilter<"StaffAssignment"> | string
     status?: StringWithAggregatesFilter<"StaffAssignment"> | string
+    role?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
     notes?: StringNullableWithAggregatesFilter<"StaffAssignment"> | string | null
     isOnCall?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
     is1on1?: BoolWithAggregatesFilter<"StaffAssignment"> | boolean
@@ -27005,6 +28295,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -27029,6 +28320,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -27051,6 +28343,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -27075,6 +28368,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -27123,6 +28417,61 @@ export namespace Prisma {
     fieldTripEndTime?: StringFieldUpdateOperationsInput | string
     minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
     requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleSettingCreateInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    school: SchoolCreateNestedOneWithoutRoleSettingsInput
+  }
+
+  export type RoleSettingUncheckedCreateInput = {
+    id?: string
+    schoolId: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleSettingUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    school?: SchoolUpdateOneRequiredWithoutRoleSettingsNestedInput
+  }
+
+  export type RoleSettingUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleSettingCreateManyInput = {
+    id?: string
+    schoolId: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleSettingUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleSettingUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    schoolId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -27335,6 +28684,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
     school: SchoolCreateNestedOneWithoutEmployeesInput
     jobTitleRecord: JobTitleCreateNestedOneWithoutEmployeesInput
   }
@@ -27355,6 +28705,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type EmployeeUpdateInput = {
@@ -27371,6 +28722,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
     school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
     jobTitleRecord?: JobTitleUpdateOneRequiredWithoutEmployeesNestedInput
   }
@@ -27391,6 +28743,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type EmployeeCreateManyInput = {
@@ -27409,6 +28762,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type EmployeeUpdateManyMutationInput = {
@@ -27425,6 +28779,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type EmployeeUncheckedUpdateManyInput = {
@@ -27443,6 +28798,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type OperatingHoursCreateInput = {
@@ -27960,6 +29316,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -27977,6 +29334,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -27990,6 +29348,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -28007,6 +29366,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -28022,6 +29382,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -28035,6 +29396,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -28050,6 +29412,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -28741,6 +30104,12 @@ export namespace Prisma {
     none?: JobTitleWhereInput
   }
 
+  export type RoleSettingListRelationFilter = {
+    every?: RoleSettingWhereInput
+    some?: RoleSettingWhereInput
+    none?: RoleSettingWhereInput
+  }
+
   export type EmployeeListRelationFilter = {
     every?: EmployeeWhereInput
     some?: EmployeeWhereInput
@@ -28781,6 +30150,10 @@ export namespace Prisma {
   }
 
   export type JobTitleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RoleSettingOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28909,6 +30282,40 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type SchoolScalarRelationFilter = {
+    is?: SchoolWhereInput
+    isNot?: SchoolWhereInput
+  }
+
+  export type RoleSettingSchoolIdNameCompoundUniqueInput = {
+    schoolId: string
+    name: string
+  }
+
+  export type RoleSettingCountOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleSettingMaxOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RoleSettingMinOrderByAggregateInput = {
+    id?: SortOrder
+    schoolId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -28922,11 +30329,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type SchoolScalarRelationFilter = {
-    is?: SchoolWhereInput
-    isNot?: SchoolWhereInput
   }
 
   export type ScheduleTypeTimeWindowListRelationFilter = {
@@ -29096,6 +30498,14 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type JobTitleScalarRelationFilter = {
     is?: JobTitleWhereInput
     isNot?: JobTitleWhereInput
@@ -29117,6 +30527,7 @@ export namespace Prisma {
     notes?: SortOrder
     availability?: SortOrder
     requestedDaysOff?: SortOrder
+    roles?: SortOrder
   }
 
   export type EmployeeAvgOrderByAggregateInput = {
@@ -29548,6 +30959,7 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    role?: SortOrder
     notes?: SortOrder
     isOnCall?: SortOrder
     is1on1?: SortOrder
@@ -29563,6 +30975,7 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    role?: SortOrder
     notes?: SortOrder
     isOnCall?: SortOrder
     is1on1?: SortOrder
@@ -29578,6 +30991,7 @@ export namespace Prisma {
     startTime?: SortOrder
     endTime?: SortOrder
     status?: SortOrder
+    role?: SortOrder
     notes?: SortOrder
     isOnCall?: SortOrder
     is1on1?: SortOrder
@@ -30031,6 +31445,13 @@ export namespace Prisma {
     connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
   }
 
+  export type RoleSettingCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput> | RoleSettingCreateWithoutSchoolInput[] | RoleSettingUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: RoleSettingCreateOrConnectWithoutSchoolInput | RoleSettingCreateOrConnectWithoutSchoolInput[]
+    createMany?: RoleSettingCreateManySchoolInputEnvelope
+    connect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+  }
+
   export type EmployeeCreateNestedManyWithoutSchoolInput = {
     create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
     connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
@@ -30091,6 +31512,13 @@ export namespace Prisma {
     connectOrCreate?: JobTitleCreateOrConnectWithoutSchoolInput | JobTitleCreateOrConnectWithoutSchoolInput[]
     createMany?: JobTitleCreateManySchoolInputEnvelope
     connect?: JobTitleWhereUniqueInput | JobTitleWhereUniqueInput[]
+  }
+
+  export type RoleSettingUncheckedCreateNestedManyWithoutSchoolInput = {
+    create?: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput> | RoleSettingCreateWithoutSchoolInput[] | RoleSettingUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: RoleSettingCreateOrConnectWithoutSchoolInput | RoleSettingCreateOrConnectWithoutSchoolInput[]
+    createMany?: RoleSettingCreateManySchoolInputEnvelope
+    connect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
   }
 
   export type EmployeeUncheckedCreateNestedManyWithoutSchoolInput = {
@@ -30173,6 +31601,20 @@ export namespace Prisma {
     update?: JobTitleUpdateWithWhereUniqueWithoutSchoolInput | JobTitleUpdateWithWhereUniqueWithoutSchoolInput[]
     updateMany?: JobTitleUpdateManyWithWhereWithoutSchoolInput | JobTitleUpdateManyWithWhereWithoutSchoolInput[]
     deleteMany?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
+  }
+
+  export type RoleSettingUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput> | RoleSettingCreateWithoutSchoolInput[] | RoleSettingUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: RoleSettingCreateOrConnectWithoutSchoolInput | RoleSettingCreateOrConnectWithoutSchoolInput[]
+    upsert?: RoleSettingUpsertWithWhereUniqueWithoutSchoolInput | RoleSettingUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: RoleSettingCreateManySchoolInputEnvelope
+    set?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    disconnect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    delete?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    connect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    update?: RoleSettingUpdateWithWhereUniqueWithoutSchoolInput | RoleSettingUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: RoleSettingUpdateManyWithWhereWithoutSchoolInput | RoleSettingUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: RoleSettingScalarWhereInput | RoleSettingScalarWhereInput[]
   }
 
   export type EmployeeUpdateManyWithoutSchoolNestedInput = {
@@ -30295,6 +31737,20 @@ export namespace Prisma {
     deleteMany?: JobTitleScalarWhereInput | JobTitleScalarWhereInput[]
   }
 
+  export type RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput = {
+    create?: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput> | RoleSettingCreateWithoutSchoolInput[] | RoleSettingUncheckedCreateWithoutSchoolInput[]
+    connectOrCreate?: RoleSettingCreateOrConnectWithoutSchoolInput | RoleSettingCreateOrConnectWithoutSchoolInput[]
+    upsert?: RoleSettingUpsertWithWhereUniqueWithoutSchoolInput | RoleSettingUpsertWithWhereUniqueWithoutSchoolInput[]
+    createMany?: RoleSettingCreateManySchoolInputEnvelope
+    set?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    disconnect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    delete?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    connect?: RoleSettingWhereUniqueInput | RoleSettingWhereUniqueInput[]
+    update?: RoleSettingUpdateWithWhereUniqueWithoutSchoolInput | RoleSettingUpdateWithWhereUniqueWithoutSchoolInput[]
+    updateMany?: RoleSettingUpdateManyWithWhereWithoutSchoolInput | RoleSettingUpdateManyWithWhereWithoutSchoolInput[]
+    deleteMany?: RoleSettingScalarWhereInput | RoleSettingScalarWhereInput[]
+  }
+
   export type EmployeeUncheckedUpdateManyWithoutSchoolNestedInput = {
     create?: XOR<EmployeeCreateWithoutSchoolInput, EmployeeUncheckedCreateWithoutSchoolInput> | EmployeeCreateWithoutSchoolInput[] | EmployeeUncheckedCreateWithoutSchoolInput[]
     connectOrCreate?: EmployeeCreateOrConnectWithoutSchoolInput | EmployeeCreateOrConnectWithoutSchoolInput[]
@@ -30377,6 +31833,20 @@ export namespace Prisma {
     update?: UserInviteUpdateWithWhereUniqueWithoutSchoolInput | UserInviteUpdateWithWhereUniqueWithoutSchoolInput[]
     updateMany?: UserInviteUpdateManyWithWhereWithoutSchoolInput | UserInviteUpdateManyWithWhereWithoutSchoolInput[]
     deleteMany?: UserInviteScalarWhereInput | UserInviteScalarWhereInput[]
+  }
+
+  export type SchoolCreateNestedOneWithoutRoleSettingsInput = {
+    create?: XOR<SchoolCreateWithoutRoleSettingsInput, SchoolUncheckedCreateWithoutRoleSettingsInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutRoleSettingsInput
+    connect?: SchoolWhereUniqueInput
+  }
+
+  export type SchoolUpdateOneRequiredWithoutRoleSettingsNestedInput = {
+    create?: XOR<SchoolCreateWithoutRoleSettingsInput, SchoolUncheckedCreateWithoutRoleSettingsInput>
+    connectOrCreate?: SchoolCreateOrConnectWithoutRoleSettingsInput
+    upsert?: SchoolUpsertWithoutRoleSettingsInput
+    connect?: SchoolWhereUniqueInput
+    update?: XOR<XOR<SchoolUpdateToOneWithWhereWithoutRoleSettingsInput, SchoolUpdateWithoutRoleSettingsInput>, SchoolUncheckedUpdateWithoutRoleSettingsInput>
   }
 
   export type SchoolCreateNestedOneWithoutScheduleTypesInput = {
@@ -30509,6 +31979,10 @@ export namespace Prisma {
     deleteMany?: EmployeeScalarWhereInput | EmployeeScalarWhereInput[]
   }
 
+  export type EmployeeCreaterolesInput = {
+    set: string[]
+  }
+
   export type SchoolCreateNestedOneWithoutEmployeesInput = {
     create?: XOR<SchoolCreateWithoutEmployeesInput, SchoolUncheckedCreateWithoutEmployeesInput>
     connectOrCreate?: SchoolCreateOrConnectWithoutEmployeesInput
@@ -30519,6 +31993,11 @@ export namespace Prisma {
     create?: XOR<JobTitleCreateWithoutEmployeesInput, JobTitleUncheckedCreateWithoutEmployeesInput>
     connectOrCreate?: JobTitleCreateOrConnectWithoutEmployeesInput
     connect?: JobTitleWhereUniqueInput
+  }
+
+  export type EmployeeUpdaterolesInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type SchoolUpdateOneRequiredWithoutEmployeesNestedInput = {
@@ -31514,6 +32993,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -31536,6 +33016,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -31776,6 +33257,30 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type RoleSettingCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleSettingUncheckedCreateWithoutSchoolInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RoleSettingCreateOrConnectWithoutSchoolInput = {
+    where: RoleSettingWhereUniqueInput
+    create: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type RoleSettingCreateManySchoolInputEnvelope = {
+    data: RoleSettingCreateManySchoolInput | RoleSettingCreateManySchoolInput[]
+    skipDuplicates?: boolean
+  }
+
   export type EmployeeCreateWithoutSchoolInput = {
     id?: string
     name: string
@@ -31790,6 +33295,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
     jobTitleRecord: JobTitleCreateNestedOneWithoutEmployeesInput
   }
 
@@ -31808,6 +33314,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type EmployeeCreateOrConnectWithoutSchoolInput = {
@@ -32063,6 +33570,33 @@ export namespace Prisma {
     requiresLeaderForOpenClose?: BoolFilter<"JobTitle"> | boolean
   }
 
+  export type RoleSettingUpsertWithWhereUniqueWithoutSchoolInput = {
+    where: RoleSettingWhereUniqueInput
+    update: XOR<RoleSettingUpdateWithoutSchoolInput, RoleSettingUncheckedUpdateWithoutSchoolInput>
+    create: XOR<RoleSettingCreateWithoutSchoolInput, RoleSettingUncheckedCreateWithoutSchoolInput>
+  }
+
+  export type RoleSettingUpdateWithWhereUniqueWithoutSchoolInput = {
+    where: RoleSettingWhereUniqueInput
+    data: XOR<RoleSettingUpdateWithoutSchoolInput, RoleSettingUncheckedUpdateWithoutSchoolInput>
+  }
+
+  export type RoleSettingUpdateManyWithWhereWithoutSchoolInput = {
+    where: RoleSettingScalarWhereInput
+    data: XOR<RoleSettingUpdateManyMutationInput, RoleSettingUncheckedUpdateManyWithoutSchoolInput>
+  }
+
+  export type RoleSettingScalarWhereInput = {
+    AND?: RoleSettingScalarWhereInput | RoleSettingScalarWhereInput[]
+    OR?: RoleSettingScalarWhereInput[]
+    NOT?: RoleSettingScalarWhereInput | RoleSettingScalarWhereInput[]
+    id?: StringFilter<"RoleSetting"> | string
+    schoolId?: StringFilter<"RoleSetting"> | string
+    name?: StringFilter<"RoleSetting"> | string
+    createdAt?: DateTimeFilter<"RoleSetting"> | Date | string
+    updatedAt?: DateTimeFilter<"RoleSetting"> | Date | string
+  }
+
   export type EmployeeUpsertWithWhereUniqueWithoutSchoolInput = {
     where: EmployeeWhereUniqueInput
     update: XOR<EmployeeUpdateWithoutSchoolInput, EmployeeUncheckedUpdateWithoutSchoolInput>
@@ -32098,6 +33632,7 @@ export namespace Prisma {
     notes?: StringNullableFilter<"Employee"> | string | null
     availability?: JsonNullableFilter<"Employee">
     requestedDaysOff?: JsonNullableFilter<"Employee">
+    roles?: StringNullableListFilter<"Employee">
   }
 
   export type OperatingHoursUpsertWithWhereUniqueWithoutSchoolInput = {
@@ -32261,6 +33796,114 @@ export namespace Prisma {
     invites?: UserInviteUncheckedUpdateManyWithoutDistrictNestedInput
   }
 
+  export type SchoolCreateWithoutRoleSettingsInput = {
+    id?: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
+    memberships?: SchoolMembershipCreateNestedManyWithoutSchoolInput
+    invites?: UserInviteCreateNestedManyWithoutSchoolInput
+    district: DistrictCreateNestedOneWithoutSchoolsInput
+  }
+
+  export type SchoolUncheckedCreateWithoutRoleSettingsInput = {
+    id?: string
+    districtId: string
+    name: string
+    closedDays: JsonNullValueInput | InputJsonValue
+    openerCount: number
+    closerCount: number
+    fieldTripStartTime?: string
+    fieldTripEndTime?: string
+    minimumMedicalDelegated: number
+    requireCurrentCpr: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
+    operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
+    fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
+    scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
+    memberships?: SchoolMembershipUncheckedCreateNestedManyWithoutSchoolInput
+    invites?: UserInviteUncheckedCreateNestedManyWithoutSchoolInput
+  }
+
+  export type SchoolCreateOrConnectWithoutRoleSettingsInput = {
+    where: SchoolWhereUniqueInput
+    create: XOR<SchoolCreateWithoutRoleSettingsInput, SchoolUncheckedCreateWithoutRoleSettingsInput>
+  }
+
+  export type SchoolUpsertWithoutRoleSettingsInput = {
+    update: XOR<SchoolUpdateWithoutRoleSettingsInput, SchoolUncheckedUpdateWithoutRoleSettingsInput>
+    create: XOR<SchoolCreateWithoutRoleSettingsInput, SchoolUncheckedCreateWithoutRoleSettingsInput>
+    where?: SchoolWhereInput
+  }
+
+  export type SchoolUpdateToOneWithWhereWithoutRoleSettingsInput = {
+    where?: SchoolWhereInput
+    data: XOR<SchoolUpdateWithoutRoleSettingsInput, SchoolUncheckedUpdateWithoutRoleSettingsInput>
+  }
+
+  export type SchoolUpdateWithoutRoleSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
+    memberships?: SchoolMembershipUpdateManyWithoutSchoolNestedInput
+    invites?: UserInviteUpdateManyWithoutSchoolNestedInput
+    district?: DistrictUpdateOneRequiredWithoutSchoolsNestedInput
+  }
+
+  export type SchoolUncheckedUpdateWithoutRoleSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    districtId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    closedDays?: JsonNullValueInput | InputJsonValue
+    openerCount?: IntFieldUpdateOperationsInput | number
+    closerCount?: IntFieldUpdateOperationsInput | number
+    fieldTripStartTime?: StringFieldUpdateOperationsInput | string
+    fieldTripEndTime?: StringFieldUpdateOperationsInput | string
+    minimumMedicalDelegated?: IntFieldUpdateOperationsInput | number
+    requireCurrentCpr?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
+    operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
+    fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
+    memberships?: SchoolMembershipUncheckedUpdateManyWithoutSchoolNestedInput
+    invites?: UserInviteUncheckedUpdateManyWithoutSchoolNestedInput
+  }
+
   export type SchoolCreateWithoutScheduleTypesInput = {
     id?: string
     name: string
@@ -32274,6 +33917,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -32297,6 +33941,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -32360,6 +34005,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -32383,6 +34029,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -32488,6 +34135,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -32511,6 +34159,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -32538,6 +34187,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
     school: SchoolCreateNestedOneWithoutEmployeesInput
   }
 
@@ -32556,6 +34206,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type EmployeeCreateOrConnectWithoutJobTitleRecordInput = {
@@ -32592,6 +34243,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -32615,6 +34267,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -32653,6 +34306,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
@@ -32676,6 +34330,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
@@ -32734,6 +34389,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
@@ -32757,6 +34413,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
@@ -32805,6 +34462,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
@@ -32828,6 +34486,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
@@ -32865,6 +34524,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
@@ -32888,6 +34548,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
@@ -32909,6 +34570,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekCreateNestedManyWithoutSchoolInput
@@ -32932,6 +34594,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     scheduleWeeks?: ScheduleWeekUncheckedCreateNestedManyWithoutSchoolInput
@@ -32969,6 +34632,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUpdateManyWithoutSchoolNestedInput
@@ -32992,6 +34656,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     scheduleWeeks?: ScheduleWeekUncheckedUpdateManyWithoutSchoolNestedInput
@@ -33013,6 +34678,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -33036,6 +34702,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -33125,6 +34792,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -33140,6 +34808,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -33249,6 +34918,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -33272,6 +34942,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -33371,6 +35042,7 @@ export namespace Prisma {
     startTime?: StringFilter<"StaffAssignment"> | string
     endTime?: StringFilter<"StaffAssignment"> | string
     status?: StringFilter<"StaffAssignment"> | string
+    role?: StringNullableFilter<"StaffAssignment"> | string | null
     notes?: StringNullableFilter<"StaffAssignment"> | string | null
     isOnCall?: BoolFilter<"StaffAssignment"> | boolean
     is1on1?: BoolFilter<"StaffAssignment"> | boolean
@@ -33625,6 +35297,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -33640,6 +35313,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -34200,6 +35874,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -34223,6 +35898,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -34334,6 +36010,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -34357,6 +36034,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -34553,6 +36231,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingCreateNestedManyWithoutSchoolInput
     employees?: EmployeeCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeCreateNestedManyWithoutSchoolInput
@@ -34576,6 +36255,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     scheduleTypes?: ScheduleTypeUncheckedCreateNestedManyWithoutSchoolInput
     jobTitles?: JobTitleUncheckedCreateNestedManyWithoutSchoolInput
+    roleSettings?: RoleSettingUncheckedCreateNestedManyWithoutSchoolInput
     employees?: EmployeeUncheckedCreateNestedManyWithoutSchoolInput
     operatingHours?: OperatingHoursUncheckedCreateNestedManyWithoutSchoolInput
     fieldTripTypes?: FieldTripTypeUncheckedCreateNestedManyWithoutSchoolInput
@@ -34658,6 +36338,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -34681,6 +36362,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -34824,6 +36506,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUpdateManyWithoutSchoolNestedInput
@@ -34846,6 +36529,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     scheduleTypes?: ScheduleTypeUncheckedUpdateManyWithoutSchoolNestedInput
     jobTitles?: JobTitleUncheckedUpdateManyWithoutSchoolNestedInput
+    roleSettings?: RoleSettingUncheckedUpdateManyWithoutSchoolNestedInput
     employees?: EmployeeUncheckedUpdateManyWithoutSchoolNestedInput
     operatingHours?: OperatingHoursUncheckedUpdateManyWithoutSchoolNestedInput
     fieldTripTypes?: FieldTripTypeUncheckedUpdateManyWithoutSchoolNestedInput
@@ -34956,6 +36640,13 @@ export namespace Prisma {
     requiresLeaderForOpenClose: boolean
   }
 
+  export type RoleSettingCreateManySchoolInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type EmployeeCreateManySchoolInput = {
     id?: string
     name: string
@@ -34971,6 +36662,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type OperatingHoursCreateManySchoolInput = {
@@ -35077,6 +36769,27 @@ export namespace Prisma {
     requiresLeaderForOpenClose?: BoolFieldUpdateOperationsInput | boolean
   }
 
+  export type RoleSettingUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleSettingUncheckedUpdateWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RoleSettingUncheckedUpdateManyWithoutSchoolInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EmployeeUpdateWithoutSchoolInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -35091,6 +36804,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
     jobTitleRecord?: JobTitleUpdateOneRequiredWithoutEmployeesNestedInput
   }
 
@@ -35109,6 +36823,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type EmployeeUncheckedUpdateManyWithoutSchoolInput = {
@@ -35126,6 +36841,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type OperatingHoursUpdateWithoutSchoolInput = {
@@ -35341,6 +37057,7 @@ export namespace Prisma {
     notes?: string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeCreaterolesInput | string[]
   }
 
   export type EmployeeUpdateWithoutJobTitleRecordInput = {
@@ -35357,6 +37074,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
     school?: SchoolUpdateOneRequiredWithoutEmployeesNestedInput
   }
 
@@ -35375,6 +37093,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type EmployeeUncheckedUpdateManyWithoutJobTitleRecordInput = {
@@ -35392,6 +37111,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     availability?: NullableJsonNullValueInput | InputJsonValue
     requestedDaysOff?: NullableJsonNullValueInput | InputJsonValue
+    roles?: EmployeeUpdaterolesInput | string[]
   }
 
   export type ScheduleDayCreateManyScheduleWeekInput = {
@@ -35426,6 +37146,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -35537,6 +37258,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -35552,6 +37274,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -35566,6 +37289,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -35652,6 +37376,7 @@ export namespace Prisma {
     startTime: string
     endTime: string
     status: string
+    role?: string | null
     notes?: string | null
     isOnCall?: boolean
     is1on1?: boolean
@@ -35665,6 +37390,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -35680,6 +37406,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean
@@ -35694,6 +37421,7 @@ export namespace Prisma {
     startTime?: StringFieldUpdateOperationsInput | string
     endTime?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
+    role?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     isOnCall?: BoolFieldUpdateOperationsInput | boolean
     is1on1?: BoolFieldUpdateOperationsInput | boolean

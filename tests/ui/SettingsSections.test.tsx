@@ -328,6 +328,7 @@ describe("Settings section components", () => {
       <EmployeesSection
         draftEmployees={employees}
         jobTitleOptions={["Assistant"]}
+        roleOptions={["Opener", "Closer"]}
         onChange={onChange}
         onAdd={jest.fn()}
         onRemove={jest.fn()}
@@ -356,6 +357,12 @@ describe("Settings section components", () => {
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Availability" }));
     });
+
+    await act(async () => {
+      fireEvent.change(screen.getByDisplayValue("Add role"), { target: { value: "Opener" } });
+    });
+    const latestAfterRoleAdd = onChange.mock.calls[onChange.mock.calls.length - 1][0] as Employee[];
+    expect(latestAfterRoleAdd[0].roles).toEqual(["Opener"]);
 
     await act(async () => {
       await user.click(screen.getByRole("button", { name: "Add time off" }));

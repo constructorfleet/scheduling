@@ -779,6 +779,22 @@ components:
         requiresLeaderForOpenClose:
           type: boolean
       required: [id, schoolId, title, leaderQualified, requiresLeaderForOpenClose]
+    RoleSettingPayload:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]
+    RoleSettingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        schoolId:
+          type: string
+        name:
+          type: string
+      required: [id, schoolId, name]
     EmployeePayload:
       type: object
       properties:
@@ -804,6 +820,10 @@ components:
           type: boolean
         notes:
           type: string
+        roles:
+          type: array
+          items:
+            type: string
         availability:
           type: array
           items:
@@ -849,6 +869,10 @@ components:
           type: boolean
         notes:
           type: string
+        roles:
+          type: array
+          items:
+            type: string
         availability:
           type: array
           items:
@@ -1056,6 +1080,8 @@ components:
         status:
           type: string
           enum: [scheduled, active, on_break, completed]
+        role:
+          type: string
         notes:
           type: string
       required: [id, segmentBlockId, employeeId, assignmentSource, startTime, endTime, status]
@@ -1130,6 +1156,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EmployeePayload'
+        roleSettings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleSettingPayload'
         operatingHours:
           type: array
           items:
@@ -1156,6 +1186,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EmployeeResponse'
+        roleSettings:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleSettingResponse'
         operatingHours:
           type: array
           items:
@@ -1299,6 +1333,8 @@ components:
         segmentBlockId:
           type: string
         employeeId:
+          type: string
+        role:
           type: string
         startTime:
           type: string

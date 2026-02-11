@@ -110,7 +110,7 @@ const renderMatrix = (overrides?: Partial<{
   days: typeof baseDays;
 }>) => {
   const onCreateAssignment = jest.fn();
-  const onUpdateAssignmentTime = jest.fn();
+  const onUpdateAssignment = jest.fn();
   render(
     <ScheduleMatrix
       staff={overrides?.staff ?? baseStaff}
@@ -127,14 +127,14 @@ const renderMatrix = (overrides?: Partial<{
       onEnrollmentChange={jest.fn()}
       onScheduleTypeChange={jest.fn()}
       onFieldTripSelection={jest.fn()}
-      onUpdateAssignmentTime={onUpdateAssignmentTime}
+      onUpdateAssignment={onUpdateAssignment}
       onDeleteAssignment={jest.fn()}
       onCreateAssignment={onCreateAssignment}
       onReassignUnlinkedStaff={jest.fn()}
       onDayClick={jest.fn()}
     />
   );
-  return { onCreateAssignment, onUpdateAssignmentTime };
+  return { onCreateAssignment, onUpdateAssignment };
 };
 
 describe("ScheduleMatrix", () => {
@@ -177,7 +177,7 @@ describe("ScheduleMatrix", () => {
         onEnrollmentChange={jest.fn()}
         onScheduleTypeChange={jest.fn()}
         onFieldTripSelection={jest.fn()}
-        onUpdateAssignmentTime={jest.fn()}
+        onUpdateAssignment={jest.fn()}
         onDeleteAssignment={jest.fn()}
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={jest.fn()}
@@ -217,8 +217,80 @@ describe("ScheduleMatrix", () => {
       employeeId: "emp-1",
       dayOfWeek: "mon",
       startTime: "09:30",
-      endTime: "11:00"
+      endTime: "11:00",
+      role: undefined
     });
+  });
+
+  it("allows selecting a role when an employee has multiple roles", async () => {
+    const user = userEvent.setup();
+    const staffWithRoles: Employee[] = [
+      {
+        ...baseStaff[0],
+        roles: ["Opener", "Closer"]
+      }
+    ];
+    const onCreateAssignment = jest.fn();
+    render(
+      <ScheduleMatrix
+        staff={staffWithRoles}
+        employeeOptions={staffWithRoles}
+        assignments={[]}
+        segmentBlocks={segmentBlocks}
+        days={baseDays}
+        daySequence={daySequence}
+        dayDisplayNames={dayDisplayNames}
+        scheduleTypeOptions={scheduleTypeOptions}
+        fieldTripTypes={[]}
+        fieldTripEventsByDay={baseFieldTripEventsByDay}
+        operatingHoursByDay={baseOperatingHoursByDay}
+        onEnrollmentChange={jest.fn()}
+        onScheduleTypeChange={jest.fn()}
+        onFieldTripSelection={jest.fn()}
+        onUpdateAssignment={jest.fn()}
+        onDeleteAssignment={jest.fn()}
+        onCreateAssignment={onCreateAssignment}
+        onReassignUnlinkedStaff={jest.fn()}
+      onDayClick={jest.fn()}
+      />
+    );
+
+    const row = screen.getByText("Jordan Lee").closest("tr");
+    expect(row).not.toBeNull();
+    const addButton = within(row as HTMLElement).getByRole("button", { name: "Add block" });
+    await act(async () => {
+      await user.click(addButton);
+    });
+
+    const roleSelect = within(row as HTMLElement).getByDisplayValue("No specific role");
+    await act(async () => {
+      await user.selectOptions(roleSelect, "Closer");
+    });
+
+    await act(async () => {
+      await user.click(within(row as HTMLElement).getByRole("button", { name: "Save" }));
+    });
+
+    expect(onCreateAssignment).toHaveBeenLastCalledWith({
+      employeeId: "emp-1",
+      dayOfWeek: "mon",
+      startTime: "07:00",
+      endTime: "09:00",
+      role: "Closer"
+    });
+  });
+
+  it("displays assignment role labels when set", () => {
+    renderMatrix({
+      assignments: [
+        {
+          ...assignments[0],
+          role: "Opener"
+        }
+      ]
+    });
+
+    expect(screen.getByText("Role: Opener")).toBeInTheDocument();
   });
 
   it("prevents overlapping blocks for the same employee/day", async () => {
@@ -280,7 +352,7 @@ describe("ScheduleMatrix", () => {
         onEnrollmentChange={jest.fn()}
         onScheduleTypeChange={jest.fn()}
         onFieldTripSelection={jest.fn()}
-        onUpdateAssignmentTime={jest.fn()}
+        onUpdateAssignment={jest.fn()}
         onDeleteAssignment={onDeleteAssignment}
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={jest.fn()}
@@ -470,7 +542,7 @@ describe("ScheduleMatrix", () => {
         onEnrollmentChange={jest.fn()}
         onScheduleTypeChange={jest.fn()}
         onFieldTripSelection={jest.fn()}
-        onUpdateAssignmentTime={jest.fn()}
+        onUpdateAssignment={jest.fn()}
         onDeleteAssignment={jest.fn()}
         onCreateAssignment={jest.fn()}
         onReassignUnlinkedStaff={onReassignUnlinkedStaff}

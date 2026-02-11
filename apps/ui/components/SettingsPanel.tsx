@@ -7,6 +7,7 @@ import {
   FieldTripsSection,
   JobTitlesSection,
   OperatingHoursSection,
+  RoleSettingsSection,
   ScheduleTypesSection,
   SchoolSettingsSection
 } from "./settings";
@@ -21,12 +22,14 @@ interface SettingsPanelProps {
   schoolRules: SchoolRules;
   scheduleTypes: ScheduleTypeOption[];
   jobTitles: JobTitleSetting[];
+  roleSettings: RoleSetting[];
   operatingHoursConfig: OperatingHoursConfig[];
   closedDays: DayOfWeek[];
   fieldTripTypes: FieldTripType[];
   employees: Employee[];
   onUpdateScheduleTypes: (next: ScheduleTypeOption[]) => void;
   onUpdateJobTitles: (next: JobTitleSetting[]) => void;
+  onUpdateRoleSettings: (next: RoleSetting[]) => void;
   onUpdateOperatingHoursConfig: (next: OperatingHoursConfig[]) => void;
   onUpdateClosedDays: (next: DayOfWeek[]) => void;
   onUpdateSchoolName: (next: string) => void;
@@ -53,6 +56,11 @@ export interface OperatingHoursConfig {
   close: string;
 }
 
+export interface RoleSetting {
+  id: string;
+  name: string;
+}
+
 export interface SchoolRules {
   openerCount: number;
   closerCount: number;
@@ -62,7 +70,7 @@ export interface SchoolRules {
   requireCurrentCpr: boolean;
 }
 
-type SettingsTab = "school" | "scheduleTypes" | "operatingHours" | "fieldTrips" | "jobTitles" | "employees";
+type SettingsTab = "school" | "scheduleTypes" | "operatingHours" | "fieldTrips" | "jobTitles" | "roleSettings" | "employees";
 
 const emptyScheduleType = (): ScheduleTypeOption => ({
   value: `custom-${Date.now()}`,
@@ -101,6 +109,7 @@ const emptyEmployee = (): Employee => ({
   medicallyDelegated: false,
   cprCurrent: false,
   notes: "",
+  roles: [],
   availability: fullDayAvailability(),
   requestedDaysOff: []
 });
@@ -110,6 +119,11 @@ const emptyJobTitle = (): JobTitleSetting => ({
   title: "New title",
   leaderQualified: false,
   requiresLeaderForOpenClose: false
+});
+
+const emptyRoleSetting = (): RoleSetting => ({
+  id: `role-${Date.now()}`,
+  name: "New role"
 });
 
 const emptyOperatingHours = (scheduleType: ScheduleType): OperatingHoursConfig => ({
@@ -127,12 +141,14 @@ export default function SettingsPanel({
   schoolRules,
   scheduleTypes,
   jobTitles,
+  roleSettings,
   operatingHoursConfig,
   closedDays,
   fieldTripTypes,
   employees,
   onUpdateScheduleTypes,
   onUpdateJobTitles,
+  onUpdateRoleSettings,
   onUpdateOperatingHoursConfig,
   onUpdateClosedDays,
   onUpdateSchoolName,
@@ -154,6 +170,7 @@ export default function SettingsPanel({
   const [draftOperatingHours, setDraftOperatingHours] = useState<OperatingHoursConfig[]>(operatingHoursConfig);
   const [draftFieldTrips, setDraftFieldTrips] = useState<FieldTripType[]>(fieldTripTypes);
   const [draftJobTitles, setDraftJobTitles] = useState<JobTitleSetting[]>(jobTitles);
+  const [draftRoleSettings, setDraftRoleSettings] = useState<RoleSetting[]>(roleSettings);
   const [draftEmployees, setDraftEmployees] = useState<Employee[]>(employees);
 
   const normalizeScheduleTypeValue = (value: string) => value.trim().toLowerCase();
@@ -190,6 +207,7 @@ export default function SettingsPanel({
     operatingHours: false,
     fieldTrips: false,
     jobTitles: false,
+    roleSettings: false,
     employees: false
   });
   const [tabWarning, setTabWarning] = useState<string | null>(null);
@@ -213,6 +231,7 @@ export default function SettingsPanel({
     setDraftOperatingHours(operatingHoursConfig);
     setDraftFieldTrips(fieldTripTypes);
     setDraftJobTitles(jobTitles);
+    setDraftRoleSettings(roleSettings);
     setDraftEmployees(employees);
     setDirtyTabs({
       school: false,
@@ -220,10 +239,11 @@ export default function SettingsPanel({
       operatingHours: false,
       fieldTrips: false,
       jobTitles: false,
+      roleSettings: false,
       employees: false
     });
     setTabWarning(null);
-  }, [isOpen, schoolName, closedDays, schoolRules, scheduleTypes, operatingHoursConfig, fieldTripTypes, jobTitles, employees]);
+  }, [isOpen, schoolName, closedDays, schoolRules, scheduleTypes, operatingHoursConfig, fieldTripTypes, jobTitles, roleSettings, employees]);
 
   useEffect(() => {
     onDirtyChange?.(isAnyDirty);
@@ -308,6 +328,12 @@ export default function SettingsPanel({
       setTabWarning(null);
       return;
     }
+    if (activeTab === "roleSettings") {
+      onUpdateRoleSettings(draftRoleSettings);
+      resetDirty("roleSettings");
+      setTabWarning(null);
+      return;
+    }
     onUpdateEmployees(draftEmployees);
     resetDirty("employees");
     setTabWarning(null);
@@ -321,6 +347,7 @@ export default function SettingsPanel({
     operatingHours: "settings-operating-hours",
     fieldTrips: "settings-field-trips",
     jobTitles: "settings-job-titles",
+    roleSettings: "settings-job-titles",
     employees: "settings-employees"
   };
 
@@ -419,7 +446,8 @@ export default function SettingsPanel({
             { id: "scheduleTypes", label: "Schedule types" },
             { id: "operatingHours", label: "Operating hours" },
             { id: "fieldTrips", label: "Field trips" },
-            { id: "jobTitles", label: "Job titles" },
+            { id: "jobTitles", label: "Job Title settings" },
+            { id: "roleSettings", label: "Role Settings" },
             { id: "employees", label: "Employees" }
           ] as { id: SettingsTab; label: string }[]).map((tab) => (
             <motion.button
@@ -655,6 +683,30 @@ export default function SettingsPanel({
             </motion.div>
           )}
 
+          {activeTab === "roleSettings" && (
+            <RoleSettingsSection
+              draftRoleSettings={draftRoleSettings}
+              onChange={(next) => {
+                setDraftRoleSettings(next);
+                markDirty("roleSettings");
+              }}
+              onAdd={() => {
+                setDraftRoleSettings([...draftRoleSettings, emptyRoleSetting()]);
+                markDirty("roleSettings");
+              }}
+              onRemove={(index) => {
+                setDraftRoleSettings(draftRoleSettings.filter((_, idx) => idx !== index));
+                markDirty("roleSettings");
+              }}
+              onSave={() => {
+                onUpdateRoleSettings(draftRoleSettings);
+                resetDirty("roleSettings");
+                setTabWarning(null);
+              }}
+              canSave={dirtyTabs.roleSettings}
+            />
+          )}
+
           {activeTab === "employees" && (
             <motion.div
               key="employees-tab"
@@ -666,6 +718,7 @@ export default function SettingsPanel({
             <EmployeesSection
               draftEmployees={draftEmployees}
               jobTitleOptions={jobTitleOptions}
+              roleOptions={draftRoleSettings.map((entry) => entry.name).filter((name) => name.trim().length > 0)}
               onChange={(next) => {
                 setDraftEmployees(next);
                 markDirty("employees");

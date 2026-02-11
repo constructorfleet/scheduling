@@ -48,6 +48,8 @@ export type { PublicDistrict } from './models/PublicDistrict';
 export type { PublicDistrictsResponse } from './models/PublicDistrictsResponse';
 export type { PublicSchool } from './models/PublicSchool';
 export type { Role } from './models/Role';
+export type { RoleSettingPayload } from './models/RoleSettingPayload';
+export type { RoleSettingResponse } from './models/RoleSettingResponse';
 export type { ScheduleDay } from './models/ScheduleDay';
 export type { ScheduleSavePayload } from './models/ScheduleSavePayload';
 export type { ScheduleStatus } from './models/ScheduleStatus';

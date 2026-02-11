@@ -50,6 +50,7 @@ model School {
 
   scheduleTypes  ScheduleType[]
   jobTitles      JobTitle[]
+  roleSettings   RoleSetting[]
   employees      Employee[]
   operatingHours OperatingHours[]
   fieldTripTypes FieldTripType[]
@@ -57,6 +58,18 @@ model School {
   memberships    SchoolMembership[]
   invites        UserInvite[]
   district       District           @relation(fields: [districtId], references: [id], onDelete: Cascade)
+}
+
+model RoleSetting {
+  id        String   @id @default(cuid())
+  schoolId  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, name])
 }
 
 model ScheduleType {
@@ -99,7 +112,7 @@ model JobTitle {
 }
 
 model Employee {
-  id                 String  @id @default(cuid())
+  id                 String   @id @default(cuid())
   schoolId           String
   name               String
   email              String?
@@ -114,6 +127,7 @@ model Employee {
   notes              String?
   availability       Json?
   requestedDaysOff   Json?
+  roles              String[] @default([])
 
   school         School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   jobTitleRecord JobTitle @relation(fields: [jobTitleId], references: [id], onDelete: Restrict)
@@ -216,6 +230,7 @@ model StaffAssignment {
   startTime        String
   endTime          String
   status           String
+  role             String?
   notes            String?
   isOnCall         Boolean @default(false)
   is1on1           Boolean @default(false)

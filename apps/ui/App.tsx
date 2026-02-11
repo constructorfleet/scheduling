@@ -6,7 +6,7 @@ import ScheduleMatrix from "./components/ScheduleMatrix";
 import ViolationNavigator from "./components/ViolationNavigator";
 import GuidedStatusTracker from "./components/GuidedStatusTracker";
 import AuditTimeline from "./components/AuditTimeline";
-import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, SchoolRules } from "./components/SettingsPanel";
+import SettingsPanel, { JobTitleSetting, OperatingHoursConfig, RoleSetting, SchoolRules } from "./components/SettingsPanel";
 import HelpCenterModal from "./components/HelpCenterModal";
 import UserManagementPanel from "./components/UserManagementPanel";
 import AuthGate from "./components/AuthGate";
@@ -181,6 +181,16 @@ const coerceEmploymentStatus = (value: string | undefined): Employee["employment
   EMPLOYMENT_STATUS_VALUES.includes(value as Employee["employmentStatus"])
     ? (value as Employee["employmentStatus"])
     : "active";
+const normalizeEmployeeRoles = (roles: string[] | undefined) => {
+  const unique = new Set<string>();
+  (roles ?? []).forEach((role) => {
+    const trimmed = role.trim();
+    if (trimmed) {
+      unique.add(trimmed);
+    }
+  });
+  return Array.from(unique);
+};
 
 const formatWeekRange = (startDate: Date) => {
   const endDate = new Date(startDate);
@@ -725,6 +735,16 @@ export default function App() {
     });
     return Array.from(map.values());
   });
+  const [roleSettingsState, setRoleSettingsState] = useState<RoleSetting[]>(() => {
+    const roles = new Set<string>();
+    employees.forEach((employee) => {
+      normalizeEmployeeRoles(employee.roles).forEach((role) => roles.add(role));
+    });
+    return Array.from(roles).map((name, index) => ({
+      id: `role-${index + 1}-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
+      name
+    }));
+  });
 
   const [operatingHoursConfigState, setOperatingHoursConfigState] = useState<OperatingHoursConfig[]>(() => {
     const configMap = new Map<string, OperatingHoursConfig>();
@@ -970,6 +990,7 @@ export default function App() {
     schoolRules: SchoolRules;
     scheduleTypes: typeof scheduleTypeOptionsState;
     jobTitles: JobTitleSetting[];
+    roleSettings: RoleSetting[];
     employees: typeof employeesState;
     operatingHours: OperatingHoursConfig[];
     fieldTripTypes: typeof fieldTripTypesState;
@@ -1003,6 +1024,11 @@ export default function App() {
     if ("jobTitles" in overrides) {
       payload.jobTitles = overrides.jobTitles ?? jobTitlesState;
     }
+    if ("roleSettings" in overrides) {
+      payload.roleSettings = (overrides.roleSettings ?? roleSettingsState).map((roleSetting) => ({
+        name: roleSetting.name.trim()
+      }));
+    }
     if ("employees" in overrides) {
       payload.employees = (overrides.employees ?? employeesState).map((employee) => ({
         id: employee.id,
@@ -1016,6 +1042,7 @@ export default function App() {
         medicallyDelegated: employee.medicallyDelegated,
         cprCurrent: employee.cprCurrent,
         notes: employee.notes,
+        roles: normalizeEmployeeRoles(employee.roles),
         availability: employee.availability ?? [],
         requestedDaysOff: employee.requestedDaysOff ?? []
       })) as EmployeePayload[];
@@ -1334,10 +1361,17 @@ export default function App() {
                   ? Boolean((employee as { leaderQualified?: boolean }).leaderQualified)
                   : false,
                 employmentStatus: coerceEmploymentStatus(employee.employmentStatus),
+                roles: normalizeEmployeeRoles("roles" in employee ? employee.roles : []),
                 availability: employee.availability ?? [],
                 requestedDaysOff: employee.requestedDaysOff ?? []
               })
             )
+          );
+          setRoleSettingsState(
+            (settings.roleSettings ?? []).map((roleSetting) => ({
+              id: roleSetting.id,
+              name: roleSetting.name
+            }))
           );
           setOperatingHoursConfigState(
             (settings.operatingHours ?? []).map((entry) => ({
@@ -1370,6 +1404,7 @@ export default function App() {
           });
           setScheduleTypeOptionsState(ensureClosedScheduleType([]));
           setJobTitlesState([]);
+          setRoleSettingsState([]);
           setEmployeesState([]);
           setOperatingHoursConfigState([]);
           setFieldTripTypesState([]);
@@ -2242,7 +2277,7 @@ export default function App() {
     assignmentId: string,
     startTime: string,
     endTime: string,
-    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string; role?: string }
   ) => {
     if (!canEditSchedule) {
       setAuthMessage("You do not have permission to edit assignments.");
@@ -2262,6 +2297,7 @@ export default function App() {
                 ...assignment,
                 startTime,
                 endTime,
+                role: options?.role ?? assignment.role,
                 isOnCall: options?.isOnCall ?? assignment.isOnCall,
                 is1on1: options?.is1on1 ?? assignment.is1on1,
                 studentName:
@@ -2453,9 +2489,28 @@ export default function App() {
       setAuthMessage("You do not have permission to update settings.");
       return;
     }
-    const normalized = next.map(ensureEmployeeAvailability);
+    const normalized = next.map((employee) =>
+      ensureEmployeeAvailability({ ...employee, roles: normalizeEmployeeRoles(employee.roles) })
+    );
     setEmployeesState(normalized);
     void persistSettings({ employees: normalized });
+  };
+
+  const handleUpdateRoleSettings = (next: RoleSetting[]) => {
+    if (!canManageSettings) {
+      setAuthMessage("You do not have permission to update settings.");
+      return;
+    }
+    const deduped = Array.from(
+      new Map(
+        next
+          .map((entry) => ({ ...entry, name: entry.name.trim() }))
+          .filter((entry) => entry.name.length > 0)
+          .map((entry) => [entry.name.toLowerCase(), entry] as const)
+      ).values()
+    );
+    setRoleSettingsState(deduped);
+    void persistSettings({ roleSettings: deduped });
   };
 
   const handleAutoSchedule = () => {
@@ -2695,10 +2750,10 @@ export default function App() {
             onEnrollmentChange={handleEnrollmentUpdate}
             onScheduleTypeChange={handleScheduleTypeUpdate}
             onFieldTripSelection={handleFieldTripSelection}
-            onUpdateAssignmentTime={handleUpdateAssignmentTime}
+            onUpdateAssignment={handleUpdateAssignmentTime}
             onDeleteAssignment={handleDeleteAssignment}
             onReassignUnlinkedStaff={handleReassignUnlinkedStaff}
-            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall, is1on1, studentName }) => {
+            onCreateAssignment={({ employeeId, dayOfWeek, startTime, endTime, isOnCall, is1on1, studentName, role }) => {
               if (!canEditSchedule) {
                 setAuthMessage("You do not have permission to edit assignments.");
                 return;
@@ -2744,6 +2799,7 @@ export default function App() {
                       assignmentSource: "manual_adjustment" as const,
                       startTime,
                       endTime,
+                      role,
                       status: "scheduled" as const,
                       isOnCall: isOnCall ?? false,
                       is1on1: is1on1 ?? false,
@@ -2846,12 +2902,14 @@ export default function App() {
                 schoolRules={schoolRulesState}
                 scheduleTypes={scheduleTypeOptionsState}
                 jobTitles={jobTitlesState}
+                roleSettings={roleSettingsState}
                 operatingHoursConfig={operatingHoursConfigState}
                 closedDays={closedDaysState}
                 fieldTripTypes={fieldTripTypesState}
                 employees={employeesState}
                 onUpdateScheduleTypes={handleUpdateScheduleTypes}
                 onUpdateJobTitles={handleUpdateJobTitles}
+                onUpdateRoleSettings={handleUpdateRoleSettings}
                 onUpdateOperatingHoursConfig={handleUpdateOperatingHours}
                 onUpdateClosedDays={handleUpdateClosedDays}
                 onUpdateSchoolName={handleUpdateSchoolName}

@@ -34,14 +34,23 @@ interface ScheduleMatrixProps {
   onEnrollmentChange: (dayId: string, enrollment: number | undefined) => void;
   onScheduleTypeChange: (dayId: string, scheduleType: ScheduleType | undefined) => void;
   onFieldTripSelection: (dayId: string, selection: FieldTripSelection) => void;
-  onUpdateAssignmentTime: (
+  onUpdateAssignment: (
     assignmentId: string,
     startTime: string,
     endTime: string,
-    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string }
+    options?: { isOnCall?: boolean; is1on1?: boolean; studentName?: string; role?: string }
   ) => void;
   onDeleteAssignment: (assignmentId: string) => void;
-  onCreateAssignment: (payload: { employeeId: string; dayOfWeek: DayOfWeek; startTime: string; endTime: string; isOnCall?: boolean; is1on1?: boolean; studentName?: string }) => void;
+  onCreateAssignment: (payload: {
+    employeeId: string;
+    dayOfWeek: DayOfWeek;
+    startTime: string;
+    endTime: string;
+    isOnCall?: boolean;
+    is1on1?: boolean;
+    studentName?: string;
+    role?: string;
+  }) => void;
   onReassignUnlinkedStaff: (fromEmployeeId: string, toEmployeeId: string) => void;
   onDayClick: (dayOfWeek: DayOfWeek) => void;
   focusedSegmentIds?: string[] | null;
@@ -111,7 +120,7 @@ export default function ScheduleMatrix({
   onEnrollmentChange,
   onScheduleTypeChange,
   onFieldTripSelection,
-  onUpdateAssignmentTime,
+  onUpdateAssignment,
   onDeleteAssignment,
   onCreateAssignment,
   onReassignUnlinkedStaff,
@@ -138,6 +147,7 @@ export default function ScheduleMatrix({
     dayOfWeek: DayOfWeek;
     startTime: string;
     endTime: string;
+    role?: string;
     isNew: boolean;
     isOnCall?: boolean;
     is1on1?: boolean;
@@ -560,6 +570,7 @@ export default function ScheduleMatrix({
             const employeeAssignments = assignmentsByEmployeeDay[member.id] ?? ({} as Record<DayOfWeek, StaffAssignment[]>);
             const isUnlinkedStaff = member.jobTitle === "Unknown";
             const reassignmentTarget = reassignmentTargetBySource[member.id] ?? "";
+            const employeeRoles = (member.roles ?? []).map((role) => role.trim()).filter((role) => role.length > 0);
             const totalHours = Object.values(employeeAssignments)
               .flat()
               .reduce((sum, assignment) => sum + getDurationHours(assignment.startTime, assignment.endTime), 0);
@@ -818,7 +829,8 @@ export default function ScheduleMatrix({
                                   isNew: false,
                                   isOnCall: block.isOnCall,
                                   is1on1: block.is1on1,
-                                  studentName: block.studentName
+                                  studentName: block.studentName,
+                                  role: block.role ?? (employeeRoles.length === 1 ? employeeRoles[0] : undefined)
                                 });
                               }}
                               title={availabilityMessage ?? operatingHoursWarning ?? undefined}
@@ -983,6 +995,31 @@ export default function ScheduleMatrix({
                                       />
                                     </>
                                   )}
+                                  {employeeRoles.length > 1 && (
+                                    <select
+                                      value={editing.role ?? ""}
+                                      onChange={(event) =>
+                                        setEditing((prev) =>
+                                          prev ? { ...prev, role: event.target.value || undefined } : prev
+                                        )
+                                      }
+                                      onClick={(event) => event.stopPropagation()}
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      style={{
+                                        borderRadius: 6,
+                                        border: "1px solid #cbd5f5",
+                                        padding: "0.2rem 0.3rem",
+                                        fontSize: "0.7rem"
+                                      }}
+                                    >
+                                      <option value="">No specific role</option>
+                                      {employeeRoles.map((roleOption) => (
+                                        <option key={`edit-role-${block.id}-${roleOption}`} value={roleOption}>
+                                          {roleOption}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
                                   <div style={{ display: "flex", gap: "0.25rem" }}>
                                     <button
                                       type="button"
@@ -1002,10 +1039,11 @@ export default function ScheduleMatrix({
                                         }
                                         const nextStartTime = editing.isOnCall ? "00:00" : editing.startTime;
                                         const nextEndTime = editing.isOnCall ? "23:59" : editing.endTime;
-                                        onUpdateAssignmentTime(block.id, nextStartTime, nextEndTime, {
+                                        onUpdateAssignment(block.id, nextStartTime, nextEndTime, {
                                           isOnCall: editing.isOnCall,
                                           is1on1: editing.is1on1,
-                                          studentName: editing.studentName
+                                          studentName: editing.studentName,
+                                          role: employeeRoles.length > 1 ? editing.role : undefined
                                         });
                                         setEditing(null);
                                       }}
@@ -1116,6 +1154,11 @@ export default function ScheduleMatrix({
                                         ? `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`
                                         : `${getDurationHours(block.startTime, block.endTime).toFixed(2)}h`}
                                   </span>
+                                  {block.role && (
+                                    <span style={{ fontSize: "0.68rem", color: "#334155" }}>
+                                      Role: {block.role}
+                                    </span>
+                                  )}
                                 </motion.div>
                               )}
                               </AnimatePresence>
@@ -1147,7 +1190,8 @@ export default function ScheduleMatrix({
                                 dayOfWeek: day,
                                 startTime: defaultStart,
                                 endTime: defaultEnd,
-                                isNew: true
+                                isNew: true,
+                                role: employeeRoles.length === 1 ? employeeRoles[0] : undefined
                               });
                             }}
                             style={{
@@ -1176,7 +1220,8 @@ export default function ScheduleMatrix({
                                 startTime: "00:00",
                                 endTime: "23:59",
                                 isNew: true,
-                                isOnCall: true
+                                isOnCall: true,
+                                role: employeeRoles.length === 1 ? employeeRoles[0] : undefined
                               });
                             }}
                             style={{
@@ -1211,7 +1256,8 @@ export default function ScheduleMatrix({
                                 startTime: defaultStart,
                                 endTime: defaultEnd,
                                 isNew: true,
-                                is1on1: true
+                                is1on1: true,
+                                role: employeeRoles.length === 1 ? employeeRoles[0] : undefined
                               });
                             }}
                             style={{
@@ -1367,6 +1413,29 @@ export default function ScheduleMatrix({
                                 />
                               </>
                             )}
+                            {employeeRoles.length > 1 && (
+                              <select
+                                value={editing.role ?? ""}
+                                onChange={(event) =>
+                                  setEditing((prev) =>
+                                    prev ? { ...prev, role: event.target.value || undefined } : prev
+                                  )
+                                }
+                                style={{
+                                  borderRadius: 6,
+                                  border: "1px solid #cbd5f5",
+                                  padding: "0.2rem 0.3rem",
+                                  fontSize: "0.7rem"
+                                }}
+                              >
+                                <option value="">No specific role</option>
+                                {employeeRoles.map((roleOption) => (
+                                  <option key={`new-role-${member.id}-${day}-${roleOption}`} value={roleOption}>
+                                    {roleOption}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
                             <div style={{ display: "flex", gap: "0.25rem" }}>
                               <button
                                 type="button"
@@ -1387,7 +1456,8 @@ export default function ScheduleMatrix({
                                     endTime: editing.isOnCall ? "23:59" : editing.endTime,
                                     isOnCall: editing.isOnCall,
                                     is1on1: editing.is1on1,
-                                    studentName: editing.studentName
+                                    studentName: editing.studentName,
+                                    role: employeeRoles.length > 1 ? editing.role : undefined
                                   });
                                   setEditing(null);
                                 }}

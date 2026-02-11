@@ -94,6 +94,22 @@ const normalizeRequestedDaysOff = (value: unknown): EmployeeTimeOffRequest[] => 
     return normalized;
 };
 
+const normalizeRoleNames = (value: unknown): string[] => {
+    if (!Array.isArray(value)) return [];
+    const unique = new Set<string>();
+    value.forEach((entry) => {
+        if (typeof entry !== "string") {
+            return;
+        }
+        const normalized = entry.trim();
+        if (!normalized) {
+            return;
+        }
+        unique.add(normalized);
+    });
+    return Array.from(unique);
+};
+
 const normalizeDayList = (days: string[]) =>
     [ ...days ].map((day) => day.toLowerCase()).sort();
 
@@ -150,6 +166,7 @@ type StaffAssignmentPayload = {
     startTime: string;
     endTime: string;
     status: string;
+    role?: string;
     notes?: string;
 };
 
@@ -1448,6 +1465,7 @@ const buildServer = async () => {
                     }
                 },
                 jobTitles: true,
+                roleSettings: true,
                 employees: true,
                 operatingHours: true,
                 fieldTripTypes: true
@@ -1463,6 +1481,11 @@ const buildServer = async () => {
             school,
             scheduleTypes: school.scheduleTypes,
             jobTitles: school.jobTitles,
+            roleSettings: school.roleSettings.map((roleSetting) => ({
+                id: roleSetting.id,
+                schoolId: roleSetting.schoolId,
+                name: roleSetting.name
+            })),
             employees: school.employees.map((employee) => ({
                 id: employee.id,
                 schoolId: employee.schoolId,
@@ -1479,7 +1502,8 @@ const buildServer = async () => {
                 cprCurrent: employee.cprCurrent,
                 notes: employee.notes ?? undefined,
                 availability: normalizeAvailability(employee.availability),
-                requestedDaysOff: normalizeRequestedDaysOff(employee.requestedDaysOff)
+                requestedDaysOff: normalizeRequestedDaysOff(employee.requestedDaysOff),
+                roles: normalizeRoleNames(employee.roles)
             })),
             operatingHours: school.operatingHours,
             fieldTripTypes: school.fieldTripTypes
@@ -1523,12 +1547,16 @@ const buildServer = async () => {
                 leaderQualified: boolean;
                 requiresLeaderForOpenClose: boolean;
             }>;
+            roleSettings?: Array<{
+                name: string;
+            }>;
             employees?: Array<{
                 id?: string;
                 name: string;
                 email?: string;
                 phone?: string;
                 jobTitle: string;
+                roles?: string[];
                 maxHoursPerDay: number;
                 maxHoursPerWeek: number;
                 employmentStatus: string;
@@ -1721,6 +1749,25 @@ const buildServer = async () => {
                 }
             }
 
+            if (Array.isArray(payload.roleSettings)) {
+                const normalizedNames = Array.from(
+                    new Set(
+                        payload.roleSettings
+                            .map((entry) => (typeof entry?.name === "string" ? entry.name.trim() : ""))
+                            .filter((name) => name.length > 0)
+                    )
+                );
+                await tx.roleSetting.deleteMany({ where: { schoolId } });
+                if (normalizedNames.length > 0) {
+                    await tx.roleSetting.createMany({
+                        data: normalizedNames.map((name) => ({
+                            schoolId,
+                            name
+                        }))
+                    });
+                }
+            }
+
             if (Array.isArray(payload.employees) && payload.employees.length > 0) {
                 const jobTitles = await tx.jobTitle.findMany({ where: { schoolId } });
                 const jobTitleByName = new Map(
@@ -1786,7 +1833,8 @@ const buildServer = async () => {
                                 cprCurrent: employee.cprCurrent,
                                 notes: employee.notes ?? null,
                                 availability: toJsonValue(normalizeAvailability(employee.availability)),
-                                requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
+                                requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff)),
+                                roles: normalizeRoleNames(employee.roles)
                             } as CorePrisma.EmployeeUncheckedUpdateInput
                         });
                         continue;
@@ -1808,7 +1856,8 @@ const buildServer = async () => {
                             cprCurrent: employee.cprCurrent,
                             notes: employee.notes ?? null,
                             availability: toJsonValue(normalizeAvailability(employee.availability)),
-                            requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff))
+                            requestedDaysOff: toJsonValue(normalizeRequestedDaysOff(employee.requestedDaysOff)),
+                            roles: normalizeRoleNames(employee.roles)
                         } as CorePrisma.EmployeeUncheckedCreateInput
                     });
                     keptEmployeeIds.add(created.id);
@@ -1972,6 +2021,7 @@ const buildServer = async () => {
                 id: assignment.id,
                 segmentBlockId: assignment.segmentBlockId,
                 employeeId: assignment.employeeId,
+                role: assignment.role ?? undefined,
                 startTime: assignment.startTime,
                 endTime: assignment.endTime
             })),
@@ -2255,6 +2305,7 @@ const buildServer = async () => {
                             startTime: assignment.startTime,
                             endTime: assignment.endTime,
                             status: assignment.status,
+                            role: assignment.role ?? null,
                             notes: assignment.notes ?? null
                         },
                         update: {
@@ -2265,6 +2316,7 @@ const buildServer = async () => {
                             startTime: assignment.startTime,
                             endTime: assignment.endTime,
                             status: assignment.status,
+                            role: assignment.role ?? null,
                             notes: assignment.notes ?? null
                         }
                     });

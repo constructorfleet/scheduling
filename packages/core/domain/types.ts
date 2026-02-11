@@ -81,6 +81,7 @@ export interface Employee {
     notes?: string;
     availability?: EmployeeAvailabilityDay[];
     requestedDaysOff?: EmployeeTimeOffRequest[];
+    roles?: string[];
 }
 
 export interface EmployeeAvailabilityBlock {
@@ -108,6 +109,7 @@ export interface StaffAssignment {
     startTime: string;
     endTime: string;
     status: "scheduled" | "active" | "on_break" | "completed";
+    role?: string;
     notes?: string;
     isOnCall?: boolean;
     is1on1?: boolean;
